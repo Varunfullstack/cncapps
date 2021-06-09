@@ -1,18 +1,21 @@
 <?php
 global $cfg;
+
+use CNCLTD\Exceptions\APIException;
+
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_dbe'] . '/DBEItemBillingCategory.php');
-require_once($cfg['path_bu'] . '/BUActivity.inc.php');
+
 
 class CTItemBillingCategory extends CTCNC
 {
-    function __construct($requestMethod,
-                         $postVars,
-                         $getVars,
-                         $cookieVars,
-                         $cfg
-    )
-    {
+    function __construct(
+        $requestMethod,
+        $postVars,
+        $getVars,
+        $cookieVars,
+        $cfg
+    ) {
         parent::__construct(
             $requestMethod,
             $postVars,
@@ -41,85 +44,26 @@ class CTItemBillingCategory extends CTCNC
     function defaultAction()
     {
         switch ($this->getAction()) {
-            case 'delete':
-                if (!$this->getParam('id')) {
-                    http_response_code(400);
-                    throw new Exception('ID is missing');
+            case 'json':
+                switch ($this->requestMethod) {
+                    case 'GET':
+                        echo  json_encode($this->getItemBillingCategory(), JSON_NUMERIC_CHECK);
+                        break;
+                    case 'POST':
+                        echo  json_encode($this->addItemBillingCategory(), JSON_NUMERIC_CHECK);
+                        break;
+                    case 'PUT':
+                        echo  json_encode($this->updateItemBillingCategory(), JSON_NUMERIC_CHECK);
+                        break;
+                    case 'DELETE':
+                        echo  json_encode($this->deleteItemBillingCategory(), JSON_NUMERIC_CHECK);
+                        break;
+                    default:
+                        # code...
+                        break;
                 }
+                exit;
 
-                $dbeItemBillingCategory = new DBEItemBillingCategory($this);
-
-                $dbeItemBillingCategory->getRow($this->getParam('id'));
-
-                if (!$dbeItemBillingCategory->rowCount) {
-                    http_response_code(404);
-                    exit;
-                }
-                $dbeItemBillingCategory->deleteRow();
-                echo json_encode(["status" => "ok"]);
-                break;
-            case 'update':
-
-                if (!$this->getParam('id')) {
-                    throw new Exception('ID is missing');
-                }
-
-                $dbeItemBillingCategory = new DBEItemBillingCategory($this);
-
-                $dbeItemBillingCategory->getRow($this->getParam('id'));
-
-                if (!$dbeItemBillingCategory->rowCount) {
-                    http_response_code(404);
-                    exit;
-                }
-
-                $dbeItemBillingCategory->setValue(
-                    DBEItemBillingCategory::name,
-                    $this->getParam('name')
-                );
-                $dbeItemBillingCategory->setValue(
-                    DBEItemBillingCategory::arrearsBilling,
-                    json_decode($this->getParam('arrearsBilling'))
-                );
-                $dbeItemBillingCategory->updateRow();
-                echo json_encode(["status" => "ok"]);
-                break;
-            case 'create':
-                $dbeItemBillingCategory = new DBEItemBillingCategory($this);
-
-                $dbeItemBillingCategory->setValue(
-                    DBEItemBillingCategory::name,
-                    $this->getParam('name')
-                );
-                $dbeItemBillingCategory->setValue(
-                    DBEItemBillingCategory::arrearsBilling,
-                    json_decode($this->getParam('arrearsBilling'))
-                );
-                $dbeItemBillingCategory->insertRow();
-
-                echo json_encode(
-                    [
-                        "id"             => $dbeItemBillingCategory->getValue(DBEItemBillingCategory::id),
-                        "name"           => $dbeItemBillingCategory->getValue(DBEItemBillingCategory::name),
-                        "arrearsBilling" => $dbeItemBillingCategory->getValue(DBEItemBillingCategory::arrearsBilling)
-                    ],
-                    JSON_NUMERIC_CHECK
-                );
-
-                break;
-            case 'getData':
-                $dbeItemBillingCategories = new DBEItemBillingCategory($this);
-                $dbeItemBillingCategories->getRows(DBEItemBillingCategory::name);
-                $data = [];
-                while ($dbeItemBillingCategories->fetchNext()) {
-                    $data[] = [
-                        "id"             => $dbeItemBillingCategories->getValue(DBEItemBillingCategory::id),
-                        "name"           => $dbeItemBillingCategories->getValue(DBEItemBillingCategory::name),
-                        "arrearsBilling" => $dbeItemBillingCategories->getValue(DBEItemBillingCategory::arrearsBilling)
-                    ];
-                }
-                echo json_encode($data, JSON_NUMERIC_CHECK);
-                break;
             case 'searchName':
                 $term = '';
                 if (isset($_REQUEST['term'])) {
@@ -149,69 +93,82 @@ class CTItemBillingCategory extends CTCNC
     }
 
     /**
-     * Export expenses that have not previously been exported
+     * Display list of types
      * @access private
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
      * @throws Exception
      */
     function displayForm()
     {
         $this->setPageTitle('Item Billing Category');
         $this->setTemplateFiles(
-            'ItemBillingCategory',
-            'ItemBillingCategories'
+            array('form' => 'ItemBillingCategories')
         );
-
+        $this->loadReactScript('ItemBillingCategoryComponent.js');
+        $this->loadReactCSS('ItemBillingCategoryComponent.css');
         $this->template->parse(
             'CONTENTS',
-            'ItemBillingCategory',
+            'form',
             true
         );
-
-        $URLDeleteItem = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            [
-                'action' => 'delete'
-            ]
-        );
-
-        $URLUpdateItem = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            [
-                'action' => 'update'
-            ]
-        );
-
-        $URLCreateItem = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            [
-                'action' => 'create'
-            ]
-        );
-
-        $URLGetData = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            [
-                'action' => 'getData'
-            ]
-        );
-        $this->template->setVar(
-            [
-                "URLDeleteItem" => $URLDeleteItem,
-                "URLUpdateItem" => $URLUpdateItem,
-                "URLAddItem"    => $URLCreateItem,
-                "URLGetData"    => $URLGetData
-            ]
-        );
-
         $this->parsePage();
     }
-
-    function update()
+    
+    function getItemBillingCategory()
     {
-        $this->defaultAction();
+        $DBEItemBillingCategory = new DBEItemBillingCategory($this);
+        $DBEItemBillingCategory->getRows(); // DBEItemBillingCategory::sortOrder
+        $data = [];
+        while ($DBEItemBillingCategory->fetchNext()) {
+            $data[] = [
+                "id"              => $DBEItemBillingCategory->getValue(DBEItemBillingCategory::id),
+                "name"            => $DBEItemBillingCategory->getValue(DBEItemBillingCategory::name),
+                "arrearsBilling"  => $DBEItemBillingCategory->getValue(DBEItemBillingCategory::arrearsBilling),
+            ];
+        }
+        return $this->success($data);
+    }
+
+    function addItemBillingCategory()
+    {
+        $body = $this->getBody();
+        $DBEItemBillingCategory = new DBEItemBillingCategory($this);
+        $DBEItemBillingCategory->setValue(DBEItemBillingCategory::name, $body->name);
+        $DBEItemBillingCategory->setValue(DBEItemBillingCategory::arrearsBilling, $body->arrearsBilling);
+        $DBEItemBillingCategory->insertRow();
+        return $this->success();
+    }
+
+    function updateItemBillingCategory()
+    {
+        $body = $this->getBody();
+        if (!isset($body->id))
+            return $this->fail(APIException::badRequest, "Bad Request");
+
+        $DBEItemBillingCategory = new DBEItemBillingCategory($this);
+        $DBEItemBillingCategory->getRow($body->id);
+
+        if (!$DBEItemBillingCategory->rowCount)
+            return $this->fail(APIException::notFound, "Not Found");
+
+        $DBEItemBillingCategory->setValue(DBEItemBillingCategory::name, $body->name);
+        $DBEItemBillingCategory->setValue(DBEItemBillingCategory::arrearsBilling, $body->arrearsBilling);
+        $DBEItemBillingCategory->updateRow();
+        return $this->success();
+    }
+
+    function deleteItemBillingCategory()
+    {
+        $id = @$_REQUEST['id'];
+
+        if (!$id)
+            return $this->fail(APIException::notFound, "Id is Missing");
+
+        $DBEItemBillingCategory = new DBEItemBillingCategory($this);
+        $DBEItemBillingCategory->getRow($id);
+        if (!$DBEItemBillingCategory->rowCount) {
+            return $this->fail(APIException::notFound, "Not Found");
+        }
+        $DBEItemBillingCategory->deleteRow();
+        return $this->success();
     }
 }

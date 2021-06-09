@@ -608,7 +608,7 @@ class CTDespatch extends CTCNC
         $fileName = $dsDeliveryNote->getValue(DBEDeliveryNote::ordheadID) . '_' . $dsDeliveryNote->getValue(
                 DBEDeliveryNote::noteNo
             ) . '.pdf';
-        $pdfFile = DELIVERY_NOTES_DIR . '/' . $fileName;
+        $pdfFile = DELIVERY_NOTES_DIR . $fileName;
         header("Pragma: public");
         header("Expires: 0");
         header("Cache-Control: must-revalidate, post-check=0, pre-check=0");

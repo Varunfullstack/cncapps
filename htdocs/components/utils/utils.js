@@ -311,13 +311,14 @@ function removeReservedWords(s) {
 }
 
 export async function similarity(s1, s2, useDefaultDictionary = true) {
-    if(s1.length==0)
-    return 0;
-  if (useDefaultDictionary) {
-    await loadReservedWords();
-  }
-  s1 = removeReservedWords(s1?s1.toLowerCase():null);
-  s2 = removeReservedWords(s2?s2.toLowerCase():null);
+    if (s1.length == 0)
+        return 0;
+    if (useDefaultDictionary) {
+        await loadReservedWords();
+
+    }
+    s1 = removeReservedWords(s1 ? s1.toLowerCase() : null);
+    s2 = removeReservedWords(s2 ? s2.toLowerCase() : null);
 
     // get s1 words
     const s1Words = stripHtml(s1).split(" ");
@@ -327,9 +328,11 @@ export async function similarity(s1, s2, useDefaultDictionary = true) {
         let max = 0;
         for (let j = 0; j < s2Words.length; j++) {
             const sim = similarityWord(s1Words[i], s2Words[j]);
+
             if (sim > max) max = sim;
         }
         totalSim += parseFloat(max);
+
     }
     return totalSim / s1Words.length;
 }

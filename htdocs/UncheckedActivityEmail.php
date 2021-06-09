@@ -8,10 +8,12 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+
+use CNCLTD\Business\BUActivity;
+
 require_once("config.inc.php");
-GLOBAL $cfg;
-require_once($cfg['path_bu'] . '/BUActivity.inc.php');
-$thing = null;
+global $cfg;
+$thing      = null;
 $buActivity = new BUActivity($thing);
 $buActivity->sendUncheckedActivityEmail();
 ?>

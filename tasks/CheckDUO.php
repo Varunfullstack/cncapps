@@ -1,12 +1,12 @@
 <?php
 
+use CNCLTD\Business\BUActivity;
 use CNCLTD\DUOApi\DUOApi;
 use CNCLTD\DUOUsersReportGenerator\DUOClientReportGenerator;
 use CNCLTD\LoggerCLI;
 
 global $cfg;
 require_once(__DIR__ . "/../htdocs/config.inc.php");
-require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 require_once($cfg['path_bu'] . '/BUPortalCustomerDocument.inc.php');
 global $db;
 $logName = 'CheckDUO';

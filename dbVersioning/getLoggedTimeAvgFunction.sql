@@ -13,6 +13,7 @@ BEGIN
           FROM user_time_log a
           WHERE a.userID = userID
             AND a.loggedDate <= givenDate
+            and not isBankHoliday(loggedDate)
           ORDER BY a.loggedDate DESC
           LIMIT days) u;
 

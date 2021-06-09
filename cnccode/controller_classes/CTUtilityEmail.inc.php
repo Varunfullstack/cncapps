@@ -1,17 +1,12 @@
 <?php
-/**
- * Expense controller class
- * CNC Ltd
- *
- * @access public
- * @authors Mustafa Taha
- */
+use CNCLTD\Business\BUActivity;
+
+global $cfg;
 
 use CNCLTD\Exceptions\APIException;
 
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_dbe'] . '/DBEUtilityEmail.inc.php');
-require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 
 // Actions
 class CTUtilityEmail extends CTCNC
@@ -63,15 +58,15 @@ class CTUtilityEmail extends CTCNC
                          break;
                     case 'DELETE':
                           echo  json_encode($this->deleteEmail(),JSON_NUMERIC_CHECK);
-                          break;                    
+                          break;
                 }
-                exit;  
+                exit;
             default:
                 $this->displayList();
                 break;
         }
     }
- 
+
     /**
      * Display list of Emails
      * @access private
@@ -79,7 +74,7 @@ class CTUtilityEmail extends CTCNC
      */
     function displayList()
     {
-        //--------new 
+        //--------new
         $this->setPageTitle('Utility Emails');
         $this->setTemplateFiles(
             array('UtilityEmail' => 'UtilityEmail.inc')
@@ -91,9 +86,9 @@ class CTUtilityEmail extends CTCNC
             'UtilityEmail',
             true
         );
-        $this->parsePage();      
+        $this->parsePage();
     }
-    function getEmails(){        
+    function getEmails(){
         $dbeUtilityEmails = new DBEUtilityEmail($this);
 
         $dbeUtilityEmails->getRows();
@@ -145,7 +140,7 @@ class CTUtilityEmail extends CTCNC
         );
 
         $dbeUtilityEmail->insertRow();
-        return $this->success();                    
+        return $this->success();
     }
     function deleteEmail(){
         $id=@$_REQUEST["id"];

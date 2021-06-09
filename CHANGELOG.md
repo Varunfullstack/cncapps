@@ -1,14 +1,126 @@
 # Changelog
 This project changes will be shown here.
-## [unreleased]
-### Change
-- Issue 1368 convert StarterLeaverManagement.php,  RootCause.php, UtilityEmails.php, IgnoredADDomains.php, Office365Licenses.php and SRSource.php
+## [Unreleased]
+### Changed
+- Issue 1366 - rewrite GoodsIn.php,QuoteTemplates.php, ContractAndNumbersReport.php,  PurchaseInv.php, PaymentTerms.php, ItemBillingCategory.php.
 
-## [unreleased]
-### Change
-- Update Header.php to be in react and update app exception
+## [v5.12.3] - 2021-06-08
+### Fixed
+- Fix issue with closing Service Request.
 
-## [v5.10.2]
+## [v5.12.2] - 2021-06-07
+### Fixed
+- Fixed issue with Prepay.
+
+## [v5.12.1] - 2021-06-04
+### Fixed
+- Fixed issue with salesFigures in the home page.
+- Fixed issue with mySettingsComponent not building properly.
+- Fixed issue with CreateSalesRequests not having the message filled in properly on load.
+
+
+ 
+## [v5.12.0] - 2021-06-03
+### Added
+- Issue 1402 - Standard Rate Card.
+- Issue 1379 - Change status of Sales Orders & Purchase Orders
+### Changed
+- Issue 1399 - Force Customer Name when creating Templated Sales Quotation.
+- Issue 1368 - convert StarterLeaverManagement.php,  RootCause.php, UtilityEmails.php, IgnoredADDomains.php, Office365Licenses.php and SRSource.php
+- Issue 1421 - Show On Hold Date & Time on SR
+- Issue 1418 - SR Statistics to breakdown visible and proactive SRs.
+- Issue 1420 - Include numbers of FTF & Source in Meeting Agenda
+- Issue 1428 - Only show active staff on Team Management Modal
+- Issue 1423 - Project Report showing budgets
+
+## [v5.11.12] - 2021-06-01
+### Fixed
+- Fixed issue with alarm date time not being parsed properly when running AutoCompletion task.
+- Fixed issue with Fixed service requests having open activities.
+
+## [v5.11.11] - 2021-05-28
+### Fixed
+- Fixed issue with Automated Import Requests.
+
+## [v5.11.10] - 2021-05-27
+### Fixed
+- Fixed issue with Header losing the value for ExpensesNextProcessingDate when saving.
+- Fixed issue with SR Asset information.
+
+## [v5.11.9] - 2021-05-24
+### Fixed
+- Fixed issue with SecondSiteBackupValidation
+- Fixed issue with RequestDashboard
+
+## [v5.11.8] - 2021-05-24
+### Fixed
+- Fixed issue with graphs
+
+## [v5.11.7] - 2021-05-21
+### Fixed
+- Fixed issue with Daily Stats and performance stats.
+
+## [v5.11.6] - 2021-05-21
+### Fixed
+- Fixed issue with OffsiteBackupStatus when doing "check now" on a suspended server.
+
+## [v5.11.5] - 2021-05-21
+### Fixed
+- Fixed issue with RequestDashboard.
+- Fixed several warnings that show up in the error log.
+
+## [v5.11.4] - 2021-05-20
+### Changed
+- Change createSalesRequest button to Submit.
+- Make "Other Request" option the default one, and enforce an option to be selected to continue.
+### Fixed
+- Fixed issue in Office365Licenses while trying to add a new record.
+- Fixed issue when a user is trying to cancel a chargeable request.
+
+## [v5.11.3] - 2021-05-18
+### Fixed
+- Fixed issue with Office365 license export.
+- Fixed issue with ServiceRequestsByCustomerReport permissions.
+- Fixed issue with Password not clearing form after adding a password.
+
+## [v5.11.2] - 2021-05-17
+### Fixed
+- Fixe issue with Broadband contracts.
+
+## [v5.11.1] - 2021-05-14
+### Fixed
+- Fixed issue with receipts not having the right path.
+- Fixed issue with SLAPerformance showing errors.
+
+## [v5.11.0] - 2021-05-14
+### Added
+- Issue 1385 - Send notification when a new customer is added.
+### Changed
+- Issue 1229 - Rearrange external files location
+- Issue 1372 - Improved Error handling for Removing qsystem assigned SRs
+- Issue 1380 - Edit Items within contracts & renewals
+- Issue 1364 - Update Header.php to be in react and update app exception
+- Issue 1363 - Make homepage Daily Stats clickable to show results
+- Issue 1389 - Customer Feedback date criteria.
+- Issue 1395 - Set Call backs as Inbound Customer Contact.
+- Issue 1392 - Direct Debit email formatting changes.
+### Fixed
+- Issue 1393 - Parts Used Send button issue.
+- Issue 1382 - IP Range restriction error.
+- Issue 1396 - Double quote characters not displaying on password page.
+### Removed
+- Issue 1375 - Error logged for DailySalesRequestEmail.php.
+
+## [v5.10.4] - 2021-05-13
+### Fixed
+- Fixed issue with PrePay contracts when fixing a Service Request.
+
+## [v5.10.3] - 2021-05-12
+## Fixed 
+- Fixed issue with customer stats.
+- Created one off script to fix issue with callbacks setting the wrong responded hours value.
+
+## [v5.10.2] - 2021-05-10
 ### Fixed
 - Fix issue with BCC on customer emails flag
 
@@ -68,7 +180,6 @@ This project changes will be shown here.
 ### Fixed
 - Issue 1226 - StreamOne error handling
 - Issue 1349 - Duplicate Duplicate Contact Warning.
-
 
 ## [v5.8.6] - 2021-04-22
 ### Fixed

@@ -37,8 +37,8 @@ class APIActivity extends APIMain {
         return fetch(`Activity.php?action=sendVisitEmail&callActivityID=${callActivityID}`);
     }
 
-    deleteDocument(callActivityID, id) {
-        return fetch(`Activity.php?action=deleteFile&callActivityID=${callActivityID}&callDocumentID=${id}`);
+    deleteDocument(id) {
+        return fetch(`SRActivity.php?action=deleteCustomerDocument&documentId=${id}`);
 
     }
 
@@ -107,8 +107,10 @@ class APIActivity extends APIMain {
         return fetch(`${ApiUrls.SRActivity}getCallActivityBasicInfo&callActivityID=${Id}`).then(res => res.json());
     }
 
-    getDocuments(callActivityID, problemID) {
-        return fetch(`${ApiUrls.SRActivity}getDocuments&callActivityID=${callActivityID}&problemID=${problemID}`).then(res => res.json());
+    async getServiceRequestCustomerDocuments(serviceRequestId) {
+        const response = await fetch(`${ApiUrls.SRActivity}getDocuments&serviceRequestId=${serviceRequestId}`);
+        const res = await response.json();
+        return res.data;
     }
 
     saveFixedInformation(body) {
@@ -198,11 +200,11 @@ class APIActivity extends APIMain {
             })
     }
 
-    async addAdditionalTimeRequest(serviceRequestId, reason, timeRequested, selectedContactId) {
+    async addAdditionalTimeRequest(serviceRequestId, reason, timeRequested, selectedContactId, selectedAdditionalChargeId) {
         const response = await fetch(`${ApiUrls.SRActivity}addAdditionalTimeRequest`,
             {
                 method: 'POST',
-                body: JSON.stringify({serviceRequestId, reason, timeRequested, selectedContactId})
+                body: JSON.stringify({serviceRequestId, reason, timeRequested, selectedContactId, selectedAdditionalChargeId})
             }
         )
         let jsonResponse = null;
@@ -226,11 +228,11 @@ class APIActivity extends APIMain {
     }
 
     async cancelChargeableRequest(id, cancelReason) {
-        return this.post(`${ApiUrls.sdDashboard}cancelPendingChargeableRequest`, {id, cancelReason})
+        return this.post(`${ApiUrls.PendingChargeableRequests}cancelPendingChargeableRequest`, {id, cancelReason})
     }
 
     async resendChargeableRequestEmail(id) {
-        return this.post(`${ApiUrls.sdDashboard}resendPendingChargeableRequestEmail`, {id})
+        return this.post(`${ApiUrls.PendingChargeableRequests}resendPendingChargeableRequestEmail`, {id})
     }
 
     async checkServiceRequestPendingCallbacks(serviceRequestId) {

@@ -2,12 +2,19 @@
 
 namespace CNCLTD\SDManagerDashboard;
 
-use BUActivity;
+use CNCLTD\Business\BUActivity;
+use CNCLTD\Data\DBEJProblem;
+use CNCLTD\Exceptions\ColumnOutOfRangeException;
 use CNCLTD\Utils;
 use Controller;
-use DBEJProblem;
+use DateTimeInterface;
+use DBECallback;
+use DBECustomer;
+use DBEUser;
+use Exception;
+use JsonSerializable;
 
-class ServiceRequestSummaryDTO implements \JsonSerializable
+class ServiceRequestSummaryDTO implements JsonSerializable
 {
     /**
      * @var bool|float|int|string|null
@@ -38,7 +45,7 @@ class ServiceRequestSummaryDTO implements \JsonSerializable
      */
     private $time;
     /**
-     * @var \DateTimeInterface|null
+     * @var DateTimeInterface|null
      */
     private $dateTime;
     /**
@@ -83,7 +90,7 @@ class ServiceRequestSummaryDTO implements \JsonSerializable
     private $priority;
     private $activityCount;
     /**
-     * @var \DateTimeInterface|null
+     * @var DateTimeInterface|null
      */
     private $alarmDateTime;
     /**
@@ -162,10 +169,14 @@ class ServiceRequestSummaryDTO implements \JsonSerializable
      */
     public function __construct() { }
 
-    public static function fromDBEJProblem(\DBEJProblem $problem,
-                                           \DBEUser $currentUser,
+    /**
+     * @throws ColumnOutOfRangeException
+     * @throws Exception
+     */
+    public static function fromDBEJProblem(DBEJProblem $problem,
+                                           DBEUser $currentUser,
                                            $withActivityCount = false
-    )
+    ): ServiceRequestSummaryDTO
     {
 
         $instance         = new self();
@@ -179,7 +190,7 @@ class ServiceRequestSummaryDTO implements \JsonSerializable
         $buActivity      = new BUActivity($stuff);
         $usedMinutes     = 0;
         $assignedMinutes = 0;
-        $dbeCustomer     = new \DBECustomer($problem);
+        $dbeCustomer     = new DBECustomer($problem);
         $dbeCustomer->getRow($problem->getValue(DBEJProblem::customerID));
         $hasCallback = self::hasCallback($serviceRequestId, $currentUser);
         switch ($problem->getValue(DBEJProblem::QUEUE_TEAM_ID)) {
@@ -243,12 +254,12 @@ class ServiceRequestSummaryDTO implements \JsonSerializable
         $instance->fixedTeamId                = $problem->getValue(DBEJProblem::FIXED_TEAM_ID);
         $instance->queueNo                    = $problem->getValue(DBEJProblem::queueNo);
         $instance->isFixSLABreached           = $problem->getValue(DBEJProblem::IS_FIX_SLA_BREACHED);
-        $instance->slaP1PenaltiesAgreed       = $dbeCustomer->getValue(\DBECustomer::slaP1PenaltiesAgreed);
-        $instance->slaP2PenaltiesAgreed       = $dbeCustomer->getValue(\DBECustomer::slaP2PenaltiesAgreed);
-        $instance->slaP3PenaltiesAgreed       = $dbeCustomer->getValue(\DBECustomer::slaP3PenaltiesAgreed);
-        $instance->slaFixHoursP1              = $dbeCustomer->getValue(\DBECustomer::slaFixHoursP1);
-        $instance->slaFixHoursP2              = $dbeCustomer->getValue(\DBECustomer::slaFixHoursP2);
-        $instance->slaFixHoursP3              = $dbeCustomer->getValue(\DBECustomer::slaFixHoursP3);
+        $instance->slaP1PenaltiesAgreed       = $dbeCustomer->getValue(DBECustomer::slaP1PenaltiesAgreed);
+        $instance->slaP2PenaltiesAgreed       = $dbeCustomer->getValue(DBECustomer::slaP2PenaltiesAgreed);
+        $instance->slaP3PenaltiesAgreed       = $dbeCustomer->getValue(DBECustomer::slaP3PenaltiesAgreed);
+        $instance->slaFixHoursP1              = $dbeCustomer->getValue(DBECustomer::slaFixHoursP1);
+        $instance->slaFixHoursP2              = $dbeCustomer->getValue(DBECustomer::slaFixHoursP2);
+        $instance->slaFixHoursP3              = $dbeCustomer->getValue(DBECustomer::slaFixHoursP3);
         $instance->contactName                = $problem->getValue(DBEJProblem::contactName);
         $instance->emailSubjectSummary        = $problem->getValue(DBEJProblem::emailSubjectSummary);
         $instance->contactName                = $problem->getValue(DBEJProblem::contactName);
@@ -257,6 +268,9 @@ class ServiceRequestSummaryDTO implements \JsonSerializable
         return $instance;
     }
 
+    /**
+     * @throws Exception
+     */
     private static function getProblemHistoryURL($problemId)
     {
         return Controller::buildLink(
@@ -270,14 +284,14 @@ class ServiceRequestSummaryDTO implements \JsonSerializable
     }
 
     /**
-     * @param $stuff
-     * @param float|null $serviceRequestId
-     * @param \DBEUser $currentUser
-     * @return mixed
+     * @param int|null $serviceRequestId
+     * @param DBEUser $currentUser
+     * @return bool
+     * @throws ColumnOutOfRangeException
      */
-    private static function hasCallback(?int $serviceRequestId, \DBEUser $currentUser)
+    private static function hasCallback(?int $serviceRequestId, DBEUser $currentUser): bool
     {
-        $dbeCallback = new \DBECallback($stuff);
+        $dbeCallback = new DBECallback($stuff);
         $dbeCallback->getAwaitingForServiceRequest($serviceRequestId);
         if (!$dbeCallback->rowCount()) {
             return false;
@@ -286,14 +300,14 @@ class ServiceRequestSummaryDTO implements \JsonSerializable
             return true;
         }
         while ($dbeCallback->fetchNext()) {
-            if ($dbeCallback->getValue(\DBECallback::consID) == $currentUser->getValue(\DBEUser::userID)) {
+            if ($dbeCallback->getValue(DBECallback::consID) == $currentUser->getValue(DBEUser::userID)) {
                 return true;
             }
         }
         return false;
     }
 
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return [
             "hoursRemainingForSLA"       => $this->hoursRemainingForSLA,

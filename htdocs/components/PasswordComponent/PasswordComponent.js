@@ -317,7 +317,7 @@ class PasswordComponent extends MainComponent {
 
     getPasswordDetails() {
         const {filter, showModal, passwordItem} = this.state;
-        if (!filter.customer || !passwordItem) {
+        if (!filter.customer || !passwordItem || !showModal) {
             return '';
         }
         return <PasswordDetails onClose={this.handleModalClose}

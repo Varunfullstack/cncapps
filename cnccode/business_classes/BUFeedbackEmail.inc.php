@@ -5,10 +5,13 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+
+use CNCLTD\Data\DBConnect;
+
+global $cfg;
 require_once($cfg ["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_dbe"] . "/CNCMysqli.inc.php");
 require_once($cfg ["path_bu"] . "/BUMail.inc.php");
-require_once($cfg["path_dbe"] . "/DBConnect.php");
 
 class BUFeedbackEmail extends Business
 {

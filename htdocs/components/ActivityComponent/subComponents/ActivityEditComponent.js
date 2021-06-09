@@ -27,6 +27,7 @@ import {TaskListComponent} from "./TaskListComponent";
 import AdditionalChargeRequestModal from "./Modals/AdditionalTimeRequestModal";
 import ExistingAdditionalChargeableWorkRequestModal from "./Modals/ExistingAdditionalChargeableWorkRequestModal";
 import CallbackModal from "../../shared/CallbackModal/CallBackModal";
+import {TEMPlATE_TYPES, TemplateModal} from "./Modals/TemplateModal";
 
 // noinspection EqualityComparisonWithCoercionJS
 const hiddenAndCustomerNoteAlertMessage = `Customer note must be empty when the activity or entire SR is hidden.`;
@@ -68,7 +69,6 @@ class ActivityEditComponent extends MainComponent {
             showAdditionalTimeRequestModal: false,
             data: {
                 curValue: "",
-                documents: [],
                 reasonTemplate: "",
                 reason: "",
                 internalNotes: [],
@@ -87,16 +87,10 @@ class ActivityEditComponent extends MainComponent {
                 priorityChangeReason: "",
                 emptyAssetReason: "",
                 emptyAssetReasonNotify: false,
-                Inbound:null
+                Inbound: null
             },
             currentActivity: "",
-            _showModal: false,
-            templateOptions: [],
-            templateOptionId: null,
-            templateDefault: "",
-            templateValue: "",
-            templateType: "",
-            templateTitle: "",
+            templateType: null,
             contactNotes: "",
             callActTypes: [],
             notSDManagerActivityTypes: [],
@@ -178,10 +172,6 @@ class ActivityEditComponent extends MainComponent {
         this.api.getCallActivityDetails(callActivityID, filters).then((res) => {
             filters.monitorSR = res.monitoringFlag == "1";
             filters.criticalSR = res.criticalFlag == "1";
-            res.documents = res.documents.map((d) => {
-                d.createDate = moment(d.createDate).format("DD/MM/YYYY");
-                return d;
-            });
             res.reasonTemplate = res.reason;
             res.cncNextActionTemplate = res.cncNextAction;
             res.customerNotesTemplate = res.customerNotes;
@@ -244,8 +234,7 @@ class ActivityEditComponent extends MainComponent {
 
         delete data.activities;
         delete data.onSiteActivities;
-        delete data.documents;
-        const finalData = pick(data, [            
+        const finalData = pick(data, [
             "callActivityID",
             "alarmDate",
             "alarmTime",
@@ -420,7 +409,7 @@ class ActivityEditComponent extends MainComponent {
             }
         }
 
-        if (!data.assetName && !this.state.data.emptyAssetReason) {
+        if (!data.assetName && !data.emptyAssetReason) {
             this.alert("Please select an asset or a reason");
             return false;
         }
@@ -650,12 +639,21 @@ class ActivityEditComponent extends MainComponent {
     handleRequestCustomerApproval = async () => {
         const {problemID: serviceRequestId} = this.state.data;
         try {
-            let {reason, selectedContactId, timeRequested} = await this.showAdditionalTimeRequestModal();
+            let {
+                reason,
+                selectedContactId,
+                timeRequested,
+                selectedAdditionalChargeId
+            } = await this.showAdditionalTimeRequestModal();
             try {
-                await this.api.addAdditionalTimeRequest(serviceRequestId, reason, timeRequested, selectedContactId);
+                await this.api.addAdditionalTimeRequest(serviceRequestId, reason, timeRequested, selectedContactId, selectedAdditionalChargeId);
                 const {currentActivity} = this.state;
                 await this.loadCallActivity(currentActivity);
-                this.alert('Request Sent');
+                let defaultAlertText = 'Request Sent';
+                if (selectedAdditionalChargeId) {
+                    defaultAlertText = 'Saved successfully';
+                }
+                this.alert(defaultAlertText);
             } catch (error) {
                 this.alert(error);
             }
@@ -741,15 +739,15 @@ class ActivityEditComponent extends MainComponent {
                    onChange={(event) => this.setValue("alarmDate", event.target.value)}
             />
             {renderTimeInput()}
-            <button onClick={() => this.handleTemplateDisplay("changeRequest")}
+            <button onClick={() => this.handleTemplateDisplay(TEMPlATE_TYPES.changeRequest)}
                     className="btn-info"
             > Change Request
             </button>
-            <button onClick={() => this.handleTemplateDisplay("salesRequest")}
+            <button onClick={() => this.handleTemplateDisplay(TEMPlATE_TYPES.salesRequest)}
                     className="btn-info"
             > Sales Request
             </button>
-            <button onClick={() => this.handleTemplateDisplay("partsUsed")}
+            <button onClick={() => this.handleTemplateDisplay(TEMPlATE_TYPES.partsUsed)}
                     className="btn-info"
             > Parts Used
             </button>
@@ -1071,15 +1069,6 @@ class ActivityEditComponent extends MainComponent {
         );
     };
 
-    async deleteDocument(id) {
-        const {data} = this.state;
-        if (await this.confirm('Are you sure you want to remove this document?')) {
-            await this.api.deleteDocument(this.state.currentActivity, id);
-            data.documents = data.documents.filter(d => d.id !== id);
-            this.setState({data});
-        }
-    }
-
     getTypeElement = () => {
         const {el} = this;
         const {data, callActTypes, notSDManagerActivityTypes, currentUser} = this.state;
@@ -1091,83 +1080,83 @@ class ActivityEditComponent extends MainComponent {
         }
 
         return this.getElementControl(
-          "Type",
-          "Type",
-          el(
-            "div",{style:{display:"flex",flexDirection:"row"}},
+            "Type",
+            "Type",
             el(
-              "select",
-              {
-                disabled: !isEnabled,
-                required: true,
-                value: data?.callActTypeID || "",
-                onChange: (event) => this.handleTypeChange(event.target.value),
-                style: { width: "100%" },
-              },
-              el("option", { key: "empty", value: "" }, "Please select"),
-              activityTypesToShow.map((t) =>
-                el("option", { key: t.id, value: t.id }, t.description)
-              )
-            ),
-            this.getInboundIcon()
-          )
+                "div", {style: {display: "flex", flexDirection: "row"}},
+                el(
+                    "select",
+                    {
+                        disabled: !isEnabled,
+                        required: true,
+                        value: data?.callActTypeID || "",
+                        onChange: (event) => this.handleTypeChange(event.target.value),
+                        style: {width: "100%"},
+                    },
+                    el("option", {key: "empty", value: ""}, "Please select"),
+                    activityTypesToShow.map((t) =>
+                        el("option", {key: t.id, value: t.id}, t.description)
+                    )
+                ),
+                this.getInboundIcon()
+            )
         );
     };
 
-    handleTypeChange=(value)=>{
+    handleTypeChange = (value) => {
         this.setValue("callActTypeID", value);
-        if(value=='11')
-        this.setState({showInboundOutboundModal:true});
+        if (value == '11')
+            this.setState({showInboundOutboundModal: true});
         else
-        this.setValue("Inbound", null);
+            this.setValue("Inbound", null);
     }
-    getInboundOutBoundModal=()=>{
-        const {data}=this.state;
-        const Inbound=data.Inbound==null?false:data.Inbound;
-        const Outbound=data.Inbound==null?false:!data.Inbound;
-        return <Modal 
-        width={300}
-        show={this.state.showInboundOutboundModal}
-        title="Select contact type"
-        footer={<div key="footerActions" >            
-            <button  onClick={()=>this.setState({showInboundOutboundModal:false})}>OK</button>
-            <button  onClick={()=>this.setState({showInboundOutboundModal:false,Inbound:null})}>Cancel</button>
-        </div>}
+    getInboundOutBoundModal = () => {
+        const {data} = this.state;
+        const Inbound = data.Inbound == null ? false : data.Inbound;
+        const Outbound = data.Inbound == null ? false : !data.Inbound;
+        return <Modal
+            width={300}
+            show={this.state.showInboundOutboundModal}
+            title="Select contact type"
+            footer={<div key="footerActions">
+                <button onClick={() => this.setState({showInboundOutboundModal: false})}>OK</button>
+                <button onClick={() => this.setState({showInboundOutboundModal: false, Inbound: null})}>Cancel</button>
+            </div>}
         >
-            <div style={{display:'flex', flexDirection:'row',justifyContent:"space-between"}}>
+            <div style={{display: 'flex', flexDirection: 'row', justifyContent: "space-between"}}>
                 <div>
                     <label className="mr-2">Inbound</label>
-                    <Toggle checked={Inbound} onChange={()=>this.setValue("Inbound",true)}></Toggle>
+                    <Toggle checked={Inbound} onChange={() => this.setValue("Inbound", true)}></Toggle>
                 </div>
                 <div>
                     <label className="mr-2">Outbound</label>
-                    <Toggle  checked={Outbound}  onChange={()=>this.setValue("Inbound",false)}></Toggle>
+                    <Toggle checked={Outbound} onChange={() => this.setValue("Inbound", false)}></Toggle>
                 </div>
             </div>
         </Modal>
     }
-    getInboundIcon=()=>{
-        const { data } = this.state;
+    getInboundIcon = () => {
+        const {data} = this.state;
         switch (data.Inbound) {
-          case true:
-            return (
-              <ToolTip title="Inbound Contact" width={15}>
-                  <i  onClick={() =>
-                    this.setState({ showInboundOutboundModal: true })
-                  } className="fal fa-sign-in pointer icon"></i>                 
-              </ToolTip>
-            );
-          case false:
-            return (
-              <ToolTip title="Outbound Contact" width={15}>
-                  <i onClick={() =>
-                    this.setState({ showInboundOutboundModal: true })
-                  } className="fal fa-sign-out  pointer icon"></i>
-                
-              </ToolTip>
-            );
-          default:
-            return null;
+            case true:
+                return (
+                    <ToolTip title="Inbound Contact" width={15}>
+                        <i onClick={() =>
+                            this.setState({showInboundOutboundModal: true})
+                        } className="fal fa-sign-in pointer icon"></i>
+                    </ToolTip>
+                );
+            case false:
+                return (
+                    <ToolTip title="Outbound Contact" width={15}>
+                        <i onClick={() =>
+                            this.setState({showInboundOutboundModal: true})
+                        } className="fal fa-sign-out  pointer icon"></i>
+
+                    </ToolTip>
+                );
+            default:
+                return null;
         }
     }
     getContactsElement = () => {
@@ -1534,159 +1523,29 @@ class ActivityEditComponent extends MainComponent {
         );
     };
 
-    handleUpload = async () => {
-        const {currentActivity} = this.state;
-        this.loadCallActivity(currentActivity);
-    };
 
-// Parts used, change requestm and sales request
-    handleTemplateChanged = (event) => {
-        const id = event.target.value;
-        const {templateOptions} = this.state;
-        let templateOptionId = null;
-        let templateValue = "";
-        if (id >= 0) {
-            const op = templateOptions.find((s) => s.id == id);
-            templateValue = op.template;
-            templateOptionId = op.id;
-        }
-        const test = () => {
-            this.setState({templateOptionId, templateValue});
-        }
-        test();
-    };
-    handleTemplateValueChange = (data) => {
-        this.setState({templateValue: data});
-    };
-    handleTemplateSend = async (type) => {
-        const {
-            templateValue,
-            templateOptionId,
-            data,
-            currentActivity,
-        } = this.state;
-        if (templateValue == "") {
-            this.alert("Please enter details");
-            return;
-        }
-        const payload = new FormData();
-        payload.append("message", templateValue);
-        payload.append("type", templateOptionId);
-        switch (type) {
-            case "changeRequest":
-                await this.api.sendChangeRequest(data.problemID, payload);
-                this.alert('Change Request Sent');
-                break;
-            case "partsUsed": {
-                const object = {
-                    message: templateValue,
-                    callActivityID: currentActivity,
-                };
-                await this.api.sendPartsUsed(object);
-                this.alert('Parts Used Sent');
-                break;
-            }
-            case "salesRequest":
-                await this.api.sendSalesRequest(
-                    data.customerId,
-                    data.problemID,
-                    payload
-                );
-                this.alert('Sales Request Sent');
-                break;
-        }
-        this.loadCallActivity(currentActivity);
-        this.setState({_showModal: false});
-    };
     getTemplateModal = () => {
         const {
-            templateValue,
-            templateOptions,
-            _showModal,
-            templateTitle,
             templateType,
+            data: {customerId, problemID: serviceRequestId},
+            currentActivity: activityId,
         } = this.state;
-        const {el} = this;
 
-        return el(Modal, {//autoFocus:true
-            width: 900,
-            key: templateType,
-            onClose: () => this.setState({_showModal: false, templateValue: ""}),
-            title: templateTitle,
-            show: _showModal,
-            content: el(
-                "div",
-                {key: "container"},
-                templateOptions.length > 0
-                    ? el(
-                    "select",
-                    {onChange: this.handleTemplateChanged, autoFocus: true},
-                    el("option", {key: "empty", value: -1}, "-- Pick an option --"),
-                    templateOptions.map((s) =>
-                        el("option", {key: s.id, value: s.id}, s.name)
-                    )
-                    )
-                    : null,
-                this.state._activityLoaded
-                    ?
-
-                    el('div', {className: 'modal_editor'},
-                        el('div', {id: 'top2'}),
-                        el(CNCCKEditor, {
-                            key: "salesRequestEditor",
-                            name: "salesRequest",
-                            value: templateValue,
-                            type: "inline",
-                            onChange: this.handleTemplateValueChange,
-                            sharedSpaces: true,
-                            top: "top2",
-                            bottom: "bottom2",
-                            autoFocus: templateOptions.length <= 0
-                        }),
-                        el('div', {id: 'bottom2'}),
-                    )
-
-                    : null
-            ),
-            footer: el(
-                "div",
-                {key: "footer", style: {display: "flex", justifyContent: "flex-end"}},
-                el(
-                    "button",
-                    {className: "float-left", onClick: () => this.handleTemplateSend(templateType)},
-                    "Send"
-                ),
-                el(
-                    "button",
-                    {className: "float-right", onClick: () => this.setState({_showModal: false})},
-                    "Cancel"
-                ),
-            ),
-        });
+        if (!templateType) {
+            return '';
+        }
+        return (
+            <TemplateModal key={templateType}
+                           templateType={templateType}
+                           onClose={() => this.setState({templateType: null})}
+                           customerId={customerId}
+                           serviceRequestId={serviceRequestId}
+                           activityId={activityId}
+            />
+        )
     };
     handleTemplateDisplay = async (type) => {
-        let options = [];
-        let templateTitle = "";
-        switch (type) {
-            case "salesRequest":
-                options = await this.api.getSalesRequestOptions();
-                templateTitle = "Sales Request";
-                break;
-            case "changeRequest":
-                options = await this.api.getChangeRequestOptions();
-                templateTitle = "Change Request";
-                break;
-            case "partsUsed":
-                templateTitle = "Parts Used";
-                break;
-        }
-        this.setState({
-            templateOptions: options,
-            _showModal: true,
-            templateType: type,
-            templateTitle,
-            templateDefault: "",
-        });
+        this.setState({templateType: type});
     };
 
     getActivityNotes() {
@@ -1781,18 +1640,6 @@ class ActivityEditComponent extends MainComponent {
         );
     }
 
-
-    onNoteAdded = () => {
-        const {currentActivity} = this.state;
-        this.loadCallActivity(currentActivity);
-    }
-
-    onTaskListUpdated = () => {
-        const {currentActivity} = this.state;
-        this.loadCallActivity(currentActivity);
-    }
-
-
     getTaskList() {
         const {data} = this.state;
         if (!data) {
@@ -1800,13 +1647,7 @@ class ActivityEditComponent extends MainComponent {
         }
 
         return (
-            <TaskListComponent
-                taskListUpdatedAt={data.taskListUpdatedAt}
-                taskListUpdatedBy={data.taskListUpdatedBy}
-                taskList={data.taskList}
-                problemId={data.problemID}
-                onUpdatedTaskList={this.onTaskListUpdated}
-            />
+            <TaskListComponent serviceRequestId={data.problemID}/>
         );
     }
 
@@ -2005,7 +1846,7 @@ class ActivityEditComponent extends MainComponent {
                 {this.getPrompt()}
                 {this.getPriorityChangeReason()}
                 {this.getProjectsElement()}
-                {this.getCallbackModal()}                                
+                {this.getCallbackModal()}
                 <ActivityHeaderComponent serviceRequestData={data}/>
                 <div className="activities-edit-container">
                     {this.getActions()}
@@ -2016,17 +1857,9 @@ class ActivityEditComponent extends MainComponent {
                 {this.getContentElement()}
                 {this.getActivityNotes()}
                 {this.getCustomerNotes()}
-                <InternalNotes onNoteAdded={this.onNoteAdded}
-                               data={data}
-                />
+                <InternalNotes serviceRequestId={data.problemID}/>
                 {this.getTaskList()}
-                <CustomerDocumentUploader
-                    onDeleteDocument={(id) => this.deleteDocument(id)}
-                    onFilesUploaded={() => this.handleUpload()}
-                    serviceRequestId={data?.problemID}
-                    activityId={data?.callActivityID}
-                    documents={data?.documents}
-                />
+                <CustomerDocumentUploader serviceRequestId={data?.problemID}/>
                 <InternalDocumentsComponent serviceRequestId={data?.problemID}/>
                 {this.getTemplateModal()}
                 {showSalesOrder ? <LinkServiceRequestOrder serviceRequestID={data.problemID}

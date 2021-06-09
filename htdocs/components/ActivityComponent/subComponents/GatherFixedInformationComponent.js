@@ -50,14 +50,13 @@ class GatherFixedInformationComponent extends MainComponent {
         const activity = await this.apiActivity.getCallActivityBasicInfo(
             params.get("callActivityID")
         );
-        const [rootCauses, customerContracts, documents, initialActivity] = await Promise.all([
+        const [rootCauses, customerContracts, initialActivity] = await Promise.all([
             this.apiActivity.getRootCauses(),
             this.apiCustomer.getCustomerContracts(
                 activity.customerID,
                 activity.contractCustomerItemID,
                 activity.linkedSalesOrderID > 0
             ),
-            this.apiActivity.getDocuments(activity.callActivityID, activity.problemID),
             this.apiActivity.getInitialActivity(activity.problemID)
         ]);
 
@@ -77,7 +76,6 @@ class GatherFixedInformationComponent extends MainComponent {
             rootCauses: rootCauses,
             contracts: customerContracts,
             groupedContracts: groupBy(customerContracts, "renewalType"),
-            documents: documents,
             initialActivity: initialActivity,
         })
     }
@@ -240,7 +238,7 @@ class GatherFixedInformationComponent extends MainComponent {
                             "option",
                             {
                                 key: i.contractCustomerItemID,
-                                disabled: i.isDisabled || (activity.prePayChargeApproved && i.contractCustomerItemID !== data?.contractCustomerItemID) || activity.hasCallOutExpense,
+                                disabled: i.isDisabled || (activity.prePayChargeApproved && i.contractCustomerItemID !== activity?.contractCustomerItemID) || activity.hasCallOutExpense,
                                 value: i.contractCustomerItemID,
                             },
                             i.contractDescription
@@ -289,29 +287,10 @@ class GatherFixedInformationComponent extends MainComponent {
         );
     };
 
-    async deleteDocument(id) {
-        const {documents, activity} = this.state;
-        if (await this.confirm('Are you sure you want to remove this document?')) {
-            await this.apiActivity.deleteDocument(activity.callActivityID, id);
-            this.setState({documents: documents.filter(d => d.id !== id)});
-        }
-    }
-
     getDocuments = () => {
-        const {documents, activity} = this.state;
-        return <CustomerDocumentUploader
-            onDeleteDocument={(id) => this.deleteDocument(id)}
-            onFilesUploaded={() => this.handleDocumentsUploads()}
-            serviceRequestId={activity.problemID}
-            activityId={activity.callActivityID}
-            documents={documents}
-        />
-    };
-    handleDocumentsUploads = async () => {
         const {activity} = this.state;
-        const documents = await this.apiActivity.getDocuments(activity.callActivityID, activity.problemID);
-        this.setState({documents});
-    }
+        return <CustomerDocumentUploader serviceRequestId={activity.problemID}/>
+    };
     getActions = () => {
         const {el} = this;
         return el('div', {className: "flex-row"},

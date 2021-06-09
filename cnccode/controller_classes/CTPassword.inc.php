@@ -68,7 +68,7 @@ class CTPassword extends CTCNC
             case self::CONST_PASSWORDS:
                 switch ($this->requestMethod) {
                     case 'GET':
-                        echo json_encode($this->getPasswords(), JSON_NUMERIC_CHECK);
+                        echo json_encode($this->getPasswords());
                         break;
                     case 'POST':
                         echo json_encode($this->updatePassword());
@@ -172,16 +172,16 @@ class CTPassword extends CTCNC
                 $password = null;
             }
             $passwords[] = [
-                "notes"               => $this->replaceQuotes($notes),
+                "notes"               => $notes,
                 "serviceName"         => $dsPassword->getValue(DBEJPassword::serviceName),
-                "serviceID"           => $dsPassword->getValue(DBEJPassword::serviceID),
-                'passwordID'          => $dsPassword->getValue(DBEPassword::passwordID),
-                'customerID'          => $dsPassword->getValue(DBEPassword::customerID),
-                DBEPassword::username => $this->replaceQuotes($userName),
-                'password'            => $this->replaceQuotes($password),
+                "serviceID"           => +$dsPassword->getValue(DBEJPassword::serviceID),
+                'passwordID'          => +$dsPassword->getValue(DBEPassword::passwordID),
+                'customerID'          => +$dsPassword->getValue(DBEPassword::customerID),
+                DBEPassword::username => $userName,
+                'password'            => $password,
                 'salesPassword'       => $dsPassword->getValue(DBEPassword::salesPassword),
                 'level'               => $dsPassword->getValue(DBEPassword::level),
-                'sortOrder'           => $dsPassword->getValue(DBEJPassword::sortOrder),
+                'sortOrder'           => +$dsPassword->getValue(DBEJPassword::sortOrder),
                 'URL'                 => $URL,
                 'archivedAt'          => $dsPassword->getValue(DBEPassword::archivedAt),
                 'archivedBy'          => $dsPassword->getValue(DBEPassword::archivedBy),

@@ -70,7 +70,11 @@ export default class MainComponent extends React.Component {
             "scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0"
         );
     }
-
+    openTab(url) {
+        window.open(
+            url,          
+        );
+    }
     //----------------alert
     alert = (message, width = 500, title = "Alert", isHTML = false, autoClose = true) => {
         const {alert} = this.state;
@@ -234,15 +238,7 @@ export default class MainComponent extends React.Component {
     }
 
     isEmpty(variable) {
-        if (variable == null || variable == undefined || variable == '')
-            return true;
-        else
-            return false;
-    }
-
-    getTrueFalseElement(value) {
-        return value ? <i className="fal fa-2x fa-check color-gray "></i> :
-            <i className="fal fa-2x fa-times color-gray "></i>
+        return variable == null || variable == '';
     }
 
     getEditElement(obj, callBack, display = true,title=null) {
@@ -272,7 +268,7 @@ export default class MainComponent extends React.Component {
             return null;
         return <i className="fal fa-2x fa-trash-alt color-gray pointer"
                   onClick={() => callBack(obj)}
-        ></i>
+        />
     }
 
     getDeleteIcon() {

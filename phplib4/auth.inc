@@ -39,6 +39,7 @@ class Auth
 
     var $auth = array();            ## Data array
     var $in = false;
+    /** @var dbSweetcode */
     var $db;
 
     ##

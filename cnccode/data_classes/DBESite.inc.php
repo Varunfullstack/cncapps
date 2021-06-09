@@ -11,23 +11,23 @@ require_once($cfg["path_dbe"] . "/DBCNCEntity.inc.php");
 class DBESite extends DBCNCEntity
 {
 
-    const customerID = "customerID";
-    const siteNo = "siteNo";
-    const add1 = "add1";
-    const add2 = "add2";
-    const add3 = "add3";
-    const town = "town";
-    const county = "county";
-    const postcode = "postcode";
+    const customerID       = "customerID";
+    const siteNo           = "siteNo";
+    const add1             = "add1";
+    const add2             = "add2";
+    const add3             = "add3";
+    const town             = "town";
+    const county           = "county";
+    const postcode         = "postcode";
     const invoiceContactID = "invoiceContactID";
     const deliverContactID = "deliverContactID";
-    const debtorCode = "debtorCode";
-    const sageRef = "sageRef";
-    const phone = "phone";
-    const maxTravelHours = "maxTravelHours";
-    const activeFlag = "activeFlag";
-    const nonUKFlag = "nonUKFlag";
-    const what3Words = "what3Words";
+    const debtorCode       = "debtorCode";
+    const sageRef          = "sageRef";
+    const phone            = "phone";
+    const maxTravelHours   = "maxTravelHours";
+    const activeFlag       = "activeFlag";
+    const nonUKFlag        = "nonUKFlag";
+    const what3Words       = "what3Words";
 
     /**
      * calls constructor()
@@ -136,13 +136,11 @@ class DBESite extends DBCNCEntity
             DA_ALLOW_NULL,
             "add_non_uk_flag"
         );
-
         $this->addColumn(
             self::what3Words,
             DA_TEXT,
             DA_ALLOW_NULL
         );
-
         $this->setPK(1);        // NOTE: This is not really the PK, just the second element
         $this->setAddColumnsOff();
         $this->setNewRowValue(
@@ -163,10 +161,9 @@ class DBESite extends DBCNCEntity
      */
     function getPKWhere()
     {
-        return (
-            $this->getDBColumnName(self::customerID) . '=' . $this->getFormattedValue(self::customerID) .
-            ' AND ' . $this->getDBColumnName(self::siteNo) . '=' . $this->getFormattedValue(self::siteNo)
-        );
+        return ($this->getDBColumnName(self::customerID) . '=' . $this->getFormattedValue(
+                self::customerID
+            ) . ' AND ' . $this->getDBColumnName(self::siteNo) . '=' . $this->getFormattedValue(self::siteNo));
     }
 
     /**
@@ -178,8 +175,8 @@ class DBESite extends DBCNCEntity
     function getNextPKValue()
     {
         $this->dbeNextPK->setQueryString(
-            'SELECT MAX(' . $this->getDBColumnName(self::siteNo) . ') + 1 FROM ' . $this->getTableName() .
-            ' WHERE ' . $this->getDBColumnName(self::customerID) . '=' . $this->getFormattedValue(self::customerID)
+            'SELECT MAX(' . $this->getDBColumnName(self::siteNo) . ') + 1 FROM ' . $this->getTableName(
+            ) . ' WHERE ' . $this->getDBColumnName(self::customerID) . '=' . $this->getFormattedValue(self::customerID)
         );
         if ($this->dbeNextPK->runQuery()) {
             if ($this->dbeNextPK->nextRecord()) {
@@ -206,8 +203,7 @@ class DBESite extends DBCNCEntity
             // exclude primary key columns
             if (($this->getName($ixCol) != self::customerID) && ($this->getName($ixCol) != self::siteNo)) {
                 if ($colString != "") $colString = $colString . ",";
-                $colString = $colString . $this->getDBColumnName($ixCol) . "=" .
-                    $this->prepareForSQL($ixCol);
+                $colString = $colString . $this->getDBColumnName($ixCol) . "=" . $this->prepareForSQL($ixCol);
             }
         }
         return $colString;
@@ -226,14 +222,11 @@ class DBESite extends DBCNCEntity
         if ($this->getValue(self::customerID) == "") {
             $this->raiseError('CustomerID not set');
         }
-        $queryString =
-            'SELECT ' . $this->getDBColumnNamesAsString() .
-            ' FROM ' . $this->getTableName() .
-            ' WHERE ' . $this->getDBColumnName(self::customerID) . '=' . $this->getFormattedValue(self::customerID);
+        $queryString = 'SELECT ' . $this->getDBColumnNamesAsString() . ' FROM ' . $this->getTableName(
+            ) . ' WHERE ' . $this->getDBColumnName(self::customerID) . '=' . $this->getFormattedValue(self::customerID);
         if ($activeFlag) {
             $queryString .= ' AND add_active_flag = "Y"';
         }
-
         $queryString .= ' ORDER BY ' . $this->getDBColumnName(self::siteNo);
         $this->setQueryString($queryString);
         return (parent::getRows());
@@ -250,11 +243,10 @@ class DBESite extends DBCNCEntity
         if ($this->getValue(self::customerID) == "") {
             $this->raiseError('CustomerID not set');
         }
-        $quey =
-            'SELECT ' . $this->getDBColumnNamesAsString() .
-            ' FROM ' . $this->getTableName() .
-            ' WHERE ' . $this->getDBColumnName(self::customerID) . '=' . $this->getFormattedValue(self::customerID) .
-            ' AND ' . $this->getDBColumnName(self::siteNo) . '=' . $this->getFormattedValue(self::siteNo);
+        $quey = 'SELECT ' . $this->getDBColumnNamesAsString() . ' FROM ' . $this->getTableName(
+            ) . ' WHERE ' . $this->getDBColumnName(self::customerID) . '=' . $this->getFormattedValue(
+                self::customerID
+            ) . ' AND ' . $this->getDBColumnName(self::siteNo) . '=' . $this->getFormattedValue(self::siteNo);
         $this->setQueryString($quey);
         return (parent::getRow());
     }
@@ -265,10 +257,10 @@ class DBESite extends DBCNCEntity
     {
         $this->setMethodName("getRowByPostcode");
         $this->setQueryString(
-            'SELECT ' . $this->getDBColumnNamesAsString() .
-            ' FROM ' . $this->getTableName() .
-            ' WHERE ' . $this->getDBColumnName(self::customerID) . '="' . $customerID . '"' .
-            ' AND ' . $this->getDBColumnName(self::postcode) . '="' . $postcode . '"'
+            'SELECT ' . $this->getDBColumnNamesAsString() . ' FROM ' . $this->getTableName(
+            ) . ' WHERE ' . $this->getDBColumnName(
+                self::customerID
+            ) . '="' . $customerID . '"' . ' AND ' . $this->getDBColumnName(self::postcode) . '="' . $postcode . '"'
         );
         return (parent::getRow());
     }
@@ -282,9 +274,9 @@ class DBESite extends DBCNCEntity
     {
         $this->setMethodName("uniqueSageRef");
         $this->setQueryString(
-            "SELECT COUNT(*)" .
-            " FROM " . $this->getTableName() .
-            " WHERE " . $this->getDBColumnName(self::sageRef) . " = '" . $sageRef . "'"
+            "SELECT COUNT(*)" . " FROM " . $this->getTableName() . " WHERE " . $this->getDBColumnName(
+                self::sageRef
+            ) . " = '" . $sageRef . "'"
         );
         if ($this->runQuery()) {
             if ($this->nextRecord()) {
@@ -312,9 +304,9 @@ class DBESite extends DBCNCEntity
             $this->raiseError('CustomerID not set');
         }
         $this->setQueryString(
-            "DELETE " .
-            " FROM " . $this->getTableName() .
-            " WHERE " . $this->getDBColumnName(self::customerID) . '=' . $this->getFormattedValue(self::customerID)
+            "DELETE " . " FROM " . $this->getTableName() . " WHERE " . $this->getDBColumnName(
+                self::customerID
+            ) . '=' . $this->getFormattedValue(self::customerID)
         );
         return (parent::runQuery());
     }
@@ -324,17 +316,18 @@ class DBESite extends DBCNCEntity
      * @access public
      * @return bool Success
      */
-    function deleteRow()
+    function deleteRow($pkValue = null): bool
     {
         $this->setMethodName("deleteRow");
         if ($this->getValue(self::customerID) == '') {
             $this->raiseError('CustomerID not set');
         }
         $this->setQueryString(
-            "DELETE " .
-            " FROM " . $this->getTableName() .
-            " WHERE " . $this->getDBColumnName(self::customerID) . '=' . $this->getFormattedValue(self::customerID) .
-            " AND " . $this->getDBColumnName(self::siteNo) . '=' . $this->getFormattedValue(self::siteNo)
+            "DELETE " . " FROM " . $this->getTableName() . " WHERE " . $this->getDBColumnName(
+                self::customerID
+            ) . '=' . $this->getFormattedValue(self::customerID) . " AND " . $this->getDBColumnName(
+                self::siteNo
+            ) . '=' . $this->getFormattedValue(self::siteNo)
         );
         return (parent::runQuery()); // ensures it goes to SCOTrans and deleted on UNIX box
     }

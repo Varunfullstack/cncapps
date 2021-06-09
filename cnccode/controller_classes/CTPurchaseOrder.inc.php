@@ -110,6 +110,7 @@ define(
 
 class CTPurchaseOrder extends CTCNC
 {
+    const UPDATE_STATUS = "UPDATE_STATUS";
     public $dsDateRange;
     public $buPurchaseOrder;
     public $dsPorhead;
@@ -194,6 +195,9 @@ class CTPurchaseOrder extends CTCNC
                 break;
             case CTPURCHASEORDER_ACT_UPDATE_ORDHEAD:
                 $this->updateHeader();
+                break;
+            case self::UPDATE_STATUS:
+                echo json_encode($this->updateStatusController());
                 break;
             case CTPURCHASEORDER_ACT_DELETE:
                 $this->deleteOrder();
@@ -534,11 +538,12 @@ class CTPurchaseOrder extends CTCNC
                 $dsPorline
             );
         }
-        $porheadID      = $dsPorhead->getValue(DBEJPorhead::porheadID);
-        $orderType      = $dsPorhead->getValue(DBEJPorhead::type);
-        $disabled       = CTCNC_HTML_DISABLED;                            // default - no editing
-        $title          = null;
-        $isPartReceived = false;
+        $porheadID       = $dsPorhead->getValue(DBEJPorhead::porheadID);
+        $orderType       = $dsPorhead->getValue(DBEJPorhead::type);
+        $disabled        = CTCNC_HTML_DISABLED;                            // default - no editing
+        $title           = null;
+        $isPartReceived  = false;
+        $canChangeStatus = $this->getDbeUser()->canChangeSalesOrdersAndPurchaseOrdersStatus();
         switch ($orderType) {
             case 'I':
                 $title            = 'Purchase Order - Initial';
@@ -669,8 +674,11 @@ class CTPurchaseOrder extends CTCNC
         $this->loadReactCSS('PurchaseOrderSupplierAndContactInputsComponent.css');
         // if there is a sales order then display the delivery details etc
         $this->template->set_var(
-            'delAdd1',
-            null
+            [
+                'delAdd1'         => null,
+                'canChangeStatus' => $canChangeStatus ? 'true' : 'false',
+                'type'            => $dsPorhead->getValue(DBEPorhead::type)
+            ]
         ); // default
         $dbeOrdhead = new DBEJOrdhead($this);
         if ($dbeOrdhead->getRow($dsPorhead->getValue(DBEJPorhead::ordheadID))) {
@@ -1087,7 +1095,6 @@ class CTPurchaseOrder extends CTCNC
                 'PurchaseOrderLineEditJS' => 'PurchaseOrderLineEditJS.inc' // javascript
             )
         );
-
         $this->loadReactScript('ItemListTypeAheadRenderer.js');
         $this->orderLineForm();
         $this->template->setVar(
@@ -1279,10 +1286,10 @@ class CTPurchaseOrder extends CTCNC
 
         $data = $this->getJSONData();
         if (empty($data['purchaseOrderHeadId'])) {
-            throw new JsonHttpException(400,'Purchase Order Id required');
+            throw new JsonHttpException(400, 'Purchase Order Id required');
         }
         if (empty($data['sequenceNumber'])) {
-            throw new JsonHttpException(400,'Sequence Number required');
+            throw new JsonHttpException(400, 'Sequence Number required');
         }
         $purchaseOrderHeadId = $data['purchaseOrderHeadId'];
         $sequenceNumber      = $data['sequenceNumber'];
@@ -1331,7 +1338,7 @@ class CTPurchaseOrder extends CTCNC
                 );
 
             }
-            $this->buPurchaseOrder->updateHeader($dsPorhead);
+            $this->buPurchaseOrder->updateHeader($dsPorhead,);
             if ($this->getParam('applyToAll')) {
                 $buSalesOrder->updatePurchaseOrdersRequiredByDate($this->buPurchaseOrder->dbePorhead);
             }
@@ -1417,5 +1424,28 @@ class CTPurchaseOrder extends CTCNC
             );
             exit();
         }
+    }
+
+    private function updateStatusController(): array
+    {
+        if (!$this->getDbeUser()->canChangeSalesOrdersAndPurchaseOrdersStatus()) {
+            throw new JsonHttpException(403, "You are not authorized to perform this action!");
+        }
+        $purchaseOrderId = @$_GET['purchaseOrderId'];
+        if (!$purchaseOrderId) {
+            throw new JsonHttpException(400, "Purchase order Id is required!");
+        }
+        $purchaseOrdearHead = new DBEPorhead($this);
+        if (!$purchaseOrdearHead->getRow($purchaseOrderId)) {
+            throw new JsonHttpException(404, "Could not found Purchase order with Id: {$purchaseOrderId}!");
+        }
+        $newStatus = @$_GET['newStatus'];
+        if (!in_array($newStatus, array_keys($this->orderTypeArray))) {
+            $statuses = implode(',', array_keys($this->orderTypeArray));
+            throw new JsonHttpException(400, "New status is not valid please provide on of {$statuses}");
+        }
+        $purchaseOrdearHead->setValue(DBEPorhead::type, $newStatus);
+        $purchaseOrdearHead->updateRow();
+        return ["status" => "ok"];
     }
 }

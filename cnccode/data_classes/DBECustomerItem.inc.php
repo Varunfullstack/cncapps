@@ -780,12 +780,6 @@ class DBECustomerItem extends DBCNCEntity
         return (parent::getRow());
     }
 
-    /**
-     * Get expiry rows by days
-     *
-     * @param unknown_type $days
-     * @return unknown
-     */
     function getExpiryRowsByDays($days)
     {
         $this->setMethodName('getExpiryRowsByDays');

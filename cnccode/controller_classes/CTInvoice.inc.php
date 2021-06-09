@@ -1724,23 +1724,35 @@ class CTInvoice extends CTCNC
     private function sendDirectDebitInvoices()
     {
         $buInvoice = new BUInvoice($this);
-
+        $body = $this->getBody(true);
         $keyData = file_get_contents('c:\\keys\\privkey.pem');
 
-        if (!isset($_POST['passphrase'])) {
+        if (!isset($body['passPhrase'])) {
             throw new Exception('Secure Passphrase not provided');
         }
         $key = openssl_pkey_get_private(
             $keyData,
-            $_POST['passphrase']
+            $body['passPhrase']
         );
 
         if (!$key) {
             throw new Exception('Passphrase not valid');
         }
+
+        if(!isset($body['collectionDate'])){
+            throw new Exception('Passphrase not valid');
+        }
+
+        $collectionDateString = $body['collectionDate'];
+        $collectionDate = DateTimeImmutable::createFromFormat('Y-m-d',$collectionDateString);
+        if(!$collectionDate){
+            throw new Exception('Collection date format is not YYYY-MM-DD');
+        }
+
         // generate PDF invoices:
         $invoiceCount = $buInvoice->printDirectDebitInvoices(
             date('Y-m-01'),
+            $collectionDate,
             $key
         );
 

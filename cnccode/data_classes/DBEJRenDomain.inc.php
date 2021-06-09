@@ -9,15 +9,15 @@ require_once($cfg["path_dbe"] . "/DBECustomerItem.inc.php");
 class DBEJRenDomain extends DBECustomerItem
 {
 
-    const customerName = "customerName";
-    const siteName = "siteName";
-    const itemDescription = "itemDescription";
+    const customerName        = "customerName";
+    const siteName            = "siteName";
+    const itemDescription     = "itemDescription";
     const itemTypeDescription = "itemTypeDescription";
-    const invoiceFromDate = "invoiceFromDate";
-    const invoiceToDate = "invoiceToDate";
-    const invoiceFromDateYMD = "invoiceFromDateYMD";
-    const invoiceToDateYMD = "invoiceToDateYMD";
-    const itemTypeId = "itemTypeId" ;
+    const invoiceFromDate     = "invoiceFromDate";
+    const invoiceToDate       = "invoiceToDate";
+    const invoiceFromDateYMD  = "invoiceFromDateYMD";
+    const invoiceToDateYMD    = "invoiceToDateYMD";
+    const itemTypeId          = "itemTypeId";
 
 
     function __construct(&$owner)
@@ -95,64 +95,48 @@ class DBEJRenDomain extends DBECustomerItem
             DA_NOT_NULL,
             "itm_sstk_cost"
         );
-
         $this->addColumn(
             self::itemTypeId,
             DA_INTEGER,
             DA_ALLOW_NULL,
             'itm_itemtypeno'
         );
-
         $this->setAddColumnsOff();
     }
 
-    function getRow()
+    function getRow($pkValue = null)
     {
-        $statement =
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " JOIN item ON  itm_itemno = cui_itemno
+        $statement = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName() . " JOIN item ON  itm_itemno = cui_itemno
       JOIN itemtype ON  ity_itemtypeno = itm_itemtypeno
 			JOIN customer ON  cus_custno = cui_custno
       JOIN address ON  add_custno = cui_custno AND add_siteno = cui_siteno
-		 WHERE " . $this->getPKWhere() .
-            " AND renewalTypeID = 4";
-
-
+		 WHERE " . $this->getPKWhere() . " AND renewalTypeID = 4";
         $this->setQueryString($statement);
-        $ret = (parent::getRow());
+        return parent::getRow();
     }
 
-    function getRows($orderBy = false)
+    function getRows($sortColumn = '', $orderDirection = '')
     {
 
-        $statement =
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " JOIN item ON  itm_itemno = cui_itemno
+        $statement = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName() . " JOIN item ON  itm_itemno = cui_itemno
       JOIN itemtype ON  ity_itemtypeno = itm_itemtypeno
 			JOIN customer ON  cus_custno = cui_custno
       JOIN address ON  add_custno = cui_custno AND add_siteno = cui_siteno
 			WHERE declinedFlag = 'N'
         AND renewalTypeID = 4";
-
-        if ($orderBy) {
-            $statement .= " ORDER BY $orderBy";
+        if ($sortColumn) {
+            $statement .= " ORDER BY $sortColumn";
         } else {
             $statement .= " ORDER BY cus_name";
         }
-
         $this->setQueryString($statement);
-        $ret = (parent::getRows());
+        return parent::getRows();
     }
 
     function getRowsByCustomerID($customerID)
     {
 
-        $statement =
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " JOIN item ON  itm_itemno = cui_itemno
+        $statement = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName() . " JOIN item ON  itm_itemno = cui_itemno
       JOIN itemtype ON  ity_itemtypeno = itm_itemtypeno
 			JOIN customer ON  cus_custno = cui_custno
       JOIN address ON  add_custno = cui_custno AND add_siteno = cui_siteno
@@ -160,9 +144,8 @@ class DBEJRenDomain extends DBECustomerItem
 				AND cui_custno = $customerID
         AND renewalTypeID = 4
 			ORDER BY cus_name";
-
         $this->setQueryString($statement);
-        $ret = (parent::getRows());
+        return parent::getRows();
     }
 
     /**
@@ -171,11 +154,8 @@ class DBEJRenDomain extends DBECustomerItem
     function getRenewalsDueRows()
     {
 
-        $statement =
-            "
-			SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " JOIN item ON  itm_itemno = cui_itemno
+        $statement = "
+			SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName() . " JOIN item ON  itm_itemno = cui_itemno
       JOIN itemtype ON  ity_itemtypeno = itm_itemtypeno
 			JOIN customer ON  cus_custno = cui_custno
       JOIN address ON  add_custno = cui_custno AND add_siteno = cui_siteno
@@ -186,7 +166,7 @@ class DBEJRenDomain extends DBECustomerItem
         AND renewalTypeID = 4 and directDebitFlag <> 'Y' and item.itm_itemtypeno <> 57";
         $statement .= " ORDER BY cui_custno, autoGenerateContractInvoice asc";
         $this->setQueryString($statement);
-        $ret = (parent::getRows());
+        return parent::getRows();
     }
 
     /**
@@ -195,24 +175,19 @@ class DBEJRenDomain extends DBECustomerItem
     function getRenewalsRowsByID($ids)
     {
 
-        $statement =
-            "
-      SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " JOIN item ON  itm_itemno = cui_itemno
+        $statement = "
+      SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName() . " JOIN item ON  itm_itemno = cui_itemno
       JOIN itemtype ON  ity_itemtypeno = itm_itemtypeno
       JOIN customer ON  cus_custno = cui_custno
       JOIN address ON  add_custno = cui_custno AND add_siteno = cui_siteno
      WHERE cui_cuino ID IN ('" . implode(
                 '\',\'',
                 $ids
-            ) . "')" .
-            " AND declinedFlag = 'N'
+            ) . "')" . " AND declinedFlag = 'N'
       AND renewalTypeID = 4 and directDebitFlag <> 'Y'
      ORDER BY cui_custno";
-
         $this->setQueryString($statement);
-        $ret = (parent::getRows());
+        return parent::getRows();
     }
 
 }

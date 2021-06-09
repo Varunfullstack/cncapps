@@ -7,6 +7,8 @@
  * @authors Karim Ahmed - Sweet Code Limited
  */
 
+use CNCLTD\Business\BUActivity;
+use CNCLTD\Data\DBEJProblem;
 use CNCLTD\StatsFromJSON\StatsFromJSON;
 use Twig\Environment;
 use Twig\TwigFilter;
@@ -20,7 +22,6 @@ require_once($cfg ['path_bu'] . '/BUContact.inc.php');
 require_once($cfg ['path_bu'] . '/BUServiceDeskReport.inc.php');
 require_once($cfg ['path_bu'] . '/BUCustomerSrAnalysisReport.inc.php');
 require_once($cfg ['path_bu'] . '/BUCustomerItem.inc.php');
-require_once($cfg ['path_bu'] . '/BUActivity.inc.php');
 require_once($cfg ['path_bu'] . '/BURenewal.inc.php');
 require_once($cfg ['path_dbe'] . '/DSForm.inc.php');
 
@@ -1278,7 +1279,7 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
         $firstTimeFixRequests = [
             "title"   => "Qualifying First Time Fix Requests",
             "columns" => ["Attempted", "Achieved"],
-            "data"    => [["Attempted", $data["attemptedFirstTimeFix"]], ["Achieved", $data["firstTimeFix"]]]
+            "data"    => [["Attempted - {$data["attemptedFirstTimeFix"]}", $data["attemptedFirstTimeFix"]], ["Achieved - {$data["firstTimeFix"]}", $data["firstTimeFix"]]]
         ];
         $sourceOfRequests     = [
             "title"   => "Source of Requests (%)",
@@ -1286,7 +1287,7 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
             "data"    => []
         ];
         foreach ($data["raiseTypeSummary"] as $item) {
-            $sourceOfRequests["data"] [] = [$item["description"], $item["total"]];
+            $sourceOfRequests["data"] [] = ["{$item["description"]} - {$item["total"]}", $item["total"]];
         }
         foreach ($historicData as $datum) {
             $row                       = [

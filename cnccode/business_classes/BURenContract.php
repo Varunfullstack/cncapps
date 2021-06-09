@@ -6,9 +6,7 @@
  */
 
 namespace CNCLTD\Business;
-global $cfg;
 
-use BUActivity;
 use BUCustomerItem;
 use BUInvoice;
 use BUItem;
@@ -27,9 +25,9 @@ use DBEOrdhead;
 use DBEOrdline;
 use DSForm;
 
+global $cfg;
 require_once($cfg ["path_gc"] . "/Business.inc.php");
 require_once($cfg ["path_bu"] . "/BUCustomerItem.inc.php");
-require_once($cfg ["path_bu"] . "/BUActivity.inc.php");
 require_once($cfg ["path_bu"] . "/BUSalesOrder.inc.php");
 require_once($cfg ["path_dbe"] . "/DBECustomerItem.inc.php");
 require_once($cfg ["path_dbe"] . "/DBEOrdline.inc.php");
@@ -215,7 +213,7 @@ class BURenContract extends Business
 
     /**
      * @param null $itemBillingCategoryID
-     * @throws Exception
+     * @throws \Exception
      */
     function createRenewalsSalesOrders($itemBillingCategoryID = null)
     {

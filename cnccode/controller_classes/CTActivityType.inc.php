@@ -332,9 +332,9 @@ class CTActivityType extends CTCNC
     }
 
     /**
-     * @return json array
+     * @return array
      */
-    function getActTypeList()
+    function getActTypeList(): array
     {
         $dsCallActType = new DataSet($this);
         $this->buActivityType->getAllTypes($dsCallActType);

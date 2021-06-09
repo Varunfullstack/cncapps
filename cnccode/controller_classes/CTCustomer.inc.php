@@ -7,6 +7,9 @@
  * @authors Karim Ahmed - Sweet Code Limited
  */
 
+use CNCLTD\Business\BUActivity;
+use CNCLTD\Data\DBConnect;
+use CNCLTD\Data\DBEJProblem;
 use CNCLTD\Encryption;
 use CNCLTD\SupportedCustomerAssets\UnsupportedCustomerAssetService;
 use CNCLTD\Utils;
@@ -26,7 +29,6 @@ require_once($cfg["path_bu"] . "/BURenHosting.inc.php");
 require_once($cfg["path_bu"] . "/BUExternalItem.inc.php");
 require_once($cfg["path_bu"] . "/BUCustomerItem.inc.php");
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
-require_once($cfg["path_dbe"] . "/DBConnect.php");
 // Parameters
 define(
     'CTCUSTOMER_VAL_NONE_SELECTED',
@@ -1604,7 +1606,6 @@ class CTCustomer extends CTCNC
             )
         );
         $renewalLink             = '<a href="' . $renewalLinkURL . '" target="_blank" title="Renewals">Renewal Information</a>';
-
         $thirdPartyLinkURL       = Controller::buildLink(
             'ThirdPartyContact.php',
             [
@@ -3245,7 +3246,7 @@ class CTCustomer extends CTCNC
                     'status'                 => $dsActiveSrs->getValue(DBEJProblem::status),
                     'isSpecialAttention'     => $this->isSpecialAttention($dsActiveSrs),
                     "assetName"              => $dsActiveSrs->getValue('assetName'),
-                    "emailSubjectSummary"              => $dsActiveSrs->getValue('emailSubjectSummary'),
+                    "emailSubjectSummary"    => $dsActiveSrs->getValue('emailSubjectSummary'),
                 )
             );
         }
@@ -3318,11 +3319,11 @@ ORDER BY NAME,
         ";
         $statement  = $labtechDB->prepare($query);
         $statement->execute([$customerId, $customerId]);
-        $customerAssets = $statement->fetchAll(PDO::FETCH_ASSOC);
+        $customerAssets                   = $statement->fetchAll(PDO::FETCH_ASSOC);
         $unsupportedCustomerAssetsService = new UnsupportedCustomerAssetService();
-        $unsupportedCustomerAssets = $unsupportedCustomerAssetsService->getAllForCustomer($customerId);
-        foreach ($customerAssets as $key => $customerAsset){
-            $customerAssets[$key]['unsupported'] = in_array($customerAsset['name'],$unsupportedCustomerAssets);
+        $unsupportedCustomerAssets        = $unsupportedCustomerAssetsService->getAllForCustomer($customerId);
+        foreach ($customerAssets as $key => $customerAsset) {
+            $customerAssets[$key]['unsupported'] = in_array($customerAsset['name'], $unsupportedCustomerAssets);
         }
         return $customerAssets;
     }
@@ -3448,7 +3449,8 @@ ORDER BY NAME,
                 $this->buCustomer->insertCustomer(
                     $this->dsCustomer,
                     $this->dsSite,
-                    $this->dsContact
+                    $this->dsContact,
+                    $this->dbeUser
                 );
                 $this->dsCustomer->initialise();
                 $this->dsCustomer->fetchNext();

@@ -2,16 +2,18 @@
 
 namespace CNCLTD\ChargeableWorkCustomerRequest\usecases;
 
-use BUActivity;
 use BUCustomer;
 use BUCustomerItem;
 use BUHeader;
 use BUSalesOrder;
+use CNCLTD\Business\BUActivity;
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequest;
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestRepository;
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestTokenId;
 use CNCLTD\CommunicationService\CommunicationService;
+use CNCLTD\Data\DBEJProblem;
 use CNCLTD\Exceptions\ChargeableWorkCustomerRequestNotFoundException;
+use CNCLTD\Exceptions\ColumnOutOfRangeException;
 use CNCLTD\Exceptions\ServiceRequestNotFoundException;
 use DataSet;
 use DateTimeImmutable;
@@ -23,16 +25,11 @@ use DBEItem;
 use DBEJContract;
 use DBEJOrdhead;
 use DBEJOrdline;
-use DBEJProblem;
 use DBEJUser;
 use DBEOrdhead;
 use DBEOrdline;
 use DBEProblem;
 use DBEUser;
-use Exception;
-
-global $cfg;
-require_once($cfg["path_bu"] . "/BUActivity.inc.php");
 
 class AcceptPendingChargeableWorkCustomerRequest
 {
@@ -56,20 +53,21 @@ class AcceptPendingChargeableWorkCustomerRequest
      * @param ChargeableWorkCustomerRequestTokenId $id
      * @param string|null $comments
      * @throws ChargeableWorkCustomerRequestNotFoundException
-     * @throws ServiceRequestNotFoundException
+     * @throws ServiceRequestNotFoundException|ColumnOutOfRangeException
      */
     public function __invoke(ChargeableWorkCustomerRequestTokenId $id, ?string $comments)
     {
-        $request           = $this->getRequest($id);
-        $serviceRequest    = $this->getServiceRequest($request);
-        $requestApprovedAt = new DateTimeImmutable();
-        $buCustomer        = new BUCustomer($this);
-        $hasPrepay         = $buCustomer->hasPrepayContract($serviceRequest->getValue(DBEProblem::customerID));
+        $request             = $this->getRequest($id);
+        $serviceRequest      = $this->getServiceRequest($request);
+        $requestApprovedAt   = new DateTimeImmutable();
+        $buCustomer          = new BUCustomer($this);
+        $hasPrepay           = $buCustomer->hasPrepayContract($serviceRequest->getValue(DBEProblem::customerID));
+        $hasLinkedSalesOrder = (bool)$serviceRequest->getValue(DBEJProblem::linkedSalesOrderID);
         $this->logCustomerContactActivity($request, $requestApprovedAt, $serviceRequest, $comments, $hasPrepay);
-        if (!$hasPrepay) {
+        if (!$hasPrepay || $hasLinkedSalesOrder) {
             $this->createOrUpdateSalesOrder($serviceRequest, $request);
         }
-        $this->updateServiceRequest($serviceRequest, $request, $hasPrepay);
+        $this->updateServiceRequest($serviceRequest, $request, $hasPrepay, $hasLinkedSalesOrder);
         $this->sendEmailToEngineer($request);
         $this->deleteChargeableRequest($request);
     }
@@ -120,14 +118,15 @@ class AcceptPendingChargeableWorkCustomerRequest
     /**
      * @param ChargeableWorkCustomerRequest $request
      * @param DateTimeInterface|null $requestApprovedAt
-     * @param DBEProblem $serviceRequest
+     * @param DBEJProblem $serviceRequest
      * @param string|null $comments
      * @param bool $hasPrepay
-     * @throws Exception
+     * @throws ColumnOutOfRangeException
+     * @throws \Exception
      */
     private function logCustomerContactActivity(ChargeableWorkCustomerRequest $request,
                                                 ?DateTimeInterface $requestApprovedAt,
-                                                DBEProblem $serviceRequest,
+                                                DBEJProblem $serviceRequest,
                                                 ?string $comments,
                                                 bool $hasPrepay
     ): void
@@ -142,7 +141,6 @@ class AcceptPendingChargeableWorkCustomerRequest
             $description .= "<p>Priority Changed from {$serviceRequest->getValue(DBEProblem::priority)} to 5</p>";
         }
         $requester = $this->getRequester($request);
-
         $buActivity->addCustomerContactActivityToServiceRequest($serviceRequest, $description, $requester);
     }
 
@@ -150,6 +148,7 @@ class AcceptPendingChargeableWorkCustomerRequest
      * @param DBEJProblem $DBEJProblem
      * @param ChargeableWorkCustomerRequest $request
      * @return void
+     * @throws ColumnOutOfRangeException
      */
     private function createOrUpdateSalesOrder(DBEJProblem $DBEJProblem, ChargeableWorkCustomerRequest $request): void
     {
@@ -191,7 +190,7 @@ class AcceptPendingChargeableWorkCustomerRequest
         $buSalesOrders->getOrderByOrdheadID($salesOrderId, $dsOrdline, $dsOrdline);
         $labourLine = $this->getLabourLine($dsOrdline);
         if (!$labourLine) {
-            $this->insertItemLine($dsOrdhead, $customerID, $request);
+            $this->insertItemLine($salesOrderId, $customerID, $request);
         } else {
             $this->updateItemLine($labourLine, $request);
         }
@@ -202,6 +201,7 @@ class AcceptPendingChargeableWorkCustomerRequest
      * @param float|null $customerID
      * @param DBEJProblem $DBEJProblem
      * @return void
+     * @throws ColumnOutOfRangeException
      */
     private function insertCommentLine(?float $ordheadID, ?float $customerID, DBEJProblem $DBEJProblem): void
     {
@@ -223,6 +223,7 @@ class AcceptPendingChargeableWorkCustomerRequest
      * @param  $ordheadID
      * @param $customerID
      * @param ChargeableWorkCustomerRequest $request
+     * @throws ColumnOutOfRangeException
      */
     private function insertItemLine($ordheadID,
                                     $customerID,
@@ -265,6 +266,9 @@ class AcceptPendingChargeableWorkCustomerRequest
         return $dbeOrdline;
     }
 
+    /**
+     * @throws ColumnOutOfRangeException
+     */
     private function updateItemLine(DBEOrdline $labourLine, ChargeableWorkCustomerRequest $request)
     {
         $quantity = $labourLine->getValue(DBEOrdline::qtyOrdered) + $request->getAdditionalHoursRequested()->value();
@@ -279,6 +283,7 @@ class AcceptPendingChargeableWorkCustomerRequest
     /**
      * @param DataSet $dsOrdline
      * @return DBEOrdline|null
+     * @throws ColumnOutOfRangeException
      */
     private function getLabourLine(DataSet $dsOrdline): ?DBEOrdline
     {
@@ -296,29 +301,34 @@ class AcceptPendingChargeableWorkCustomerRequest
      * @param DBEJProblem $dbeProblem
      * @param ChargeableWorkCustomerRequest $request
      * @param bool $hasPrepay
+     * @param $hasLinkedSalesOrder
+     * @throws ColumnOutOfRangeException
      */
     private function updateServiceRequest(DBEJProblem $dbeProblem,
                                           ChargeableWorkCustomerRequest $request,
-                                          bool $hasPrepay
+                                          bool $hasPrepay,
+                                          bool $hasLinkedSalesOrder
     ): void
     {
         $toUpdateProblem  = new DBEProblem($this);
         $serviceRequestId = $dbeProblem->getValue(DBEProblem::problemID);
         $toUpdateProblem->getRow($serviceRequestId);
-        if (!$hasPrepay) {
-            $toUpdateProblem->setValue(DBEProblem::priority, 5);
-        } else {
-            $toUpdateProblem->setValue(DBEProblem::prePayChargeApproved, 1);
-            $buCustomer       = new BUCustomerItem($this);
-            $datasetContracts = new DataSet($this);
-            $buCustomer->getPrepayContractByCustomerID(
-                $dbeProblem->getValue(DBEProblem::customerID),
-                $datasetContracts
-            );
-            $toUpdateProblem->setValue(
-                DBEProblem::contractCustomerItemID,
-                $datasetContracts->getValue(DBEJContract::customerItemID)
-            );
+        if (!$hasLinkedSalesOrder) {
+            if (!$hasPrepay) {
+                $toUpdateProblem->setValue(DBEProblem::priority, 5);
+            } else {
+                $toUpdateProblem->setValue(DBEProblem::prePayChargeApproved, 1);
+                $buCustomer       = new BUCustomerItem($this);
+                $datasetContracts = new DataSet($this);
+                $buCustomer->getPrepayContractByCustomerID(
+                    $dbeProblem->getValue(DBEProblem::customerID),
+                    $datasetContracts
+                );
+                $toUpdateProblem->setValue(
+                    DBEProblem::contractCustomerItemID,
+                    $datasetContracts->getValue(DBEJContract::customerItemID)
+                );
+            }
         }
         $requesterId = $request->getRequesterId()->value();
         $dbeUser     = new DBEJUser($this);

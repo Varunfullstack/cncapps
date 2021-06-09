@@ -5,6 +5,7 @@
  * Date: 28/09/2018
  * Time: 14:47
  */
+use CNCLTD\Business\BUActivity;
 global $cfg;
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_dbe"] . "/DBEDirectDebitContracts.php");
@@ -289,7 +290,7 @@ class BUDirectDebitContracts extends Business
                     case CONFIG_CONTRACT_RENEWAL_TYPE_ID:
                         break;
                     default:
-
+                        $description = '';
                         $dbeOrdline->setValue(
                             DBEOrdline::description,
                             $description

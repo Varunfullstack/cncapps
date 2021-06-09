@@ -6,11 +6,12 @@
  * Time: 10:39
  */
 
+use CNCLTD\Business\BUActivity;
+use CNCLTD\Data\DBEJProblem;
 use Twig\Environment;
 
 global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
-require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 require_once($cfg['path_bu'] . '/BUExpense.inc.php');
 require_once($cfg ["path_dbe"] . "/DBEJCallActivity.php");
 
@@ -1185,7 +1186,7 @@ WHERE
             );
             $overtimeApprovedValue = $overtimeDurationApproved;
             if (!$overtimeApprovedValue) {
-                $buExpense = new BUExpense($this);
+                $buExpense             = new BUExpense($this);
                 $overtimeApprovedValue = number_format($buExpense->calculateOvertime($activityId), 2, '.', '');
             }
             $dbeCallActivity->setValue(

@@ -584,6 +584,7 @@ class DBECallActivitySearch extends DBEntity
         if ($limit) {
             $statement .= " LIMIT 0, 150";
         }
+
         $this->setQueryString($statement);
         $ret = (parent::getRows());
         return $ret;

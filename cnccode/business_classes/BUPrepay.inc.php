@@ -11,7 +11,6 @@ require_once($cfg ["path_gc"] . "/Controller.inc.php");
 require_once($cfg ["path_dbe"] . "/DBECallActivity.inc.php");
 require_once($cfg ["path_dbe"] . "/DBEJCallActivity.php");
 require_once($cfg ["path_dbe"] . "/DBEProblem.inc.php");
-require_once($cfg ["path_dbe"] . "/DBEJProblem.inc.php");
 require_once($cfg ["path_dbe"] . "/DBECallActivitySearch.inc.php");
 require_once($cfg ["path_dbe"] . "/DBECallDocument.inc.php");
 require_once($cfg ["path_dbe"] . "/DBECallActType.inc.php");
@@ -28,21 +27,22 @@ require_once($cfg ["path_dbe"] . "/DBEUser.inc.php");
 require_once($cfg ["path_dbe"] . "/DBEJUser.inc.php");
 require_once($cfg ["path_dbe"] . "/DBESite.inc.php");
 require_once($cfg ["path_bu"] . "/BUMail.inc.php");
+require_once($cfg['path_bu'] . '/BUExpense.inc.php');
 
 class BUPrepay extends Business
 {
 
-    const exportDataSetEndDate = "endDate";
+    const exportDataSetEndDate    = "endDate";
     const exportDataSetPreviewRun = "previewRun";
 
-    const exportPrePayCustomerName = "customerName";
+    const exportPrePayCustomerName    = "customerName";
     const exportPrePayPreviousBalance = "previousBalance";
-    const exportPrePayCurrentBalance = "currentBalance";
-    const exportPrePayExpiryDate = "expiryDate";
-    const exportPrePayTopUp = "topUp";
-    const exportPrePayContacts = "contacts";
-    const exportPrePayContractType = "contractType";
-    const exportPrePayWebFileLink = "webFileLink";
+    const exportPrePayCurrentBalance  = "currentBalance";
+    const exportPrePayExpiryDate      = "expiryDate";
+    const exportPrePayTopUp           = "topUp";
+    const exportPrePayContacts        = "contacts";
+    const exportPrePayContractType    = "contractType";
+    const exportPrePayWebFileLink     = "webFileLink";
     /**
      * @var DBEJCallActivity
      */
@@ -73,9 +73,9 @@ class BUPrepay extends Business
     {
         parent::__construct($owner);
         $this->dbeJCallActivity = new DBEJCallActivity ($this);
-        $this->dbeUser = new DBEUser ($this);
-        $buHeader = new BUHeader ($this);
-        $this->dsHeader = new DataSet($this);
+        $this->dbeUser          = new DBEUser ($this);
+        $buHeader               = new BUHeader ($this);
+        $this->dsHeader         = new DataSet($this);
         $buHeader->getHeader($this->dsHeader);
         $this->buCustomer = new BUCustomer ($this);
     }
@@ -102,11 +102,9 @@ class BUPrepay extends Business
     {
 
         $this->setMethodName('exportPrePayActivities');
-
-        $this->dsData = $dsData;
+        $this->dsData     = $dsData;
         $this->updateFlag = $updateFlag;
-
-        $dsResults = new DataSet ($this);
+        $dsResults        = new DataSet ($this);
         $dsResults->addColumn(self::exportPrePayCustomerName, DA_STRING, DA_ALLOW_NULL);
         $dsResults->addColumn(self::exportPrePayPreviousBalance, DA_FLOAT, DA_ALLOW_NULL);
         $dsResults->addColumn(self::exportPrePayCurrentBalance, DA_FLOAT, DA_ALLOW_NULL);
@@ -115,15 +113,11 @@ class BUPrepay extends Business
         $dsResults->addColumn(self::exportPrePayContacts, DA_STRING, DA_ALLOW_NULL);
         $dsResults->addColumn(self::exportPrePayContractType, DA_STRING, DA_ALLOW_NULL);
         $dsResults->addColumn(self::exportPrePayWebFileLink, DA_STRING, DA_ALLOW_NULL); // link to statement
-
         $dbeVat = new DBEVat($this);
         $dbeVat->getRow();
-        $vatCode = $this->dsHeader->getValue(DBEHeader::stdVATCode);
+        $vatCode               = $this->dsHeader->getValue(DBEHeader::stdVATCode);
         $this->standardVatRate = $dbeVat->getValue((integer)$vatCode[1]); // use second part of code as column no
-
-        $db = new dbSweetcode (); // database connection for query
-
-
+        $db                    = new dbSweetcode (); // database connection for query
         /* get a list of valid support customer items */
         $queryString = "
     SELECT
@@ -132,29 +126,25 @@ class BUPrepay extends Business
       custitem
 			JOIN customer ON customer.cus_custno = custitem.cui_custno
 		WHERE
-      cui_itemno = " . $this->dsHeader->getValue(DBEHeader::gscItemID) .
-            " AND cui_expiry_date >= '" . $this->dsData->getValue(self::exportDataSetEndDate) . "'" .
-            " AND cui_desp_date <= '" . $this->dsData->getValue(
+      cui_itemno = " . $this->dsHeader->getValue(
+                DBEHeader::gscItemID
+            ) . " AND cui_expiry_date >= '" . $this->dsData->getValue(
+                self::exportDataSetEndDate
+            ) . "'" . " AND cui_desp_date <= '" . $this->dsData->getValue(
                 self::exportDataSetEndDate
             ) . "'" . // and the contract has started
             " AND cui_expiry_date >= now()" . // and is not expired
-            " AND	cus_custno <> " . CONFIG_SALES_STOCK_CUSTOMERID .
-            " AND	renewalStatus  <> 'D'";
-
+            " AND	cus_custno <> " . CONFIG_SALES_STOCK_CUSTOMERID . " AND	renewalStatus  <> 'D'";
         $db->query($queryString);
         while ($db->next_record()) {
             $validContracts [$db->Record ['cui_cuino']] = 0; // initialise to no activity
         }
-
 //        $dbUpdate = new dbSweetcode (); // database connection for update query
-
 //        $dbeCallActivity = new DBECallActivity ($this); // for update of status
         /*
         Bring out a list of PrePay Service Requests to be included in the statement run
         */
-
-        $queryString =
-            "SELECT
+        $queryString = "SELECT
         pro_problemno,
         pro_custno AS custno,
         DATE_FORMAT(pro_date_raised, '%d/%m/%Y') AS requestDate,
@@ -194,27 +184,19 @@ class BUPrepay extends Business
             " AND pro_custno <> " . CONFIG_SALES_STOCK_CUSTOMERID .                 // Not CNC sales stock customer
             " AND renewalStatus <> 'D' " .                                          // Contract renewal not declined
             " AND caa_callacttypeno NOT IN( " .                                     // Activity type not engineer travel or proactive
-            CONFIG_ENGINEER_TRAVEL_ACTIVITY_TYPE_ID . "," .
-            CONFIG_PROACTIVE_SUPPORT_ACTIVITY_TYPE_ID .
-            ")" .
-            " AND pro_status = 'C'" .                                                // Service Request completed
+            CONFIG_ENGINEER_TRAVEL_ACTIVITY_TYPE_ID . "," . CONFIG_PROACTIVE_SUPPORT_ACTIVITY_TYPE_ID . ")" . " AND pro_status = 'C'" .                                                // Service Request completed
             " AND caa_status = 'C'" .                                                // Activity completed
             " AND
           ( caa_starttime <> caa_endtime OR curValue <> 0 )" .                   // time was logged or this is a value (e.g. topUp)
             " GROUP BY pro_problemno 
       ORDER BY pro_custno, pro_problemno, pro_date_raised";
-
         $db->query($queryString);
-
-        $ret = FALSE; // indicates there were no statements to export
-
+        $ret       = FALSE; // indicates there were no statements to export
         $buContact = new BUContact ($this);
-
         // ensure all customers have at least one statement contact
-        $last_custno = '9999';
+        $last_custno    = '9999';
         $htmlFileHandle = null;
-        $buExpense = new BUExpense($this);
-
+        $buExpense      = new BUExpense($this);
         while ($db->next_record()) {
             if ($db->Record ['custno'] != $last_custno) {
                 if ($last_custno != '9999') {
@@ -230,14 +212,14 @@ class BUPrepay extends Business
             }
             $last_custno = $db->Record ['custno'];
         }
-
-
         $db->query($queryString);
-
-        $last_custno = '9999';
-        $filepath = null;
-        $date = DateTime::createFromFormat(DATE_MYSQL_DATE, $this->dsData->getValue(self::exportDataSetEndDate));
-        $csvFileName = SAGE_EXPORT_DIR . '/PrePayOOH' . (new DateTime())->format('d-m-Y') . '.csv';
+        $last_custno    = '9999';
+        $filepath       = null;
+        $date           = DateTime::createFromFormat(
+            DATE_MYSQL_DATE,
+            $this->dsData->getValue(self::exportDataSetEndDate)
+        );
+        $csvFileName    = SAGE_EXPORT_DIR . '/PrePayOOH' . (new DateTime())->format('d-m-Y') . '.csv';
         $csvFileHandler = fopen($csvFileName, "w");
         fputcsv(
             $csvFileHandler,
@@ -247,9 +229,7 @@ class BUPrepay extends Business
         while ($db->next_record()) {
 
             $validContracts [$db->Record ['cui_cuino']] = 1; // flag contract as having activity
-
-            $ret = TRUE; // there was at least one statement to export
-
+            $ret                                        = TRUE; // there was at least one statement to export
             // new customer so create new html file
             if ($db->Record ['custno'] != $last_custno) {
 
@@ -264,12 +244,9 @@ class BUPrepay extends Business
                             'remainingBalance' => common_numberFormat($newBalance)
                         )
                     );
-
                     $this->template->parse('output', 'page', true);
                     fwrite($htmlFileHandle, $this->template->get_var('output'));
                     fclose($htmlFileHandle); // close previous html file
-
-
                     $this->postRowToSummaryFile(
                         $lastRecord,
                         $dsResults,
@@ -278,12 +255,9 @@ class BUPrepay extends Business
                         $topUpValue,
                         $date->format(DATE_MYSQL_DATE)
                     );
-
                     $dsStatementContact->initialise();
-
                     if ($this->updateFlag) {
                         $fileName = $filepath . '.html';
-
                         $this->sendStatement(
                             $fileName,
                             $last_custno,
@@ -296,23 +270,17 @@ class BUPrepay extends Business
                     }
 
                 } // end if ( $last_custno != '9999' )
-
-
                 $this->totalCost = 0; // reset cost
-
-
-                $filepath = SAGE_EXPORT_DIR . '/PP_' . substr(
+                $filepath        = SAGE_EXPORT_DIR . '/PP_' . substr(
                         $db->Record ['cus_name'],
                         0,
                         20
                     ) . $date->format('Y-m-d');
-
-                $htmlFileHandle = fopen($filepath . '.html', 'wb');
+                $htmlFileHandle  = fopen($filepath . '.html', 'wb');
                 if (!$htmlFileHandle) {
                     print_r(error_get_last());
                     $this->raiseError("Unable to open html file " . $filepath);
                 }
-
                 // set up new html file template
                 $this->template = new Template ($GLOBALS ["cfg"] ["path_templates"], "remove");
                 $this->template->set_file('page', 'PrepayReport.inc.html');
@@ -331,7 +299,6 @@ class BUPrepay extends Business
                     $dsStatementContact->getValue(DBEContact::siteNo),
                     $dsSite
                 );
-
                 // Set header fields
                 $this->template->set_var(
                     array(
@@ -356,18 +323,14 @@ class BUPrepay extends Business
                         'cnc_phone'     => $this->dsHeader->getValue(DBEHeader::phone)
                     )
                 );
-
                 $this->template->set_block('page', 'lineBlock', 'lines');
-
                 $last_custno = $db->Record ['custno'];
-                $ret = TRUE; // indicates there were statements to export
+                $ret         = TRUE; // indicates there were statements to export
             }
             $lastRecord = $db->Record;
-
             $this->getActivitiesByServiceRequest($db->Record);
         }
         //close file
-
         if ($ret == TRUE) {
             $topUpValue = $this->doTopUp($lastRecord);
             $newBalance = $lastRecord ['curGSCBalance'] + $this->totalCost;
@@ -378,11 +341,9 @@ class BUPrepay extends Business
                     'remainingBalance' => common_numberFormat($newBalance)
                 )
             );
-
             $this->template->parse('output', 'page', true);
             fwrite($htmlFileHandle, $this->template->get_var('output'));
             fclose($htmlFileHandle);
-
             $this->postRowToSummaryFile(
                 $lastRecord,
                 $dsResults,
@@ -391,7 +352,6 @@ class BUPrepay extends Business
                 $topUpValue,
                 $date->format(DATE_MYSQL_DATE)
             );
-
             if ($this->updateFlag) {
                 $dsStatementContact->initialise();
                 $this->sendStatement(
@@ -404,7 +364,6 @@ class BUPrepay extends Business
                 );
             }
         }
-
         /*
     Now produce statements for contracts that had no activity
 */
@@ -413,8 +372,7 @@ class BUPrepay extends Business
         foreach ($validContracts as $key => $value) {
             if ($value == 0) {
 
-                $ret = true;
-
+                $ret         = true;
                 $queryString = "SELECT
 						cus_name,
             cus_custno,
@@ -436,22 +394,19 @@ class BUPrepay extends Business
                 $db->next_record();
                 // get GSC contact record
                 $buContact->getGSCContactByCustomerID($db->Record ['custno'], $dsStatementContact);
-
                 if (!$dsStatementContact->rowCount()) {
                     $this->raiseError(
                         'Customer ' . $db->Record ['cus_name'] . ' needs at least one Pre-pay statement contact.'
                     );
                     exit ();
                 }
-
                 $this->buCustomer->getSiteByCustomerIDSiteNo(
                     $dsStatementContact->getValue(DBEContact::customerID),
                     $dsStatementContact->getValue(DBEContact::siteNo),
                     $dsSite
                 );
-
                 // set up new html file template
-                $filepath = SAGE_EXPORT_DIR . '/PP_' . substr(
+                $filepath       = SAGE_EXPORT_DIR . '/PP_' . substr(
                         $db->Record ['cus_name'],
                         0,
                         20
@@ -463,7 +418,6 @@ class BUPrepay extends Business
                 }
                 $this->template = new Template ($GLOBALS ["cfg"] ["path_templates"], "remove");
                 $this->template->set_file('page', 'PrepayReport.inc.html');
-
                 // Set header fields
                 $this->template->set_var(
                     array(
@@ -490,9 +444,7 @@ class BUPrepay extends Business
                         'cnc_phone'     => $this->dsHeader->getValue(DBEHeader::phone)
                     )
                 );
-
                 $this->template->set_block('page', 'lineBlock', 'lines');
-
                 $this->template->set_var(
                     array(
                         'requestDate'            => '',
@@ -503,7 +455,6 @@ class BUPrepay extends Business
                         'requestDetails'         => 'No service requests logged in this period'
                     )
                 );
-
                 $this->template->parse('lines', 'lineBlock', true);
                 $this->totalCost += $value;
                 $this->template->set_var(
@@ -516,10 +467,8 @@ class BUPrepay extends Business
                 $this->template->parse('output', 'page', true);
                 fwrite($htmlFileHandle, $this->template->get_var('output'));
                 fclose($htmlFileHandle);
-
                 $dsStatementContact->initialise();
                 $topUpValue = $this->doTopUp($db->Record);
-
                 $this->postRowToSummaryFile(
                     $db->Record,
                     $dsResults,
@@ -528,7 +477,6 @@ class BUPrepay extends Business
                     $topUpValue,
                     $date->format(DATE_MYSQL_DATE)
                 );
-
                 if ($this->updateFlag) {
                     $this->sendStatement(
                         $filepath . '.html',
@@ -541,7 +489,6 @@ class BUPrepay extends Business
                 }
             }
         }
-
         if ($ret) {
             return $dsResults;
         } else {
@@ -559,11 +506,9 @@ class BUPrepay extends Business
             $dbeCustomerItem->setValue(DBECustomerItem::curGSCBalance, $newBalance);
             $dbeCustomerItem->updateRow();
         }
-
         if ($newBalance >= 100) {
             return 0;
         }
-
         if ($newBalance < 0) {
             // value of the top-up activity is the GSC item price plus amount required to clear balance
             $topUpValue = (0 - $newBalance) + $Record ['gscTopUpAmount'];
@@ -574,7 +519,6 @@ class BUPrepay extends Business
         if ($this->updateFlag) {
             $this->createTopUpSalesOrder($Record, $topUpValue);
         }
-
         return $topUpValue;
     }
 
@@ -584,16 +528,13 @@ class BUPrepay extends Business
           order for the top-up amount.
           This call will now appear on
       */
-
     function createTopUpSalesOrder(&$Record, $topUpValue)
     {
         $this->setMethodName('createTopUpSalesOrder');
-
         $this->buCustomer->getCustomerByID($Record ['custno'], $dsCustomer);
-
         // create sales order header with correct field values
         $buSalesOrder = new BUSalesOrder ($this);
-        $dsOrdhead = new DataSet($this);
+        $dsOrdhead    = new DataSet($this);
         $buSalesOrder->initialiseOrder($dsOrdhead, $dbeOrdline, $dsCustomer);
         $dsOrdhead->setUpdateModeUpdate();
         $dsOrdhead->setvalue(DBEJOrdhead::custPORef, 'Top Up');
@@ -608,14 +549,11 @@ class BUPrepay extends Business
             $dsOrdhead->getValue(DBEJOrdhead::partInvoice),
             $dsOrdhead->getValue(DBEJOrdhead::addItem)
         );
-
-        $ordheadID = $dsOrdhead->getValue(DBEJOrdhead::ordheadID);
+        $ordheadID  = $dsOrdhead->getValue(DBEJOrdhead::ordheadID);
         $sequenceNo = 1;
-
         // get topUp item details
         $dbeItem = new DBEItem ($this);
         $dbeItem->getRow(CONFIG_DEF_PREPAY_TOPUP_ITEMID);
-
         // create order line
         $dbeOrdline = new DBEOrdline ($this);
         $dbeOrdline->setValue(DBEJOrdline::ordheadID, $ordheadID);
@@ -677,15 +615,14 @@ class BUPrepay extends Business
      */
     function sendStatement($statementFilepath, $custno, &$dsContact, $balance, $date, $topUpValue)
     {
-        $buMail = new BUMail($this);
+        $buMail      = new BUMail($this);
         $senderEmail = CONFIG_SALES_EMAIL;
-
-        $subject = 'Pre-Pay Contract Statement: ' . Controller::dateYMDtoDMY($date);
+        $subject     = 'Pre-Pay Contract Statement: ' . Controller::dateYMDtoDMY($date);
         $attachments = new \CNCLTD\Email\AttachmentCollection();
         $attachments->add($statementFilepath, 'text/html', null, true);
         while ($dsContact->fetchNext()) {
             global $twig;
-            $body = $twig->render(
+            $body    = $twig->render(
                 '@customerFacing/PrePayInformation/PrePayInformation.html.twig',
                 [
                     "contactFirstName" => $dsContact->getValue(DBEContact::firstName),
@@ -696,17 +633,14 @@ class BUPrepay extends Business
             $toEmail = "{$dsContact->getValue(DBEContact::firstName)} {$dsContact->getValue(DBEContact::lastName)}<{$dsContact->getValue(DBEContact::email)}>";
             $buMail->sendEmailWithAttachments($body, $subject, $toEmail, $attachments, $senderEmail);
         }
-
         $this->persistPrePayStatement($statementFilepath, $custno, $balance);
     }
 
     function persistPrePayStatement($filename, $custno, $balance)
     {
-        $db = $GLOBALS['db'];
-
+        $db         = $GLOBALS['db'];
         $fileString = mysqli_real_escape_string($db->link_id(), file_get_contents($filename));
-        $sql =
-            "INSERT INTO
+        $sql        = "INSERT INTO
         prepaystatement(
           pre_custno,
           pre_date,
@@ -719,7 +653,6 @@ class BUPrepay extends Business
           '$fileString',
           $balance
         )";
-
         $db->query($sql);
 
     }
@@ -727,12 +660,10 @@ class BUPrepay extends Business
     /*
         Create sales order for top-up
     */
-
     function getActivitiesByServiceRequest($serviceRequestRecord)
     {
 
-        $db = new dbSweetcode (); // database connection for query
-
+        $db          = new dbSweetcode (); // database connection for query
         $queryString = "
       SELECT
           caa_callactivityno,
@@ -766,24 +697,22 @@ class BUPrepay extends Business
           JOIN contact ON caa_contno = con_contno
           join customer on problem.pro_custno = customer.cus_custno
         WHERE
-          caa_problemno = " . $serviceRequestRecord['pro_problemno'] .
-            " AND itm_itemno = " . $this->dsHeader->getValue(DBEHeader::gscItemID) . " AND caa_endtime IS NOT NULL and caa_endtime <> ''
+          caa_problemno = " . $serviceRequestRecord['pro_problemno'] . " AND itm_itemno = " . $this->dsHeader->getValue(
+                DBEHeader::gscItemID
+            ) . " AND caa_endtime IS NOT NULL and caa_endtime <> ''
           AND caa_status = 'C'
           AND caa_callacttypeno NOT IN( " .                                     // Activity type not engineer travel or proactive
-            CONFIG_ENGINEER_TRAVEL_ACTIVITY_TYPE_ID . "," .
-            CONFIG_PROACTIVE_SUPPORT_ACTIVITY_TYPE_ID .
-            ")
+            CONFIG_ENGINEER_TRAVEL_ACTIVITY_TYPE_ID . "," . CONFIG_PROACTIVE_SUPPORT_ACTIVITY_TYPE_ID . ")
         ORDER BY caa_date, caa_starttime";
-
         $db->query($queryString);
-        $firstActivity = true;
-        $requestValue = 0;
-        $requestHours = 0;
-        $dbeCallActivity = null;
-        $reason = null;
-        $customerContact = null;
+        $firstActivity            = true;
+        $requestValue             = 0;
+        $requestHours             = 0;
+        $dbeCallActivity          = null;
+        $reason                   = null;
+        $customerContact          = null;
         $prepayOvertimeActivities = [];
-        $buExpense = new BUExpense($this);
+        $buExpense                = new BUExpense($this);
         while ($db->next_record()) {
 
             $overtime = $buExpense->calculateOvertime($db->Record['caa_callactivityno']);
@@ -800,9 +729,7 @@ class BUPrepay extends Business
                     "overtime"         => round($overtime, 1)
                 ];
             }
-
             if ($db->Record ['curValueFlag'] == 'Y') { // This is a monetary value activity such as top-up or adjustment
-
                 $requestValue += $db->Record ['curValue'];
 
             } else {
@@ -816,7 +743,6 @@ class BUPrepay extends Business
                         $db->Record['caa_siteno'],
                         $dsSite
                     );
-
                     $max_hours = $dsSite->getValue(DBESite::maxTravelHours);
 
                 } else {
@@ -842,7 +768,6 @@ class BUPrepay extends Business
                     $overtimeRate,
                     $normalRate
                 );
-
                 /*
                 Only add to totals if this is chargeable
                 */
@@ -853,16 +778,13 @@ class BUPrepay extends Business
                 }
 
             } // end if ($db->Record ['curValueFlag'] == 'Y')
-
             if ($firstActivity) {
-                $reason = substr(strip_tags($db->Record ['reason']), 0, 130);
-                $reason = str_replace("\r\n", "", $reason);
-                $reason = str_replace("\"", "", $reason);
+                $reason          = substr(strip_tags($db->Record ['reason']), 0, 130);
+                $reason          = str_replace("\r\n", "", $reason);
+                $reason          = str_replace("\"", "", $reason);
                 $customerContact = trim($db->Record ['con_first_name']) . ' ' . trim($db->Record ['con_last_name']);
-
-                $firstActivity = false;
+                $firstActivity   = false;
             }
-
             if ($this->updateFlag) {
                 if (!$dbeCallActivity) {
                     $dbeCallActivity = new DBECallActivity($this);
@@ -875,16 +797,14 @@ class BUPrepay extends Business
             }
 
         } // end while $db->next_record
-
         if (count($prepayOvertimeActivities)) {
-            $csvFileName = SAGE_EXPORT_DIR . '/PrePayOOH' . (new DateTime())->format('d-m-Y') . '.csv';
+            $csvFileName    = SAGE_EXPORT_DIR . '/PrePayOOH' . (new DateTime())->format('d-m-Y') . '.csv';
             $csvFileHandler = fopen($csvFileName, "a");
             foreach ($prepayOvertimeActivities as $prepayOvertimeActivity) {
                 fputcsv($csvFileHandler, array_values($prepayOvertimeActivity));
             }
             fclose($csvFileHandler);
         }
-
         $this->postRowToPrePayExportFile(
             $serviceRequestRecord,
             $reason,
@@ -896,12 +816,11 @@ class BUPrepay extends Business
 
     }
 
-    function postRowToPrePayExportFile(
-        &$serviceRequestRecord,
-        $reason,
-        $customerContact,
-        $requestHours,
-        $requestValue
+    function postRowToPrePayExportFile(&$serviceRequestRecord,
+                                       $reason,
+                                       $customerContact,
+                                       $requestHours,
+                                       $requestValue
     )
     {
 
@@ -916,9 +835,7 @@ class BUPrepay extends Business
                 'requestValue'           => common_numberFormat($requestValue)
             )
         );
-
         $this->template->parse('lines', 'lineBlock', true);
-
         $this->totalCost += $requestValue;
     }
 

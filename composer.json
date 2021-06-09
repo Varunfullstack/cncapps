@@ -34,12 +34,17 @@
         "karriere/json-decoder": "^4.0.0",
         "ext-sqlite3": "*",
         "data-uri/data-uri": "^0.2.5",
-        "html2text/html2text": "^4.3"
+        "html2text/html2text": "^4.3",
+        "ramsey/uuid": "^4.1",
+        "symfony/messenger": "^5.2",
+        "lambdish/phunctional": "^2.1",
+        "symfony/validator": "^5.2"
     },
     "autoload": {
         "psr-4": {
             "CNCLTD\\": "cnccode/customClasses",
             "CNCLTD\\Data\\": "cnccode/data_classes",
+            "CNCLTD\\Controller\\": "cnccode/controller_classes",
             "CNCLTD\\Business\\": "cnccode/business_classes"
         }
     },

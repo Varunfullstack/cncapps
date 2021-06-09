@@ -4,6 +4,9 @@
 * @access public
 */
 global $cfg;
+
+use CNCLTD\Data\DBConnect;
+
 require_once($cfg["path_dbe"] . "/DBCNCEntity.inc.php");
 
 class DBECustomer extends DBCNCEntity
@@ -827,10 +830,11 @@ class DBECustomer extends DBCNCEntity
         $ret = (self::getRows());
         return $ret;
     }
-    public function getCustomerSiteAddress($customerID,$siteID)
+
+    public function getCustomerSiteAddress($customerID, $siteID)
     {
-        $query="select * from address where add_custno=:custID and (:siteID is null or add_siteno=:siteID)";
-        $address=DBConnect::fetchOne($query,["siteID"=>$siteID,"custID"=>$customerID]);
+        $query   = "select * from address where add_custno=:custID and (:siteID is null or add_siteno=:siteID)";
+        $address = DBConnect::fetchOne($query, ["siteID" => $siteID, "custID" => $customerID]);
         return $address;
     }
 }

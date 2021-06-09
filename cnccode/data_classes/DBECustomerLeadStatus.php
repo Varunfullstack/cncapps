@@ -1,19 +1,21 @@
 <?php
+
+use CNCLTD\Data\DBConnect;
+
 /**
  * Created by PhpStorm.
  * User: fizda
  * Date: 10/01/2018
  * Time: 16:25
  */
-
 class DBECustomerLeadStatus extends DBEntity
 {
     use \CNCLTD\SortableDBE;
 
-    const id = "id";
-    const name = "name";
+    const id             = "id";
+    const name           = "name";
     const appearOnScreen = "appearOnScreen";
-    const sortOrder = "sortOrder";
+    const sortOrder      = "sortOrder";
 
     /**
      * calls constructor()
@@ -50,7 +52,9 @@ class DBECustomerLeadStatus extends DBEntity
         global $db;
         return $db;
     }
-    public function hasName($name){
-        return DBConnect::fetchOne("select * from customerleadstatus where name=:name",["name"=>$name]);
+
+    public function hasName($name)
+    {
+        return DBConnect::fetchOne("select * from customerleadstatus where name=:name", ["name" => $name]);
     }
 }

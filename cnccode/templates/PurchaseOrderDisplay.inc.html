@@ -12,6 +12,10 @@
 <script language='JavaScript'>
 
     const isPartReceived = {isPartReceived};
+    const canChangeStatus = {canChangeStatus};
+    const type = '{type}';
+    let typeInput;
+
 
     function checkFunctionKey(field) {
         if (event.keyCode == 120) {			// F9 - edit
@@ -219,6 +223,8 @@
     document.addEventListener("DOMContentLoaded", function () {
         checkValidity();
 
+        typeInput = document.querySelector('input[type="hidden"][name="porhead[1][type]"]');
+
         addNewButton = document.getElementById('addNewRowButton');
         const deleteLineButtons = document.querySelectorAll('button.deleteLineButton');
 
@@ -270,7 +276,74 @@
             );
 
         }
+
+        if (canChangeStatus) {
+
+            const updateButtonRow = document.querySelector('.updateButtonRow');
+            const newRow = getStatusRow(type)
+            updateButtonRow.parentNode.insertBefore(newRow, updateButtonRow);
+        }
+
     });
+
+    function getStatusRow(currentSelectedValue) {
+        const newRow = document.createElement('tr');
+        const promptText = document.createElement('td');
+        promptText.className = "promptText";
+        promptText.textContent = "Status";
+        newRow.appendChild(promptText);
+        const selector = document.createElement('td');
+        selector.className = "mainHeadText";
+        const statusSelector = getStatusSelector(currentSelectedValue)
+        selector.appendChild(statusSelector);
+        const button = document.createElement('button');
+        button.textContent = "Update Status";
+        button.addEventListener('click', () => {
+            if (selector.value == typeInput.value) {
+                return;
+            }
+            const purchaseOrderId = getPurchaseOrderId();
+            const newStatus = statusSelector.value;
+
+            fetch('?action=UPDATE_STATUS&purchaseOrderId=' + purchaseOrderId + '&newStatus=' + newStatus)
+                    .then(response => response.json())
+                    .then(response => {
+                        console.log(response);
+                        if (response.status == 'error') {
+                            throw new Error(response.message);
+                        }
+                        document.location.reload();
+                    })
+                    .catch(error => {
+                        console.log(error);
+                        alert(error.message);
+                    })
+
+        })
+        selector.appendChild(button);
+        newRow.appendChild(selector);
+        return newRow;
+    }
+
+    function getStatusSelector(currentSelectedValue) {
+        const options = [
+            {value: "I", label: "Initial",},
+            {value: "P", label: "Part Received",},
+            {value: "C", label: "Completed",},
+            {value: "A", label: "Authorised"},
+        ]
+        const selector = document.createElement('select');
+        selector.value = currentSelectedValue;
+        options.forEach(optionData => {
+            const option = document.createElement('option');
+            option.label = optionData.label;
+            option.value = optionData.value;
+            option.selected = currentSelectedValue === optionData.value;
+            selector.options.add(option);
+        })
+        return selector;
+    }
+
 </SCRIPT>
 
 <TABLE width="400px"

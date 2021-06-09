@@ -162,6 +162,10 @@ class CTRenQuotation extends CTCNC
         $this->setTemplateFiles(
             array('RenQuotationEdit' => 'RenQuotationEdit.inc')
         );
+
+        $this->loadReactScript('ItemSelectorWrapperComponent.js');
+        $this->loadReactCSS('ItemSelectorWrapperComponent.css');
+
         $disabled = CTCNC_HTML_DISABLED;
         $readonly = 'READONLY';
 

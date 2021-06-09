@@ -9,6 +9,7 @@
 
 use CNCLTD\Exceptions\ColumnOutOfRangeException;
 
+global $cfg;
 require_once($cfg["path_gc"] . "/BaseObject.inc.php");
 define(
     "DA_NOT_NULL",
@@ -691,7 +692,7 @@ class DataAccess extends BaseObject
         if ($this->columnExists($ixColumn) != DA_OUT_OF_RANGE) {
             return $this->colName[$ixColumn];
         } else {
-            throw new \CCNCLTD\Exceptions\ColumnOutOfRangeException($ixColumn);
+            throw new ColumnOutOfRangeException($ixColumn);
             return "";
         }
     }
@@ -882,7 +883,7 @@ class DataAccess extends BaseObject
         if ($ixColumn != DA_OUT_OF_RANGE) {
             return $this->colType[$ixColumn];
         } else {
-            throw new \CCNCLTD\Exceptions\ColumnOutOfRangeException($ixPassedColumn);
+            throw new ColumnOutOfRangeException($ixPassedColumn);
             return DA_OUT_OF_RANGE;
         }
     }

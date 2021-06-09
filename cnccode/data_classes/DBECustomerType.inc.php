@@ -3,19 +3,23 @@
 * @authors Karim Ahmed
 * @access public
 */
+
+use CNCLTD\Data\DBConnect;
+
+global $cfg;
 require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBECustomerType extends DBEntity
 {
 
     const customerTypeID = "customerTypeID";
-    const description = "description";
+    const description    = "description";
 
     /**
      * calls constructor()
      * @access public
+     * @param void
      * @return void
-     * @param  void
      * @see constructor()
      */
     function __construct(&$owner)
@@ -37,8 +41,13 @@ class DBECustomerType extends DBEntity
         $this->setPK(0);
         $this->setAddColumnsOff();
     }
-    function hasType($type,$id=null){
-        return DBConnect::fetchOne("select * from custype where cty_desc=:desc and (:id = null or cty_ctypeno<> :id )",["desc"=>$type,"id"=>$id]);
+
+    function hasType($type, $id = null)
+    {
+        return DBConnect::fetchOne(
+            "select * from custype where cty_desc=:desc and (:id = null or cty_ctypeno<> :id )",
+            ["desc" => $type, "id" => $id]
+        );
     }
 }
 

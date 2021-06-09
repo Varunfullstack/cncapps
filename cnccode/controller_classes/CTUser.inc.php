@@ -7,6 +7,7 @@
  * @authors Karim Ahmed - Sweet Code Limited
  */
 
+use CNCLTD\Data\DBConnect;
 use CNCLTD\Encryption;
 
 global $cfg;
@@ -590,6 +591,9 @@ class CTUser extends CTCNC
                 'forceClosingPermissionChecked'                          => $dsUser->getValue(
                     DBEUser::forceClosingPermission
                 ) ? 'checked' : '',
+                'changeSalesOrdersStatusPermissionChecked'               => $dsUser->getValue(
+                    DBEUser::changeSalesOrdersStatusPermission
+                ) ? 'checked' : '',
                 'createRenewalSalesOrdersFlagChecked'                    => Controller::htmlChecked(
                     $dsUser->getValue(DBEJUser::createRenewalSalesOrdersFlag)
                 ),
@@ -672,7 +676,7 @@ class CTUser extends CTCNC
         );
         // manager selection
         $dbeManager = new DBEUser($this);
-        $dbeManager->getRows();
+        $dbeManager->getActiveUsers();
         $this->template->set_block(
             'UserEdit',
             'managerBlock',
@@ -815,15 +819,13 @@ class CTUser extends CTCNC
             $this->edit();
             exit;
         }
-
-        if($this->dsUser->getValue(DBEJUser::userID)){
+        if ($this->dsUser->getValue(DBEJUser::userID)) {
             $dbeUser = new DBEUser($this);
             $dbeUser->getRow($this->dsUser->getValue(DBEUser::userID));
             $this->dsUser->setUpdateModeUpdate();
             $this->dsUser->setValue(DBEUser::bccOnCustomerEmails, $dbeUser->getValue(DBEUser::bccOnCustomerEmails));
             $this->dsUser->post();
         }
-
         $this->buUser->updateUser($this->dsUser);
         $urlNext = Controller::buildLink(
             $_SERVER['PHP_SELF'],
@@ -1028,7 +1030,7 @@ class CTUser extends CTCNC
     function getAllUsers()
     {
         $dbeUser = new DBEUser($this);
-        $dbeUser->getRows(false);  // include inActive users
+        $dbeUser->getRows();  // include inActive users
         $users = array();
         while ($dbeUser->fetchNext()) {
             array_push(
@@ -1047,7 +1049,7 @@ class CTUser extends CTCNC
     function getActiveUsers()
     {
         $dbeUser = new DBEUser($this);
-        $dbeUser->getRows(true);  // include inActive users
+        $dbeUser->getActiveUsers();
         $users = array();
         while ($dbeUser->fetchNext()) {
             array_push(

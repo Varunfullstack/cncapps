@@ -3,7 +3,7 @@
 namespace CNCLTD\ChargeableWorkCustomerRequest\Core;
 
 use CNCLTD\Exceptions\EmptyStringException;
-use CNCLTD\shared\core\ValueObject;
+use CNCLTD\shared\Domain\ValueObject;
 
 class CancelReason implements ValueObject
 {

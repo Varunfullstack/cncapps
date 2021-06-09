@@ -529,4 +529,5 @@ WHERE {$this->getDBColumnName(self::linkedSalesOrderID)} is null and  {$this->ge
         );
         return parent::getRows();
     }
+
 }

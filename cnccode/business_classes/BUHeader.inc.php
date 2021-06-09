@@ -5,6 +5,7 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+global $cfg;
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_dbe"] . "/DBEHeader.inc.php");
 require_once($cfg["path_dbe"] . "/DBEJHeader.php");
@@ -22,7 +23,7 @@ class BUHeader extends Business
     function __construct(&$owner)
     {
         parent::__construct($owner);
-        $this->dbeHeader = new DBEHeader($this);
+        $this->dbeHeader  = new DBEHeader($this);
         $this->dbeJHeader = new DBEJHeader($this);
     }
 

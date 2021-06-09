@@ -2,10 +2,9 @@
 
 namespace CNCLTD\SupportedCustomerAssets;
 
-use DBConnect;
+use CNCLTD\Data\DBConnect;
 use PDO;
-global $cfg;
-require_once($cfg["path_dbe"] . "/DBConnect.php");
+
 class UnsupportedCustomerAssetService
 {
     /**

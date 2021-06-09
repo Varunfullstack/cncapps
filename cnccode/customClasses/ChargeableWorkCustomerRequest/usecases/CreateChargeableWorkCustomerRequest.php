@@ -2,7 +2,7 @@
 
 namespace CNCLTD\ChargeableWorkCustomerRequest\usecases;
 
-use BUActivity;
+use CNCLTD\Business\BUActivity;
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequest;
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestAdditionalHoursRequested;
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestReason;
@@ -14,6 +14,7 @@ use CNCLTD\CommunicationService\CommunicationService;
 use CNCLTD\Exceptions\AdditionalHoursRequestedInvalidValueException;
 use CNCLTD\Exceptions\ChargeableWorkCustomerRequestContactNotFoundException;
 use CNCLTD\Exceptions\ChargeableWorkCustomerRequestContactNotMainException;
+use CNCLTD\Exceptions\ColumnOutOfRangeException;
 use DateTimeImmutable;
 use DBECallActivity;
 use DBEContact;
@@ -51,6 +52,7 @@ class CreateChargeableWorkCustomerRequest
      * @throws AdditionalHoursRequestedInvalidValueException
      * @throws ChargeableWorkCustomerRequestContactNotFoundException
      * @throws ChargeableWorkCustomerRequestContactNotMainException
+     * @throws ColumnOutOfRangeException
      */
     public function __invoke(DBEProblem $serviceRequest,
                              DBEUser $requester,
@@ -82,14 +84,16 @@ class CreateChargeableWorkCustomerRequest
         CommunicationService::sendExtraChargeableWorkRequestToContact($newRequest);
         $requesterFullName = "{$requester->getValue(DBEUser::firstName)} {$requester->getValue(DBEUser::lastName)}";
         $requesteeFullName = "{$requestee->getValue(DBEContact::firstName)} {$requestee->getValue(DBEContact::lastName)}";
-        $contactActivity = $this->BUActivity->addCustomerContactActivityToServiceRequest(
+        $contactActivity   = $this->BUActivity->addCustomerContactActivityToServiceRequest(
             $serviceRequest,
             "<p>$requesterFullName sent a request for $additionalTimeRequested hour(s) to $requesteeFullName</p><br/>{$reason}",
             $requester
         );
         $contactActivity->setValue(DBECallActivity::awaitingCustomerResponseFlag, 'Y');
         $contactActivity->updateRow();
-        $serviceRequest->setValue(DBEProblem::awaitingCustomerResponseFlag, 'Y');
-        $serviceRequest->updateRow();
+        $toUpdateServiceRequest = new DBEProblem($this);
+        $toUpdateServiceRequest->getRow($serviceRequestId);
+        $toUpdateServiceRequest->setValue(DBEProblem::awaitingCustomerResponseFlag, 'Y');
+        $toUpdateServiceRequest->updateRow();
     }
 }

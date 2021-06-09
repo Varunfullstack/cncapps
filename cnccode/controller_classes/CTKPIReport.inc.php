@@ -1,10 +1,12 @@
 <?php
 global $cfg;
+
+use CNCLTD\Data\DBConnect;
+
 require_once($cfg ['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg ['path_bu'] . '/BUMISReport.inc.php');
 require_once($cfg ['path_bu'] . '/BUCustomer.inc.php');
 require_once($cfg ['path_dbe'] . '/DSForm.inc.php');
-require_once($cfg["path_dbe"] . "/DBConnect.php");
 
 class CTKPIReport extends CTCNC
 {
@@ -16,6 +18,7 @@ class CTKPIReport extends CTCNC
     const GET_DAILY_SOURCE                        = 'dailySource';
     const GET_ENGINEER_MONTHLY_BILLING            = "engineerMonthlyBilling";
     const GET_DAILY_CONTACT                       = "dailyContact";
+
     /**
      * CTKPIReport constructor.
      */
@@ -55,8 +58,8 @@ class CTKPIReport extends CTCNC
                 echo json_encode($this->getDailySource(), JSON_NUMERIC_CHECK);
                 exit;
             case self::GET_DAILY_CONTACT:
-              echo json_encode($this->getDailyContact(), JSON_NUMERIC_CHECK);
-              exit;
+                echo json_encode($this->getDailyContact(), JSON_NUMERIC_CHECK);
+                exit;
             default:
                 $this->setTemplate();
                 break;
@@ -237,7 +240,7 @@ WHERE problem.`pro_date_raised` >= '2020-01-01'
         $from       = (@$_REQUEST['from'] ?? '') == '' ? null : $_REQUEST['from'];
         $to         = (@$_REQUEST['to'] ?? '') == '' ? null : $_REQUEST['to'];
         $customerID = (@$_REQUEST['customerID'] ?? '') == '' ? null : $_REQUEST['customerID'];
-        $query = "SELECT
+        $query      = "SELECT
         COUNT(DISTINCT pro_problemno ) AS total,
         DATE_FORMAT(pro_date_raised,'%Y-%m-%d') date,
         'raisedToday' AS type
@@ -332,7 +335,7 @@ WHERE problem.`pro_date_raised` >= '2020-01-01'
         $from = (@$_REQUEST['from'] ?? '') == '' ? null : $_REQUEST['from'];;
         $to         = (@$_REQUEST['to'] ?? '') == '' ? null : $_REQUEST['to'];
         $customerID = (@$_REQUEST['customerID'] ?? '') == '' ? null : $_REQUEST['customerID'];
-        $query = "SELECT r.`description` as type,
+        $query      = "SELECT r.`description` as type,
                     COUNT(*)  total, 
                     DATE_FORMAT(pro_date_raised ,'%Y-%m-%d') date
                 FROM problem p LEFT JOIN `problemraisetype` r ON p.`raiseTypeId`=r.`id`
@@ -344,10 +347,12 @@ WHERE problem.`pro_date_raised` >= '2020-01-01'
                 GROUP BY r.`description`,DATE";
         return DBConnect::fetchAll($query, ["from" => $from, "to" => $to, "customerID" => $customerID]);
     }
-    function getEngineerMonthlyBilling(){
-        $from       = @$_REQUEST["from"]??'';
-        $to         = @$_REQUEST["to"]??'';
-        $query      = "SELECT
+
+    function getEngineerMonthlyBilling()
+    {
+        $from   = @$_REQUEST["from"] ?? '';
+        $to     = @$_REQUEST["to"] ?? '';
+        $query  = "SELECT
         inl_desc,
         inh_date_printed_yearmonth,
         SUM(`inl_qty` * `inl_unit_price`) AS amount
@@ -368,8 +373,7 @@ WHERE problem.`pro_date_raised` >= '2020-01-01'
         )
         AND inl_desc LIKE '%- consultancy%'           
        ";
-        $params     = array();
-
+        $params = array();
         if ($from != '') {
             $query          .= "  AND inh_date_printed >= :from ";
             $params["from"] = $from;
@@ -378,31 +382,32 @@ WHERE problem.`pro_date_raised` >= '2020-01-01'
             $query        .= "  AND inh_date_printed <= :to ";
             $params["to"] = $to;
         }
-
         $query .= "  GROUP BY  invhead.`inh_date_printed_yearmonth`, inl_desc  order by inh_date_printed_yearmonth";
         return DBConnect::fetchAll($query, $params);
     }
-    function getDailyContact(){
-      $from = (@$_REQUEST['from'] ?? '') == '' ? null : $_REQUEST['from'];;
-      $to         = (@$_REQUEST['to'] ?? '') == '' ? null : $_REQUEST['to'];
-      $where="";
-      $params=[];
-      if($from!=''){      
-        $where .=" AND create_at>=:from";
-        $params["from"]=$from;
-      }
-      if($to!=''){      
-        $where .=" AND create_at<=:to";
-        $params["to"]=$to;
-      }
-      $query="SELECT 'Inbound' AS type ,COUNT(*) total,DATE_FORMAT(create_at,'%Y-%m-%d') date FROM callactivity_customer_contact 
+
+    function getDailyContact()
+    {
+        $from = (@$_REQUEST['from'] ?? '') == '' ? null : $_REQUEST['from'];;
+        $to     = (@$_REQUEST['to'] ?? '') == '' ? null : $_REQUEST['to'];
+        $where  = "";
+        $params = [];
+        if ($from != '') {
+            $where          .= " AND create_at>=:from";
+            $params["from"] = $from;
+        }
+        if ($to != '') {
+            $where        .= " AND create_at<=:to";
+            $params["to"] = $to;
+        }
+        $query = "SELECT 'Inbound' AS type ,COUNT(*) total,DATE_FORMAT(create_at,'%Y-%m-%d') date FROM callactivity_customer_contact 
       WHERE isInbound=1   $where
       GROUP BY DATE_FORMAT(create_at,'%Y-%m-%d')
       UNION
       SELECT 'Outbound' AS type ,COUNT(*) total,DATE_FORMAT(create_at,'%Y-%m-%d') date FROM callactivity_customer_contact 
       WHERE isInbound=0   $where
       GROUP BY DATE_FORMAT(create_at,'%Y-%m-%d')";
-      //echo $query; exit;
-      return DBConnect::fetchAll($query, $params);
+        //echo $query; exit;
+        return DBConnect::fetchAll($query, $params);
     }
 }

@@ -6,6 +6,7 @@
  * Time: 11:26
  */
 
+use CNCLTD\Business\BUActivity;
 use CNCLTD\LoggerCLI;
 use CNCLTD\SolarwindsAccountItem;
 
@@ -13,7 +14,6 @@ require_once(__DIR__ . "/../htdocs/config.inc.php");
 global $cfg;
 global $db;
 require_once($cfg['path_bu'] . '/BUHeader.inc.php');
-require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 require_once($cfg['path_bu'] . '/BUMail.inc.php');
 require_once($cfg['path_dbe'] . '/DBECustomerItem.inc.php');
 $logName = 'Office365BackupChecks';

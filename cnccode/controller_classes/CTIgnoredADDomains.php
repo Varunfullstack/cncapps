@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Expense controller class
  * CNC Ltd
@@ -7,12 +6,13 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+global $cfg;
 
 use CNCLTD\Exceptions\APIException;
 
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_dbe'] . '/DBEIgnoredADDomain.inc.php');
-require_once($cfg['path_bu'] . '/BUActivity.inc.php');
+
 
 // Actions
 class CTIgnoredADDomains extends CTCNC
@@ -78,7 +78,7 @@ class CTIgnoredADDomains extends CTCNC
      */
     function displayList()
     {
-        //--------new 
+        //--------new
         $this->setPageTitle('Ignored AD Domains');
         $this->setTemplateFiles(
             array('IgnoredADDomains' => 'IgnoredADDomains')
@@ -92,7 +92,7 @@ class CTIgnoredADDomains extends CTCNC
         );
         $this->parsePage();
     }
-    
+
     function getDomains()
     {
         $DBEIgnoredADDomains = new DBEIgnoredADDomain($this);

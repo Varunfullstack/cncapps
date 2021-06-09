@@ -2,22 +2,21 @@
 
 namespace CNCLTD\ChargeableWorkCustomerRequest\usecases;
 
-use BUActivity;
+use CNCLTD\Business\BUActivity;
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequest;
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestRepository;
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestTokenId;
 use CNCLTD\CommunicationService\CommunicationService;
+use CNCLTD\Data\DBEJProblem;
 use CNCLTD\Exceptions\ChargeableWorkCustomerRequestNotFoundException;
+use CNCLTD\Exceptions\ColumnOutOfRangeException;
 use CNCLTD\Exceptions\ServiceRequestNotFoundException;
 use DateTimeImmutable;
 use DateTimeInterface;
 use DBEContact;
-use DBEJProblem;
 use DBEProblem;
 use DBEUser;
 
-global $cfg;
-require_once($cfg["path_bu"] . "/BUActivity.inc.php");
 
 class RejectPendingChargeableWorkCustomerRequest
 {
@@ -102,6 +101,8 @@ class RejectPendingChargeableWorkCustomerRequest
      * @param DateTimeInterface|null $requestApprovedAt
      * @param DBEProblem $serviceRequest
      * @param string|null $comments
+     * @throws ColumnOutOfRangeException
+     * @throws \Exception
      */
     private function logCustomerContactActivity(ChargeableWorkCustomerRequest $request,
                                                 ?DateTimeInterface $requestApprovedAt,
@@ -121,6 +122,7 @@ class RejectPendingChargeableWorkCustomerRequest
 
     /**
      * @param DBEJProblem $dbeProblem
+     * @throws ColumnOutOfRangeException
      */
     private function updateServiceRequest(DBEJProblem $dbeProblem): void
     {

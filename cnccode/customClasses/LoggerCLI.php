@@ -18,7 +18,7 @@ class LoggerCLI
      * @param $logName
      * @param int $loggerLevel
      */
-    public function __construct($logName, $loggerLevel = Logger::INFO)
+    public function __construct($logName, int $loggerLevel = Logger::INFO)
     {
         $date        = new \DateTime();
         $this->log   = new Logger('logger');

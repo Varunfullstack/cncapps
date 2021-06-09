@@ -7,14 +7,14 @@
  * @authors Karim Ahmed - Sweet Code Limited
  */
 
+use CNCLTD\Business\BUActivity;
 use CNCLTD\Data\CallBackStatus;
+use CNCLTD\Data\DBConnect;
 use CNCLTD\SDManagerDashboard\ServiceRequestSummaryDTO;
 use CNCLTD\Utils;
 
 global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
-require_once($cfg['path_bu'] . '/BUActivity.inc.php');
-require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 require_once($cfg['path_bu'] . '/BUUser.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
 require_once($cfg['path_dbe'] . '/DBEPendingReopened.php');
@@ -168,6 +168,9 @@ class CTCurrentActivityReport extends CTCNC
         }
     }
 
+    /**
+     * @throws \CNCLTD\Exceptions\ColumnOutOfRangeException
+     */
     private function renderQueue($queueNo)
     {
         if ($queueNo == self::FIXED_AWAITING_CLOSURE) {
@@ -206,7 +209,7 @@ class CTCurrentActivityReport extends CTCNC
     function getAllocatedUsers()
     {
         $dbeUser = new DBEUser($this);
-        $dbeUser->getRows('firstName');
+        $dbeUser->getActiveUsers();
         $allocatedUser = array();
         while ($dbeUser->fetchNext()) {
 
@@ -717,6 +720,8 @@ class CTCurrentActivityReport extends CTCNC
                 $buMail->sendSimpleEmail($body, $subject, $to, CONFIG_SUPPORT_EMAIL, $cc);
             }
         }
+        $buActivity = new BUActivity($this);
+        $buActivity->updateInbound($dbeCallActivity->getPKValue(), true);
         return ["status" => true, "callActivityID" => $dbeCallActivity->getPKValue()];
     }
 
@@ -786,8 +791,6 @@ class CTCurrentActivityReport extends CTCNC
             $dbeCallActivity->insertRow();
             $dbeProblem = new DBEProblem($this);
             $dbeProblem->getRow($problemID);
-            $respondedHours = $dbeProblem->getValue(DBEJProblem::workingHours);
-            $dbeProblem->setValue(DBEJProblem::respondedHours, $respondedHours);
             $dbeProblem->setValue(DBEProblem::status, 'P');
             $dbeProblem->updateRow();
             return ['status' => true, "callActivityID" => $dbeCallActivity->getPKValue()];

@@ -9,36 +9,35 @@ class AutoComplete extends React.Component {
             // The active selection's index
             activeSuggestion: 0,
             // The suggestions that match the user's input
-            filteredSuggestions: this.props.items||[],
+            filteredSuggestions: this.props.items || [],
             // Whether or not the suggestion list is shown
             showSuggestions: false,
             // What the user has entered
             userInput: "",
             filtered: false,
-            value:'',
-            items:[]
+            value: '',
+            items: []
         };
 
     }
-     
+
     // Event fired when the input value is changed
     onChange = (e) => {
         let {items, displayLength, displayColumn} = this.props;
         if (!displayLength) displayLength = 10;
         const userInput = e.currentTarget.value;
 
-        if(this.props.onFilter)
-        {
+        if (this.props.onFilter) {
             this.props.onFilter(userInput);
             this.setState({
-                activeSuggestion: e.currentTarget.value.length > 0 ? 0 : -1,                
+                activeSuggestion: e.currentTarget.value.length > 0 ? 0 : -1,
                 showSuggestions: true,
-                userInput:userInput,
+                userInput: userInput,
                 filtered: true
             });
             return;
         }
-       
+
 
         // Filter our suggestions that don't contain the user's input
         let filteredSuggestions = items
@@ -167,21 +166,17 @@ class AutoComplete extends React.Component {
             this.setState({showSuggestions: false})
         }, 200);
     }
- 
-    static getDerivedStateFromProps(props,state){  
-        if(props.value!=state.value)
-        {
-            state.value=props.value;
-            state.userInput=props.value;
+
+    static getDerivedStateFromProps(props, state) {
+        if (props.value != state.value) {
+            state.value = props.value;
+            state.userInput = props.value;
             return state;
-        }
-        else if(props.items.length!=state.items.length)
-        {
-            state.items=[...props.items];
-            state.filteredSuggestions=[...props.items];
+        } else if (props.items.length != state.items.length) {
+            state.items = [...props.items];
+            state.filteredSuggestions = [...props.items];
             return state;
-        }
-        else return state;
+        } else return state;
     }
 
     render() {
@@ -213,11 +208,12 @@ class AutoComplete extends React.Component {
                         className = "suggestion-active";
                     }
 
-                    return React.createElement("li", {
-                        className: className,
-                        key: pk ? suggestion[pk] : suggestion,
-                        onClick: () => onClick(suggestion)
-                    }, displayColumn ? suggestion[displayColumn] : suggestion);
+                    return <li
+                        className={className}
+                        key={pk ? suggestion[pk] : suggestion}
+                        onClick={() => onClick(suggestion)}>
+                        {displayColumn ? suggestion[displayColumn] : suggestion}
+                    </li>
                 }));
             } else {
                 if (userInput !== "")

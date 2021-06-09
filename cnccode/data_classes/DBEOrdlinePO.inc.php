@@ -3,16 +3,17 @@
 * @authors Karim Ahmed
 * @access public
 */
+global $cfg;
 require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBEOrdlinePO extends DBEntity
 {
 
-    const supplierID = "supplierID";
-    const stockcat = "stockcat";
-    const itemID = "itemID";
+    const supplierID  = "supplierID";
+    const stockcat    = "stockcat";
+    const itemID      = "itemID";
     const curUnitCost = "curUnitCost";
-    const qtyOrdered = "qtyOrdered";
+    const qtyOrdered  = "qtyOrdered";
 
     /**
      * calls constructor()
@@ -39,21 +40,14 @@ class DBEOrdlinePO extends DBEntity
      * @param null $ordheadID
      * @return bool
      */
-    function getRows($ordheadID = null)
+    function getRowsReadyForGenerationOfPurchaseOrders($ordheadID = null)
     {
         $this->setMethodName("getRows");
         if (!$ordheadID) {
             $this->raiseError('ordheadID not set');
         }
         $this->setQueryString(
-            "SELECT DISTINCT  odl_suppno, odl_stockcat, " .
-            "odl_itemno, odl_d_unit, SUM(odl_qty_ord) " .
-            "FROM ordline " .
-            "WHERE odl_ordno = " . $ordheadID .
-            " AND odl_type = 'I' " .
-            "GROUP BY odl_suppno, odl_stockcat, " .
-            "odl_itemno, odl_d_unit " .
-            "ORDER BY odl_suppno, odl_item_no"
+            "SELECT DISTINCT  odl_suppno, odl_stockcat, odl_itemno, odl_d_unit, SUM(odl_qty_ord) FROM ordline WHERE odl_ordno = {$ordheadID} AND odl_type = 'I' GROUP BY odl_suppno, odl_stockcat, odl_itemno, odl_d_unit ORDER BY odl_suppno, odl_item_no"
         );
         return (parent::getRows());
     }

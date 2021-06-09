@@ -120,9 +120,28 @@
     let newLineRecurringSequenceNumberInput;
     let oneOffTable;
     let recurringTable;
+    let performActionButton;
 
     let requiredByDateInput;
     let tbcInput;
+
+    function onActionSelectorValueChanged(value) {
+        let updateSupplierDisplayValue = "inline-block";
+        let purchaseOrderDisplayValue = 'inline-block';
+        if (value !== 'CHANGE_SUPPLIER_FOR_LINES') {
+            updateSupplierDisplayValue = 'none'
+        }
+
+        if (value !== 'CREATE_PURCHASE_ORDERS') {
+            purchaseOrderDisplayValue = 'none';
+        }
+
+        performActionButton.disabled = !value;
+
+        requiredByDateInput.style.display = purchaseOrderDisplayValue;
+        tbcInput.style.display = purchaseOrderDisplayValue;
+        updateSupplierName.style.display = updateSupplierDisplayValue;
+    }
 
     document.addEventListener('DOMContentLoaded', () => {
         window.fromDate = $('#fromDate').get(0);
@@ -195,6 +214,7 @@
         });
 
         actionSelector = document.querySelector('#actionSelector');
+        performActionButton = document.querySelector('#performActionButton');
         supplierToChangeId = document.querySelector('#updateSupplierID');
         salutationInput = document.querySelector('#salutation');
         introductionTextArea = document.querySelector('#introduction');
@@ -214,13 +234,21 @@
         newLineOneOffSequenceNumberInput = document.querySelector('input[name="oneOffSequenceNumber"]')
         newLineRecurringSequenceNumberInput = document.querySelector('input[name="recurringSequenceNumber"]')
 
+        onActionSelectorValueChanged(actionSelector.value);
+
+
         function handleNewLineClick() {
             newLineOneOffSequenceNumberInput.value = getOneOffLastSelectedLineCheckboxSequenceNumber();
             newLineRecurringSequenceNumberInput.value = getRecurringLastSelectedLineCheckboxSequenceNumber();
         }
 
-        newLineSubmitButton.addEventListener('click', handleNewLineClick);
-        newLineSubmitRecurringButton.addEventListener('click', handleNewLineClick);
+        if (newLineSubmitButton) {
+
+            newLineSubmitButton.addEventListener('click', handleNewLineClick);
+        }
+        if (newLineSubmitRecurringButton) {
+            newLineSubmitRecurringButton.addEventListener('click', handleNewLineClick);
+        }
 
 
         toggleCheckBoxes.forEach(el => {
@@ -267,71 +295,75 @@
             stockLevelContainer.innerHTML = htmlContent;
         }
 
-        document.querySelectorAll('tr[data-line-type="I"]')
-                .forEach(itemRow => {
-                            const buttonContainer = itemRow.querySelector('td:last-child > div');
-                            const description = itemRow.querySelector('a').text;
-                            const supplierName = itemRow.querySelector('.supplier-name').textContent;
+        if (salesOrderType !== 'C') {
 
-                            updateStockLevel(itemRow);
 
-                            if (salesOrderType === SALES_ORDER_TYPES.QUOTATION) {
-                                const button = document.createElement('button');
-                                button.type = "button";
-                                button.className = "salesOrderButton";
-                                let title = "Update master item price";
-                                if (itemRow.dataset.itemUpdatedAt) {
-                                    title = "Price updated by " + itemRow.dataset.itemUpdatedBy + " at " + (moment(itemRow.dataset.itemUpdatedAt).format('DD/MM/YYYY HH:mm'))
-                                }
-                                button.title = title;
-                                button.addEventListener('click', async () => {
-                                    const newCost = itemRow.querySelector('input.lineItemUnitCost').value;
-                                    const newSale = itemRow.querySelector('input.lineItemUnitSale').value;
+            document.querySelectorAll('tr[data-line-type="I"]')
+                    .forEach(itemRow => {
+                                const buttonContainer = itemRow.querySelector('td:last-child > div');
+                                const description = itemRow.querySelector('a').text;
+                                const supplierName = itemRow.querySelector('.supplier-name').textContent;
 
-                                    if (!confirm(
-                                            "Please confirm you want to change the master item cost price for " +
-                                            description +
-                                            " from " +
-                                            toPounds(itemRow.dataset.itemCost) + " to " +
-                                            toPounds(newCost) + " and the sale price from " + toPounds(itemRow.dataset.itemSale) +
-                                            " to " + toPounds(newSale) + ". The default supplier will also be updated to " + supplierName
-                                    )) {
-                                        return;
+                                updateStockLevel(itemRow);
+
+                                if (salesOrderType === SALES_ORDER_TYPES.QUOTATION) {
+                                    const button = document.createElement('button');
+                                    button.type = "button";
+                                    button.className = "salesOrderButton";
+                                    let title = "Update master item price";
+                                    if (itemRow.dataset.itemUpdatedAt) {
+                                        title = "Price updated by " + itemRow.dataset.itemUpdatedBy + " at " + (moment(itemRow.dataset.itemUpdatedAt).format('DD/MM/YYYY HH:mm'))
                                     }
+                                    button.title = title;
+                                    button.addEventListener('click', async () => {
+                                        const newCost = itemRow.querySelector('input.lineItemUnitCost').value;
+                                        const newSale = itemRow.querySelector('input.lineItemUnitSale').value;
 
-                                    try {
-
-                                        const response = await fetch(
-                                                '/Item.php?action=updateItemFromSalesOrder',
-                                                {
-                                                    method: 'POST',
-                                                    body: JSON.stringify({
-                                                        itemId: itemRow.dataset.itemId,
-                                                        cost: newCost,
-                                                        sale: newSale,
-                                                        supplierId: itemRow.dataset.supplierId
-                                                    })
-                                                }
-                                        )
-                                        const res = await response.json();
-                                        if (res.status !== 'ok') {
-                                            throw new Error('Failed to save prices');
+                                        if (!confirm(
+                                                "Please confirm you want to change the master item cost price for " +
+                                                description +
+                                                " from " +
+                                                toPounds(itemRow.dataset.itemCost) + " to " +
+                                                toPounds(newCost) + " and the sale price from " + toPounds(itemRow.dataset.itemSale) +
+                                                " to " + toPounds(newSale) + ". The default supplier will also be updated to " + supplierName
+                                        )) {
+                                            return;
                                         }
-                                        alert('Prices saved, reloading page...');
-                                        window.location.reload();
-                                    } catch (error) {
-                                        alert("Failed to save new prices");
-                                    }
+
+                                        try {
+
+                                            const response = await fetch(
+                                                    '/Item.php?action=updateItemFromSalesOrder',
+                                                    {
+                                                        method: 'POST',
+                                                        body: JSON.stringify({
+                                                            itemId: itemRow.dataset.itemId,
+                                                            cost: newCost,
+                                                            sale: newSale,
+                                                            supplierId: itemRow.dataset.supplierId
+                                                        })
+                                                    }
+                                            )
+                                            const res = await response.json();
+                                            if (res.status !== 'ok') {
+                                                throw new Error('Failed to save prices');
+                                            }
+                                            alert('Prices saved, reloading page...');
+                                            window.location.reload();
+                                        } catch (error) {
+                                            alert("Failed to save new prices");
+                                        }
 
 
-                                })
-                                const icon = document.createElement('i');
-                                icon.className = "fal fa-money-check-edit-alt";
-                                button.appendChild(icon);
-                                buttonContainer.appendChild(button);
+                                    })
+                                    const icon = document.createElement('i');
+                                    icon.className = "fal fa-money-check-edit-alt";
+                                    button.appendChild(icon);
+                                    buttonContainer.appendChild(button);
+                                }
                             }
-                        }
-                )
+                    )
+        }
 
         function toPounds(number) {
             if (typeof number !== 'number') {
@@ -370,23 +402,14 @@
             return selectedLines;
         }
 
+
         actionSelector.addEventListener('change', $event => {
-            let updateSupplierDisplayValue = "inline-block";
-            let purchaseOrderDisplayValue = 'inline-block';
-            if (actionSelector.value !== 'CHANGE_SUPPLIER_FOR_LINES') {
-                updateSupplierDisplayValue = 'none'
-            }
 
-            if (actionSelector.value !== 'CREATE_PURCHASE_ORDERS') {
-                purchaseOrderDisplayValue = 'none';
-            }
 
-            requiredByDateInput.style.display = purchaseOrderDisplayValue;
-            tbcInput.style.display = purchaseOrderDisplayValue;
-            updateSupplierName.style.display = updateSupplierDisplayValue;
+            onActionSelectorValueChanged($event.target.value);
         })
 
-        document.querySelector('#performActionButton').addEventListener('click', $event => {
+        performActionButton.addEventListener('click', $event => {
             if (!actionSelector.selectedOptions.length) {
                 return;
             }
@@ -604,12 +627,58 @@
                     )
                             .then(response => response.json())
                             .then(response => {
+                                console.log(response);
                                 if (response.status == 'error') {
                                     throw new Error(response.message);
                                 }
                                 document.location.reload();
                             })
                             .catch(error => {
+                                console.log(error);
+                                alert(error.message);
+                            })
+
+                    break;
+                }
+                case 'INITIAL_TO_QUOTATION': {
+                    const salesOrderId = orderHeadIdInput.value;
+                    fetch("?action=INITIAL_TO_QUOTATION&salesOrderId=" + salesOrderId,
+                            {
+                                method: 'POST',
+                            }
+                    )
+                            .then(response => response.json())
+                            .then(response => {
+                                console.log(response);
+                                if (response.status == 'error') {
+                                    throw new Error(response.message);
+                                }
+                                document.location.reload();
+                            })
+                            .catch(error => {
+                                console.log(error);
+                                alert(error.message);
+                            })
+
+                    break;
+                }
+                case 'COMPLETED_TO_INITIAL': {
+                    const salesOrderId = orderHeadIdInput.value;
+                    fetch("?action=COMPLETED_TO_INITIAL&salesOrderId=" + salesOrderId,
+                            {
+                                method: 'POST',
+                            }
+                    )
+                            .then(response => response.json())
+                            .then(response => {
+                                console.log(response);
+                                if (response.status == 'error') {
+                                    throw new Error(response.message);
+                                }
+                                document.location.reload();
+                            })
+                            .catch(error => {
+                                console.log(error);
                                 alert(error.message);
                             })
 
@@ -913,7 +982,7 @@
                         value="{updateSupplierID}"
                 >
 
-                <select {readOnly}
+                <select {actionSelectorReadOnly}
                         id="actionSelector"
                 >
                     <!-- BEGIN actionBlock -->
@@ -949,7 +1018,6 @@
                 >
                 </div>
                 <button id="performActionButton"
-                        {readOnly}
                         type="button"
                         class="salesOrderButton not-so-faint"
                         title="Complete selected action"

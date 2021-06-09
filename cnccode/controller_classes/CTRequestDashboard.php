@@ -1,10 +1,15 @@
 <?php
 global $cfg;
+
+use CNCLTD\Business\BUActivity;
+use CNCLTD\Data\DBEJProblem;
+use CNCLTD\Exceptions\JsonHttpException;
+
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
-require_once($cfg["path_dbe"] . "/DBConnect.php");
-require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 require_once($cfg ["path_dbe"] . "/DBEJCallActivity.php");
 require_once($cfg['path_bu'] . '/BUHeader.inc.php');
+require_once($cfg['path_dbe'] . '/DBECallDocumentWithoutFile.php');
+require_once($cfg["path_dbe"] . "/DBEProblem.inc.php");
 
 class CTRequestDashboard extends CTCNC
 {
@@ -34,7 +39,6 @@ class CTRequestDashboard extends CTCNC
             $getVars,
             $cookieVars,
             $cfg,
-            false
         );
         if (!self::isSdManager()) {
             Header("Location: /NotAllowed.php");
@@ -191,8 +195,9 @@ class CTRequestDashboard extends CTCNC
                     'teamManagementApprovalMinutes' => $teamManagementTimeApprovalMinutes,
                     "callActivityID"                => $dbejCallActivity->getValue(DBEJCallActivity::callActivityID),
                     'problemID'                     => $dbejCallActivity->getValue(DBEJCallActivity::problemID),
-                    "linkedSalesOrderID"            => $dbejCallActivity->getValue(DBEJCallActivity::linkedSalesOrderID),
-
+                    "linkedSalesOrderID"            => $dbejCallActivity->getValue(
+                        DBEJCallActivity::linkedSalesOrderID
+                    ),
                 ]
             );
 
@@ -274,16 +279,15 @@ class CTRequestDashboard extends CTCNC
         $result = [];
         while ($dbejCallActivity->fetchNext()) {
             $result[] = [
-                'customerName'      => $dbejCallActivity->getValue(DBEJCallActivity::customerName),
-                'problemID'         => $dbejCallActivity->getValue(DBEJCallActivity::problemID),
-                'requestBody'       => $dbejCallActivity->getValue(DBEJCallActivity::reason),
-                'requestedBy'       => $dbejCallActivity->getValue(DBEJCallActivity::userAccount),
-                'requestedDateTime' => $dbejCallActivity->getValue(
+                'customerName'       => $dbejCallActivity->getValue(DBEJCallActivity::customerName),
+                'problemID'          => $dbejCallActivity->getValue(DBEJCallActivity::problemID),
+                'requestBody'        => $dbejCallActivity->getValue(DBEJCallActivity::reason),
+                'requestedBy'        => $dbejCallActivity->getValue(DBEJCallActivity::userAccount),
+                'requestedDateTime'  => $dbejCallActivity->getValue(
                         DBEJCallActivity::date
                     ) . ' ' . $dbejCallActivity->getValue(DBEJCallActivity::startTime) . ':00',
-                'callActivityID'    => $dbejCallActivity->getValue(DBEJCallActivity::callActivityID),
-                "linkedSalesOrderID"=> $dbejCallActivity->getValue(DBEJCallActivity::linkedSalesOrderID),
-
+                'callActivityID'     => $dbejCallActivity->getValue(DBEJCallActivity::callActivityID),
+                "linkedSalesOrderID" => $dbejCallActivity->getValue(DBEJCallActivity::linkedSalesOrderID),
             ];
         }
         return $result;
@@ -380,7 +384,7 @@ class CTRequestDashboard extends CTCNC
             $dsCallActivity
         );
         if ($dsCallActivity->getValue(DBECallActivity::salesRequestStatus) !== 'O') {
-            throw new \CNCLTD\Exceptions\JsonHttpException(400, "This sales request has already been processed");
+            throw new JsonHttpException(400, "This sales request has already been processed");
         }
         {
             $notify = true;
@@ -394,7 +398,7 @@ class CTRequestDashboard extends CTCNC
                     $option = 'D';
                     break;
                 default:
-                    throw new \CNCLTD\Exceptions\JsonHttpException(400, 'Action not valid');
+                    throw new JsonHttpException(400, 'Action not valid');
             }
             try {
                 $buActivity->salesRequestProcess(
@@ -404,8 +408,8 @@ class CTRequestDashboard extends CTCNC
                     $body['comments'],
                     $notify
                 );
-            } catch (\Exception $exception) {
-                throw new \CNCLTD\Exceptions\JsonHttpException(400, $exception->getMessage());
+            } catch (Exception $exception) {
+                throw new JsonHttpException(400, $exception->getMessage());
             }
         }
         return ["status" => true];

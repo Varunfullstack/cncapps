@@ -12,7 +12,6 @@ use CNCLTD\Business\BURenContract;
 
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/Burencontract.php');
-require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
 require_once($cfg['path_dbe'] . '/DBEItem.inc.php');
@@ -25,7 +24,7 @@ class CTRenContract extends CTCNC
     const invoiceFromDate             = 'invoiceFromDate';
     const invoiceToDate               = 'invoiceToDate';
     const itemID                      = 'itemID';
-    const itemDescription             = 'itemDescription'; 
+    const itemDescription             = 'itemDescription';
     const siteDesc                    = 'siteDesc';
     const costPrice                   = 'costPrice';
     const salePrice                   = 'salePrice';
@@ -136,7 +135,7 @@ class CTRenContract extends CTCNC
                 try {
                     $this->addItemToContract($contractCustomerItemId, $itemToAddId);
                     $data = ["status" => "ok"];
-                } catch (\Exception $exception) {
+                } catch (Exception $exception) {
                     $data = ["status" => "error", "message" => $exception->getMessage()];
                 }
                 echo json_encode($data);
@@ -211,7 +210,7 @@ class CTRenContract extends CTCNC
             $dsRenContract->fetchNext();
             $customerItemID = $dsRenContract->getValue(DBEJRenContract::customerItemID);
         }
-        $urlUpdate = Controller::buildLink(
+        $urlUpdate      = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
                 'action'         => 'update',
@@ -232,6 +231,8 @@ class CTRenContract extends CTCNC
                 'RenContractPrepayFields' => 'RenContractPrepayFields.inc'
             )
         );
+        $this->loadReactScript('ItemSelectorWrapperComponent.js');
+        $this->loadReactCSS('ItemSelectorWrapperComponent.css');
         $disabled = 'DISABLED';
         $readonly = 'READONLY';
         if ($this->hasPermissions(RENEWALS_PERMISSION)) {
@@ -252,7 +253,7 @@ class CTRenContract extends CTCNC
             )
         );
         if (!$disabled) {
-            $prices = '<tr>
+            $prices   = '<tr>
             <td class="promptText">Sale Price/Annum </td>
             <td class="fieldText">
             <input name="renContract[1][curUnitSale]"
@@ -332,7 +333,7 @@ class CTRenContract extends CTCNC
         $isDirectDebitAllowed = $dsCustomer->getValue(DBECustomer::sortCode) && $dsCustomer->getValue(
                 DBECustomer::accountName
             ) && $dsCustomer->getValue(DBECustomer::accountNumber);
-        $expiryDate = null;
+        $expiryDate           = null;
         if ($installationDate = DateTime::createFromFormat(
             'Y-m-d',
             $dsRenContract->getValue(DBECustomerItem::installationDate)
@@ -790,15 +791,15 @@ class CTRenContract extends CTCNC
             while ($dsRenContract->fetchNext()) {
 
                 $customerItemID = $dsRenContract->getValue(DBEJRenContract::customerItemID);
-                $urlEdit = Controller::buildLink(
+                $urlEdit        = Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => 'edit',
                         'ID'     => $customerItemID
                     )
                 );
-                $txtEdit = '[edit]';
-                $urlList = Controller::buildLink(
+                $txtEdit        = '[edit]';
+                $urlList        = Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => 'list'

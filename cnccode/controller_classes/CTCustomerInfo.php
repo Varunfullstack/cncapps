@@ -1,9 +1,11 @@
 <?php
 global $cfg;
+
+use CNCLTD\Data\DBConnect;
+
 require_once($cfg['path_ct'] . '/CTCurrentActivityReport.inc.php');
 require_once($cfg['path_bu'] . '/BUSecondSite.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
-require_once($cfg["path_dbe"] . "/DBConnect.php");
 require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
 require_once($cfg['path_bu'] . '/BUContact.inc.php');
 require_once($cfg['path_dbe'] . '/DBEJContactAudit.php');

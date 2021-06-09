@@ -8,18 +8,18 @@ require_once($cfg["path_dbe"] . "/DBECustomerItem.inc.php");
 
 class DBEJRenBroadband extends DBECustomerItem
 {
-    const allowDirectDebit = "allowDirectDebit";
-    const contractExpiryDate = "contractExpiryDate";
-    const itemDescription = "itemDescription";
-    const customerName = "customerName";
-    const invoiceFromDate = "invoiceFromDate";
-    const invoiceToDate = "invoiceToDate";
-    const siteName = "siteName";
-    const itemTypeDescription = "itemTypeDescription";
-    const invoiceFromDateYMD = "invoiceFromDateYMD";
-    const invoiceToDateYMD = "invoiceToDateYMD";
+    const allowDirectDebit       = "allowDirectDebit";
+    const contractExpiryDate     = "contractExpiryDate";
+    const itemDescription        = "itemDescription";
+    const customerName           = "customerName";
+    const invoiceFromDate        = "invoiceFromDate";
+    const invoiceToDate          = "invoiceToDate";
+    const siteName               = "siteName";
+    const itemTypeDescription    = "itemTypeDescription";
+    const invoiceFromDateYMD     = "invoiceFromDateYMD";
+    const invoiceToDateYMD       = "invoiceToDateYMD";
     const contractExpireNotified = "contractExpireNotified";
-    const itemTypeId = "itemTypeId";
+    const itemTypeId             = "itemTypeId";
 
     function __construct(&$owner)
     {
@@ -79,14 +79,12 @@ class DBEJRenBroadband extends DBECustomerItem
             DA_NOT_NULL,
             "DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` + `invoicePeriodMonths` MONTH ) as invoiceToDateYMD"
         );
-
         $this->addColumn(
             self::contractExpiryDate,
             DA_DATE,
             DA_NOT_NULL,
             "DATE_ADD(installationDate, INTERVAL initialContractLength MONTH) AS contractExpiryDate"
         );
-
         $this->addColumn(
             self::allowDirectDebit,
             DA_YN,
@@ -98,7 +96,6 @@ class DBEJRenBroadband extends DBECustomerItem
             DA_NOT_NULL,
             "contractExpireNotified"
         );
-
         $this->addColumn(
             self::itemTypeId,
             DA_INTEGER,
@@ -108,42 +105,31 @@ class DBEJRenBroadband extends DBECustomerItem
         $this->setAddColumnsOff();
     }
 
-    function getRow()
+    function getRow($pkValue = null)
     {
-        $statement =
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " JOIN item ON  itm_itemno = cui_itemno
+        $statement = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName() . " JOIN item ON  itm_itemno = cui_itemno
       JOIN itemtype ON  ity_itemtypeno = itm_itemtypeno
 			JOIN customer ON  cus_custno = cui_custno
       JOIN address ON  add_custno = cui_custno AND add_siteno = cui_siteno
-		 WHERE " . $this->getPKWhere() .
-            " AND renewalTypeID = 1";
-
+		 WHERE " . $this->getPKWhere() . " AND renewalTypeID = 1";
         $this->setQueryString($statement);
-
-        $ret = (parent::getRow());
+        return parent::getRow();
     }
 
-    function getRows($orderBy = false)
+    function getRows($sortColumn = '', $orderDirection = '')
     {
 
-        $statement =
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " JOIN item ON  itm_itemno = cui_itemno
+        $statement = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName() . " JOIN item ON  itm_itemno = cui_itemno
       JOIN itemtype ON  ity_itemtypeno = itm_itemtypeno
 			JOIN customer ON  cus_custno = cui_custno
       JOIN address ON  add_custno = cui_custno AND add_siteno = cui_siteno
 			WHERE declinedFlag = 'N'
         AND renewalTypeID = 1";
-
-        if ($orderBy) {
-            $statement .= " ORDER BY $orderBy";
+        if ($sortColumn) {
+            $statement .= " ORDER BY $sortColumn";
         } else {
             $statement .= " ORDER BY cus_name";
         }
-
         $this->setQueryString($statement);
         $ret = (parent::getRows());
     }
@@ -152,10 +138,7 @@ class DBEJRenBroadband extends DBECustomerItem
                                     $upperBoundDays = 67
     )
     {
-        $statement =
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " JOIN item ON  itm_itemno = cui_itemno
+        $statement = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName() . " JOIN item ON  itm_itemno = cui_itemno
       JOIN itemtype ON  ity_itemtypeno = itm_itemtypeno
 			JOIN customer ON  cus_custno = cui_custno
       JOIN address ON  add_custno = cui_custno AND add_siteno = cui_siteno
@@ -172,10 +155,7 @@ class DBEJRenBroadband extends DBECustomerItem
     function getRowsByCustomerID($customerID)
     {
 
-        $statement =
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " JOIN item ON  itm_itemno = cui_itemno
+        $statement = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName() . " JOIN item ON  itm_itemno = cui_itemno
       JOIN itemtype ON  ity_itemtypeno = itm_itemtypeno
 			JOIN customer ON  cus_custno = cui_custno
       JOIN address ON  add_custno = cui_custno AND add_siteno = cui_siteno
@@ -183,7 +163,6 @@ class DBEJRenBroadband extends DBECustomerItem
         AND renewalTypeID = 1
 				AND cui_custno = $customerID		
 			ORDER BY cus_name";
-
         $this->setQueryString($statement);
         $ret = (parent::getRows());
     }
@@ -199,11 +178,8 @@ class DBEJRenBroadband extends DBECustomerItem
     function getRenewalsDueRows()
     {
 
-        $statement =
-            "
-			SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " JOIN item ON  itm_itemno = cui_itemno
+        $statement = "
+			SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName() . " JOIN item ON  itm_itemno = cui_itemno
       JOIN itemtype ON  ity_itemtypeno = itm_itemtypeno
 			JOIN customer ON  cus_custno = cui_custno
       JOIN address ON  add_custno = cui_custno AND add_siteno = cui_siteno
@@ -221,23 +197,18 @@ class DBEJRenBroadband extends DBECustomerItem
     function getRenewalsRowsByID($ids)
     {
 
-        $statement =
-            "
-      SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " JOIN item ON  itm_itemno = cui_itemno
+        $statement = "
+      SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName() . " JOIN item ON  itm_itemno = cui_itemno
       JOIN itemtype ON  ity_itemtypeno = itm_itemtypeno
       JOIN customer ON  cus_custno = cui_custno
       JOIN address ON  add_custno = cui_custno AND add_siteno = cui_siteno
      WHERE cui_cuino IN ('" . implode(
                 '\',\'',
                 $ids
-            ) . "')" .
-            " AND declinedFlag = 'N'
+            ) . "')" . " AND declinedFlag = 'N'
         AND renewalTypeID = 1 and directDebitFlag <> 'Y'
       ORDER BY cui_custno
      ";
-
         $this->setQueryString($statement);
         $ret = (parent::getRows());
     }

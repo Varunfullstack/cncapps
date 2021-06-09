@@ -163,7 +163,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
         $mainPDF = new CNCLTD\StaffAppraisalPDF(
             $questionnaireAnswer, $passPhrase
         );
-        $fileName = PDF_TEMP_DIR . '/test.pdf';
+        $fileName = PDF_TEMP_DIR . 'test.pdf';
         $mainPDF->Output(
             'F',
             $fileName,

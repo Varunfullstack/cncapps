@@ -5,6 +5,9 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+
+use CNCLTD\Business\BUActivity;
+
 global $cfg;
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_dbe"] . "/DBEJOrdhead.inc.php");
@@ -160,25 +163,7 @@ class BUSalesOrder extends Business
         }
 
     }
-
-    /**
-     * Get all users
-     * @parameter DataSet &$dsResults results
-     * @param $dsResults
-     * @return bool : Success
-     * @access public
-     */
-    function getAllUsers(&$dsResults)
-    {
-        $this->setMethodName('getAllUsers');
-        $dbeUser = new DBEUser($this);
-        $dbeUser->getRows();
-        return ($this->getData(
-            $dbeUser,
-            $dsResults
-        ));
-    }
-
+    
     /**
      * Get one users
      * @parameter integer $userID user
@@ -278,7 +263,7 @@ class BUSalesOrder extends Business
         );
         // delete quote docs from DB and quote directory
         while ($dsQuotation->fetchNext()) {
-            $quoteFile = 'quotes/' . $dsQuotation->getValue(DBEQuotation::ordheadID) . '_' . $dsQuotation->getValue(
+            $quoteFile = QUOTES_DIR . $dsQuotation->getValue(DBEQuotation::ordheadID) . '_' . $dsQuotation->getValue(
                     DBEQuotation::versionNo
                 ) . '.' . $dsQuotation->getValue(DBEQuotation::fileExtension);
             $this->deleteQuotationDoc($dsQuotation->getValue(DBEQuotation::quotationID));
@@ -1579,7 +1564,7 @@ class BUSalesOrder extends Business
             $this->raiseError('order not found');
         }
         $dbeOrdlinePO = new DBEOrdlinePO($this);
-        $dbeOrdlinePO->getRows($ordheadID);
+        $dbeOrdlinePO->getRowsReadyForGenerationOfPurchaseOrders($ordheadID);
         return ($this->getData(
             $dbeOrdlinePO,
             $dsOrdline

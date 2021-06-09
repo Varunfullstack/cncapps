@@ -93,7 +93,7 @@ class Table extends React.Component {
     }
 
     handleSort = (path) => {
-        
+
         let {sortColumn} = this.state;
         const {columns} = this.props;
 
@@ -109,9 +109,8 @@ class Table extends React.Component {
         } else {
             this.enableSortable();
         }
-        if(this.props.onSort)
-        {
-            this.props.onSort(sortColumn);             
+        if (this.props.onSort) {
+            this.props.onSort(sortColumn);
         }
         this.setState({sortColumn});
     };
@@ -134,7 +133,7 @@ class Table extends React.Component {
         });
     };
     handleSearch = (event) => {
-       
+
         if (event.target.value) {
             this.disableSortable();
         } else {
@@ -143,10 +142,10 @@ class Table extends React.Component {
         clearTimeout(this.delayTimer);
         event.persist();
         this.delayTimer = setTimeout(() => {
-            if(this.props.onSearch)            // custome search 
-                this.props.onSearch(event.target.value);            
+            if (this.props.onSearch)            // custome search
+                this.props.onSearch(event.target.value);
             else
-            this.setState({searchFilter: event.target.value});
+                this.setState({searchFilter: event.target.value});
         }, 1000); // Will do the ajax stuff after 1000 ms, or 1 s
     };
 
@@ -201,7 +200,7 @@ class Table extends React.Component {
                 this.sort(filterData, this.state.sortColumn.path, this.state.sortColumn.order);
             }
         }
-        return el("div",{style:style},
+        return el("div", {style: style},
             el("div", {className: "flex-row", key: "tableSearch"},
                 search
                     ? el("div", {key: "tableSearch", style: {marginBottom: 5}, className: "flex-row"}, [
@@ -247,7 +246,7 @@ class Table extends React.Component {
                     : null,
                 hasFooter ? el(TableFooter, {key: "tableFooter", id: "tableFooter", columns}) : null
             ]),
-            );
+        );
     }
 }
 Table.propTypes={

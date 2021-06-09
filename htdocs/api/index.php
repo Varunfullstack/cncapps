@@ -1,5 +1,8 @@
 <?php
 
+use CNCLTD\AdditionalChargesRates\Application\GetRatesForCustomer\GetRatesForCustomerQuery;
+use CNCLTD\AdditionalChargesRates\Application\GetRatesForCustomer\GetRatesForCustomerResponse;
+use CNCLTD\AdditionalChargesRates\Domain\CustomerId;
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestTokenId;
 use CNCLTD\ChargeableWorkCustomerRequest\infra\ChargeableWorkCustomerRequestMySQLRepository;
 use CNCLTD\ChargeableWorkCustomerRequest\usecases\AcceptPendingChargeableWorkCustomerRequest;
@@ -7,11 +10,12 @@ use CNCLTD\ChargeableWorkCustomerRequest\usecases\GetPendingToProcessChargeableR
 use CNCLTD\ChargeableWorkCustomerRequest\usecases\RejectPendingChargeableWorkCustomerRequest;
 use CNCLTD\CustomerFeedback;
 use CNCLTD\CustomerFeedbackRepository;
-use CNCLTD\Exceptions\ChargeableWorkCustomerRequestAlreadyProcessedException;
+use CNCLTD\Data\DBConnect;
 use CNCLTD\Exceptions\ChargeableWorkCustomerRequestNotFoundException;
 use CNCLTD\Exceptions\ContactNotFoundException;
 use CNCLTD\FeedbackTokenGenerator;
 use CNCLTD\JsonBodyParserMiddleware;
+use CNCLTD\Shared\Domain\Bus\QueryBus;
 use CNCLTD\SignableProcess;
 use DI\Container;
 use Monolog\Handler\RotatingFileHandler;
@@ -29,6 +33,10 @@ use Slim\Routing\RouteCollectorProxy;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
+const STAT_TYPE_ALL             = 'all';
+const STAT_TYPE_CUSTOMER_FACING = 'customerFacing';
+const STAT_TYPE_PROACTIVE       = 'proactive';
+const statsTypes                = [STAT_TYPE_ALL, STAT_TYPE_CUSTOMER_FACING, STAT_TYPE_PROACTIVE];
 require_once __DIR__ . '/../config.inc.php';
 global $cfg;
 require_once($cfg["path_dbe"] . "/DBEQuotation.inc.php");
@@ -47,6 +55,13 @@ $container->set(
         $loader = new FilesystemLoader('', __DIR__ . '/../../twig');
         $loader->addPath('api', 'api');
         return new Environment($loader, ["cache" => __DIR__ . '/../../cache']);
+    }
+);
+$container->set(
+    'queryBus',
+    function () {
+        global $inMemorySymfonyBus;
+        return $inMemorySymfonyBus;
     }
 );
 $container->set(
@@ -95,15 +110,28 @@ $app->group(
                         return $response->withStatus(400);
                     }
                 }
-                $params      = [
+                $params    = [
                     ["type" => "i", "value" => $args['customerId']],
                     ["type" => "s", "value" => $startDate->format(DATE_MYSQL_DATE)],
                     ["type" => "s", "value" => $endDate->format(DATE_MYSQL_DATE)],
                 ];
-                $isBreakDown = isset($queryParams['breakDown']);
+                $typeWhere = '';
+                $typeParam = [];
+                if (isset($queryParams['type'])) {
+                    $type = $queryParams['type'];
+                    if (!in_array($type, statsTypes)) {
+                        $typesString = implode(',', statsTypes);
+                        $response->getBody()->write(
+                            json_encode(["error" => "The type must be one of {$typesString}"])
+                        );
+                        return $response->withStatus(400);
+                    }
+                    $typeWhere   = " and pro_hide_from_customer_flag = ?";
+                    $typeParam[] = ["type" => "s", "value" => $type == STAT_TYPE_CUSTOMER_FACING ? 'N' : 'Y'];
+                }
                 $query       = "select SUM(1) AS raised,
     SUM(pro_status IN ('F' , 'C')) AS `fixed`,
-    AVG(problem.`pro_responded_hours`) AS responseTime,
+    AVG(if(pro_status IN ('F', 'C'),problem.`pro_responded_hours`,null)) AS responseTime,
        null as sla,
     AVG(IF(pro_status IN ('F' , 'C'),
         problem.`pro_responded_hours` < CASE problem.`pro_priority`
@@ -184,7 +212,9 @@ WHERE
        
         problem.pro_custno = ?
   and initial.caa_date between ? and ?
+  {$typeWhere}
         AND pro_priority <= 4";
+                $isBreakDown = isset($queryParams['breakDown']);
                 if ($isBreakDown) {
 
                     $params = [
@@ -196,12 +226,12 @@ WHERE
                         ["type" => "s", "value" => $startDate->format(DATE_MYSQL_DATE)],
                         ["type" => "s", "value" => $endDate->format(DATE_MYSQL_DATE)],
                     ];
-                    $query = "
+                    $query  = "
 
 SELECT
   priorities.*,
   raised,
-  FIXED,
+  fixed,
   responseTime,
   slaMet,
   slaMetRaw,
@@ -248,13 +278,15 @@ FROM
     customer.`slaFixHoursP4` AS fixSLA
   FROM
     customer
-  WHERE customer.`cus_custno` = ?) priorities
+  WHERE customer.`cus_custno` = ?
+      
+      ) priorities
   LEFT JOIN
     (SELECT
       pro_priority AS priority,
       SUM(1) AS raised,
       SUM(pro_status IN ('F', 'C')) AS `fixed`,
-      AVG(problem.`pro_responded_hours`) AS responseTime,
+      AVG(if(pro_status IN ('F', 'C'),problem.`pro_responded_hours`, null)) AS responseTime,
       AVG(
         IF(
           pro_status IN ('F', 'C'),
@@ -409,7 +441,7 @@ FROM
       LEFT JOIN callactivity initial
         ON initial.`caa_problemno` = problem.`pro_problemno`
         AND initial.`caa_callacttypeno` = 51
-      LEFT JOIN callactivity FIXED
+      LEFT JOIN callactivity fixed
         ON fixed.caa_problemno = problem.pro_problemno
         AND fixed.caa_callacttypeno = 57
       JOIN customer
@@ -418,9 +450,11 @@ FROM
       AND initial.caa_date BETWEEN ?
       AND ?
       AND pro_priority <= 4
+      {$typeWhere}
     GROUP BY pro_priority) stats
     ON stats.priority = priorities.priority";
                 }
+                $params = array_merge($params, $typeParam);
                 /** @var $db dbSweetcode */ global $db;
                 $statement = $db->preparedQuery($query, $params);
                 if ($isBreakDown) {
@@ -582,6 +616,26 @@ ORDER BY raisedManually DESC";
                 $statement = $db->preparedQuery($query, $params);
                 $data      = $statement->fetch_all(MYSQLI_ASSOC);
                 $response->getBody()->write(json_encode($data, JSON_NUMERIC_CHECK));
+                return $response;
+            }
+        );
+        $group->get(
+            '/customerAdditionalChargeRates/{customerId}',
+            function (Request $request, Response $response, $args) {
+                $customerId = @$args['customerId'];
+                if (!$customerId) {
+                    $response->getBody()->write(
+                        json_encode(["error" => "Customer ID required"])
+                    );
+                    return $response->withStatus(400);
+                }
+                /** @var QueryBus $queryBus */
+                $queryBus = $this->get('queryBus');
+                /** @var GetRatesForCustomerResponse $res */
+                $res = $queryBus->ask(new GetRatesForCustomerQuery(new CustomerId($customerId)));
+                $response->getBody()->write(
+                    json_encode($res, JSON_NUMERIC_CHECK)
+                );
                 return $response;
             }
         );
@@ -788,17 +842,31 @@ ORDER BY COUNT DESC";
                         return $response->withStatus(400);
                     }
                 }
-                $params      = [
+                $params    = [
                     ["type" => "s", "value" => $startDate->format(DATE_MYSQL_DATE)],
                     ["type" => "s", "value" => $endDate->format(DATE_MYSQL_DATE)],
                 ];
+                $typeWhere = '';
+                $typeParam = [];
+                if (isset($queryParams['type'])) {
+                    $type = $queryParams['type'];
+                    if (!in_array($type, statsTypes)) {
+                        $typesString = implode(',', statsTypes);
+                        $response->getBody()->write(
+                            json_encode(["error" => "The type must be one of {$typesString}"])
+                        );
+                        return $response->withStatus(400);
+                    }
+                    $typeWhere   = " and pro_hide_from_customer_flag = ?";
+                    $typeParam[] = ["type" => "s", "value" => $type == STAT_TYPE_CUSTOMER_FACING ? 'N' : 'Y'];
+                }
                 $isBreakDown = isset($queryParams['breakDown']);
-                $query       = 'SELECT
-  SUM(1) AS raised,
-    SUM(pro_status IN("F","C")) AS `fixed`,
-  AVG(if(problem.pro_priority = 1,problem.`pro_responded_hours`, null)) AS responseTime,
+                $query       = "SELECT
+    SUM(1) AS raised,
+    SUM(pro_status IN(\"F\",\"C\")) AS `fixed`,
+  AVG(if(pro_status IN (\"F\",\"C\") ,problem.`pro_responded_hours`, null)) AS responseTime,
   AVG(
-   IF(pro_status IN ("F","C"),   
+   IF(pro_status IN (\"F\",\"C\"),   
    problem.`pro_responded_hours` < 
     CASE
       problem.`pro_priority`
@@ -814,11 +882,11 @@ ORDER BY COUNT DESC";
     END,
     NULL) 
   ) AS slaMet,
-    AVG(IF(pro_status IN ("F","C"), openHours < 8, NULL)) AS closedWithin8Hours,
-    AVG(IF(pro_status ="C" and pro_hide_from_customer_flag <> "Y",problem.`pro_reopened_date` IS NOT NULL, NULL)) AS reopened,
-    AVG(IF(pro_status IN ("F","C"), problem.`pro_chargeable_activity_duration_hours`,NULL)) AS avgChargeableTime,
-    AVG(IF(pro_status IN ("F","C"), problem.pro_working_hours,NULL)) AS avgTimeAwaitingCNC,
-    AVG(IF(pro_status IN ("F","C"), openHours,NULL)) AS avgTimeFromRaiseToFixHours
+    AVG(IF(pro_status IN (\"F\",\"C\"), openHours < 8, NULL)) AS closedWithin8Hours,
+    AVG(IF(pro_status =\"C\" and pro_hide_from_customer_flag <> \"Y\",problem.`pro_reopened_date` IS NOT NULL, NULL)) AS reopened,
+    AVG(IF(pro_status IN (\"F\",\"C\"), problem.`pro_chargeable_activity_duration_hours`,NULL)) AS avgChargeableTime,
+    AVG(IF(pro_status IN (\"F\",\"C\"), problem.pro_working_hours,NULL)) AS avgTimeAwaitingCNC,
+    AVG(IF(pro_status IN (\"F\",\"C\"), openHours,NULL)) AS avgTimeFromRaiseToFixHours
 FROM
   problem
   LEFT JOIN callactivity initial
@@ -827,49 +895,111 @@ FROM
   JOIN customer
     ON problem.`pro_custno` = customer.`cus_custno`
 WHERE  caa_date between ? and ?
-  AND pro_priority < 4';
+ {$typeWhere}
+  AND pro_priority < 4";
                 if ($isBreakDown) {
-                    $query = 'SELECT
-       pro_priority as priority,
-  SUM(1) AS raised,
-    SUM(pro_status IN("F","C")) AS `fixed`,
-  AVG(if(problem.pro_priority = 1,problem.`pro_responded_hours`, null)) AS responseTime,
-  AVG(
-   IF(pro_status IN ("F","C"),   
-   problem.`pro_responded_hours` < 
-    CASE
-      problem.`pro_priority`
-      WHEN 1
-      THEN customer.`cus_sla_p1`
-      WHEN 2
-      THEN customer.`cus_sla_p2`
-      WHEN 3
-      THEN customer.`cus_sla_p3`
-      WHEN 4
-      THEN customer.`cus_sla_p4`
-      ELSE 0
-    END,
-    NULL) 
-  ) AS slaMet,
-    AVG(IF(pro_status IN ("F","C"), openHours < 8, NULL)) AS closedWithin8Hours,
-    AVG(IF(pro_status ="C" and pro_hide_from_customer_flag <> "Y",problem.`pro_reopened_date` IS NOT NULL, NULL)) AS reopened,
-    AVG(IF(pro_status IN ("F","C"), problem.`pro_chargeable_activity_duration_hours`,NULL)) AS avgChargeableTime,
-    AVG(IF(pro_status IN ("F","C"), problem.pro_working_hours,NULL)) AS avgTimeAwaitingCNC,
-    AVG(IF(pro_status IN ("F","C"), openHours,NULL)) AS avgTimeFromRaiseToFixHours
+                    $query = "SELECT
+  p.priority, data.avgChargeableTime, raised, fixed, responseTime, slaMet, closedWithin8Hours, reopened, avgChargeableTime, avgTimeAwaitingCNC, avgTimeFromRaiseToFixHours
 FROM
-  problem
-  LEFT JOIN callactivity initial
-    ON initial.`caa_problemno` = problem.`pro_problemno`
-    AND initial.`caa_callacttypeno` = 51
-  JOIN customer
-    ON problem.`pro_custno` = customer.`cus_custno`
-WHERE 
- caa_date between ? and ?
-  AND pro_priority < 5 
-  group by pro_priority
-        order by pro_priority';
+  (SELECT
+    1 AS priority
+  UNION
+  ALL
+  SELECT
+    2 AS priority
+  UNION
+  ALL
+  SELECT
+    3 AS priority
+  UNION
+  ALL
+  SELECT
+    4 AS priority) p
+  LEFT JOIN
+    (SELECT
+      pro_priority AS priority,
+      SUM(1) AS raised,
+      SUM(pro_status IN (\"F\", \"C\")) AS `fixed`,
+      AVG(
+        IF(
+          pro_status IN (\"F\", \"C\"),
+          problem.`pro_responded_hours`,
+          NULL
+        )
+      ) AS responseTime,
+      AVG(
+        IF(
+          pro_status IN (\"F\", \"C\"),
+          problem.`pro_responded_hours` <
+          CASE
+            problem.`pro_priority`
+            WHEN 1
+            THEN customer.`cus_sla_p1`
+            WHEN 2
+            THEN customer.`cus_sla_p2`
+            WHEN 3
+            THEN customer.`cus_sla_p3`
+            WHEN 4
+            THEN customer.`cus_sla_p4`
+            ELSE 0
+          END,
+          NULL
+        )
+      ) AS slaMet,
+      AVG(
+        IF(
+          pro_status IN (\"F\", \"C\"),
+          openHours < 8,
+          NULL
+        )
+      ) AS closedWithin8Hours,
+      AVG(
+        IF(
+          pro_status = \"C\"
+          AND pro_hide_from_customer_flag <> \"Y\",
+          problem.`pro_reopened_date` IS NOT NULL,
+          NULL
+        )
+      ) AS reopened,
+      AVG(
+        IF(
+          pro_status IN (\"F\", \"C\"),
+          problem.`pro_chargeable_activity_duration_hours`,
+          NULL
+        )
+      ) AS avgChargeableTime,
+      AVG(
+        IF(
+          pro_status IN (\"F\", \"C\"),
+          problem.pro_working_hours,
+          NULL
+        )
+      ) AS avgTimeAwaitingCNC,
+      AVG(
+        IF(
+          pro_status IN (\"F\", \"C\"),
+          openHours,
+          NULL
+        )
+      ) AS avgTimeFromRaiseToFixHours
+    FROM
+      problem
+      LEFT JOIN callactivity initial
+        ON initial.`caa_problemno` = problem.`pro_problemno`
+        AND initial.`caa_callacttypeno` = 51
+      JOIN customer
+        ON problem.`pro_custno` = customer.`cus_custno`
+    WHERE caa_date BETWEEN ?
+      AND ?
+      AND pro_priority < 5
+      {$typeWhere}
+    GROUP BY pro_priority
+    ORDER BY pro_priority) data
+    ON data.priority = p.priority";
                 }
                 try {
+
+                    $params = array_merge($params, $typeParam);
                     $statement = $db->preparedQuery($query, $params);
                     if (!$isBreakDown) {
                         $data = $statement->fetch_assoc();

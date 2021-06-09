@@ -18,7 +18,6 @@ require_once($cfg ['path_gc'] . '/Controller.inc.php');
 require_once($cfg ['path_dbe'] . '/DBEJUser.inc.php');
 require_once($cfg ['path_dbe'] . '/DBETeam.inc.php');
 require_once($cfg['path_bu'] . '/BUUser.inc.php');
-require_once($cfg["path_dbe"] . "/DBConnect.php");
 define(
     'CTCNC_ACT_DISP_CUST_POPUP',
     'dispCustPopup'
@@ -788,7 +787,7 @@ class CTCNC extends Controller
                 "id"    => 308,
                 "label" => "Goods In",
                 "href"  => "GoodsIn.php",
-            ],           
+            ],
             [
                 "id"    => 309,
                 "label" => "PO Status Report",
@@ -804,11 +803,11 @@ class CTCNC extends Controller
                 "label" => "Quote Templates",
                 "href"  => "QuoteTemplates.php",
             ],
-            // [
-            //     "id"    => 313,
-            //     "label" => "TechData Orders",
-            //     "href"  => "CustomerLicenses.php?action=searchOrders",
-            // ],
+            [
+                "id"    => 312,
+                "label" => "Additional Charge Rates",
+                "href"  => "AdditionalChargeRate.php",
+            ],
         ];
     }
 
@@ -1039,7 +1038,6 @@ class CTCNC extends Controller
                 "label" => "Item Types",
                 "href"  => "ItemType.php",
             ],
-            
             [
                 "id"    => 806,
                 "label" => "Standard Text",
@@ -1246,8 +1244,9 @@ class CTCNC extends Controller
         echo $js_code;
     }
 
-    function getBody($associative=false){
-        return json_decode(file_get_contents('php://input'),$associative);
+    function getBody($associative = false)
+    {
+        return json_decode(file_get_contents('php://input'), $associative);
     }
 
     function hideMenu()
@@ -1279,13 +1278,15 @@ class CTCNC extends Controller
         http_response_code($code);
         return ["status" => false, "error" => $message];
     }
-    public function success($data=null)
+
+    public function success($data = null)
     {
-        return ["state"=>true,"data"=>$data];
+        return ["state" => true, "data" => $data];
     }
-    public function fail($code,$message="")
+
+    public function fail($code, $message = "")
     {
-        return new APIException($code,$message);
+        return new APIException($code, $message);
 
     }
 }

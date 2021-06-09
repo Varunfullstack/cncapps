@@ -11,18 +11,18 @@ require_once($cfg["path_dbe"] . "/DBEPasswordService.inc.php");
 require_once($cfg["path_dbe"] . "/DBEProblem.inc.php");
 require_once($cfg["path_dbe"] . "/DBEJCallActivity.php");
 require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
-require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 require_once($cfg['path_bu'] . '/BUHeader.inc.php');
 require_once($cfg['path_bu'] . '/BUPassword.inc.php');
 require_once($cfg['path_bu'] . '/BUMail.inc.php');
 require_once($cfg["path_bu"] . "/BUProblemRaiseType.inc.php");
 
-use BUActivity;
 use BUCustomer;
 use BUHeader;
 use BUMail;
 use BUPassword;
 use BUProblemRaiseType;
+use CNCLTD\Business\BUActivity;
+use CNCLTD\Data\DBEJProblem;
 use DataSet;
 use DateInterval;
 use DateTime;
@@ -31,7 +31,6 @@ use DBEContact;
 use DBECustomer;
 use DBEHeader;
 use DBEJCallActivity;
-use DBEJProblem;
 use DBEOffice365License;
 use DBEPassword;
 use DBEPasswordService;
@@ -117,7 +116,7 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
         $this->commandName    = "365OfficeLicensesExport";
         try {
             $data = $this->run();
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             $this->createFailedSR(
                 $dbeCustomer,
                 $exception->getMessage(),
@@ -215,13 +214,15 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
                 $logger->error('Failed to process sharepoint sites for customer: ' . $exception->getMessage());
             }
         }
-        if(count($permissions)){
+        if (count($permissions)) {
             $this->processPermissions(
                 $spreadsheet,
                 $permissions,
             );
         }
-        if (!count($mailboxes) && !count($licenses) && !count($devices) && !count($sharePointSites) && !count($permissions)) {
+        if (!count($mailboxes) && !count($licenses) && !count($devices) && !count($sharePointSites) && !count(
+                $permissions
+            )) {
             $message = 'This customer does not have a licences nor mailboxes nor devices nor sharePointSites nor permissions';
             $logger->warning($message);
             throw new UnexpectedValueException($message);
@@ -581,7 +582,10 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
                         }
                     } else {
                         $this->logger->warning('Raising a License not found SR while processing Mailboxes:' . $license);
-                        $this->raiseCNCRequest($license, $dbeCustomer, $datum['DisplayName']);
+                        $this->raiseCustomerServiceRequest(
+                            $dbeCustomer,
+                            "License not found {$license} while processing mailbox {$datum['DisplayName']} "
+                        );
                     }
                 }
                 if ($licensesWithDefender > 1) {
@@ -1294,17 +1298,17 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
             null,
             'A1'
         );
-        $permissionsSheet->fromArray($permissions,null,'A2');
-
+        $permissionsSheet->fromArray($permissions, null, 'A2');
         $highestRow    = $permissionsSheet->getHighestRow();
         $highestColumn = $permissionsSheet->getHighestColumn();
         $permissionsSheet->getStyle("A1:{$highestColumn}1")->getFont()->setBold(true);
-        $permissionsSheet->getStyle("A1:{$highestColumn}{$highestRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $permissionsSheet->getStyle("A1:{$highestColumn}{$highestRow}")->getAlignment()->setHorizontal(
+            Alignment::HORIZONTAL_CENTER
+        );
         foreach (range('A', $highestColumn) as $col) {
             $permissionsSheet->getColumnDimension($col)->setAutoSize(true);
         }
         $dateTime = new DateTime();
-
         $permissionsSheet->getStyle("A{$highestRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
         $legendRowStart = $highestRow + 2;
         $permissionsSheet->fromArray(

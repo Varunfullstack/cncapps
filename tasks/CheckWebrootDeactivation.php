@@ -1,6 +1,8 @@
 <?php
 global $cfg;
 const DATA_CSV_FILENAME = 'data.csv';
+use CNCLTD\Business\BUActivity;
+use CNCLTD\Data\DBEJProblem;
 use CNCLTD\LoggerCLI;
 use CNCLTD\ToCheckDevice;
 use CNCLTD\WebrootAPI\WebrootAPI;
@@ -11,7 +13,6 @@ require_once(__DIR__ . "/../htdocs/config.inc.php");
 require_once($cfg ["path_bu"] . "/BUHeader.inc.php");
 require_once($cfg ["path_bu"] . "/BUMail.inc.php");
 require_once($cfg["path_bu"] . '/BUCustomer.inc.php');
-require_once($cfg["path_bu"] . '/BUActivity.inc.php');
 // increasing execution time to infinity...
 ini_set('max_execution_time', 0);
 if (!is_cli()) {

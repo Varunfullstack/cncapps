@@ -8,18 +8,18 @@ require_once($cfg["path_dbe"] . "/DBECustomerItem.inc.php");
 
 class DBEJRenContract extends DBECustomerItem
 {
-    const allowDirectDebit = 'allowDirectDebit';
-    const isSSL = "isSSL";
-    const customerName = "customerName";
-    const siteName = "siteName";
-    const itemDescription = "itemDescription";
+    const allowDirectDebit    = 'allowDirectDebit';
+    const isSSL               = "isSSL";
+    const customerName        = "customerName";
+    const siteName            = "siteName";
+    const itemDescription     = "itemDescription";
     const itemTypeDescription = "itemTypeDescription";
-    const invoiceFromDate = "invoiceFromDate";
-    const invoiceToDate = "invoiceToDate";
-    const invoiceFromDateYMD = "invoiceFromDateYMD";
-    const invoiceToDateYMD = "invoiceToDateYMD";
-    const isArrears = 'isArrears';
-    const itemTypeId = 'itemTypeId';
+    const invoiceFromDate     = "invoiceFromDate";
+    const invoiceToDate       = "invoiceToDate";
+    const invoiceFromDateYMD  = "invoiceFromDateYMD";
+    const invoiceToDateYMD    = "invoiceToDateYMD";
+    const isArrears           = 'isArrears';
+    const itemTypeId          = 'itemTypeId';
 
 
     function __construct(&$owner)
@@ -97,20 +97,17 @@ class DBEJRenContract extends DBECustomerItem
             DA_NOT_NULL,
             'cui_cost_price'
         );
-
         $this->addColumn(
             self::allowDirectDebit,
             DA_YN,
             DA_NOT_NULL
         );
-
         $this->addColumn(
             self::isSSL,
             DA_BOOLEAN,
             DA_NOT_NULL,
             "itm_desc like '%SSL%' as isSSL "
         );
-
         $this->addColumn(
             self::isArrears,
             DA_BOOLEAN,
@@ -120,30 +117,25 @@ class DBEJRenContract extends DBECustomerItem
     0
   ) as isArrears"
         );
-
         $this->addColumn(
             self::itemTypeId,
             DA_INTEGER,
             DA_ALLOW_NULL,
             'itm_itemtypeno'
         );
-
         $this->setAddColumnsOff();
     }
 
-    function getRow()
+    function getRow($pkValue = null)
     {
-        $statement = $this->getBaseQuery() . " WHERE " . $this->getPKWhere() .
-            " AND renewalTypeID = 2";
+        $statement = $this->getBaseQuery() . " WHERE " . $this->getPKWhere() . " AND renewalTypeID = 2";
         $this->setQueryString($statement);
         $ret = (parent::getRow());
     }
 
     private function getBaseQuery()
     {
-        return "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " JOIN item ON  itm_itemno = cui_itemno
+        return "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName() . " JOIN item ON  itm_itemno = cui_itemno
       JOIN itemtype ON  ity_itemtypeno = itm_itemtypeno
 			JOIN customer ON  cus_custno = cui_custno
       JOIN address ON  add_custno = cui_custno AND add_siteno = cui_siteno
@@ -152,15 +144,14 @@ class DBEJRenContract extends DBECustomerItem
       ";
     }
 
-    function getRows($orderBy = false)
+    function getRows($sortColumn = '', $orderDirection = null)
     {
         $statement = $this->getBaseQuery() . " WHERE declinedFlag = 'N' AND renewalTypeID = 2";
-        if ($orderBy) {
-            $statement .= " ORDER BY $orderBy";
+        if ($sortColumn) {
+            $statement .= " ORDER BY $sortColumn";
         } else {
             $statement .= " ORDER BY cus_name";
         }
-
         $this->setQueryString($statement);
         $ret = (parent::getRows());
     }
@@ -168,10 +159,8 @@ class DBEJRenContract extends DBECustomerItem
     function getRowsByCustomerID($customerID)
     {
 
-        $statement = $this->getBaseQuery() .
-            " WHERE declinedFlag = 'N'
-				AND cui_custno = " . $this->escapeValue($customerID) .
-            " AND renewalTypeID = 2      
+        $statement = $this->getBaseQuery() . " WHERE declinedFlag = 'N'
+				AND cui_custno = " . $this->escapeValue($customerID) . " AND renewalTypeID = 2      
 			ORDER BY cus_name";
         $this->setQueryString($statement);
         $ret = (parent::getRows());
@@ -189,11 +178,8 @@ class DBEJRenContract extends DBECustomerItem
     function getRenewalsDueRows($itemBillingCategoryID = null)
     {
 
-        $statement =
-            "
-			SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " JOIN item ON  itm_itemno = cui_itemno
+        $statement = "
+			SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName() . " JOIN item ON  itm_itemno = cui_itemno
       JOIN itemtype ON  ity_itemtypeno = itm_itemtypeno
 			JOIN customer ON  cus_custno = cui_custno
       JOIN address ON  add_custno = cui_custno AND add_siteno = cui_siteno
@@ -230,22 +216,17 @@ class DBEJRenContract extends DBECustomerItem
     function getRenewalsRowsByID($ids)
     {
 
-        $statement =
-            "
-      SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " JOIN item ON  itm_itemno = cui_itemno
+        $statement = "
+      SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName() . " JOIN item ON  itm_itemno = cui_itemno
       JOIN itemtype ON  ity_itemtypeno = itm_itemtypeno
       JOIN customer ON  cus_custno = cui_custno
       JOIN address ON  add_custno = cui_custno AND add_siteno = cui_siteno
      WHERE customerItemID IN ('" . implode(
                 '\',\'',
                 $ids
-            ) . "')" .
-            " AND declinedFlag = 'N' and directDebitFlag <> 'Y'
+            ) . "')" . " AND declinedFlag = 'N' and directDebitFlag <> 'Y'
         AND renewalTypeID = 2";
         $statement .= " ORDER BY cui_custno";
-
         $this->setQueryString($statement);
         $ret = (parent::getRows());
     }

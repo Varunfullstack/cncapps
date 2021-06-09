@@ -40,7 +40,7 @@ class TableBody extends React.Component {
 
                 }, this.addToolTip(
                 c.content ? c.content(item) :
-                    <div dangerouslySetInnerHTML={{__html: this.get(item, c.path)}}></div>, c?.toolTip || null)
+                    <div dangerouslySetInnerHTML={{__html: this.get(item, c.path)}}/>, c?.toolTip || null)
             ))))
         );
     }

@@ -6,9 +6,9 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BURenHosting.inc.php');
-require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
 require_once($cfg['path_bu'] . '/BUCustomerItem.inc.php');
@@ -54,9 +54,9 @@ class CTRenHosting extends CTCNC
             exit;
         }
         $this->setMenuId(605);
-        $this->buRenHosting = new BURenHosting($this);
+        $this->buRenHosting   = new BURenHosting($this);
         $this->buCustomerItem = new BUCustomerItem($this);
-        $this->dsRenHosting = new DSForm($this);
+        $this->dsRenHosting   = new DSForm($this);
         $this->dsRenHosting->copyColumnsFrom($this->buRenHosting->dbeRenHosting);
         $this->dsRenHosting->addColumn(
             DBEJRenHosting::customerName,
@@ -139,8 +139,6 @@ class CTRenHosting extends CTCNC
     {
         $this->setMethodName('edit');
         $dsRenHosting = &$this->dsRenHosting; // ref to class var
-
-
         if (!$this->getFormError()) {
             if ($this->getAction() == 'edit') {
                 $this->buRenHosting->getRenHostingByID(
@@ -161,39 +159,34 @@ class CTRenHosting extends CTCNC
             $dsRenHosting->fetchNext();
             $customerItemID = $dsRenHosting->getValue(DBEJRenHosting::customerItemID);
         }
-
-        $urlUpdate =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action'         => 'update',
-                    'ordheadID'      => $this->getParam('ordheadID'),
-                    'customerItemID' => $customerItemID
-                )
-            );
-
-        $urlDisplayList =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action' => 'list'
-                )
-            );
+        $urlUpdate = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action'         => 'update',
+                'ordheadID'      => $this->getParam('ordheadID'),
+                'customerItemID' => $customerItemID
+            )
+        );
+        $urlDisplayList = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action' => 'list'
+            )
+        );
         $this->setPageTitle('Edit Hosting');
         $this->setTemplateFiles(
             array('RenHostingEdit' => 'RenHostingEdit.inc')
         );
+        $this->loadReactScript('ItemSelectorWrapperComponent.js');
+        $this->loadReactCSS('ItemSelectorWrapperComponent.css');
         $readonly = null;
         $disabled = null;
-
         if (!$this->hasPermissions(RENEWALS_PERMISSION)) {
             $disabled = 'DISABLED';
             $readonly = 'READONLY';
         }
-
         if (!$disabled) {
-            $prices =
-                '<tr>
+            $prices = '<tr>
             <td class="promptText">Sale Price/Annum </td>
             <td class="fieldText"><input
               name="renHosting[1][curUnitSale]"
@@ -216,9 +209,7 @@ class CTRenHosting extends CTCNC
                     $dsRenHosting->getMessage(DBEJRenHosting::curUnitCost)
                 ) . '</span> </td>
         </tr>';
-
-            $declined =
-                '<tr>
+            $declined = '<tr>
             <td class="promptText">Declined</td>
             <td class="fieldText">
             <input
@@ -229,7 +220,6 @@ class CTRenHosting extends CTCNC
               ' . Controller::htmlChecked($dsRenHosting->getValue(DBEJRenHosting::declinedFlag)) . '
             /></td>
         </tr>';
-
             $this->template->set_var(
                 array(
                     'prices'   => $prices,
@@ -237,46 +227,39 @@ class CTRenHosting extends CTCNC
                 )
             );
         }
-        $urlItemPopup =
-            Controller::buildLink(
-                CTCNC_PAGE_ITEM,
-                array(
-                    'action'        => CTCNC_ACT_DISP_ITEM_POPUP,
-                    'renewalTypeID' => CONFIG_HOSTING_RENEWAL_TYPE_ID,
-                    'htmlFmt'       => CT_HTML_FMT_POPUP
-                )
-            );
-        $urlItemEdit =
-            Controller::buildLink(
-                CTCNC_PAGE_ITEM,
-                array(
-                    'action'  => CTCNC_ACT_ITEM_EDIT,
-                    'htmlFmt' => CT_HTML_FMT_POPUP
-                )
-            );
-
-        $urlPrintContract =
-            Controller::buildLink(
-                'CustomerItem.php',
-                array(
-                    'action'         => 'printContract',
-                    'customerItemID' => $customerItemID
-                )
-            );
+        $urlItemPopup = Controller::buildLink(
+            CTCNC_PAGE_ITEM,
+            array(
+                'action'        => CTCNC_ACT_DISP_ITEM_POPUP,
+                'renewalTypeID' => CONFIG_HOSTING_RENEWAL_TYPE_ID,
+                'htmlFmt'       => CT_HTML_FMT_POPUP
+            )
+        );
+        $urlItemEdit  = Controller::buildLink(
+            CTCNC_PAGE_ITEM,
+            array(
+                'action'  => CTCNC_ACT_ITEM_EDIT,
+                'htmlFmt' => CT_HTML_FMT_POPUP
+            )
+        );
+        $urlPrintContract = Controller::buildLink(
+            'CustomerItem.php',
+            array(
+                'action'         => 'printContract',
+                'customerItemID' => $customerItemID
+            )
+        );
         $this->template->set_var(
             array(
                 'txtPrintContract' => 'Print Contract',
                 'urlPrintContract' => $urlPrintContract
             )
         );
-
-
         $dsCustomer = new DBECustomer($this);
         $dsCustomer->getRow($dsRenHosting->getValue(DBECustomerItem::customerID));
         $isDirectDebitAllowed = $dsCustomer->getValue(DBECustomer::sortCode) && $dsCustomer->getValue(
                 DBECustomer::accountName
             ) && $dsCustomer->getValue(DBECustomer::accountNumber);
-
         $expiryDate = null;
         if ($installationDate = DateTime::createFromFormat(
             'Y-m-d',
@@ -287,7 +270,6 @@ class CTRenHosting extends CTCNC
                 $dsRenHosting->getValue(DBECustomerItem::initialContractLength)
             )->format('d/m/Y');
         }
-
         $this->template->set_var(
             array(
                 'customerItemID'                     => $dsRenHosting->getValue(DBEJRenHosting::customerItemID),
@@ -357,7 +339,6 @@ class CTRenHosting extends CTCNC
                 ),
                 'controlPanelUrlMessage'             => Controller::htmlDisplayText(
                     $dsRenHosting->getMessage(DBEJRenHosting::controlPanelUrl)
-
                 ),
                 'ftpAddress'                         => Controller::htmlInputText(
                     $dsRenHosting->getValue(DBEJRenHosting::ftpAddress)
@@ -398,14 +379,11 @@ class CTRenHosting extends CTCNC
                 'clientCheckDirectDebit'             => $isDirectDebitAllowed ? 'true' : 'false'
             )
         );
-
-
         $this->template->setBlock(
             'RenHostingEdit',
             'initialContractLengthBlock',
             'initialContractLengths'
         );
-
         $this->parseInitialContractLength($dsRenHosting->getValue(DBECustomerItem::initialContractLength));
         $this->template->set_block(
             'RenHostingEdit',
@@ -437,13 +415,11 @@ class CTRenHosting extends CTCNC
             'renewalStatuss'
         );
         $this->parseRenewalSelector($dsRenHosting->getValue(DBEJRenHosting::renewalStatus));
-
         $this->template->parse(
             'CONTENTS',
             'RenHostingEdit',
             true
         );
-
         $this->parsePage();
 
     }
@@ -505,10 +481,9 @@ class CTRenHosting extends CTCNC
     function editFromSalesOrder()
     {
         $buSalesOrder = new BUSalesOrder($this);
-        $DBEJOrdline = new DBEJOrdline($this);
+        $DBEJOrdline  = new DBEJOrdline($this);
         $DBEJOrdline->getRow($this->getParam('lineId'));
         $renewalCustomerItemID = $DBEJOrdline->getValue(DBEJOrdline::renewalCustomerItemID);
-
         // has the order line get a renewal already?
         if (!$renewalCustomerItemID) {
             // create a new record first
@@ -518,15 +493,12 @@ class CTRenHosting extends CTCNC
                 $dsOrdhead,
                 $dsDontNeedOrdline
             );
-
             $this->buRenHosting->createNewRenewal(
                 $dsOrdhead->getValue(DBEOrdhead::customerID),
                 $DBEJOrdline->getValue(DBEOrdline::itemID),
                 $renewalCustomerItemID,
                 $dsOrdhead->getValue(DBEOrdhead::delSiteNo)                // returned by function
             );
-
-
             // For despatch, prevents the renewal appearing again today during despatch process.
             $dbeOrdline = new DBEOrdline($this);
             $dbeOrdline->getRow($DBEJOrdline->getValue(DBEJOrdline::id));
@@ -534,20 +506,16 @@ class CTRenHosting extends CTCNC
                 DBEJOrdline::renewalCustomerItemID,
                 $renewalCustomerItemID
             );
-
             $dbeOrdline->updateRow();
 
         }
-
-        $urlNext =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action' => 'edit',
-                    'ID'     => $renewalCustomerItemID
-                )
-            );
-
+        $urlNext = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action' => 'edit',
+                'ID'     => $renewalCustomerItemID
+            )
+        );
         header('Location: ' . $urlNext);
         exit;
     }
@@ -570,32 +538,27 @@ class CTRenHosting extends CTCNC
             $this->edit();
             exit;
         }
-
         $this->buRenHosting->updateRenHosting($this->dsRenHosting);
-
         if ($this->getParam('ordheadID') == 1) {        // see whether more renewals need to be edited for this
             // despatch
-            $urlNext =
-                Controller::buildLink(
-                    'Despatch',
-                    array(
-                        'action' => 'inputRenewals',
-                        'ID'     => $this->getParam('ordheadID')
-                    )
-                );
+            $urlNext = Controller::buildLink(
+                'Despatch',
+                array(
+                    'action' => 'inputRenewals',
+                    'ID'     => $this->getParam('ordheadID')
+                )
+            );
 
         } else {
-            $urlNext =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action' => 'edit',
-                        'ID'     => $this->dsRenHosting->getValue(DBEJRenHosting::customerItemID)
-                    )
-                );
+            $urlNext = Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action' => 'edit',
+                    'ID'     => $this->dsRenHosting->getValue(DBEJRenHosting::customerItemID)
+                )
+            );
 
         }
-
         header('Location: ' . $urlNext);
     }
 
@@ -628,7 +591,6 @@ class CTRenHosting extends CTCNC
             $dsRenHosting,
             $this->getParam('orderBy')
         );
-
         if ($dsRenHosting->rowCount() > 0) {
             $this->template->set_block(
                 'RenHostingList',
@@ -638,25 +600,20 @@ class CTRenHosting extends CTCNC
             while ($dsRenHosting->fetchNext()) {
 
                 $customerItemID = $dsRenHosting->getValue(DBEJRenHosting::customerItemID);
-
-                $urlEdit =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action' => 'edit',
-                            'ID'     => $customerItemID
-                        )
-                    );
+                $urlEdit = Controller::buildLink(
+                    $_SERVER['PHP_SELF'],
+                    array(
+                        'action' => 'edit',
+                        'ID'     => $customerItemID
+                    )
+                );
                 $txtEdit = '[edit]';
-
-                $urlList =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action' => 'list'
-                        )
-                    );
-
+                $urlList = Controller::buildLink(
+                    $_SERVER['PHP_SELF'],
+                    array(
+                        'action' => 'list'
+                    )
+                );
                 $this->template->set_var(
                     array(
                         'customerName'    => $dsRenHosting->getValue(DBEJRenHosting::customerName),

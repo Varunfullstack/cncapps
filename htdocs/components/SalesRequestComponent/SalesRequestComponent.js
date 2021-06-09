@@ -1,27 +1,24 @@
 import MainComponent from "../shared/MainComponent.js";
 import React from "react";
-import ReactDOM from "react-dom"; 
+import ReactDOM from "react-dom";
 import '../style.css';
 import './SalesRequestComponent.css';
-import { CreateSalesRequestComponent } from "./subComponents/CreateSalesRequestComponent.js";
+import {CreateSalesRequestComponent} from "./subComponents/CreateSalesRequestComponent.js";
 
 class SalesRequestComponent extends MainComponent {
-    
+
     constructor(props) {
         super(props);
-        this.state = {
-             
-            
-        };
+        this.state = {};
     }
 
-    componentDidMount() {  
-      
+    componentDidMount() {
+
     }
- 
-    render() {        
+
+    render() {
         return <div>
-            <CreateSalesRequestComponent></CreateSalesRequestComponent>
+            <CreateSalesRequestComponent/>
         </div>;
     }
 }

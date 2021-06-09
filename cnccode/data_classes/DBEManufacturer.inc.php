@@ -4,12 +4,15 @@
 * @access public
 */
 global $cfg;
+
+use CNCLTD\Data\DBConnect;
+
 require_once($cfg["path_dbe"] . "/DBCNCEntity.inc.php");
 
 class DBEManufacturer extends DBCNCEntity
 {
     const manufacturerID = "manufacturerID";
-    const name = "name";
+    const name           = "name";
 
     /**
      * calls constructor()
@@ -36,19 +39,20 @@ class DBEManufacturer extends DBCNCEntity
         }
         global $db;
         $escapedName = mysqli_real_escape_string($db->link_id(), $name);
-        $queryString =
-            "SELECT {$this->getDBColumnNamesAsString()} FROM {$this->getTableName()} WHERE  man_name LIKE '%{$escapedName}%' ORDER BY {$this->getDBColumnName(self::name)}";
+        $queryString = "SELECT {$this->getDBColumnNamesAsString()} FROM {$this->getTableName()} WHERE  man_name LIKE '%{$escapedName}%' ORDER BY {$this->getDBColumnName(self::name)}";
         if ($limit) {
             $queryString .= " LIMIT 0,200";
         }
-
         $this->setQueryString($queryString);
-
         $ret = (parent::getRows());
         return $ret;
     }
-    function hasName($name,$id=null)
+
+    function hasName($name, $id = null)
     {
-        return DBConnect::fetchOne("select * from ".$this->getTableName()." where man_name=:name and (:id=null or man_manno<>:id)",["name"=>$name,"id"=>$id]);
+        return DBConnect::fetchOne(
+            "select * from " . $this->getTableName() . " where man_name=:name and (:id=null or man_manno<>:id)",
+            ["name" => $name, "id" => $id]
+        );
     }
 }
