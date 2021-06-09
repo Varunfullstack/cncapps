@@ -8,6 +8,7 @@
  * @authors Karim Ahmed - Sweet Code Limited
  */
 
+use CNCLTD\Data\DBConnect;
 use Syonix\ChangelogViewer\Factory\ViewerFactory;
 
 global $cfg;
