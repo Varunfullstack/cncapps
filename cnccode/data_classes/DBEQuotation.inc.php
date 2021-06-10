@@ -8,24 +8,25 @@ require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 class DBEQuotation extends DBEntity
 {
 
-    const quotationID = "quotationID";
-    const ordheadID = "ordheadID";
-    const versionNo = "versionNo";
-    const salutation = "salutation";
-    const emailSubject = "emailSubject";
-    const sentDateTime = "sentDateTime";
-    const userID = "userID";
-    const fileExtension = "fileExtension";
-    const documentType = "documentType";
-    const deliverySiteAdd1 = "deliverySiteAdd1";
-    const deliverySiteAdd2 = "deliverySiteAdd2";
-    const deliverySiteAdd3 = "deliverySiteAdd3";
-    const deliverySiteTown = "deliverySiteTown";
-    const deliverySiteCounty = "deliverySiteCounty";
+    const quotationID          = "quotationID";
+    const ordheadID            = "ordheadID";
+    const versionNo            = "versionNo";
+    const salutation           = "salutation";
+    const emailSubject         = "emailSubject";
+    const sentDateTime         = "sentDateTime";
+    const userID               = "userID";
+    const fileExtension        = "fileExtension";
+    const documentType         = "documentType";
+    const deliverySiteAdd1     = "deliverySiteAdd1";
+    const deliverySiteAdd2     = "deliverySiteAdd2";
+    const deliverySiteAdd3     = "deliverySiteAdd3";
+    const deliverySiteTown     = "deliverySiteTown";
+    const deliverySiteCounty   = "deliverySiteCounty";
     const deliverySitePostCode = "deliverySitePostCode";
-    const deliveryContactID = "deliveryContactID";
-    const confirmCode = "confirmationCode";
-    const signableEnvelopeID = "signableEnvelopeID";
+    const deliveryContactID    = "deliveryContactID";
+    const confirmCode          = "confirmationCode";
+    const signableEnvelopeID   = "signableEnvelopeID";
+    const isDownloaded         = "isDownloaded";
 
 
     /**
@@ -128,7 +129,13 @@ class DBEQuotation extends DBEntity
             DA_STRING,
             DA_ALLOW_NULL
         );
-
+        $this->addColumn(
+            self::isDownloaded,
+            DA_BOOLEAN,
+            DA_NOT_NULL,
+            "is_downloaded",
+            0
+        );
         $this->setAddColumnsOff();
         $this->setPK(0);
     }
@@ -137,8 +144,8 @@ class DBEQuotation extends DBEntity
     {
         $ret = null;
         $this->setQueryString(
-            'SELECT MAX(' . $this->getDBColumnName(self::versionNo) . ') + 1 FROM ' . $this->getTableName() .
-            ' WHERE ' . $this->getDBColumnName(self::ordheadID) . '=' . $this->getFormattedValue(self::ordheadID)
+            'SELECT MAX(' . $this->getDBColumnName(self::versionNo) . ') + 1 FROM ' . $this->getTableName(
+            ) . ' WHERE ' . $this->getDBColumnName(self::ordheadID) . '=' . $this->getFormattedValue(self::ordheadID)
         );
         if ($this->runQuery()) {
             if ($this->nextRecord()) {
@@ -169,9 +176,10 @@ class DBEQuotation extends DBEntity
     public function getQuotesWithSignableDocumentForSalesOrder(int $salesOrderID)
     {
         $this->setQueryString(
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " WHERE " . $this->getDBColumnName(self::ordheadID) . " = " . $salesOrderID . " and " . $this->getDBColumnName(self::signableEnvelopeID) . " is not null"
+            "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName(
+            ) . " WHERE " . $this->getDBColumnName(
+                self::ordheadID
+            ) . " = " . $salesOrderID . " and " . $this->getDBColumnName(self::signableEnvelopeID) . " is not null"
         );
         parent::getRows();
     }

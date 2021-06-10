@@ -1,0 +1,20 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="xavi" id="issue1436-0">
+        <tagDatabase tag="issue1436"/>
+    </changeSet>
+    <changeSet author="xavi" id="issue1436-1">
+        <preConditions>
+            <not>
+                <columnExists tableName="quotation" columnName="is_downloaded"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="quotation">
+            <column name="is_downloaded" type="tinyint(1)" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>
