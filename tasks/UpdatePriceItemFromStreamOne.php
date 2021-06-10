@@ -260,7 +260,7 @@ foreach ($allSubscriptions as $item) {
     );
 }
 $logger->info("Loading all subscriptions and related addOns from streamOne.....");
-$orderDetails          = $buStreamOneApi->getProductsDetails($orderIds, 40);
+$orderDetails          = $buStreamOneApi->getProductsDetails($orderIds);
 $allAddonLicenses      = getAddonLicensesFromOrders($orderDetails);
 $missingLicensesErrors = syncAddons($allAddonLicenses, $cncItems, $forcedMode, $logger);
 $updatedItems          = 0;
