@@ -1,8 +1,6 @@
 <?php
 
-
 namespace CNCLTD\StreamOneProcessing;
-
 class ContractsStreamOneEmail
 {
     /**
@@ -27,8 +25,7 @@ class ContractsStreamOneEmail
 
         if (!isset($this->map[$contractData->getStreamOneEmail()])) {
             $this->map[$contractData->getStreamOneEmail()] = new ContractsByEmail(
-                $contractData->getStreamOneEmail(),
-                $contractData->getCustomerName()
+                $contractData->getStreamOneEmail(), $contractData->getCustomerName()
             );
         }
         $this->map[$contractData->getStreamOneEmail()]->addContract($contractData);
@@ -39,7 +36,6 @@ class ContractsStreamOneEmail
         if (!isset($this->map[$email])) {
             return;
         }
-
         $this->map[$email]->flagSKU($sku);
     }
 

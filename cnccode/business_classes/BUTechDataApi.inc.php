@@ -10,6 +10,7 @@ require_once($cfg["path_gc"] . "/Business.inc.php");
 
 use CNCLTD\LoggerCLI;
 use CNCLTD\StreamOneProcessing\Subscription\Subscription;
+use function Lambdish\Phunctional\map;
 
 class BUTechDataApi extends Business
 {
@@ -221,7 +222,7 @@ class BUTechDataApi extends Business
                     $subscriptionData['company'],
                     $subscriptionData['endCustomerName'],
                     @$subscriptionData['endCustomerPO'],
-                    $subscriptionData['additionalData']
+                    @$subscriptionData['additionalData']
                 );
             },
             $bodyText['subscriptions']
@@ -243,29 +244,11 @@ class BUTechDataApi extends Business
         $amountOfMultiRequests = count($urls) / $pagesPerMultiRequest;
         $responses             = [];
         for ($i = 0; $i < $amountOfMultiRequests; $i++) {
-            $subUrls  = array_slice($urls, $i * $pagesPerMultiRequest, $pagesPerMultiRequest);
-            $response = $this->callMultipleApi($subUrls);
-            $result   = array_merge($responses, $response);
-
+            $subUrls   = array_slice($urls, $i * $pagesPerMultiRequest, $pagesPerMultiRequest);
+            $response  = $this->callMultipleApi($subUrls);
+            $responses = array_merge($responses, $response);
         }
         return $responses;
-    }
-
-    function getAllSubscriptionsSync($pages, $pageSize = 25)
-    {
-        $urls = array();
-        foreach ($pages as $page) {
-            array_push($urls, "order/subscriptions/$page");
-        }
-        $totalPages = count($urls) / $pageSize;
-        $result     = array();
-        for ($i = 0; $i < $totalPages; $i++) {
-            $subUrls  = array_slice($urls, $i * $pageSize, $pageSize);
-            $response = $this->callMultipleApi($subUrls);
-            $result   = array_merge($result, $response);
-
-        }
-        return $result;
     }
 
     function callMultipleApi($urls, $body = null, $method = 'GET')
@@ -302,7 +285,7 @@ class BUTechDataApi extends Business
         } while ($running > 0);
         // get content and remove handles
         foreach ($multiCurl as $k => $ch) {
-            $result[$k] = json_decode(curl_multi_getcontent($ch), true);
+            $result[$k] = curl_multi_getcontent($ch);
             curl_multi_remove_handle($mh, $ch);
         }
         // close
@@ -433,12 +416,16 @@ class BUTechDataApi extends Business
         $totalPages = count($orderNumbers) / $pageSize;
         $result     = array();
         for ($i = 0; $i < $totalPages; $i++) {
-            $subUrls = array_slice($urls, $i * $pageSize, $pageSize);
-            //echo json_encode($subUrls);
-            $response = $this->callMultipleApi($subUrls);
-            $result   = array_merge($result, $response);
+            $subUrls         = array_slice($urls, $i * $pageSize, $pageSize);
+            $responses       = $this->callMultipleApi($subUrls);
+            $parsedResponses = map(
+                function ($response) {
+                    return json_decode($response, true);
+                },
+                $responses
+            );
+            $result          = array_merge($result, $parsedResponses);
         }
-        // return $this->callMultipleApi($urls);
         return $result;
     }
 
@@ -450,7 +437,7 @@ class BUTechDataApi extends Business
     private function getBodyTextFromResponse($response)
     {
         if (!$response) {
-            throw new Exception('Failed to fetch first subscriptions page');
+            throw new Exception('Response is not valid');
         }
         $data = json_decode($response, true);
         if (!key_exists('Result', $data) || $data['Result'] !== 'Success') {

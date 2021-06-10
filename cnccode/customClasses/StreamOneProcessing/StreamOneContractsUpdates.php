@@ -161,13 +161,13 @@ class StreamOneContractsUpdates
         $units           = $this->getUnitsFromSubscriptions($subscriptions);
         $dbeCustomerItem = new DBECustomerItem($this);
         $dbeCustomerItem->getRow($contractId);
-        $salePrice      = $dbeCustomerItem->getValue(DBECustomerItem::salePrice);
+        $salePrice      = $dbeCustomerItem->getValue(DBECustomerItem::salePricePerMonth);
         $salePriceAnnum = ($salePrice * $units) * 12;
         $costPriceAnnum = ($price * $units) * 12;
         $dbeCustomerItem->setValue(DBECustomerItem::costPricePerMonth, $price);
-        $dbeCustomerItem->setValue(DBECustomerItem::costPrice, $costPriceAnnum);
+        $dbeCustomerItem->setValue(DBECustomerItem::curUnitCost, $costPriceAnnum);
         $dbeCustomerItem->setValue(DBECustomerItem::users, $units);
-        $dbeCustomerItem->setValue(DBECustomerItem::salePrice, $salePriceAnnum);
+        $dbeCustomerItem->setValue(DBECustomerItem::curUnitSale, $salePriceAnnum);
         $dbeCustomerItem->updateRow();
     }
 

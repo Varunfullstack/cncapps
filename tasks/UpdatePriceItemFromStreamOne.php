@@ -5,12 +5,15 @@ use CNCLTD\LoggerCLI;
 use CNCLTD\StreamOneProcessing\ContractData;
 use CNCLTD\StreamOneProcessing\ContractDataFactory;
 use CNCLTD\StreamOneProcessing\ContractsByStreamOneEmailAndSKUCollection;
+use CNCLTD\StreamOneProcessing\ContractWithDuplicatedSKU;
 use CNCLTD\StreamOneProcessing\CustomerForLicenseEmailGetter;
 use CNCLTD\StreamOneProcessing\StreamOneContractsUpdates;
 use CNCLTD\StreamOneProcessing\StreamOneLicenseData;
+use CNCLTD\StreamOneProcessing\Subscription\Subscription;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
+use function Lambdish\Phunctional\filter;
 
 require_once(__DIR__ . "/../htdocs/config.inc.php");
 global $cfg;
@@ -247,10 +250,14 @@ if ($allCustomers->Result == "Success") {
 // now we have all subscriptions,  streamone customers and cnc items
 //----------------------------start update customer items seats from stream one
 //2- get all subscriptions details
-$count    = 0;
-$orderIds = array();
+$count                    = 0;
+$orderIds                 = array();
+$streamOneLicensesToCheck = [];
 foreach ($allSubscriptions as $item) {
     array_push($orderIds, $item->orderNumber());
+    $streamOneLicensesToCheck[] = new StreamOneLicenseData(
+        $item->sku(), $item->customerEmail()
+    );
 }
 $logger->info("Loading all subscriptions and related addOns from streamOne.....");
 $orderDetails          = $buStreamOneApi->getProductsDetails($orderIds, 40);
@@ -261,7 +268,6 @@ $updatedItemsAddOns    = 0;
 $subscription          = null;
 $logger->info("All subscriptions number :" . count($allSubscriptions));
 //get all customer subscriptions
-$streamOneLicensesToCheck = [];
 foreach ($allAddonLicenses as $addonLicense) {
     $streamOneLicensesToCheck[] = new StreamOneLicenseData(
         $addonLicense->sku, $addonLicense->email
@@ -269,7 +275,6 @@ foreach ($allAddonLicenses as $addonLicense) {
 }
 $streamOneContractsUpdates = new StreamOneContractsUpdates($allSubscriptions, $logger);
 $streamOneContractsUpdates->__invoke();
-$logger->info("Received StreamOne Licences", $streamOneLicensesToCheck);
 storeReceivedData($streamOneLicensesToCheck);
 checkAllContractsHaveAMatchingStreamOneLicense($streamOneLicensesToCheck, $logger);
 if (!empty($missingLicensesErrors)) {
@@ -393,7 +398,7 @@ WHERE item.`isStreamOne`
     while ($db->next_record(MYSQLI_ASSOC)) {
         try {
             $contractsByStreamOneEmailAndSKUCollection->add($contractDataFactory->fromDB($db->Record));
-        } catch (\CNCLTD\StreamOneProcessing\ContractWithDuplicatedSKU $contractWithDuplicatedSKU) {
+        } catch (ContractWithDuplicatedSKU $contractWithDuplicatedSKU) {
             sendContractsWithDuplicatedSKUAlert($contractWithDuplicatedSKU);
         }
     }
@@ -413,7 +418,8 @@ function checkAllContractsHaveAMatchingStreamOneLicense(array $licensesToCheck, 
     $contractsCollection = getContractsToCheck($loggerCLI);
     $contractsCollection->checkLicenses($licensesToCheck);
     $elementsNotChecked = $contractsCollection->getNotFlaggedContracts();
-    sendMissingStreamOneLicenseForContractEmail($elementsNotChecked);
+    var_dump($elementsNotChecked);
+//    sendMissingStreamOneLicenseForContractEmail($elementsNotChecked);
 }
 
 /**
@@ -475,8 +481,7 @@ function sendMissingStreamOneLicenseForContractEmail(array $contracts)
 
 }
 
-function sendContractsWithDuplicatedSKUAlert(\CNCLTD\StreamOneProcessing\ContractWithDuplicatedSKU $contractWithDuplicatedSKU
-)
+function sendContractsWithDuplicatedSKUAlert(ContractWithDuplicatedSKU $contractWithDuplicatedSKU)
 {
     $fromEmail   = CONFIG_SUPPORT_EMAIL;
     $buMail      = new BUMail($thing);
