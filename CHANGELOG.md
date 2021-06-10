@@ -6,6 +6,7 @@ This project changes will be shown here.
 - Issue 1431 - StreamOne count current and old part code
 ### Fixed
 - Issue 1437 -  Password page for referred customers doesn't load
+- Issue 1436 - Signable Customer Order documents doubling up.
 
 ## [v5.12.3] - 2021-06-08
 ### Fixed
