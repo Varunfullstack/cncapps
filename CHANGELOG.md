@@ -1,6 +1,9 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Fixed
+- Issue 1437 -  Password page for referred customers doesn't load
 ## [v5.12.3] - 2021-06-08
 ### Fixed
 - Fix issue with closing Service Request.
