@@ -102,7 +102,7 @@ class StreamOneContractsUpdates
         $subscriptionsCount = count($subscriptions);
         if (!$subscriptionsCount) {
             throw new Exception(
-                "Customer ($customerId) with contract $contractId does not have a any matching subscriptions in StreamOne"
+                "Customer ($customerId) with contract $contractId does not have any matching subscriptions in StreamOne"
             );
         }
         if ($subscriptionsCount > 2) {
@@ -151,15 +151,6 @@ class StreamOneContractsUpdates
     }
 
     /**
-     * @param Subscription $subscription
-     * @return bool
-     */
-    private function isSubscriptionActive(Subscription $subscription): bool
-    {
-        return $subscription->licenceStatus() !== 'inactive';
-    }
-
-    /**
      * @param $subscriptions
      * @param $contractId
      * @throws ColumnOutOfRangeException
@@ -193,23 +184,28 @@ class StreamOneContractsUpdates
             $licenseStatus  = $subscription->licenceStatus();
             $licenseEmail   = $subscription->customerEmail();
             $customer       = $this->customerForLicenseEmailGetter->__invoke($licenseEmail);
-            if (!$customer && $subscription->isActive()) {
+            if (!$customer) {
                 $this->loggerCLI->error(
                     "Failed to retrieve customer for subscription $subscriptionId for license $sku and email $licenseEmail with $units and status $licenseStatus"
                 );
-                $this->emailSales(
-                    "StreamOne Customer Not Linked To CNC customer",
-                    "$licenseEmail has active subscriptions for SKU $sku and it is not linked to a CNC customer"
-                );
+                if ($subscription->isActive()) {
+
+                    $this->emailSales(
+                        "StreamOne Customer Not Linked To CNC customer",
+                        "$licenseEmail has active subscriptions for SKU $sku and it is not linked to a CNC customer"
+                    );
+                }
                 continue;
             }
             $customerId   = $customer->getValue(DBECustomer::customerID);
             $customerName = $customer->getValue(DBECustomer::name);
             $itemId       = $this->getItemIdForSKU($sku);
-            if (!$itemId && $subscription->isActive()) {
-                $message = "There is no Item with partNo or oldPartNO matching the SKU SK10224 in CNCAPPS";
+            if (!$itemId) {
+                $message = "There is no Item with partNo or oldPartNO matching the SKU $sku in CNCAPPS";
                 $this->loggerCLI->error($message);
-                $this->emailSales("StreamOne Licence in use with no CNC Item", $message);
+                if ($subscription->isActive()) {
+                    $this->emailSales("StreamOne Licence in use with no CNC Item", $message);
+                }
                 continue;
             }
             if (!key_exists($customerId, $this->customerContractsWithLicenses)) {
@@ -229,13 +225,14 @@ class StreamOneContractsUpdates
             if (!key_exists($contractId, $this->customerContractsWithLicenses[$customerId])) {
                 $this->customerContractsWithLicenses[$customerId][$contractId] = [];
             }
-            $this->customerContractsWithLicenses[$customerId][$itemId][] = $subscription;
+            $this->customerContractsWithLicenses[$customerId][$contractId][] = $subscription;
         }
     }
 
     private function emailSales($subject, $body)
     {
-
+        $buMail = new \BUMail($this);
+        $buMail->sendSimpleEmail($body, $subject, CONFIG_SALES_EMAIL);
     }
 
 }
