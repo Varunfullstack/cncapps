@@ -77,10 +77,16 @@ class PasswordComponent extends MainComponent {
             this.setState({showSpinner: true}, () => {
                 this.api.getAllPasswords(filter.customer.id, filter.showArchived, filter.showHigherLevel)
                     .then(res => {
-                        if (res.state)
-                            this.setState({passwords: res.data, error: null, showSpinner: false});
-                        else
-                            this.setState({error: res.error, showSpinner: false});
+                        if (!res.state) {
+                            throw new Error('Failed to retrieve data');
+                        }
+                        this.setState({passwords: res.data, error: null, showSpinner: false});
+                    })
+                    .catch(error => {
+                        if ('error' in error) {
+                            error = error.error;
+                        }
+                        this.setState({error: error, showSpinner: false});
                     });
             })
     }
