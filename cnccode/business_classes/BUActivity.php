@@ -23,6 +23,7 @@ use BUUser;
 use CNCLTD\AutomatedRequest;
 use CNCLTD\ChargeableWorkCustomerRequest\infra\ChargeableWorkCustomerRequestMySQLRepository;
 use CNCLTD\ChargeableWorkCustomerRequest\usecases\ClearPendingChargeableRequestsOnServiceRequestClosed;
+use CNCLTD\Data\DBEItem;
 use CNCLTD\Data\DBEJProblem;
 use CNCLTD\DUOApi\Accounts\Account;
 use CNCLTD\Email\AttachmentCollection;
@@ -62,7 +63,6 @@ use DBEContact;
 use DBECustomer;
 use DBECustomerItem;
 use DBEHeader;
-use DBEItem;
 use DBEItemType;
 use DBEJCallActivity;
 use DBEJCallActType;
@@ -103,7 +103,6 @@ require_once($cfg ["path_dbe"] . "/DBEJContract.inc.php");
 require_once($cfg ["path_dbe"] . "/DBECallActivity.inc.php");
 require_once($cfg ["path_dbe"] . "/DBEJCallActivity.php");
 require_once($cfg ["path_dbe"] . "/DBEProblem.inc.php");
-require_once($cfg ["path_dbe"] . "/DBEItem.inc.php");
 require_once($cfg ["path_dbe"] . "/DBEItemType.inc.php");
 require_once($cfg ["path_dbe"] . "/DBECallActivitySearch.inc.php");
 require_once($cfg ["path_dbe"] . "/DBECallDocument.inc.php");
@@ -3886,7 +3885,7 @@ class BUActivity extends Business
                 // that's the case ...we don't want to set the activities to authorised
                 $customerItem = new DBEJCustomerItem($this);
                 $customerItem->getRow($dbeProblem->getValue(DBEJProblem::contractCustomerItemID));
-                $DBItem = new DBEItem($this);
+                $DBItem = new DBEItem();
                 $DBItem->getRow($customerItem->getValue(DBECustomerItem::itemID));
                 if ($DBItem->getValue(DBEItem::itemTypeID) == CONFIG_PREPAY_ITEMTYPEID) {
                     $shouldSetActivitiesToAuthorised = false;

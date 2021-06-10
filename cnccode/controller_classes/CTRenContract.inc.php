@@ -9,12 +9,12 @@
 global $cfg;
 
 use CNCLTD\Business\BURenContract;
+use CNCLTD\Data\DBEItem;
 
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/Burencontract.php');
 require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
-require_once($cfg['path_dbe'] . '/DBEItem.inc.php');
 require_once($cfg['path_bu'] . '/BUCustomerItem.inc.php');
 require_once($cfg['path_bu'] . '/BUPDFSupportContract.inc.php');
 

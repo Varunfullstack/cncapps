@@ -1,8 +1,10 @@
-<?php /*
-* Item table
-* @authors Karim Ahmed
-* @access public
-*/
+<?php
+
+namespace CNCLTD\Data;
+global $cfg;
+
+use DBCNCEntity;
+
 require_once($cfg["path_dbe"] . "/DBCNCEntity.inc.php");
 
 class DBEItem extends DBCNCEntity
@@ -320,7 +322,7 @@ class DBEItem extends DBCNCEntity
         $queryString = "SELECT {$this->getDBColumnNamesAsString()} FROM {$this->getTableName()} WHERE 
                               {$this->getDBColumnName(self::partNo)} = '{$sku}' or {$this->getDBColumnName(self::partNoOld)} = '{$sku}' limit 1";
         $this->setQueryString($queryString);
-        return parent::getRows();
+        return parent::getRow();
     }
 
     public function getChildItems($parentItemId)

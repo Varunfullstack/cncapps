@@ -712,7 +712,7 @@ class DBECustomerItem extends DBCNCEntity
             $queryString .= " and {$this->getDBColumnName(self::declinedFlag)} <> 'Y' and {$this->getDBColumnName(self::renewalStatus)} = 'R'";
         }
         $this->setQueryString($queryString);
-        return (parent::getRows());
+        return parent::getRows();
     }
 
     function getCountByCustomerAndItemID($customerID,

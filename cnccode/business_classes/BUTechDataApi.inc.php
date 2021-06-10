@@ -9,6 +9,7 @@ global $cfg;
 require_once($cfg["path_gc"] . "/Business.inc.php");
 
 use CNCLTD\LoggerCLI;
+use CNCLTD\StreamOneProcessing\Subscription\Subscription;
 
 class BUTechDataApi extends Business
 {
@@ -166,14 +167,88 @@ class BUTechDataApi extends Business
         return $this->callApi("order/addOns", $body, 'POST');
     }
 
+    /**
+     * @throws Exception
+     */
     function getAllSubscriptions()
     {
+        $response = $this->getAllSubscriptionsForPage();
+        $bodyText = $this->getBodyTextFromResponse($response);
+        if (!key_exists('totalPages', $bodyText)) {
+            throw new Exception('totalPages not found in bodyText!');
+        }
+        $totalPages = $bodyText['totalPages'];
+        if (!key_exists('subscriptions', $bodyText)) {
+            throw new Exception('subscriptions not found in bodyText!');
+        }
+        $subscriptions         = $this->getSubscriptionsFromBodyText($bodyText);
+        $subscriptionResponses = $this->getRestOfSubscriptionPages($totalPages);
+        foreach ($subscriptionResponses as $subscriptionResponse) {
+            $subscriptions = array_merge($subscriptions, $this->getSubscriptionsFromResponse($subscriptionResponse));
+        }
+        return $subscriptions;
+    }
 
+    function getSubscriptionsFromResponse($response)
+    {
+        $bodyText = $this->getBodyTextFromResponse($response);
+        if (!key_exists('subscriptions', $bodyText)) {
+            throw new Exception('subscriptions not found in bodyText!');
+        }
+        return $this->getSubscriptionsFromBodyText($bodyText);
+    }
+
+    /**
+     * @param $bodyText
+     * @return Subscription[]
+     */
+    function getSubscriptionsFromBodyText($bodyText): array
+    {
+        return Lambdish\Phunctional\map(
+            function ($subscriptionWithId) {
+                $id               = array_key_first($subscriptionWithId);
+                $subscriptionData = $subscriptionWithId[$id];
+                return new CNCLTD\StreamOneProcessing\Subscription\Subscription(
+                    $id,
+                    $subscriptionData['orderNumber'],
+                    $subscriptionData['sku'],
+                    $subscriptionData['productType'],
+                    $subscriptionData['name'],
+                    $subscriptionData['quantity'],
+                    $subscriptionData['unitPrice'],
+                    $subscriptionData['lineStatus'],
+                    $subscriptionData['endCustomerEmail'],
+                    $subscriptionData['company'],
+                    $subscriptionData['endCustomerName'],
+                    @$subscriptionData['endCustomerPO'],
+                    $subscriptionData['additionalData']
+                );
+            },
+            $bodyText['subscriptions']
+        );
     }
 
     function getAllSubscriptionsForPage($page = 1)
     {
         return $this->callApi("order/subscriptions/$page");
+    }
+
+    function getRestOfSubscriptionPages($totalPages)
+    {
+        $pagesPerMultiRequest = 25;
+        $urls                 = [];
+        for ($page = 2; $page <= $totalPages; $page++) {
+            $urls[] = "order/subscriptions/$page";
+        }
+        $amountOfMultiRequests = count($urls) / $pagesPerMultiRequest;
+        $responses             = [];
+        for ($i = 0; $i < $amountOfMultiRequests; $i++) {
+            $subUrls  = array_slice($urls, $i * $pagesPerMultiRequest, $pagesPerMultiRequest);
+            $response = $this->callMultipleApi($subUrls);
+            $result   = array_merge($responses, $response);
+
+        }
+        return $responses;
     }
 
     function getAllSubscriptionsSync($pages, $pageSize = 25)
@@ -365,6 +440,27 @@ class BUTechDataApi extends Business
         }
         // return $this->callMultipleApi($urls);
         return $result;
+    }
+
+    /**
+     * @param $response
+     * @return mixed
+     * @throws Exception
+     */
+    private function getBodyTextFromResponse($response)
+    {
+        if (!$response) {
+            throw new Exception('Failed to fetch first subscriptions page');
+        }
+        $data = json_decode($response, true);
+        if (!key_exists('Result', $data) || $data['Result'] !== 'Success') {
+            throw new Exception('Failed to fetch first subscriptions page');
+        }
+        if (!key_exists('BodyText', $data)) {
+            throw new Exception('BodyText not found in response!');
+        }
+        $bodyText = $data['BodyText'];
+        return $bodyText;
     }
 
 }// End of class

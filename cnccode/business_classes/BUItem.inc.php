@@ -4,9 +4,11 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+
+use CNCLTD\Data\DBEItem;
+
 global $cfg;
 require_once($cfg["path_gc"] . "/Business.inc.php");
-require_once($cfg["path_dbe"] . "/DBEItem.inc.php");
 require_once($cfg["path_dbe"] . "/DBEItemType.inc.php");
 require_once($cfg["path_dbe"] . "/DBEManufacturer.inc.php");
 

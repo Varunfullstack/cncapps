@@ -1,7 +1,9 @@
 <?php
-require_once($cfg["path_dbe"] . "/DBEItem.inc.php");
-require_once($cfg["path_dbe"] . "/DBEHeader.inc.php");
+global $cfg;
 
+use CNCLTD\Data\DBEItem;
+
+require_once($cfg["path_dbe"] . "/DBEHeader.inc.php");
 /*=========================================================================
 Functions that relate to call activities
 ===========================================================================*/
@@ -20,36 +22,31 @@ Functions that relate to call activities
  * @param $overtimeRate
  * @param $normalRate
  */
-function getRatesAndHours(
-    $date,
-    $startTime,
-    $endTime,
-    $minHours,
-    $maxHours,
-    $oohMultiplier,
-    $itemID,
-    &$dsHeader,
-    &$normalHours,
-    &$hoursBeforeWork,
-    &$hoursAfterWork,
-    &$overtimeRate,
-    &$normalRate
+function getRatesAndHours($date,
+                          $startTime,
+                          $endTime,
+                          $minHours,
+                          $maxHours,
+                          $oohMultiplier,
+                          $itemID,
+                          &$dsHeader,
+                          &$normalHours,
+                          &$hoursBeforeWork,
+                          &$hoursAfterWork,
+                          &$overtimeRate,
+                          &$normalRate
 )
 {
-    $that = null;// get activity times as decimals
+    $that              = null;// get activity times as decimals
     $activityStartTime = common_convertHHMMToDecimal($startTime);
-    $activityEndTime = common_convertHHMMToDecimal($endTime);
-
+    $activityEndTime   = common_convertHHMMToDecimal($endTime);
     // get system office hours as decimals
     $officeStartTime = common_convertHHMMToDecimal($dsHeader->getValue(DBEHeader::billingStartTime));
-    $officeEndTime = common_convertHHMMToDecimal($dsHeader->getValue(DBEHeader::billingEndTime));
-
+    $officeEndTime   = common_convertHHMMToDecimal($dsHeader->getValue(DBEHeader::billingEndTime));
     // in hours rate for activity type (from attached item row)
     $dbeItem = new DBEItem($that);
     $dbeItem->getRow($itemID);
-
     $normalRate = $dbeItem->getValue(DBEItem::curUnitSale);                // Normal, in office hours rate
-
     /* remove as per request from GL on 30/4/2008
 
         // Contract rate is ?65 ph
@@ -61,29 +58,24 @@ function getRatesAndHours(
     */
     // apply out-of-hours multiplier to get overtime rate
     $overtimeRate = $normalRate * $oohMultiplier;
-
     $activityEndTime = getCalculationEndTime(
         $activityStartTime,
         $activityEndTime,
         $minHours,
         $maxHours
     );
-
     $totalHours = $activityEndTime - $activityStartTime;
-
-
     // weekend days are counted as out-of-hours so simply set hoursAfterWork and return
     $weekDayNo = date(
         'w',
         strtotime($date)
     );
-    if (($weekDayNo == 0) OR ($weekDayNo == 6)) {
+    if (($weekDayNo == 0) or ($weekDayNo == 6)) {
         $hoursBeforeWork = 0;
-        $normalHours = 0;
-        $hoursAfterWork = $totalHours;
+        $normalHours     = 0;
+        $hoursAfterWork  = $totalHours;
         return;
     }
-
     // Hours before office start time
     if ($activityStartTime < $officeStartTime) {
         $useStartTime = $activityStartTime;
@@ -97,7 +89,7 @@ function getRatesAndHours(
         $hoursBeforeWork = 0;
     }
     // Hours during office hours
-    if (($activityStartTime < $officeEndTime) AND ($activityEndTime >= $officeStartTime)) {
+    if (($activityStartTime < $officeEndTime) and ($activityEndTime >= $officeStartTime)) {
         if ($activityStartTime > $officeStartTime) {
             $useStartTime = $activityStartTime;
         } else {
@@ -127,26 +119,21 @@ function getRatesAndHours(
     }
     return;
 } // end function
-
-function getCalculationEndTime(
-    $activityStartTime,
-    $activityEndTime,
-    $minHours,
-    $maxHours
+function getCalculationEndTime($activityStartTime,
+                               $activityEndTime,
+                               $minHours,
+                               $maxHours
 )
 {
 
     $decimalTime = $activityEndTime - $activityStartTime;
-
     $ret = $activityEndTime;  // default
-
     if (($minHours != 0) && ($decimalTime < $minHours)) {
         $ret = $activityStartTime + $minHours;
     }
     if (($maxHours != 0) && ($decimalTime > $maxHours)) {
         $ret = $activityStartTime + $maxHours;
     }
-
     return $ret;
 
 }

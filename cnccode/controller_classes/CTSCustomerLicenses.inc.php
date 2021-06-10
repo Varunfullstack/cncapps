@@ -1,25 +1,14 @@
 <?php
 
-/**
- * My Account controller class
- * CNC Ltd
- *
- * @access public
- * @authors Mustafa Taha
- */
-
+use CNCLTD\Data\DBEItem;
 use PhpParser\Node\Expr\Isset_;
 
 global $cfg;
-
-
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg ['path_dbe'] . '/DSForm.inc.php');
 require_once($cfg ['path_dbe'] . '/DBECustomer.inc.php');
-require_once($cfg ['path_dbe'] . '/DBEItem.inc.php');
 require_once($cfg ['path_dbe'] . '/DBECustomerItem.inc.php');
 require_once($cfg ['path_dbe'] . '/DBEStreamOneCustomers.inc.php');
-
 require_once($cfg['path_bu'] . '/BUTechDataApi.inc.php');
 
 class CTSCustomerLicenses extends CTCNC
@@ -30,12 +19,11 @@ class CTSCustomerLicenses extends CTCNC
      */
     private $buTechDataApi;
 
-    function __construct(
-        $requestMethod,
-        $postVars,
-        $getVars,
-        $cookieVars,
-        $cfg
+    function __construct($requestMethod,
+                         $postVars,
+                         $getVars,
+                         $cookieVars,
+                         $cfg
     )
     {
         parent::__construct(
@@ -45,12 +33,10 @@ class CTSCustomerLicenses extends CTCNC
             $cookieVars,
             $cfg
         );
-
         if (!$this->dbeUser->getValue(DBEUser::streamOneLicenseManagement)) {
             Header("Location: /NotAllowed.php");
             exit;
         }
-
         $this->buTechDataApi = new BUTechDataApi($this);
     }
 
@@ -61,9 +47,7 @@ class CTSCustomerLicenses extends CTCNC
     function defaultAction()
     {
         $page = 1;
-        if (isset($_GET['page']))
-            $page = $_GET['page'];
-
+        if (isset($_GET['page'])) $page = $_GET['page'];
         switch ($this->getAction()) {
             case "getProductList":
                 echo $this->buTechDataApi->getProductList($page);
@@ -143,18 +127,18 @@ class CTSCustomerLicenses extends CTCNC
     {
         $this->setMethodName('getCustomerById');
         $endCustomerId = $_GET['endCustomerId'];
-        $endCustomer = null;
+        $endCustomer   = null;
         if (isset($endCustomerId)) {
             //get techdata end customer
             $endCustomer = $this->buTechDataApi->getCustomerById($endCustomerId);
-            $obj = json_decode($endCustomer);
+            $obj         = json_decode($endCustomer);
             //get cnc customer by endcustomerId
             if ($obj->Result == 'Success') {
                 $dbeCustomer = new DBECustomer($this);
                 $dbeCustomer->setValue(DBECustomer::streamOneEmail, $endCustomerId);
                 $dbeCustomer->getRowsByColumn(DBECustomer::streamOneEmail);
                 $dbeCustomer->fetchNext();
-                $obj->BodyText->endCustomerDetails->cncCustomerId = $dbeCustomer->getValue(DBECustomer::customerID);
+                $obj->BodyText->endCustomerDetails->cncCustomerId   = $dbeCustomer->getValue(DBECustomer::customerID);
                 $obj->BodyText->endCustomerDetails->cncCustomerName = $dbeCustomer->getValue(DBECustomer::name);
 
             }
@@ -167,15 +151,10 @@ class CTSCustomerLicenses extends CTCNC
         $body = file_get_contents('php://input');
         if (isset($_GET['endCustomerId']) && isset($body)) {
             $bodyObj = json_decode($body);
-
-
-            $result = $this->buTechDataApi->updateCustomer($_GET['endCustomerId'], $body);
-            $obj = json_decode($result);
-
+            $result  = $this->buTechDataApi->updateCustomer($_GET['endCustomerId'], $body);
+            $obj     = json_decode($result);
             if ($obj->Result == 'Success') {
-                if (
-                    $bodyObj->cncCustId != null
-                ) {
+                if ($bodyObj->cncCustId != null) {
                     $dbeCustomer = new DBECustomer($this);
                     $dbeCustomer->setPKValue($bodyObj->cncCustId);
                     $dbeCustomer->getRow();
@@ -196,32 +175,58 @@ class CTSCustomerLicenses extends CTCNC
                 $dbeStreamOneCustomers = new DBEStreamOneCustomers($this);
                 $dbeStreamOneCustomers->setPKValue($bodyObj->id);
                 $dbeStreamOneCustomers->getRow();
-                if (isset($bodyObj->addressLine1))
-                    $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::addressLine1, $bodyObj->addressLine1);
-                if (isset($bodyObj->addressLine2))
-                    $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::addressLine2, $bodyObj->addressLine2);
-                if (isset($bodyObj->city))
-                    $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::city, $bodyObj->city);
-                if (isset($bodyObj->companyName))
-                    $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::companyName, $bodyObj->companyName);
-                if (isset($bodyObj->country))
-                    $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::country, $bodyObj->country);
-                if (isset($bodyObj->createdOn))
-                    $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::createdOn, $bodyObj->createdOn);
-                if (isset($bodyObj->email))
-                    $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::email, $bodyObj->email);
-                if (isset($bodyObj->endCustomerId))
-                    $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::endCustomerId, $bodyObj->endCustomerId);
-                if (isset($bodyObj->endCustomerPO))
-                    $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::endCustomerPO, $bodyObj->endCustomerPO);
-                if (isset($bodyObj->name))
-                    $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::name, $bodyObj->name);
-                if (isset($bodyObj->phone1))
-                    $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::phone1, $bodyObj->phone1);
-                if (isset($bodyObj->postalCode))
-                    $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::postalCode, $bodyObj->postalCode);
-                if (isset($bodyObj->title))
-                    $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::title, $bodyObj->title);
+                if (isset($bodyObj->addressLine1)) $dbeStreamOneCustomers->setValue(
+                    DBEStreamOneCustomers::addressLine1,
+                    $bodyObj->addressLine1
+                );
+                if (isset($bodyObj->addressLine2)) $dbeStreamOneCustomers->setValue(
+                    DBEStreamOneCustomers::addressLine2,
+                    $bodyObj->addressLine2
+                );
+                if (isset($bodyObj->city)) $dbeStreamOneCustomers->setValue(
+                    DBEStreamOneCustomers::city,
+                    $bodyObj->city
+                );
+                if (isset($bodyObj->companyName)) $dbeStreamOneCustomers->setValue(
+                    DBEStreamOneCustomers::companyName,
+                    $bodyObj->companyName
+                );
+                if (isset($bodyObj->country)) $dbeStreamOneCustomers->setValue(
+                    DBEStreamOneCustomers::country,
+                    $bodyObj->country
+                );
+                if (isset($bodyObj->createdOn)) $dbeStreamOneCustomers->setValue(
+                    DBEStreamOneCustomers::createdOn,
+                    $bodyObj->createdOn
+                );
+                if (isset($bodyObj->email)) $dbeStreamOneCustomers->setValue(
+                    DBEStreamOneCustomers::email,
+                    $bodyObj->email
+                );
+                if (isset($bodyObj->endCustomerId)) $dbeStreamOneCustomers->setValue(
+                    DBEStreamOneCustomers::endCustomerId,
+                    $bodyObj->endCustomerId
+                );
+                if (isset($bodyObj->endCustomerPO)) $dbeStreamOneCustomers->setValue(
+                    DBEStreamOneCustomers::endCustomerPO,
+                    $bodyObj->endCustomerPO
+                );
+                if (isset($bodyObj->name)) $dbeStreamOneCustomers->setValue(
+                    DBEStreamOneCustomers::name,
+                    $bodyObj->name
+                );
+                if (isset($bodyObj->phone1)) $dbeStreamOneCustomers->setValue(
+                    DBEStreamOneCustomers::phone1,
+                    $bodyObj->phone1
+                );
+                if (isset($bodyObj->postalCode)) $dbeStreamOneCustomers->setValue(
+                    DBEStreamOneCustomers::postalCode,
+                    $bodyObj->postalCode
+                );
+                if (isset($bodyObj->title)) $dbeStreamOneCustomers->setValue(
+                    DBEStreamOneCustomers::title,
+                    $bodyObj->title
+                );
                 $dbeStreamOneCustomers->updateRow();
             }
             return $result;
@@ -238,14 +243,11 @@ class CTSCustomerLicenses extends CTCNC
     {
         global $db;
         $customerId = null;
-        $sku = null;
-        $seats = null;
-        if (isset($_GET['customerId']))
-            $customerId = $_GET['customerId'];
-        if (isset($_GET['sku']))
-            $sku = $_GET['sku'];
+        $sku        = null;
+        $seats      = null;
+        if (isset($_GET['customerId'])) $customerId = $_GET['customerId'];
+        if (isset($_GET['sku'])) $sku = $_GET['sku'];
         //get item id
-
         $dbeItem = new DBEItem($this);
         $dbeItem->setValue(DBEItem::partNo, $sku);
         $dbeItem->getRowByColumn(DBEItem::partNo);
@@ -317,7 +319,6 @@ class CTSCustomerLicenses extends CTCNC
      `cus_custno` cncCustId   
         FROM  streamOneCustomers s LEFT JOIN `customer` c ON s.email=c.streamOneEmail"
         );
-
         return json_encode($db->fetchAll(MYSQLI_ASSOC));
     }
 
@@ -325,7 +326,7 @@ class CTSCustomerLicenses extends CTCNC
     {
         global $db;
         $email = $_GET["email"] ?? null;
-        $sku = $_GET["sku"] ?? null;
+        $sku   = $_GET["sku"] ?? null;
         if ($email != null && $sku != null) {
             //get customer Id
             $dbeCustomer = new DBECustomer($this);
@@ -335,11 +336,10 @@ class CTSCustomerLicenses extends CTCNC
             if ($custId) {
                 // get item no by sku
                 $dbeItem = new DBEItem($this);
-                $dbeItem->getItemsByPartNoOrOldPartNo($sku);
-                if ($dbeItem->fetchNext()) {
-                    $itemId = $dbeItem->getPKValue();
+                if ($dbeItem->getItemsByPartNoOrOldPartNo($sku)) {
+                    $itemId       = $dbeItem->getPKValue();
                     $customerItem = new DBECustomerItem($this);
-                    $count = $customerItem->getCountByCustomerAndItemID($custId, $itemId);
+                    $count        = $customerItem->getCountByCustomerAndItemID($custId, $itemId);
                     if ($count) {
                         return json_encode(["status" => true, "custId" => $custId, "itemId" => $itemId]);
                     }
@@ -354,13 +354,13 @@ class CTSCustomerLicenses extends CTCNC
     {
         $this->setMethodName('setTemplate');
         $email = null;
-        $name = "";
+        $name  = "";
         if (isset($_GET["email"])) {
-            $email = $_GET["email"];
+            $email                 = $_GET["email"];
             $dbeStreamOneCustomers = new DBEStreamOneCustomers($this);
             $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::email, $email);
             $dbeStreamOneCustomers->getRowByColumn(DBEStreamOneCustomers::email);
-            $name = $dbeStreamOneCustomers->getValue(DBEStreamOneCustomers::name);
+            $name    = $dbeStreamOneCustomers->getValue(DBEStreamOneCustomers::name);
             $company = $dbeStreamOneCustomers->getValue(DBEStreamOneCustomers::companyName);
 
         }
@@ -386,14 +386,12 @@ class CTSCustomerLicenses extends CTCNC
                 $this->setPageTitle('StreamOne Edit Customer Details');
                 break;
         }
-
         $this->setTemplateFiles(
             'CustomerLicenses',
             'CustomerLicenses.inc'
         );
         $this->loadReactScript('CustomerLicensesComponent.js');
         $this->loadReactCSS('CustomerLicensesComponent.css');
-
         $this->template->parse(
             'CONTENTS',
             'CustomerLicenses',
