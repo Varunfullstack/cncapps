@@ -11,13 +11,13 @@ use CNCLTD\AdditionalChargesRates\Application\GetOneSpecificRateForCustomer\GetO
 use CNCLTD\AdditionalChargesRates\Domain\AdditionalChargeRateId;
 use CNCLTD\AdditionalChargesRates\Domain\CustomerId;
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequest;
+use CNCLTD\Data\DBEItem;
 use CNCLTD\Data\DBEJProblem;
 use CNCLTD\Exceptions\ColumnOutOfRangeException;
 use CNCLTD\Shared\Domain\Bus\QueryBus;
 use DataSet;
 use DBECustomer;
 use DBEHeader;
-use DBEItem;
 use DBEJContract;
 use DBEJOrdhead;
 use DBEJOrdline;
@@ -280,7 +280,6 @@ class ProcessChargeableWorkCustomerRequestFromSpecificCustomerRate
             default:
                 $teamField = null;
         }
-
         if ($teamField) {
             $toUpdateProblem->setValue(
                 $teamField,

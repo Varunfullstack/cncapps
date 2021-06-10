@@ -11,6 +11,7 @@ global $cfg;
 use CNCLTD\Business\BUActivity;
 use CNCLTD\ChildItem\ChildItemRepository;
 use CNCLTD\Data\DBConnect;
+use CNCLTD\Data\DBEItem;
 use CNCLTD\Exceptions\JsonHttpException;
 
 require_once($cfg['path_bu'] . '/BUCustomer.inc.php');

@@ -1,7 +1,6 @@
 <?php
 
 use CNCLTD\Data\DBEItem;
-use PhpParser\Node\Expr\Isset_;
 
 global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
@@ -83,7 +82,7 @@ class CTSCustomerLicenses extends CTCNC
                 echo $this->buTechDataApi->getProductsByVendor($page);
                 exit;
             case "getOrderDetials":
-                echo $this->buTechDataApi->getOrderDetials($page);
+                echo $this->buTechDataApi->getOrderDetials();
                 exit;
             case "getProductBySKU":
                 echo $this->buTechDataApi->getProductBySKU();

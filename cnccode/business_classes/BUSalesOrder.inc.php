@@ -7,6 +7,7 @@
  */
 
 use CNCLTD\Business\BUActivity;
+use CNCLTD\Data\DBEItem;
 
 global $cfg;
 require_once($cfg["path_gc"] . "/Business.inc.php");
@@ -163,7 +164,7 @@ class BUSalesOrder extends Business
         }
 
     }
-    
+
     /**
      * Get one users
      * @parameter integer $userID user
