@@ -418,8 +418,7 @@ function checkAllContractsHaveAMatchingStreamOneLicense(array $licensesToCheck, 
     $contractsCollection = getContractsToCheck($loggerCLI);
     $contractsCollection->checkLicenses($licensesToCheck);
     $elementsNotChecked = $contractsCollection->getNotFlaggedContracts();
-    var_dump($elementsNotChecked);
-//    sendMissingStreamOneLicenseForContractEmail($elementsNotChecked);
+    sendMissingStreamOneLicenseForContractEmail($elementsNotChecked);
 }
 
 /**

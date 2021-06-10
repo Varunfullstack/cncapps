@@ -44,6 +44,7 @@ class ContractsStreamOneEmail
      */
     public function getNotFlaggedContracts()
     {
+
         return array_reduce(
             $this->map,
             function ($acc, ContractsByEmail $item) {

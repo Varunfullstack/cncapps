@@ -12,6 +12,8 @@ use CNCLTD\StreamOneProcessing\Subscription\Subscription;
 use DBECustomer;
 use DBECustomerItem;
 use Exception;
+use function Lambdish\Phunctional\map;
+use function Lambdish\Phunctional\reduce;
 
 class StreamOneContractsUpdates
 {
@@ -33,6 +35,10 @@ class StreamOneContractsUpdates
      * @var LoggerCLI
      */
     private $loggerCLI;
+    /**
+     * @var array
+     */
+    private $errorsToEmail = [];
 
     /**
      * StreamOneContractsUpdates constructor.
@@ -64,6 +70,9 @@ class StreamOneContractsUpdates
                     $this->loggerCLI->error($exception->getMessage());
                 }
             }
+        }
+        if (count($this->errorsToEmail)) {
+            $this->emailSales($this->errorsToEmail);
         }
     }
 
@@ -185,15 +194,15 @@ class StreamOneContractsUpdates
             $licenseEmail   = $subscription->customerEmail();
             $customer       = $this->customerForLicenseEmailGetter->__invoke($licenseEmail);
             if (!$customer) {
-                $this->loggerCLI->error(
-                    "Failed to retrieve customer for subscription $subscriptionId for license $sku and email $licenseEmail with $units and status $licenseStatus"
-                );
+                $message = "Failed to retrieve customer for subscription $subscriptionId for license $sku and email $licenseEmail with $units and status $licenseStatus";
                 if ($subscription->isActive()) {
-
-                    $this->emailSales(
-                        "StreamOne Customer Not Linked To CNC customer",
-                        "$licenseEmail has active subscriptions for SKU $sku and it is not linked to a CNC customer"
-                    );
+                    $this->loggerCLI->error($message);
+                    $this->errorsToEmail[] = [
+                        "errorType" => "missingCustomerLink",
+                        "message"   => "$licenseEmail has active subscriptions for SKU $sku and it is not linked to a CNC customer"
+                    ];
+                } else {
+                    $this->loggerCLI->warning($message);
                 }
                 continue;
             }
@@ -201,10 +210,12 @@ class StreamOneContractsUpdates
             $customerName = $customer->getValue(DBECustomer::name);
             $itemId       = $this->getItemIdForSKU($sku);
             if (!$itemId) {
-                $message = "There is no Item with partNo or oldPartNO matching the SKU $sku in CNCAPPS";
-                $this->loggerCLI->error($message);
+                $message = "There is no Item with partNo or oldPartNO matching the SKU $sku corresponding to {$subscription->name()} for customer {$customerName} in CNCAPPS";
                 if ($subscription->isActive()) {
-                    $this->emailSales("StreamOne Licence in use with no CNC Item", $message);
+                    $this->loggerCLI->error($message);
+                    $this->errorsToEmail[] = ["errorType" => "missingItemForSKU", "message" => $message];
+                } else {
+                    $this->loggerCLI->warning($message);
                 }
                 continue;
             }
@@ -214,10 +225,12 @@ class StreamOneContractsUpdates
             $contracts = new DBECustomerItem($this);
             $contracts->getRowsByCustomerAndItemID($customerId, $itemId, true);
             if (!$contracts->fetchNext()) {
+                $message = "Customer $customerName($customerId) $licenseEmail  does not have a matching valid contract for SKU $sku corresponding to {$subscription->name()}  in CNCAPPS";
                 if ($subscription->isActive()) {
-                    $this->loggerCLI->error(
-                        "Customer $customerName($customerId) $licenseEmail  does not have a corresponding valid contract for SKU $sku in CNCAPPS"
-                    );
+                    $this->loggerCLI->error($message);
+                    $this->errorsToEmail[] = ["errorType" => "validContractMissing", "message" => $message];
+                } else {
+                    $this->loggerCLI->warning($message);
                 }
                 continue;
             }
@@ -229,9 +242,27 @@ class StreamOneContractsUpdates
         }
     }
 
-    private function emailSales($subject, $body)
+    private function emailSales(array $errors)
     {
-        $buMail = new \BUMail($this);
+        $buMail  = new \BUMail($this);
+        $subject = "StreamOne Issues Summary";
+        $errors  = \Lambdish\Phunctional\sort(
+            function ($error1, $error2) {
+                return strcmp($error1['errorType'], $error2['errorType']);
+            },
+            $errors
+        );
+        $body    = "<p>These are the errors generated on the last attempt to update StreamOne related contracts</p>";
+        $body    .= "<ul>";
+        $body    .= reduce(
+            function ($acc, $error) {
+                $acc .= "<li>{$error['message']}</li>";
+                return $acc;
+            },
+            $errors,
+            ""
+        );
+        $body    .= "</ul>";
         $buMail->sendSimpleEmail($body, $subject, CONFIG_SALES_EMAIL);
     }
 
