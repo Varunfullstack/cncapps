@@ -253,7 +253,6 @@ class BUTechDataApi extends Business
 
     function callMultipleApi($urls, $body = null, $method = 'GET')
     {
-        //$this->logger->info(json_encode($urls) );
         $result    = array();
         $multiCurl = array();
         $mh        = curl_multi_init();
@@ -276,7 +275,6 @@ class BUTechDataApi extends Business
             );
             curl_multi_add_handle($mh, $multiCurl[$i]);
         }
-        //$index=null;
         do {
             curl_multi_exec($mh, $running);
             // Wait a short time for more activity
@@ -408,7 +406,7 @@ class BUTechDataApi extends Business
      */
     function getProductsDetails(array $orderNumbers)
     {
-        $requestsPerBatch =  30;
+        $requestsPerBatch = 1;
         $urls             = array();
         foreach ($orderNumbers as $orderNumber) {
             array_push($urls, "order/details/$orderNumber");
@@ -416,6 +414,7 @@ class BUTechDataApi extends Business
         $batches = count($orderNumbers) / $requestsPerBatch;
         $result  = array();
         for ($i = 0; $i < $batches; $i++) {
+            sleep(1);
             $subUrls         = array_slice($urls, $i * $requestsPerBatch, $requestsPerBatch);
             $responses       = $this->callMultipleApi($subUrls);
             $parsedResponses = map(
