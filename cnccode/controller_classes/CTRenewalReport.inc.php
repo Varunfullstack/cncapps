@@ -8,6 +8,7 @@
  */
 
 use CNCLTD\Business\BUActivity;
+use CNCLTD\Data\DBEItem;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use setasign\Fpdi\Fpdi;
