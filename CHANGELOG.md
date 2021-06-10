@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [unreleased]
+## [v5.13.0] - 2021-06-10
 ### Changed
 - Issue 1431 - StreamOne count current and old part code
 ### Fixed
