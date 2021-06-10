@@ -4,6 +4,9 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+
+use CNCLTD\Data\DBEItem;
+
 global $cfg;
 require_once($cfg ["path_gc"] . "/Business.inc.php");
 require_once($cfg ["path_bu"] . "/BUCustomerItem.inc.php");
@@ -73,7 +76,7 @@ class BURenDomain extends Business
     {
         // create a customer item
         $dbeCustomerItem = new DBECustomerItem ($this);
-        $dsCustomerItem = new DataSet ($this);
+        $dsCustomerItem  = new DataSet ($this);
         $dsCustomerItem->copyColumnsFrom($dbeCustomerItem);
         $dsCustomerItem->setUpdateModeInsert();
         $dsCustomerItem->setValue(
@@ -106,7 +109,7 @@ class BURenDomain extends Business
         $this->dbeJRenDomain->getRenewalsDueRows();
         $buMail      = new BUMail($this);
         $senderEmail = CONFIG_SALES_EMAIL;
-        $hdrs = array(
+        $hdrs        = array(
             'From'         => $senderEmail,
             'To'           => $toEmail,
             'Subject'      => 'Domain Renewals Due Today',
@@ -146,7 +149,7 @@ class BURenDomain extends Business
             'head_charset'  => 'UTF-8'
         );
         $body        = $buMail->mime->get($mime_params);
-        $hdrs = $buMail->mime->headers($hdrs);
+        $hdrs        = $buMail->mime->headers($hdrs);
         $buMail->putInQueue(
             $senderEmail,
             $toEmail,
@@ -159,19 +162,19 @@ class BURenDomain extends Business
     function createRenewalsSalesOrders()
     {
         $buSalesOrder = new BUSalesOrder ($this);
-        $buInvoice = new BUInvoice ($this);
+        $buInvoice    = new BUInvoice ($this);
         $this->dbeJRenDomain->getRenewalsDueRows();
         $dbeRenDomainUpdate = new DBECustomerItem($this);
-        $dbeJCustomerItem = new DBEJCustomerItem ($this);
-        $dbeCustomer = new DBECustomer ($this);
-        $dbeOrdline = new DBEOrdline ($this);
+        $dbeJCustomerItem   = new DBEJCustomerItem ($this);
+        $dbeCustomer        = new DBECustomer ($this);
+        $dbeOrdline         = new DBEOrdline ($this);
         /** @var DataSet $dsOrdhead */
         $dsOrdhead          = null;
         $dsOrdline          = new DataSet($this);
         $line               = 0;
         $previousCustomerID = 99999;
-        $generateInvoice = false;
-        $generatedOrder  = false;
+        $generateInvoice    = false;
+        $generatedOrder     = false;
         while ($this->dbeJRenDomain->fetchNext()) {
             $generatedOrder = false;
             ?>

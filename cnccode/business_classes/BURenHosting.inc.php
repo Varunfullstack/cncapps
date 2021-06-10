@@ -4,6 +4,9 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+
+use CNCLTD\Data\DBEItem;
+
 global $cfg;
 require_once($cfg ["path_gc"] . "/Business.inc.php");
 require_once($cfg ["path_bu"] . "/BUCustomerItem.inc.php");
@@ -17,7 +20,7 @@ require_once($cfg ["path_bu"] . "/BUMail.inc.php");
 class BURenHosting extends Business
 {
     /** @var DBECustomerItem */
-    public $dbeRenHosting;
+    public  $dbeRenHosting;
     private $dbeJRenHosting;
 
     /**
@@ -28,7 +31,7 @@ class BURenHosting extends Business
     function __construct(&$owner)
     {
         parent::__construct($owner);
-        $this->dbeRenHosting = new DBECustomerItem($this);
+        $this->dbeRenHosting  = new DBECustomerItem($this);
         $this->dbeJRenHosting = new DBEJRenHosting($this);
     }
 
@@ -39,7 +42,6 @@ class BURenHosting extends Business
             $dsData,
             $this->dbeRenHosting
         );
-
         return TRUE;
     }
 
@@ -67,26 +69,20 @@ class BURenHosting extends Business
     }
 
 
-    function createNewRenewal(
-        $customerID,
-        $itemID,
-        &$customerItemID,
-        $siteNo = 0
+    function createNewRenewal($customerID,
+                              $itemID,
+                              &$customerItemID,
+                              $siteNo = 0
     )
     {
         // create a customer item
         // create a customer item
         $dbeItem = new DBEItem ($this);
         $dbeItem->getRow($itemID);
-
         $dbeCustomerItem = new DBECustomerItem ($this);
-
-        $dsCustomerItem = new DataSet ($this);
-
+        $dsCustomerItem  = new DataSet ($this);
         $dsCustomerItem->copyColumnsFrom($dbeCustomerItem);
-
         $dsCustomerItem->setUpdateModeInsert();
-
         $dsCustomerItem->setValue(
             DBECustomerItem::customerItemID,
             null
@@ -111,14 +107,10 @@ class BURenHosting extends Business
             DBECustomerItem::curUnitSale,
             $dbeItem->getValue(DBEItem::curUnitSale)
         );
-
         $dsCustomerItem->post();
-
         $buCustomerItem = new BUCustomerItem ($this);
         $buCustomerItem->update($dsCustomerItem);
-
         $customerItemID = $dsCustomerItem->getPKValue();
-
         return;
 
     }
@@ -126,23 +118,18 @@ class BURenHosting extends Business
     /**
      * @param string $toEmail
      */
-    function emailRenewalsSalesOrdersDue($toEmail = CONFIG_SALES_MANAGER_EMAIL
-    )
+    function emailRenewalsSalesOrdersDue($toEmail = CONFIG_SALES_MANAGER_EMAIL)
     {
         $this->dbeJRenHosting->getRenewalsDueRows();
-
-        $buMail = new BUMail($this);
+        $buMail      = new BUMail($this);
         $senderEmail = CONFIG_SALES_EMAIL;
-
-        $hdrs =
-            array(
-                'From'         => $senderEmail,
-                'To'           => $toEmail,
-                'Subject'      => 'Hosting Renewals Due Today',
-                'Date'         => date("r"),
-                'Content-Type' => 'text/html; charset=UTF-8'
-            );
-
+        $hdrs        = array(
+            'From'         => $senderEmail,
+            'To'           => $toEmail,
+            'Subject'      => 'Hosting Renewals Due Today',
+            'Date'         => date("r"),
+            'Content-Type' => 'text/html; charset=UTF-8'
+        );
         ob_start(); ?>
         <HTML lang="en">
         <BODY>
@@ -167,10 +154,8 @@ class BURenHosting extends Business
         </BODY>
         </HTML>
         <?php
-
         $message = ob_get_contents();
         ob_end_clean();
-
         $buMail->mime->setHTMLBody($message);
         $mime_params = array(
             'text_encoding' => '7bit',
@@ -178,10 +163,8 @@ class BURenHosting extends Business
             'html_charset'  => 'UTF-8',
             'head_charset'  => 'UTF-8'
         );
-        $body = $buMail->mime->get($mime_params);
-
-        $hdrs = $buMail->mime->headers($hdrs);
-
+        $body        = $buMail->mime->get($mime_params);
+        $hdrs        = $buMail->mime->headers($hdrs);
         $buMail->putInQueue(
             $senderEmail,
             $toEmail,
@@ -194,24 +177,18 @@ class BURenHosting extends Business
     function createRenewalsSalesOrders()
     {
         $buSalesOrder = new BUSalesOrder ($this);
-
-        $buInvoice = new BUInvoice ($this);
-
+        $buInvoice    = new BUInvoice ($this);
         $this->dbeJRenHosting->getRenewalsDueRows();
-
         $dbeJCustomerItem = new DBEJCustomerItem ($this);
-
-        $dbeCustomer = new DBECustomer ($this);
-
-        $dbeOrdline = new DBEOrdline ($this);
+        $dbeCustomer      = new DBECustomer ($this);
+        $dbeOrdline       = new DBEOrdline ($this);
         /** @var DataSet $dsOrdhead */
-        $dsOrdhead = null;
-        $dsOrdline = new DataSet($this);
-
+        $dsOrdhead          = null;
+        $dsOrdline          = new DataSet($this);
         $previousCustomerID = 99999;
-        $generateInvoice = false;
-        $generatedOrder = false;
-        $line = 0;
+        $generateInvoice    = false;
+        $generatedOrder     = false;
+        $line               = 0;
         while ($this->dbeJRenHosting->fetchNext()) {
             $generatedOrder = false;
             ?>
@@ -224,13 +201,11 @@ class BURenHosting extends Business
                 /*
                  * Group many contracts for same customer under one sales order
                  */
-                if (
-                    $previousCustomerID != $dbeJCustomerItem->getValue(DBEJCustomerItem::customerID) ||
-                    (
-                        !$generateInvoice &&
-                        $this->dbeJRenHosting->getValue(DBECustomerItem::autoGenerateContractInvoice) === 'Y'
-                    )
-                ) {
+                if ($previousCustomerID != $dbeJCustomerItem->getValue(
+                        DBEJCustomerItem::customerID
+                    ) || (!$generateInvoice && $this->dbeJRenHosting->getValue(
+                            DBECustomerItem::autoGenerateContractInvoice
+                        ) === 'Y')) {
 
                     /*
                    If generating invoices and an order has been started
@@ -238,13 +213,11 @@ class BURenHosting extends Business
                     if ($generateInvoice && $dsOrdhead) {
 
                         $buSalesOrder->setStatusCompleted($dsOrdhead->getValue(DBEOrdhead::ordheadID));
-
                         $buSalesOrder->getOrderByOrdheadID(
                             $dsOrdhead->getValue(DBEOrdhead::ordheadID),
                             $dsOrdhead,
                             $dsOrdline
                         );
-
                         $buInvoice->createInvoiceFromOrder(
                             $dsOrdhead,
                             $dsOrdline
@@ -258,14 +231,13 @@ class BURenHosting extends Business
                         $dbeCustomer,
                         $dsCustomer
                     );
-
                     $buSalesOrder->initialiseOrder(
                         $dsOrdhead,
                         $dsOrdline,
                         $dsCustomer
                     );
                     $generatedOrder = true;
-                    $line = -1;  // initialise sales order line seq
+                    $line           = -1;  // initialise sales order line seq
                 }
                 $generateInvoice = $this->dbeJRenHosting->getValue(
                         DBECustomerItem::autoGenerateContractInvoice
@@ -276,17 +248,14 @@ class BURenHosting extends Business
                 if ($this->dbeJRenHosting->getValue(DBEJRenHosting::notes)) {
 
                     $line++;
-
                     $dbeOrdline->setValue(
                         DBEOrdline::description,
                         $this->dbeJRenHosting->getValue(DBEJRenHosting::notes)
                     );
-
                     $dbeOrdline->setValue(
                         DBEOrdline::isRecurring,
                         $dbeJCustomerItem->getValue(DBEJCustomerItem::reoccurring)
                     );
-
                     $dbeOrdline->setValue(
                         DBEOrdline::renewalCustomerItemID,
                         null
@@ -335,12 +304,9 @@ class BURenHosting extends Business
                         DBEOrdline::curUnitCost,
                         0
                     );
-
                     $dbeOrdline->insertRow();
 
                 } // end notes
-
-
                 $line++;
                 /*
                  * Get stock category from item table
@@ -359,7 +325,6 @@ class BURenHosting extends Business
                     DBEOrdline::stockcat,
                     $dsItem->getValue(DBEItem::stockcat)
                 );
-
                 $dbeOrdline->setValue(
                     DBEOrdline::renewalCustomerItemID,
                     $this->dbeJRenHosting->getValue(DBEJRenHosting::customerItemID)
@@ -416,9 +381,7 @@ class BURenHosting extends Business
                         DBEJRenHosting::invoicePeriodMonths
                     )
                 );
-
                 $dbeOrdline->insertRow();
-
                 // period comment line
                 $line++;
                 $description = $this->dbeJRenHosting->getValue(
@@ -484,27 +447,22 @@ class BURenHosting extends Business
                     DBEOrdline::curUnitCost,
                     0
                 );
-
                 $dbeOrdline->insertRow();
-
-
                 /*
                  * Update total months invoiced on renewal record
                  */
                 $this->dbeRenHosting->getRow($this->dbeJRenHosting->getValue(DBEJRenHosting::customerItemID));
                 $this->dbeRenHosting->setValue(
                     DBEJRenHosting::totalInvoiceMonths,
-                    $this->dbeJRenHosting->getValue(DBEJRenHosting::totalInvoiceMonths) +
-                    $this->dbeJRenHosting->getValue(DBEJRenHosting::invoicePeriodMonths)
+                    $this->dbeJRenHosting->getValue(
+                        DBEJRenHosting::totalInvoiceMonths
+                    ) + $this->dbeJRenHosting->getValue(DBEJRenHosting::invoicePeriodMonths)
                 );
-
                 $this->dbeRenHosting->setValue(
                     DBECustomerItem::transactionType,
                     '17'
                 );
-
                 $this->dbeRenHosting->updateRow();
-
                 $previousCustomerID = $dbeJCustomerItem->getValue(DBEJCustomerItem::customerID);
 
             }
@@ -515,13 +473,11 @@ class BURenHosting extends Business
          */
         if ($generateInvoice && $generatedOrder) {
             $buSalesOrder->setStatusCompleted($dsOrdhead->getValue(DBEOrdhead::ordheadID));
-
             $buSalesOrder->getOrderByOrdheadID(
                 $dsOrdhead->getValue(DBEOrdhead::ordheadID),
                 $dsOrdhead,
                 $dsOrdline
             );
-
             $buInvoice->createInvoiceFromOrder(
                 $dsOrdhead,
                 $dsOrdline
@@ -532,18 +488,13 @@ class BURenHosting extends Business
     function isCompleted($customerItemID)
     {
         $this->dbeRenHosting->getRow($customerItemID);
-
         $ret = false;
-
-        if
-        (
-            $this->dbeRenHosting->getValue(DBECustomerItem::installationDate) &&
-            $this->dbeRenHosting->getValue(DBECustomerItem::invoicePeriodMonths)
-        ) {
+        if ($this->dbeRenHosting->getValue(DBECustomerItem::installationDate) && $this->dbeRenHosting->getValue(
+                DBECustomerItem::invoicePeriodMonths
+            )) {
             $ret = true;
 
         }
-
         return $ret;
 
     }
@@ -558,21 +509,16 @@ class BURenHosting extends Business
             $ID
         );
         $dbeJRenHosting->getRow();
-
-        $buMail = new BUMail($this);
-
-        $toEmail = $emailAddress;
+        $buMail      = new BUMail($this);
+        $toEmail     = $emailAddress;
         $senderEmail = CONFIG_SALES_EMAIL;
-
-        $hdrs =
-            array(
-                'From'         => $senderEmail,
-                'To'           => $toEmail,
-                'Subject'      => 'Hosting details',
-                'Date'         => date("r"),
-                'Content-Type' => 'text/html; charset=UTF-8'
-            );
-
+        $hdrs        = array(
+            'From'         => $senderEmail,
+            'To'           => $toEmail,
+            'Subject'      => 'Hosting details',
+            'Date'         => date("r"),
+            'Content-Type' => 'text/html; charset=UTF-8'
+        );
         ob_start(); ?>
 
         <HTML lang="en">
@@ -638,10 +584,8 @@ class BURenHosting extends Business
         </BODY>
         </HTML>
         <?php
-
         $message = ob_get_contents();
         ob_end_clean();
-
         $buMail->mime->setHTMLBody($message);
         $mime_params = array(
             'text_encoding' => '7bit',
@@ -649,10 +593,8 @@ class BURenHosting extends Business
             'html_charset'  => 'UTF-8',
             'head_charset'  => 'UTF-8'
         );
-        $body = $buMail->mime->get($mime_params);
-
-        $hdrs = $buMail->mime->headers($hdrs);
-
+        $body        = $buMail->mime->get($mime_params);
+        $hdrs        = $buMail->mime->headers($hdrs);
         $buMail->putInQueue(
             $senderEmail,
             $toEmail,

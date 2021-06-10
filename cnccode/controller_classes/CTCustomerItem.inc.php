@@ -9,6 +9,7 @@
 
 use CNCLTD\Business\BUActivity;
 use CNCLTD\Data\DBConnect;
+use CNCLTD\Data\DBEItem;
 
 global $cfg;
 require_once($cfg['path_bu'] . '/BUCustomerItem.inc.php');

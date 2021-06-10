@@ -1,6 +1,7 @@
 <?php
 global $cfg;
 
+use CNCLTD\Data\DBEItem;
 use CNCLTD\Supplier\infra\MySQLSupplierRepository;
 use CNCLTD\Supplier\Supplier;
 use CNCLTD\Supplier\SupplierId;

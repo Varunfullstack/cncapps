@@ -4,6 +4,7 @@ namespace CNCLTD\CommunicationService;
 
 use BUMail;
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequest;
+use CNCLTD\Data\DBEItem;
 use CNCLTD\TwigDTOs\ChargeableWorkCustomerRequestEmailDTO;
 use CNCLTD\TwigDTOs\ChargeableWorkCustomerRequestProcessedEmailDTO;
 use DBEContact;
@@ -36,7 +37,7 @@ class CommunicationService
         $dbeUser->getRow($request->getRequesterId()->value());
         $serviceRequestId = $request->getServiceRequestId()->value();
         $dbeProblem->getRow($serviceRequestId);
-        $dbeItem = new \DBEItem($thing);
+        $dbeItem = new DBEItem($thing);
         $dbeItem->getRow(CONFIG_CONSULTANCY_HOURLY_LABOUR_ITEMID);
         $dto        = new ChargeableWorkCustomerRequestEmailDTO(
             PORTAL_URL . '/chargeable-activity-feedback/?token=' . $request->getId()->value() . "&type=accept",
@@ -46,7 +47,7 @@ class CommunicationService
             $serviceRequestId,
             $request->getReason()->value(),
             "{$dbeUser->getValue(\DBEUser::firstName)} {$dbeUser->getValue(\DBEUser::lastName)}",
-            $dbeItem->getValue(\DBEItem::curUnitSale)
+            $dbeItem->getValue(DBEItem::curUnitSale)
         );
         $body       = $twig->render(
             '@customerFacing/ChargeableWorkCustomerRequestEmail/ChargeableWorkCustomerRequest.html.twig',

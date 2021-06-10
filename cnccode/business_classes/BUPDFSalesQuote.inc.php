@@ -1,5 +1,8 @@
 <?php
 global $cfg;
+
+use CNCLTD\Data\DBEItem;
+
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_bu"] . "/BUPDF.inc.php");
 require_once($cfg["path_bu"] . "/BUItem.inc.php");
@@ -79,7 +82,6 @@ class BUPDFSalesQuote extends Business
             $emailSubject = $dsOrdhead->getValue(DBEOrdhead::quotationSubject);
         }
         $versionNo = $this->buSalesOrder->getNextQuoteVersion($ordheadID);
-
         $quoteFile = QUOTES_DIR . $ordheadID . '_' . $versionNo . '.pdf';
         $userID    = $GLOBALS ['auth']->is_authenticated();
         $dsUser    = new DataSet($this);
@@ -558,7 +560,7 @@ class BUPDFSalesQuote extends Business
             $dsUser
         );
         $quoteFileName = "{$dbeQuotation->getValue(DBEOrdhead::ordheadID)}_{$dbeQuotation->getValue(DBEQuotation::versionNo)}.pdf";
-        $quoteFile     = QUOTES_DIR.$quoteFileName;
+        $quoteFile     = QUOTES_DIR . $quoteFileName;
         global $twig;
         $DBEJRenQuotation = new DBEJRenQuotation($this);
         $DBEJRenQuotation->getRowsBySalesOrderID($dsOrdhead->getValue(DBEOrdhead::ordheadID));
