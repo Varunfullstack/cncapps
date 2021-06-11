@@ -1,6 +1,12 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.13.1] - 2021-06-11
+### Fixed
+- Fixed issue with Supplier field outline in supplier selector react component
+- Fixed issue with box missing around options in Customer picker at StreamOneCustomerLicenses
+- Fixed issue with Pre-Pay.
+
 ## [v5.13.0] - 2021-06-10
 ### Changed
 - Issue 1431 - StreamOne count current and old part code
