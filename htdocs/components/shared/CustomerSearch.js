@@ -29,7 +29,6 @@ class CustomerSearch extends MainComponent {
     }
     getCustomerName = () => {
         const {customers} = this.state;
-
         let customerName = this.props.customerName;
         if (this.props.customerID) {
             const customer = customers.find(c => c.id == this.props.customerID);

@@ -5,6 +5,7 @@ import ToolTip from "../../shared/ToolTip";
 import APICustomerLicenses from "./APICustomerLicenses";
 import AutoComplete from "../../shared/AutoComplete/autoComplete";
 import React from 'react';
+import CustomerSearch from "../../shared/CustomerSearch";
 
 /**
  *  Edit TechData customers and link them with CNC customers
@@ -247,16 +248,11 @@ class TDCustomerDetailsComponent extends React.Component {
                 this.getCustomerElement(
                     "CNC Customer",
                     "cncCustomerId",
-                    el(AutoComplete, {
-                        key: "customersAuto",
-                        errorMessage: "No Customer found",
-                        items: cncCustomers,
-                        displayLength: "40",
-                        displayColumn: "name",
-                        pk: "id",
-                        value: data.cncCustName,
-                        onSelect: handleCncCustomerOnSelect,
-                    })
+                    <CustomerSearch
+                        customerID={data.cncCustomerId}
+                        customerName={data.cncCustName}
+                        onChange={handleCncCustomerOnSelect}
+                    />
                 ),
                 el(
                     "tr",

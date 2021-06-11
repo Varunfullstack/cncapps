@@ -3885,7 +3885,7 @@ class BUActivity extends Business
                 // that's the case ...we don't want to set the activities to authorised
                 $customerItem = new DBEJCustomerItem($this);
                 $customerItem->getRow($dbeProblem->getValue(DBEJProblem::contractCustomerItemID));
-                $DBItem = new DBEItem();
+                $DBItem = new DBEItem($this);
                 $DBItem->getRow($customerItem->getValue(DBECustomerItem::itemID));
                 if ($DBItem->getValue(DBEItem::itemTypeID) == CONFIG_PREPAY_ITEMTYPEID) {
                     $shouldSetActivitiesToAuthorised = false;

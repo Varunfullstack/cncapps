@@ -3,6 +3,8 @@ import React from 'react';
 import {SupplierService} from "../../services/SupplierService";
 import PropTypes from 'prop-types';
 
+import './SupplierSelectorComponent.css';
+
 export const CHANGE_REASON = {
     INITIALIZATION: 'INITIALIZATION'
 }

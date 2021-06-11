@@ -1,6 +1,8 @@
 "use strict";
 import React from 'react';
 
+import './autoComplete.css';
+
 class AutoComplete extends React.Component {
     constructor(props) {
         super(props);
