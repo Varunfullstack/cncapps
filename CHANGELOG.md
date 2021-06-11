@@ -3,9 +3,13 @@ This project changes will be shown here.
 
 ## [v5.13.1] - 2021-06-11
 ### Fixed
-- Fixed issue with Supplier field outline in supplier selector react component
-- Fixed issue with box missing around options in Customer picker at StreamOneCustomerLicenses
+- Fixed issue with Supplier field outline in supplier selector react component.
+- Fixed issue with box missing around options in Customer picker at StreamOneCustomerLicenses.
 - Fixed issue with Pre-Pay.
+- Fixed issue with saving Item without renewal type.
+- Fixed issue with sales orders labour lines not having the right supplier.
+- Fixed issue with forcibly closing Service Requests.
+- Fixed issue with Source of Requests chart not picking the right date range.
 
 ## [v5.13.0] - 2021-06-10
 ### Changed
