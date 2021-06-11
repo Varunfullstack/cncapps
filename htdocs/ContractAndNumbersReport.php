@@ -1,7 +1,7 @@
 <?php
 require_once("config.inc.php");
 global $cfg;
-require_once($cfg["path_ct"]."/CTContractAndNumbersReport.php");
+use CNCLTD\Controller\CTContractAndNumbersReport;
 session_start();
 page_open(
     array(

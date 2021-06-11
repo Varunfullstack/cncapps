@@ -7,7 +7,8 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
-
+namespace CNCLTD\Controller;
+use CTCNC;
 use CNCLTD\Data\DBConnect;
 use Syonix\ChangelogViewer\Factory\ViewerFactory;
 

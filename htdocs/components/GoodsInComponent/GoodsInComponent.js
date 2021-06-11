@@ -2,7 +2,7 @@ import MainComponent from "../shared/MainComponent.js";
 import React from "react";
 import ReactDOM from "react-dom";
 import Spinner from "../shared/Spinner/Spinner";
-import Table from "../shared/table/table.js";
+import Table, { CellType } from "../shared/table/table.js";
 import APIGoodsIn from "./services/APIGoodsIn.js";
 import "../style.css";
 import "./GoodsInComponent.css";
@@ -48,58 +48,51 @@ class GoodsInComponent extends MainComponent {
       {
         path: "supplierName",
         label: "",
-        hdToolTip: "Supplier",
-        hdClassName: "text-center",
+        hdToolTip: "Supplier",        
         icon: "fal fa-2x fa-warehouse-alt color-gray2 pointer",
         sortable: true,
-        //className: "text-center",
+        cellType:CellType.Text
       },
       {
         path: "porheadID",
         label: "",
-        hdToolTip: "Order No",
-        hdClassName: "text-center",
+        hdToolTip: "Order No",        
         icon: "fal fa-2x fa-hashtag color-gray2 pointer",
         sortable: true,
-        //className: "text-center",
-        //content:(order)=><a href={`GoodsIn.php?action=displayGoodsIn&porheadID=${order.porheadID}`}>{order.porheadID}</a>
+        cellType:CellType.Number
+
       },
       {
         path: "ordheadID",
         label: "",
-        hdToolTip: "Sales Order",
-        hdClassName: "text-center",
         icon: "fal fa-2x fa-tag color-gray2 pointer",
         sortable: true,
-        className: "text-center",
-        content:(order)=><label>{order.customerID}/{order.ordheadID}</label> 
+        cellType:CellType.Text,
+        content:(order)=><label>{order.customerID}/{order.ordheadID}</label> ,
       },
       {
         path: "orderType",
         label: "",
-        hdToolTip: "Status",
-        hdClassName: "text-center",
+        hdToolTip: "Status",        
         icon: "fal fa-2x fa-text color-gray2 pointer",
         sortable: true,
-        //className: "text-center",
+        cellType:CellType.Text,
       },
       {
         path: "supplierRef",
         label: "",
-        hdToolTip: "Supplier Ref",
-        hdClassName: "text-center",
+        hdToolTip: "Supplier Ref",        
         icon: "fal fa-2x fa-user-tag color-gray2 pointer",
         sortable: true,
-        //className: "text-center",
+        cellType:CellType.Text,
       },
       {
         path: "customerName",
         label: "",
-        hdToolTip: "Solid to",
-        hdClassName: "text-center",
+        hdToolTip: "Solid to",        
         icon: "fal fa-2x fa-building color-gray2 pointer",
         sortable: true,
-        //className: "text-center",
+        cellType:CellType.Text,
       },
       {
         path: "edit",

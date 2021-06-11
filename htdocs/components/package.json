@@ -100,7 +100,7 @@
         "start:AdditionalChargeRateWrapperComponent": "parcel AdditionalChargeRateWrapperComponent/AdditionalChargeRateWrapperComponent.js --public-url /components/dist",
         "build:AdditionalChargeRateWrapperComponent": "parcel build AdditionalChargeRateWrapperComponent/AdditionalChargeRateWrapperComponent.js --public-url /components/dist",
         "build:AdditionalChargeRatesSelectorWrapperComponent": "parcel build AdditionalChargeRatesSelectorWrapperComponent/AdditionalChargeRatesSelectorWrapperComponent.js --public-url /components/dist",
-        "start:AdditionalChargeRatesSelectorWrapperComponent": "parcel AdditionalChargeRatesSelectorWrapperComponent/AdditionalChargeRatesSelectorWrapperComponent.js --public-url /components/dist",        
+        "start:AdditionalChargeRatesSelectorWrapperComponent": "parcel AdditionalChargeRatesSelectorWrapperComponent/AdditionalChargeRatesSelectorWrapperComponent.js --public-url /components/dist",
         "start:StarterLeaverManagementComponent": "parcel StarterLeaverManagementComponent/StarterLeaverManagementComponent.js --public-url /components/dist",
         "build:StarterLeaverManagementComponent": "parcel build StarterLeaverManagementComponent/StarterLeaverManagementComponent.js --public-url /components/dist",
         "start:RootCauseComponent": "parcel RootCauseComponent/RootCauseComponent.js --public-url /components/dist",
@@ -141,6 +141,7 @@
         "react": "^17.0.1",
         "react-chartjs-2": "^2.11.1",
         "react-dom": "^17.0.1",
+        "react-tooltip": "^4.2.21",
         "striptags": "^3.1.1"
     },
     "devDependencies": {

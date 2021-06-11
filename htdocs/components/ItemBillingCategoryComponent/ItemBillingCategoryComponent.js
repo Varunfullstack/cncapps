@@ -2,7 +2,7 @@ import MainComponent from "../shared/MainComponent.js";
 import React from "react";
 import ReactDOM from "react-dom";
 import Spinner from "../shared/Spinner/Spinner";
-import Table from "../shared/table/table.js";
+import Table, { CellType } from "../shared/table/table.js";
 import ToolTip from "../shared/ToolTip.js";
 import Modal from "../shared/Modal/modal.js";
 import Toggle from "../shared/Toggle.js";
@@ -47,10 +47,8 @@ class ItemBillingCategoryComponent extends MainComponent {
       {
         path: "name",
         label: "Name",
-         hdClassName: "text-center",
-        //icon: "fal fa-2x fa-text color-gray2 pointer",
-        sortable: true,
-        //className: "text-center",
+        cellType:CellType.Text,         
+        sortable: true,        
       },
      
       {

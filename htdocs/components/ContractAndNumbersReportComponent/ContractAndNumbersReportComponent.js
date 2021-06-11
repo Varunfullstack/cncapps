@@ -2,13 +2,14 @@ import MainComponent from "../shared/MainComponent.js";
 import React from "react";
 import ReactDOM from "react-dom";
 import Spinner from "../shared/Spinner/Spinner";
-import Table from "../shared/table/table.js"; 
+import Table, { CellType } from "../shared/table/table.js"; 
 import APIContractAndNumbersReport from "./services/APIContractAndNumbersReport.js";
 import ToolTip from "../shared/ToolTip";
 import "../style.css";
 import "./ContractAndNumbersReportComponent.css";
 import { exportCSV } from "../utils/utils.js";
- 
+import ReactTooltip from 'react-tooltip';
+
 
 class ContractAndNumbersReportComponent extends MainComponent {
   api = new APIContractAndNumbersReport();
@@ -46,10 +47,11 @@ class ContractAndNumbersReportComponent extends MainComponent {
         path: "customerName",
         label: "Customer",
         hdToolTip: "Customer",
-        hdClassName: "text-center",
+        //hdClassName: "text-left",
        // icon: "fal fa-2x fa-building color-gray2 pointer",
         sortable: true,
         //className: "text-center",
+        cellType:CellType.Text,
       },
       {
         path: "serviceDeskProduct",
@@ -59,6 +61,7 @@ class ContractAndNumbersReportComponent extends MainComponent {
         //icon: "fal fa-2x fa-tag color-gray2 pointer",
         sortable: true,
         //className: "text-center",
+        cellType:CellType.Text,
       },
       {
         path: "serviceDeskUsers",
@@ -69,7 +72,8 @@ class ContractAndNumbersReportComponent extends MainComponent {
         sortable: true,
         className: "text-center",
         footerContent:(contract)=><label>Total: {this.getTotal("serviceDeskUsers")}</label>,
-        footerClass:"text-center"
+        footerClass:"text-center",
+        cellType:CellType.Number,
       },
       {
         path: "supportedUsers",
@@ -79,6 +83,7 @@ class ContractAndNumbersReportComponent extends MainComponent {
         //icon: "fal fa-2x fa-tag color-gray2 pointer",
         sortable: true,
         classNameColumn: "moreThanExpectedClass",
+        cellType:CellType.Text,
       },
       {
         path: "serviceDeskContract",
@@ -90,7 +95,8 @@ class ContractAndNumbersReportComponent extends MainComponent {
         className: "text-center",
         content:(contract)=><label>£{contract.serviceDeskContract}</label>,
         footerContent:(contract)=><label>Total: £{this.getTotal("serviceDeskContract")}</label>,
-        footerClass:"text-center"
+        footerClass:"text-center",
+        cellType:CellType.Money,
       },
       {
         path: "serviceDeskCostPerUserMonth",
@@ -102,7 +108,8 @@ class ContractAndNumbersReportComponent extends MainComponent {
         className: "text-center",
         content:(contract)=><label>£{contract.serviceDeskCostPerUserMonth}</label>,
         footerContent:(contract)=><label>AVG: £{this.getAvg("serviceDeskCostPerUserMonth")}</label>,
-        footerClass:"text-center"
+        footerClass:"text-center",
+        cellType:CellType.Money,
       },
       {
         path: "serverCareProduct",
@@ -112,6 +119,7 @@ class ContractAndNumbersReportComponent extends MainComponent {
         //icon: "fal fa-2x fa-tag color-gray2 pointer",
         sortable: true,
         //className: "text-center",
+        cellType:CellType.Text,
       },
       {
         path: "physicalServers",
@@ -122,7 +130,8 @@ class ContractAndNumbersReportComponent extends MainComponent {
         sortable: true,
         className: "text-center",
         footerContent:(contract)=><label>Total: {this.getTotal("physicalServers")}</label>,
-        footerClass:"text-center"
+        footerClass:"text-center",
+        cellType:CellType.Number,
       },
       {
         path: "virtualServers",
@@ -133,7 +142,8 @@ class ContractAndNumbersReportComponent extends MainComponent {
         sortable: true,
         className: "text-center",
         footerContent:(contract)=><label>Total: {this.getTotal("virtualServers")}</label>,
-        footerClass:"text-center"
+        footerClass:"text-center",
+        cellType:CellType.Number,
       },
       {
         path: "serverCareContract",
@@ -145,7 +155,8 @@ class ContractAndNumbersReportComponent extends MainComponent {
         className: "text-center",
         content:(contract)=><label>£{contract.serverCareContract}</label>,
         footerContent:(contract)=><label>Total: £{this.getTotal("virtualServers")}</label>,
-        footerClass:"text-center"
+        footerClass:"text-center",
+        cellType:CellType.Money,
 
       },
        
@@ -183,7 +194,17 @@ class ContractAndNumbersReportComponent extends MainComponent {
   render() {
     const {items,totalPrePay}=this.state;
     return (
-      <div>
+      <div >
+        <div style={{display:"flex",justifyContent:"center",alignItems:"center",flexDirection:"row"}}>
+        <div id="tool" className="mr-5">
+           <span data-tip="hello new tooltip1">Test Tooltip</span>
+           <ReactTooltip place="top" />
+        </div>
+        <div id="tool"  className="ml-5">
+           <span data-tip="hello new tooltip2">Test Tooltip2</span>
+           <ReactTooltip place="bottom" />
+        </div>
+        </div>
         <Spinner show={this.state.showSpinner}></Spinner>
         {this.getAlert()}        
         <ToolTip title="Export to CSV" width={40}>
