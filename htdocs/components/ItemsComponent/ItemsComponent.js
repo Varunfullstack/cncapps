@@ -352,18 +352,19 @@ class ItemsComponent extends MainComponent {
                         <select value={data.warrantyID || ''}
                                 onChange={(event) => this.setValue("warrantyID", event.target.value)}
                                 className="form-control"
-                    >
-                        <option/>
-                        {warranties.map(w => <option key={w.id}
-                                                     value={w.id}
-                        >{w.name}</option>)}
-                    </select>
+                        >
+                            <option/>
+                            {warranties.map(w => <option key={w.id}
+                                                         value={w.id}
+                            >{w.name}</option>)}
+                        </select>
                     </td>
                 </tr>
                 <tr>
                     <td className="text-right">Default Supplier</td>
                     <td>
-                        <SupplierSelectorComponent supplierId={data.supplierId} onChange={(supplier )  => this.setValue("supplierId", supplier?.id)}/>
+                        <SupplierSelectorComponent supplierId={data.supplierId}
+                                                   onChange={(supplier) => this.setValue("supplierId", supplier?.id)}/>
                     </td>
                     <td className="text-right">Warranty</td>
                     <td>
@@ -388,7 +389,8 @@ class ItemsComponent extends MainComponent {
                             />
                             {
                                 data.allowGlobalPriceUpdate ?
-                                    <button onClick={() => this.updateGlobalPrice('cost', data.curUnitCost, data.itemID)}> Globally
+                                    <button
+                                        onClick={() => this.updateGlobalPrice('cost', data.curUnitCost, data.itemID)}> Globally
                                         Update Contract Pricing</button> : null}
                         </div>
 
@@ -398,7 +400,7 @@ class ItemsComponent extends MainComponent {
                                 onChange={(event) => this.setValue("renewalTypeID", event.target.value)}
                                 className="form-control"
                     >
-                        <option>Not a renewal</option>
+                        <option value={''}>Not a renewal</option>
                         {renewalTypes.map(w => <option key={w.id}
                                                        value={w.id}
                         >{w.name}</option>)}
@@ -415,7 +417,8 @@ class ItemsComponent extends MainComponent {
                             />
                             {
                                 data.allowGlobalPriceUpdate ?
-                                    <button onClick={() => this.updateGlobalPrice('sale', data.curUnitSale, data.itemID)}> Globally
+                                    <button
+                                        onClick={() => this.updateGlobalPrice('sale', data.curUnitSale, data.itemID)}> Globally
                                         Update Contract Pricing</button> : null
                             }
                         </div>
