@@ -79,24 +79,26 @@ class BUPurchaseOrder extends Business
             $dsOrdline
         );
         // generate one PO for each distinct supplier ID found
-        $lastSupplierID = null;
-        $supplierRepo   = new MySQLSupplierRepository();
-        $this->counter  = 0;
+        $lastSupplierID  = null;
+        $supplierRepo    = new MySQLSupplierRepository();
+        $this->counter   = 0;
+        $purchaseOrderId = null;
         while ($dsOrdline->fetchNext()) {
             // new supplier so create PO header
+            var_dump($dsOrdline->getValue(DBEJOrdline::supplierID));
             if ($dsOrdline->getValue(DBEJOrdline::supplierID) != $lastSupplierID) {
 
-                $supplier      = $supplierRepo->getById(
+                $supplier        = $supplierRepo->getById(
                     new SupplierId($dsOrdline->getValue(DBEJOrdline::supplierID))
                 );
-                $this->counter = 1;
-                $this->insertPOHeader(
+                $this->counter   = 1;
+                $purchaseOrderId = $this->insertPOHeader(
                     $userID,
                     $supplier,
                     $requiredByDate
                 );
             }
-            $this->insertPOLine();
+            $this->insertPOLine($purchaseOrderId, $this->counter);
             $lastSupplierID = $dsOrdline->getValue(DBEJOrdline::supplierID);
             $this->counter++;
         }
@@ -190,17 +192,21 @@ class BUPurchaseOrder extends Business
         return ($dbePorhead->getPKValue());
     }
 
-    function insertPOLine()
+    function insertPOLine($purchaseOrderId, $lineNumber)
     {
         $dsOrdline  = &$this->dsOrdline;
         $dbePorline = &$this->dbePorline;
+        var_dump($purchaseOrderId);
+        if (!$purchaseOrderId) {
+            throw new Exception('Purchase Order Id is null!!');
+        }
         $dbePorline->setValue(
             DBEPorline::porheadID,
-            $this->dbePorhead->getValue(DBEPorhead::porheadID)
+            $purchaseOrderId
         );
         $dbePorline->setValue(
             DBEPorline::sequenceNo,
-            $this->counter
+            $lineNumber
         );
         $dbePorline->setValue(
             DBEPorline::itemID,

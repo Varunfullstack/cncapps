@@ -4055,7 +4055,6 @@ class BUActivity extends Business
                 $lastProblemID = $problemID;
                 //we are looking at a new problem, we should create the lines we have from the previous run
                 if (count($toInsertLines)) {
-
                     foreach ($toInsertLines as $insertLine) {
                         $insertLine->insertRow();
                     }
@@ -4225,6 +4224,8 @@ class BUActivity extends Business
                                                   $itemID = CONFIG_CONSULTANCY_DAY_LABOUR_ITEMID
     )
     {
+        $dbeItem = new DBEItem($this);
+        $dbeItem->getRow($itemID);
         $dbeOrderLine = new DBEOrdline($this);
         $dbeOrderLine->setValue(DBEOrdline::ordheadID, $ordheadId);
         $dbeOrderLine->setValue(
@@ -4263,6 +4264,7 @@ class BUActivity extends Business
             DBEJOrdline::curTotalSale,
             0
         );
+        $dbeOrderLine->setValue(DBEOrdline::supplierID, $dbeItem->getValue(DBEItem::supplierId));
         return $dbeOrderLine;
     }
 
