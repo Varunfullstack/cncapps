@@ -256,7 +256,7 @@ class BUCustomerAnalysisReport extends Business
       inh_type = 'I'
       AND inl_line_type = 'I'
       AND inh_date_printed_yearmonth BETWEEN '" . $startDate->format('Ym') . "' AND '" . $endDate->format('Ym') . "'
-      AND item.renewalTypeID = 0"; // excludes contracts
+      AND item.renewalTypeID is null"; // excludes contracts
         if ($customerID) {
             $sql .= " AND invhead.inh_custno = $customerID";
         }
