@@ -10,6 +10,11 @@ use CNCLTD\Business\BUActivity;
 use CNCLTD\Data\DBEJProblem;
 use CNCLTD\Exceptions\ColumnOutOfRangeException;
 use CNCLTD\LoggerCLI;
+use CNCLTD\ServiceRequest\Domain\CannotCloseServiceRequestOnHold;
+use CNCLTD\ServiceRequest\Domain\CannotCloseServiceRequestThatIsNotFixed;
+use CNCLTD\ServiceRequest\Domain\CannotCloseServiceRequestWithNoActivities;
+use CNCLTD\ServiceRequest\Domain\CannotCloseServiceRequestWithoutFixedActivity;
+use CNCLTD\ServiceRequest\Domain\CannotForciblyCloseServiceRequestWithPriorityGreaterThanThree;
 
 global $cfg;
 require_once($cfg ["path_gc"] . "/Business.inc.php");
@@ -736,28 +741,41 @@ class BUProblemSLA extends Business
                 $body
             );
 
-        } // end if ( $dbeJCallActivity = $this->buActivity->getFirstActivityInProblem( $problemID ) ){
+        }
     }
 
+    /**
+     * @throws ColumnOutOfRangeException
+     * @throws CannotCloseServiceRequestWithoutFixedActivity
+     * @throws CannotCloseServiceRequestThatIsNotFixed
+     * @throws CannotForciblyCloseServiceRequestWithPriorityGreaterThanThree
+     * @throws CannotCloseServiceRequestWithNoActivities
+     * @throws CannotCloseServiceRequestOnHold
+     */
+    function forciblyCloseServiceRequest(DBEProblem $dsProblems)
+    {
+        $this->checkToCloseServiceRequestIsValid($dsProblems);
+        if ($dsProblems->getValue(DBEProblem::priority) > 3) {
+            throw new CannotForciblyCloseServiceRequestWithPriorityGreaterThanThree();
+        }
+        $problemID = $dsProblems->getValue(DBEProblem::problemID);
+        $this->buActivity->setProblemToCompleted($problemID);
+    }
+
+
+    /**
+     * @throws ColumnOutOfRangeException
+     * @throws CannotCloseServiceRequestOnHold
+     * @throws CannotCloseServiceRequestWithNoActivities
+     * @throws CannotCloseServiceRequestWithoutFixedActivity
+     * @throws CannotCloseServiceRequestThatIsNotFixed
+     */
     function closeServiceRequest(DBEProblem $dsProblems, LoggerCLI $loggerCLI)
     {
-        if ($dsProblems->getValue(DBEProblem::holdForQA) == 1) {
-            return;
-        }
+        $this->checkToCloseServiceRequestIsValid($dsProblems);
         $problemID       = $dsProblems->getValue(DBEProblem::problemID);
         $dbeCallActivity = $this->buActivity->getLastActivityInProblem($problemID);
-        if (!$dbeCallActivity) {
-            return;
-        }
         $loggerCLI->info("Processing Service Request: {$problemID}");
-        $buActivity    = new BUActivity($this);
-        $fixedActivity = $buActivity->getFixedActivityInServiceRequest($problemID);
-        if (!$fixedActivity) {
-            $loggerCLI->warning("This SR does not have a fixed activity, sending a No fixed alert to team manager!!");
-            $this->sendNoFixedActivityAlert($problemID);
-            return;
-        }
-        $this->dbeProblem->getRow($problemID);
         $fixedDate            = strtotime($this->dbeProblem->getValue(DBEProblem::completeDate));
         $completedDateAndTime = $this->dbeProblem->getValue(
                 DBEProblem::completeDate
@@ -835,7 +853,14 @@ class BUProblemSLA extends Business
     {
         $dsProblems = $this->buActivity->getProblemsByStatus('F');
         while ($dsProblems->fetchNext()) {
-            $this->closeServiceRequest($dsProblems, $logger);
+            try {
+                $this->closeServiceRequest($dsProblems, $logger);
+            } catch (CannotCloseServiceRequestOnHold | CannotCloseServiceRequestThatIsNotFixed | CannotCloseServiceRequestWithNoActivities  $exception) {
+                $logger->error($exception->getMessage());
+            } catch (CannotCloseServiceRequestWithoutFixedActivity $exception) {
+                $logger->warning("This SR does not have a fixed activity, sending a No fixed alert to team manager!!");
+                $this->sendNoFixedActivityAlert($dsProblems->getValue(DBEProblem::problemID));
+            }
         }
     }
 
@@ -1112,5 +1137,33 @@ class BUProblemSLA extends Business
         }
     }
 
+    /**
+     * @param DBEProblem $dsProblems
+     * @throws CannotCloseServiceRequestOnHold
+     * @throws CannotCloseServiceRequestThatIsNotFixed
+     * @throws CannotCloseServiceRequestWithNoActivities
+     * @throws CannotCloseServiceRequestWithoutFixedActivity
+     * @throws ColumnOutOfRangeException
+     */
+    private function checkToCloseServiceRequestIsValid(DBEProblem $dsProblems)
+    {
+        if ($dsProblems->getValue(DBEProblem::holdForQA) == 1) {
+            throw new CannotCloseServiceRequestOnHold();
+        }
+        $problemID       = $dsProblems->getValue(DBEProblem::problemID);
+        $dbeCallActivity = $this->buActivity->getLastActivityInProblem($problemID);
+        if (!$dbeCallActivity) {
+            throw new CannotCloseServiceRequestWithNoActivities();
+        }
+        $buActivity    = new BUActivity($this);
+        $fixedActivity = $buActivity->getFixedActivityInServiceRequest($problemID);
+        if (!$fixedActivity) {
+            throw new CannotCloseServiceRequestWithoutFixedActivity();
+        }
+        $this->dbeProblem->getRow($problemID);
+        if ($dsProblems->getValue(DBEProblem::status) !== 'F') {
+            throw new CannotCloseServiceRequestThatIsNotFixed();
+        }
+    }
 } // End of class
 ?>

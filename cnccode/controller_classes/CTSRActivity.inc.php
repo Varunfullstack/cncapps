@@ -18,6 +18,7 @@ use CNCLTD\InternalDocuments\Base64FileDTO;
 use CNCLTD\InternalDocuments\Entity\InternalDocumentMapper;
 use CNCLTD\InternalDocuments\InternalDocumentRepository;
 use CNCLTD\InternalDocuments\UseCases\AddDocumentsToServiceRequest;
+use CNCLTD\LoggerCLI;
 use CNCLTD\ServiceRequestInternalNote\infra\ServiceRequestInternalNotePDORepository;
 use CNCLTD\ServiceRequestInternalNote\ServiceRequestInternalNote;
 use CNCLTD\ServiceRequestInternalNote\ServiceRequestInternalNotePDOMapper;
@@ -1869,6 +1870,9 @@ AND c.caa_problemno = ? ',
         return $this->dbeUser->isAllowedForceClosingSR();
     }
 
+    /**
+     * @throws APIException
+     */
     private function forceCloseServiceRequest()
     {
         $jsonBody         = $this->getBody(true);
@@ -1879,8 +1883,11 @@ AND c.caa_problemno = ? ',
         $buProblemSLA   = new BUProblemSLA($this);
         $serviceRequest = new DBEProblem($this);
         $serviceRequest->getRow($serviceRequestId);
-        $logger = new \CNCLTD\LoggerCLI('ServiceRequestForciblyClosed');
-        $buProblemSLA->closeServiceRequest($serviceRequest, $logger);
+        try {
+            $buProblemSLA->forciblyCloseServiceRequest($serviceRequest);
+        } catch (Exception$exception) {
+            throw new APIException(400, $exception->getMessage());
+        }
         return [
             "status" => "ok"
         ];

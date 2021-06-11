@@ -586,8 +586,6 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
                     'page',
                     true
                 );
-                $customStartDate = new DateTime($endDate->format('Y-m-d'));
-                $customStartDate->modify("-3 month");
                 $buCustomer                       = new BUCustomer($this);
                 $firstTimeFixReport               = $buCustomer->getFirstTimeFixSummary(
                     $customerId,
@@ -596,7 +594,7 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
                 );
                 $raiseTypeSummary                 = $buCustomer->getProblemRaisedTypeSummary(
                     $customerId,
-                    $customStartDate,
+                    $startDate,
                     $endDate
                 );
                 $nonEditableText                  = $nonEditableTemplate->get_var('output');
@@ -1279,7 +1277,10 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
         $firstTimeFixRequests = [
             "title"   => "Qualifying First Time Fix Requests",
             "columns" => ["Attempted", "Achieved"],
-            "data"    => [["Attempted - {$data["attemptedFirstTimeFix"]}", $data["attemptedFirstTimeFix"]], ["Achieved - {$data["firstTimeFix"]}", $data["firstTimeFix"]]]
+            "data"    => [
+                ["Attempted - {$data["attemptedFirstTimeFix"]}", $data["attemptedFirstTimeFix"]],
+                ["Achieved - {$data["firstTimeFix"]}", $data["firstTimeFix"]]
+            ]
         ];
         $sourceOfRequests     = [
             "title"   => "Source of Requests (%)",
