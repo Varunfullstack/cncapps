@@ -13,6 +13,18 @@ use CNCLTD\Exceptions\APIException;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BUQuotationTemplate.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
+define(
+    'ctQuotationTemplates_ACT_CREATE',
+    'createQuotationTemplate'
+);
+define(
+    'ctQuotationTemplates_ACT_UPDATE',
+    'updateQuotationTemplate'
+);
+define(
+    'ctQuotationTemplates_ACT_EDIT',
+    'editQuotationTemplate'
+);
 class CTQuoteTemplates extends CTCNC
 {
     public $dsQuotationTemplate;
@@ -219,7 +231,7 @@ class CTQuoteTemplates extends CTCNC
         $body = $this->getBody(true);
         $this->setMethodName('updateTemplate');
         $dsQuotationTemplate = &$this->dsQuotationTemplate; // ref to class var
-        $id = @$_REQUEST["id"];
+        $id = $body["id"];
         if ($id) {
             $this->buQuotationTemplate->getQuotationTemplateByID(
                 $id,

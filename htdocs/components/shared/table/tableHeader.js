@@ -1,7 +1,7 @@
 import React from 'react';
 import '../ToolTip.css'
 import { CellType } from './table';
-
+import ToolTip from "../ToolTip";
 class TableHeader extends React.Component {
   el = React.createElement;
   raiseSort = (path) => {
@@ -60,25 +60,15 @@ class TableHeader extends React.Component {
                   justifyContent: this.getCellAlign(c),
                 },
               },
-              el(
-                "div",
-                {
-                  className: "tooltip",
-                  style: { ...c.hdStyle, width: 30, whiteSpace: "nowrap" },
-                },
-                el('div',null,
-                c?.label || " ",
-                c.icon ? el("i", { className: c.icon }) : null,
-                renderSortIcon(c),
-                ),
-                c.hdToolTip
-                  ? el(
-                      "div",
-                      { className: "tooltiptext tooltip-bottom" },
-                      c.hdToolTip ? c.hdToolTip : ""
-                    )
-                  : null
-              )
+              <div style={{ ...c.hdStyle, whiteSpace: "nowrap",display: "flex",alignItems: "center",justifyContent: "center" }}>
+                <ToolTip title={c.hdToolTip ? c.hdToolTip : ""} >
+                <span>{c?.label || " "}</span>
+                {c.icon ?<i className={ c.icon} onClick={this.handleExportCsv}></i>:null}
+                </ToolTip>
+                <div style={{marginLeft:3}}>
+                  {renderSortIcon(c)}
+                </div>
+              </div>             
             )
           )
         )

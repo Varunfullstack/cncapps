@@ -194,20 +194,10 @@ class ContractAndNumbersReportComponent extends MainComponent {
   render() {
     const {items,totalPrePay}=this.state;
     return (
-      <div >
-        <div style={{display:"flex",justifyContent:"center",alignItems:"center",flexDirection:"row"}}>
-        <div id="tool" className="mr-5">
-           <span data-tip="hello new tooltip1">Test Tooltip</span>
-           <ReactTooltip place="top" />
-        </div>
-        <div id="tool"  className="ml-5">
-           <span data-tip="hello new tooltip2">Test Tooltip2</span>
-           <ReactTooltip place="bottom" />
-        </div>
-        </div>
+      <div > 
         <Spinner show={this.state.showSpinner}></Spinner>
         {this.getAlert()}        
-        <ToolTip title="Export to CSV" width={40}>
+        <ToolTip title="Export to CSV" >
           <i className="fal fa-2x fa-file-csv color-gray2 pointer mb-5" onClick={this.handleExportCsv}></i>
         </ToolTip>
         {this.getDataTable()}
