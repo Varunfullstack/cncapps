@@ -10,6 +10,7 @@ import { SupplierSearchComponent } from "../SupplierSearchComponent/SupplierSear
 import SupplierSelectorComponent from "../PurchaseOrderSupplierAndContactInputsComponent/subComponents/SupplierSelectorComponent.js";
 import Modal from "../shared/Modal/modal.js";
 import OrderDetailsComponent from "./subComponents/OrderDetailsComponent.js";
+import { params } from "../utils/utils.js";
  
 class GoodsInComponent extends MainComponent {
   api = new APIGoodsIn();
@@ -133,7 +134,7 @@ class GoodsInComponent extends MainComponent {
     onClose={()=>this.setState({showModal:false,order:null})}
     
     >
-      <OrderDetailsComponent onClose={this.handleOnClose} porheadID={order.porheadID}></OrderDetailsComponent>
+      <OrderDetailsComponent  isModal={true}  onClose={this.handleOnClose} porheadID={order.porheadID}></OrderDetailsComponent>
     </Modal>
   }
   handleOnClose=()=>{
@@ -141,6 +142,10 @@ class GoodsInComponent extends MainComponent {
     this.setState({showModal:false})
   }
   render() {
+    const action=params.get("action");     
+    if(action=="receive"||action=="displayGoodsIn")
+    return  <OrderDetailsComponent isModal={false} onClose={this.handleOnClose} porheadID={params.get("porheadID")}></OrderDetailsComponent>
+
     const {filter}=this.state;
     return (
       <div>

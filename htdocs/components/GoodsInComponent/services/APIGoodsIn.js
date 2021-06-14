@@ -9,6 +9,6 @@ export default class APIGoodsIn extends APIMain {
         return this.get(`${ApiUrls.GoodsIn}lines&porheadID=${porheadID}`)
     }
     receive(porheadID,body){
-        return this.post(`${ApiUrls.GoodsIn}receive&porheadID=${porheadID}`,body,true);
+        return this.post(`${ApiUrls.GoodsIn}lines&porheadID=${porheadID}`,body,true);
     }   
 }

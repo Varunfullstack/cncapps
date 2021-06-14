@@ -124,7 +124,7 @@ export default class SupplierSelectorComponent extends React.PureComponent {
                           renderInput={params => {
                               const {inputProps, InputLabelProps, InputProps} = params;
 
-                              inputProps.className += "form-control";
+                              inputProps.className += " form-control";
 
                               return (
                                   <div ref={InputProps.ref}>

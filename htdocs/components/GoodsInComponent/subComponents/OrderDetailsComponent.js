@@ -15,22 +15,48 @@ export default class OrderDetailsComponent extends MainComponent {
       showSpinner: false,
       showModal: false,
       lines: [],
+      order:null,
+      recieveAll:false
     };
   }
 
   componentDidMount() {
     this.getData();
+    document.addEventListener("keydown",this.handleKeyDown)
   }
-
+  handleKeyDown=(ev)=>{     
+    if(ev.key=="F5")
+    {
+      this.handleRecieveAll(!this.state.recieveAll);
+      ev.preventDefault();
+      return false;
+    }
+    
+  }
+  componentWillUnmount() {
+    document.removeEventListener("keydown",this.handleKeyDown);
+  }
   getData = () => {
-    const { porheadID } = this.props;
+    const { porheadID,isModal } = this.props;
     if (porheadID)
-      this.api.getOrderLines(porheadID).then(
+    {
+      if(!isModal)
+      this.api.getSearchResult(porheadID,"").then(
         (res) => {
-          this.setState({ lines: res.lines });
+          this.setState({ order: res.data[0] });
         },
         (error) => this.alert("Error in loading data")
       );
+      this.api.getOrderLines(porheadID).then(
+        (res) => {
+          const lines= res.lines;
+          this.setState({ lines });
+        },
+        (error) => this.alert("Error in loading data")
+      );     
+        
+    
+    }
   };
 
   getDataTable = () => {
@@ -183,32 +209,53 @@ export default class OrderDetailsComponent extends MainComponent {
       this.alert("Please enter at least one value to receive");
       return;
     }
-    this.api.receive(porheadID,lines).then(res=>{
-      // this.getData();
-      // this.setState({showModal:false});
-      window.location=`PurchaseOrder.php?action=display&porheadID=${porheadID}`;
-      // if(this.props.onClose)
-      // this.props.onClose()
-    }).catch(res=>{
-      console.log(res);
-      //this.alert(error);
+    this.api.receive(porheadID,lines).then(res=>{   
+      window.location=`PurchaseOrder.php?action=display&porheadID=${porheadID}`;     
+    }).catch(res=>{      
       this.alert(res.error)
     })
   }
   handleRecieveAll=(value)=>{
     let {lines}=this.state;
     lines.map(line=>line.qtyToReceive=value?line.qtyOS:0);
-    this.setState(lines);
-    console.log("change",value);
+    this.setState({lines,recieveAll:value});
+  }
+  getOrderDetails=()=>{
+    const {order}=this.state;
+    if(order)
+    {
+      return <table className="mt-4">
+        <tbody>
+          <tr>
+            <td className="label">Supplier</td>
+            <td>{order.supplierName}</td>
+          </tr>
+          <tr>
+            <td className="label">Purchase Order</td>
+            <td>{order.porheadID}</td>
+          </tr>
+          <tr>
+            <td className="label">Customer</td>
+            <td>{order.customerName}</td>
+          </tr>
+          <tr>
+            <td className="label">Sales Order</td>
+            <td>{order.customerID+"/"+order.ordheadID}</td>
+          </tr>
+        </tbody>
+      </table>
+    }
   }
   render() {
+    
     return (
       <div>
         <Spinner show={this.state.showSpinner}></Spinner>
         {this.getAlert()}
+        {this.getOrderDetails()}
         <div style={{display:"flex","justifyContent":"center","marginBottom":-40,alignItems:"center"}}>
           <label className="mr-2" style={{marginLeft:200}}>Recevive All</label>
-          <Toggle width={30} onChange={this.handleRecieveAll}>
+          <Toggle checked={this.state.recieveAll} width={30} onChange={this.handleRecieveAll}>
 
           </Toggle>
         </div>

@@ -122,17 +122,26 @@ class CTGoodsIn extends CTCNC
                 echo json_encode($this->search(),JSON_NUMERIC_CHECK);
                 break;
             case self::LINES:
-                echo json_encode($this->getOrderLines(),JSON_NUMERIC_CHECK);
+                switch ($this->requestMethod) {
+                    case 'GET':
+                        echo json_encode($this->getOrderLines(),JSON_NUMERIC_CHECK);
+                        break;
+                    case 'POST':
+                        echo json_encode($this->handleReceive(),JSON_NUMERIC_CHECK);
+                        break;
+                    default:
+                        # code...
+                        break;
+                }
                 break;
             case CTGOODSIN_ACT_DISP_SEARCH:
                 $this->displaySearchForm();
                 break;
             case CTCNC_ACT_DISPLAY_GOODS_IN:
-                $this->displayGoodsIn();
-                break;
+                // $this->displayGoodsIn();
+                // break;
             case CTGOODSIN_ACT_RECEIVE:
-                echo json_encode($this->handleReceive(),JSON_NUMERIC_CHECK);
-                break;
+                
             default:
                 $this->displaySearch();
                 break;
@@ -530,8 +539,8 @@ class CTGoodsIn extends CTCNC
         $this->dsPorhead->initialise();
         $this->buGoodsIn->search(
             $this->dsPorhead,
-            $this->getParam('supplierID'),
-            $this->getParam('porheadID'),
+            $supplierID,
+            $porheadID,
             null,
             null,
             'B'
@@ -542,16 +551,7 @@ class CTGoodsIn extends CTCNC
             $customerNameCol = $this->dsPorhead->columnExists(DBEJPorhead::customerName);
             $porheadIDCol    = $this->dsPorhead->columnExists(DBEJPorhead::porheadID);
             $supplierRefCol  = $this->dsPorhead->columnExists(DBEJPorhead::supplierRef);
-            //$customerIDCol = $this->dsPorhead->columnExists(DBEJPorhead::customerID);
-
-            while ($this->dsPorhead->fetchNext()) {
-                // $goodsInURL   = Controller::buildLink(
-                //     $_SERVER['PHP_SELF'],
-                //     array(
-                //         'action'    => CTCNC_ACT_DISPLAY_GOODS_IN,
-                //         'porheadID' => $this->dsPorhead->getValue($porheadIDCol)
-                //     )
-                // );
+            while ($this->dsPorhead->fetchNext()) {            
                 $customerName = $this->dsPorhead->getValue($customerNameCol);
                 $supplierName = $this->dsPorhead->getValue($supplierNameCol);
                 $data []=
@@ -570,6 +570,7 @@ class CTGoodsIn extends CTCNC
         }
         return  $this->success( $data ) ;
     }
+     
      /**
      * Display the results of order search
      * @access private
@@ -587,10 +588,9 @@ class CTGoodsIn extends CTCNC
             $porheadID,
             $dsPorhead
         );
-
+      
         $dsPorhead->fetchNext();
-        //return $this->success( $dsPorhead->getValue(DBEPorhead::porheadID));
-
+        //return $this->success( $dsPorhead->getValue(DBEPorhead::porheadID));        
         $this->buPurchaseOrder->getLinesByID(
             $dsPorhead->getValue(DBEPorhead::porheadID),
             $dsPorline
@@ -691,7 +691,7 @@ class CTGoodsIn extends CTCNC
                             ''
                         ),
                         'qtyToReceive'    => $this->dsGoodsIn->getValue(BUGoodsIn::receiveDataSetQtyToReceive),
-                        'serialNo'        => $this->dsGoodsIn->getValue(BUGoodsIn::receiveDataSetSerialNo),
+                        'serialNo'        => $this->dsGoodsIn->getValue(BUGoodsIn::receiveDataSetSerialNo)??"",
                         'requireSerialNo' => $this->dsGoodsIn->getValue(BUGoodsIn::receiveDataSetRequireSerialNo),
                         'allowReceive'    => $this->dsGoodsIn->getValue(BUGoodsIn::receiveDataSetAllowReceive),
                         'renew'           => $this->dsGoodsIn->getValue(

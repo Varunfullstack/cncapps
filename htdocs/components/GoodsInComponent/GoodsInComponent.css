@@ -6,3 +6,7 @@
 .form-group label{
     margin-left: 5px;
 }
+.label{
+    text-align: right;
+    color: #992211;
+}
