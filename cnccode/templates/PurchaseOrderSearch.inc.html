@@ -1,46 +1,19 @@
 <!-- Template: PurchaseOrderSearch.inc.html -->
 <script language='JavaScript'>
 
-    function validateSupplierName() {
-        if (document.getElementById("supplierName").value != "") {
-            window.open(
-                '{urlSupplierPopup}&supplierName=' +
-                escape(document.getElementById("supplierName").value) +
-                '&parentIDField=supplierID' +
-                '&parentDescField=supplierName',
-                'items',
-                'scrollbars=yes,resizable=no,width=450,height=400,copyhistory=no, menubar=0'
-            )
-        } else {
-            document.getElementById("supplierID").value = '';
-        }
-    }
-
-    function checkFunctionKey(field) {
-        if (event.keyCode == 120) {			// F9 - edit
-            switch (field.id) {
-                case "supplierName":
-                    if (document.getElementById("supplierID").value != "") {
-                        window.open(
-                            '{urlSupplierEdit}&supplierID=' +
-                            escape(document.getElementById("supplierID").value) +
-                            '&parentIDField=supplierID' +
-                            '&parentDescField=supplierName',
-                            'supplier',
-                            'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0'
-                        );
-                    }
-                    break;
-            }
-        }
-        return;
-    }
-
     function submitOnReturn() {
         if (event.keyCode == 13) {
             document.searchForm.submit();
         }
     }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const reactSupplierSearchContainer = document.getElementById('reactSupplierSearchContainer');
+        document.renderSupplierSearchComponent(reactSupplierSearchContainer, {
+            inputId: 'supplierID',
+            defaultText: ''
+        });
+    })
 
     function createOrder() {
         if (
@@ -76,16 +49,10 @@
                         id="supplierID"
                         value="{supplierID}"
                 >
-                <input
-                        type="text"
-                        name="supplierName"
-                        id="supplierName"
-                        value="{supplierName}"
-                        onChange="javascript:validateSupplierName()"
-                        onKeydown="javascript:checkFunctionKey(supplierName)"
-                        size="50"
-                        maxlength="50"
-                ></td>
+                <div id="reactSupplierSearchContainer"
+                     data-input-id="supplierID"
+                ></div>
+            </td>
         </tr>
         <tr>
             <td class="promptText">

@@ -72,6 +72,7 @@
                    pattern="^\d+\.\d+\.\d+$"
             >
         </div>
+
         <div>
             <span>Availability Date:</span>
             <br>
@@ -181,43 +182,43 @@
         list = $('.list');
         missingRowsTable = $('.missingRows');
         missingRowsDataTable = missingRowsTable.DataTable(
-            {
-                dom: 'Blfrti', buttons: [
-                    {
-                        text: 'Add',
-                        action: (e, dt, node, config) => {
-                            const rows = missingRowsDataTable.rows({selected: true}).data();
-                            const newOSSupport = {
-                                "id": null,
-                                "name": rows[0].name,
-                                "version": rows[0].version,
-                                "availabilityDate": null,
-                                "endOfLifeDate": null,
-                                "friendlyName": null
-                            };
-                            showEdit(newOSSupport);
-                        },
-                        name: 'add'
-                    }
-                ],
-                // serverSide: true,
-                ajax: {
-                    url: "{URLGetMissingRowsData}",
-                    type: "GET"
-                },
-                rowId: 'id',
-                select: {style: 'single'},
-                columns: [
-                    {data: "name"},
-                    {data: "version"},
-                ],
-                paging: false,
-                order: [
-                    [0, 'asc'],
-                ],
-                scrollY: '60vh',
-                scrollCollapse: true
-            }
+                {
+                    dom: 'Blfrti', buttons: [
+                        {
+                            text: 'Add',
+                            action: (e, dt, node, config) => {
+                                const rows = missingRowsDataTable.rows({selected: true}).data();
+                                const newOSSupport = {
+                                    "id": null,
+                                    "name": rows[0].name,
+                                    "version": rows[0].version,
+                                    "availabilityDate": null,
+                                    "endOfLifeDate": null,
+                                    "friendlyName": null,
+                                };
+                                showEdit(newOSSupport);
+                            },
+                            name: 'add'
+                        }
+                    ],
+                    // serverSide: true,
+                    ajax: {
+                        url: "{URLGetMissingRowsData}",
+                        type: "GET"
+                    },
+                    rowId: 'id',
+                    select: {style: 'single'},
+                    columns: [
+                        {data: "name"},
+                        {data: "version"},
+                    ],
+                    paging: false,
+                    order: [
+                        [0, 'asc'],
+                    ],
+                    scrollY: '60vh',
+                    scrollCollapse: true
+                }
         );
 
         missingRowsDataTable.buttons(["add:name"]).enable(false);
@@ -320,7 +321,7 @@
                 },
                 {
                     data: "friendlyName"
-                }
+                },
             ],
             columnDefs: [
                 {type: "date-eu", targets: [2, 3]}

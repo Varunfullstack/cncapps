@@ -1,12 +1,10 @@
-<?php /**
- * Call manufacturer business class
- *
- * @access public
- * @authors Karim Ahmed - Sweet Code Limited
- */
+<?php
+
+use CNCLTD\Data\DBEItem;
+
+global $cfg;
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_dbe"] . "/DBEManufacturer.inc.php");
-require_once($cfg["path_dbe"] . "/DBEItem.inc.php");
 define('BUMANUFACTURER_NAME_STR_NT_PASD', 'No name string passed');
 
 class BUManufacturer extends Business
@@ -49,7 +47,7 @@ class BUManufacturer extends Business
             $this->raiseError(BUMANUFACTURER_NAME_STR_NT_PASD);
         }
         $matchString = trim($matchString);
-        $ret = FALSE;
+        $ret         = FALSE;
         if (is_numeric($matchString)) {
             $ret = ($this->getManufacturerByID($matchString, $dsResults));
         }

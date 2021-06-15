@@ -1,9 +1,10 @@
 <?php
 
-
 namespace CNCLTD\core\domain\usecases;
 
-
+use CNCLTD\Business\BUActivity;
+use DBEProblem;
+use DBEUser;
 use Exception;
 
 class AssignToBeLoggedToServiceRequest
@@ -11,12 +12,12 @@ class AssignToBeLoggedToServiceRequest
     /**
      * @param $toBeLoggedRequestId
      * @param $serviceRequestId
-     * @param \DBEUser $currentUser
+     * @param DBEUser $currentUser
      * @throws Exception
      */
-    public function __invoke($toBeLoggedRequestId, $serviceRequestId, \DBEUser $currentUser)
+    public function __invoke($toBeLoggedRequestId, $serviceRequestId, DBEUser $currentUser)
     {
-        $buActivity             = new \BUActivity($this);
+        $buActivity             = new BUActivity($this);
         $customerServiceRequest = $this->getCustomerRaisedRequest($buActivity, $toBeLoggedRequestId);
         $dbeProblem             = $this->getServiceRequest($serviceRequestId);
         $this->checkServiceRequestIsValid($dbeProblem);
@@ -30,12 +31,12 @@ class AssignToBeLoggedToServiceRequest
 
     /**
      * @param $serviceRequestId
-     * @return \DBEProblem
+     * @return DBEProblem
      * @throws Exception
      */
-    private function getServiceRequest($serviceRequestId): \DBEProblem
+    private function getServiceRequest($serviceRequestId): DBEProblem
     {
-        $dbeProblem = new \DBEProblem($this);
+        $dbeProblem = new DBEProblem($this);
         if (!$dbeProblem->getRow($serviceRequestId)) {
             throw new Exception("Service request not found");
         }
@@ -43,23 +44,23 @@ class AssignToBeLoggedToServiceRequest
     }
 
     /**
-     * @param \DBEProblem $dbeProblem
+     * @param DBEProblem $dbeProblem
      * @throws Exception
      */
-    private function checkServiceRequestIsValid(\DBEProblem $dbeProblem): void
+    private function checkServiceRequestIsValid(DBEProblem $dbeProblem): void
     {
-        if (!(in_array($dbeProblem->getValue(\DBEProblem::status), ["I", "P"]))) {
+        if (!(in_array($dbeProblem->getValue(DBEProblem::status), ["I", "P"]))) {
             throw new Exception("Service request must be in status Initial or In Progress");
         }
     }
 
     /**
-     * @param \BUActivity $buActivity
+     * @param BUActivity $buActivity
      * @param $toBeLoggedRequestId
      * @return array
      * @throws Exception
      */
-    private function getCustomerRaisedRequest(\BUActivity $buActivity, $toBeLoggedRequestId): array
+    private function getCustomerRaisedRequest(BUActivity $buActivity, $toBeLoggedRequestId): array
     {
         $customerServiceRequest = $buActivity->getCustomerRaisedRequest($toBeLoggedRequestId);
         if (!$customerServiceRequest) {

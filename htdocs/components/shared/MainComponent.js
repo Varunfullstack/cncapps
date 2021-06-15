@@ -4,6 +4,8 @@ import Prompt from "./Prompt.js";
 
 import React from 'react';
 import APIHeader from '../services/APIHeader';
+import * as PropTypes from "prop-types";
+import {TrueFalseIconComponent} from "./TrueFalseIconComponent/TrueFalseIconComponent";
 
 export default class MainComponent extends React.Component {
 
@@ -105,7 +107,6 @@ export default class MainComponent extends React.Component {
         const {alert} = this.state;
         alert.show = false;
         this.setState({alert});
-        //console.log("auto close");
     }
     handleAlertClose = () => {
         const {alert} = this.state;
@@ -196,11 +197,10 @@ export default class MainComponent extends React.Component {
         data[property] = value;
         this.setState({data});
     }
-    setFilter=(field,value)=>{
-        console.log(field,value);
-        const {filter}=this.state;
-        filter[field]=value;
-        this.setState({filter});
+    setFilter = (field, value, callback = null) => {
+        const {filter} = this.state;
+        filter[field] = value;
+        this.setState({filter}, callback);
     }
     editorHasProblems = async () => {
         return this.apiHeader.getNumberOfAllowedMistaks().then(nMistakes => {
@@ -224,18 +224,56 @@ export default class MainComponent extends React.Component {
             return false;
         });
     }
-    getCorrectDate(date,hasTime=false){
-        let format="DD/MM/YYYY";
-        if(hasTime)
-        format +=" HH:mm";
-        if(date!='' && date!=null)
-        return moment(date).format(format);
+
+    getCorrectDate(date, hasTime = false) {
+        let format = "DD/MM/YYYY";
+        if (hasTime)
+            format += " HH:mm";
+        if (date != '' && date != null)
+            return moment(date).format(format);
         else return '';
     }
-    isEmpty(variable){
-        if(variable==null || variable==undefined || variable=='')
-            return true;
-        else 
-            return false;
+
+    isEmpty(variable) {
+        return variable == null || variable == '';
     }
+
+    getEditElement(obj, callBack, display = true) {
+        if (!display)
+            return null;
+        return <i className="fal fa-2x fa-edit color-gray pointer"
+                  onClick={() => callBack(obj)}
+        />
+    }
+
+    getEditIcon() {
+        return "fal fa-2x fa-edit color-gray2 pointer";
+    }
+
+    getDeleteElement(obj, callBack, display = true) {
+        if (!display)
+            return null;
+        return <i className="fal fa-2x fa-trash-alt color-gray pointer"
+                  onClick={() => callBack(obj)}
+        />
+    }
+
+    getDeleteIcon() {
+        return "fal fa-2x fa-trash-alt color-gray2 pointer";
+    }
+
+    getTableStyle() {
+        return "table table-striped";
+    }
+    
+    isFormValid=(id)=>{
+        const elements=$(`#${id} :input`);  
+        //console.log(elements);
+        for(let i=0;i<elements.length;i++)
+        {
+            if($(elements[i]).prop('required')&&elements[i].value=="")
+                return false;
+        }
+        return true;
+      }
 }

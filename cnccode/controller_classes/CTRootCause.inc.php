@@ -6,6 +6,9 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+
+use CNCLTD\Exceptions\APIException;
+
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BURootCause.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
@@ -22,7 +25,7 @@ class CTRootCause extends CTCNC
     public $dsRootCause;
     /** @var BURootCause */
     public $buRootCause;
-
+    const CONST_ROOT_CAUSE='rootCause';
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
@@ -45,165 +48,28 @@ class CTRootCause extends CTCNC
     {
         $this->checkPermissions(MAINTENANCE_PERMISSION);
         switch ($this->getAction()) {
-            case CTROOTCAUSE_ACT_EDIT:
-            case CTROOTCAUSE_ACT_CREATE:
-                $this->edit();
-                break;
-            case CTROOTCAUSE_ACT_DELETE:
-                $this->delete();
-                break;
-            case CTROOTCAUSE_ACT_UPDATE:
-                $this->update();
-                break;
-            case CTROOTCAUSE_ACT_DISPLAY_LIST:
+            case self::CONST_ROOT_CAUSE:
+                switch ($this->requestMethod) {
+                    case 'GET':
+                        echo  json_encode($this->getItemTypes(),JSON_NUMERIC_CHECK);
+                        break;
+                     case 'POST':
+                         echo  json_encode($this->updateItem(),JSON_NUMERIC_CHECK);
+                         break;
+                    case 'PUT':
+                        echo  json_encode($this->updateItem(),JSON_NUMERIC_CHECK);
+                        break;
+                     case 'DELETE':
+                         echo  json_encode($this->deleteItemType(),JSON_NUMERIC_CHECK);
+                         break;                    
+                }
+                exit;  
             default:
                 $this->displayList();
                 break;
         }
     }
 
-/**
-     * Edit/Add Further Action
-     * @access private
-     * @throws Exception
-     */
-    function edit()
-    {
-        $this->setMethodName('edit');
-        $dsRootCause = &$this->dsRootCause; // ref to class var
-
-        if (!$this->getFormError()) {
-            if ($this->getAction() == CTROOTCAUSE_ACT_EDIT) {
-                $this->buRootCause->getRootCauseByID($this->getParam('rootCauseID'), $dsRootCause);
-                $rootCauseID = $this->getParam('rootCauseID');
-            } else {                                                                    // creating new
-                $dsRootCause->initialise();
-                $dsRootCause->setValue(DBERootCause::rootCauseID, '0');
-                $rootCauseID = '0';
-            }
-        } else {                                                                        // form validation error
-            $dsRootCause->initialise();
-            $dsRootCause->fetchNext();
-            $rootCauseID = $dsRootCause->getValue(DBERootCause::rootCauseID);
-        }
-        $urlDelete = null;
-        $txtDelete = null;
-        if ($this->getAction() == CTROOTCAUSE_ACT_EDIT && $this->buRootCause->canDelete(
-                $this->getParam('rootCauseID')
-            )) {
-            $urlDelete = Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action'      => CTROOTCAUSE_ACT_DELETE,
-                    'rootCauseID' => $rootCauseID
-                )
-            );
-            $txtDelete = 'Delete';
-        }
-        $urlUpdate =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action'      => CTROOTCAUSE_ACT_UPDATE,
-                    'rootCauseID' => $rootCauseID
-                )
-            );
-        $urlDisplayList =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action' => CTROOTCAUSE_ACT_DISPLAY_LIST
-                )
-            );
-        $this->setPageTitle('Edit Further Action');
-        $this->setTemplateFiles(
-            array('RootCauseEdit' => 'RootCauseEdit.inc')
-        );
-        $this->template->set_var(
-            array(
-                'rootCauseID'            => $rootCauseID,
-                'description'            => Controller::htmlInputText(
-                    $dsRootCause->getValue(DBERootCause::description)
-                ),
-                'descriptionMessage'     => Controller::htmlDisplayText(
-                    $dsRootCause->getMessage(DBERootCause::description)
-                ),
-                'longDescription'        => Controller::htmlInputText(
-                    $dsRootCause->getValue(DBERootCause::longDescription)
-                ),
-                'longDescriptionMessage' => Controller::htmlDisplayText(
-                    $dsRootCause->getMessage(DBERootCause::longDescription)
-                ),
-                'fixedExplanation'       => Controller::htmlDisplayText(
-                    $dsRootCause->getValue(DBERootCause::fixedExplanation)
-                ),
-                'urlUpdate'              => $urlUpdate,
-                'urlDelete'              => $urlDelete,
-                'txtDelete'              => $txtDelete,
-                'urlDisplayList'         => $urlDisplayList
-            )
-        );
-        $this->template->parse('CONTENTS', 'RootCauseEdit', true);
-        $this->parsePage();
-    }
-
-        /**
-     * Delete Further Action
-     *
-     * @access private
-     * @authors Karim Ahmed - Sweet Code Limited
-     * @throws Exception
-     */
-    function delete()
-    {
-        $this->setMethodName('delete');
-        if (!$this->buRootCause->deleteRootCause($this->getParam('rootCauseID'))) {
-            $this->displayFatalError('Cannot delete this row');
-            exit;
-        } else {
-            $urlNext =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action' => CTROOTCAUSE_ACT_DISPLAY_LIST
-                    )
-                );
-            header('Location: ' . $urlNext);
-            exit;
-        }
-    }// end function editFurther Action()
-
-    /**
-     * Update call Further Action details
-     * @access private
-     * @throws Exception
-     */
-    function update()
-    {
-        $this->setMethodName('update');
-        $this->formError = (!$this->dsRootCause->populateFromArray($this->getParam('rootCause')));
-        if ($this->formError) {
-            if ($this->dsRootCause->getValue(DBERootCause::rootCauseID)) {
-                $this->setAction(CTROOTCAUSE_ACT_EDIT);
-            } else {
-                $this->setAction(CTROOTCAUSE_ACT_CREATE);
-            }
-            $this->edit();
-            exit;
-        }
-
-        $this->buRootCause->updateRootCause($this->dsRootCause);
-
-        $urlNext =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'rootCauseID' => $this->dsRootCause->getValue(DBERootCause::rootCauseID),
-                    'action'      => CTCNC_ACT_VIEW
-                )
-            );
-        header('Location: ' . $urlNext);
-    }
 
     /**
      * Display list of types
@@ -212,76 +78,77 @@ class CTRootCause extends CTCNC
      */
     function displayList()
     {
-        $this->setMethodName('displayList');
+        //--------new 
         $this->setPageTitle('Root Causes');
         $this->setTemplateFiles(
             array('RootCauseList' => 'RootCauseList.inc')
         );
+        $this->loadReactScript('RootCauseComponent.js');
+        $this->loadReactCSS('RootCauseComponent.css');
+        $this->template->parse(
+            'CONTENTS',
+            'RootCauseList',
+            true
+        );
+        $this->parsePage();      
+    }
+    //------------new
+    function getItemTypes()
+    {
+        $items=[];
         $dsRootCause = new DataSet($this);
         $this->buRootCause->getAll($dsRootCause);
-
-        $urlCreate = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            array(
-                'action' => CTROOTCAUSE_ACT_CREATE
-            )
-        );
-
-        $this->template->set_var(
-            array('urlCreate' => $urlCreate)
-        );
-
-        if ($dsRootCause->rowCount() > 0) {
-
-            $this->template->set_block(
-                'RootCauseList',
-                'RootCauseBlock',
-                'rootCauses'
-            );
-
+        if ($dsRootCause->rowCount() > 0) {         
             while ($dsRootCause->fetchNext()) {
 
-                $rootCauseID = $dsRootCause->getValue(DBERootCause::rootCauseID);
-
-                $urlEdit =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action'      => CTROOTCAUSE_ACT_EDIT,
-                            'rootCauseID' => $rootCauseID
-                        )
-                    );
-                $txtEdit = '[edit]';
-
-                $urlDelete = null;
-                $txtDelete = null;
-                if ($this->buRootCause->canDelete($rootCauseID)) {
-                    $urlDelete =
-                        Controller::buildLink(
-                            $_SERVER['PHP_SELF'],
-                            array(
-                                'action'      => CTROOTCAUSE_ACT_DELETE,
-                                'rootCauseID' => $rootCauseID
-                            )
-                        );
-                    $txtDelete = '[delete]';
-                }
-                $this->template->set_var(
+                $rootCauseID = $dsRootCause->getValue(DBERootCause::rootCauseID);                
+                $canDelete=$this->buRootCause->canDelete($rootCauseID);                  
+                $items []=
                     array(
                         'rootCauseID' => $rootCauseID,
                         'description' => Controller::htmlDisplayText($dsRootCause->getValue(DBERootCause::description)),
-                        'urlEdit'     => $urlEdit,
-                        'urlDelete'   => $urlDelete,
-                        'txtEdit'     => $txtEdit,
-                        'txtDelete'   => $txtDelete
-                    )
-                );
-
-                $this->template->parse('rootCauses', 'RootCauseBlock', true);
-
+                        'canDelete'   => $canDelete,               
+                        'longDescription'        => Controller::htmlInputText(
+                            $dsRootCause->getValue(DBERootCause::longDescription)
+                        ),                        
+                        'fixedExplanation'       =>  
+                            $dsRootCause->getValue(DBERootCause::fixedExplanation)
+                         ,         
+                    );
             }//while $dsRootCause->fetchNext()
         }
-        $this->template->parse('CONTENTS', 'RootCauseList', true);
-        $this->parsePage();
+        return $this->success($items);
     }
+     /**
+     * Update call Further Action details
+     * @access private
+     * @throws Exception
+     */
+    function updateItem()
+    {
+        $body=$this->getBody(true);      
+        //$this->dsRootCause->debug=true;  
+        $this->formError = (!$this->dsRootCause->populateFromArray(["0"=> $body]));
+        if ($this->formError) {
+           return $this->fail(APIException::badRequest,"Error in save data");
+        }
+        $this->buRootCause->updateRootCause($this->dsRootCause);
+        return $this->success();
+    }
+         /**
+     * Delete Further Action
+     *
+     * @access private
+     * @authors Karim Ahmed - Sweet Code Limited
+     * @throws Exception
+     */
+    function deleteItemType()
+    {
+         if (!$this->buRootCause->deleteRootCause($this->getParam('rootCauseID'))) {
+             return $this->fail(APIException::badRequest,'Cannot delete this row');
+          
+        } 
+        return $this->success();
+    }// end function editFurther Action()
+
 }

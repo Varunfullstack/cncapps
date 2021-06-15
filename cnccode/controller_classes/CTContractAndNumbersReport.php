@@ -6,6 +6,9 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+
+use Syonix\ChangelogViewer\Factory\ViewerFactory;
+
 global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 

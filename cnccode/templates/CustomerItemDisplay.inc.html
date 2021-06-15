@@ -220,21 +220,35 @@
         </tr>
         <TR>
             <TD class="promptText">Server Name</TD>
-            <TD class="field"><span class="displayfield">
-      <input
-              type="text"
-              name="customerItem[1][serverName]"
-              id="customerItem[1][serverName]"
-              value="{serverName}"
-              {readonly}
-              size="50"
-              maxlength="50"
-      >
-      </span>
+            <TD class="field">
+
+                <input
+                        type="text"
+                        name="customerItem[1][serverName]"
+                        id="customerItem[1][serverName]"
+                        value="{serverName}"
+                        {readonly}
+                        size="50"
+                        maxlength="50"
+                >
+
             </TD>
         </TR>
+        <tr>
+            <td class="promptText">Bypass CWA Agent Check</td>
+            <td colspan="2">
+                <input
+                        name="customerItem[1][bypassCWAAgentCheck]"
+                        type="checkbox"
+                        {bypassCWAAgentCheckChecked}
+                        {readonly}
+                        value="1"
+                >
+                Item is supported but can't have the CWA installed on it
+            </td>
+        </tr>
 
-        <tr id="secondsiteLocalExcludeFlag">
+        <tr>
             <td class="promptText">Exclude Offsite Backup check</td>
             <td colspan="2">
                 <input
@@ -245,6 +259,7 @@
                         {readonly}
                         value="Y"
                 >
+            </td>
         </tr>
 
         <tr id="secondSiteReplicationExcludeFlagRow">
@@ -258,6 +273,7 @@
                         {readonly}
                         value="Y"
                 >
+            </td>
         </tr>
 
         <tr>
@@ -386,6 +402,12 @@
                 </select>
                 <font class="formErrorMessage">{secondsiteImageDelayDaysMessage}</font>
                 {imageDelayByText}
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Server Used Space</td>
+            <td colspan="2">
+                {serverUsedSpace}
             </td>
         </tr>
 

@@ -7,13 +7,14 @@
  * @authors Karim Ahmed - Sweet Code Limited
  */
 
+use CNCLTD\Business\BUActivity;
+use CNCLTD\Data\CallBackStatus;
+use CNCLTD\Data\DBConnect;
 use CNCLTD\SDManagerDashboard\ServiceRequestSummaryDTO;
 use CNCLTD\Utils;
 
 global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
-require_once($cfg['path_bu'] . '/BUActivity.inc.php');
-require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 require_once($cfg['path_bu'] . '/BUUser.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
 require_once($cfg['path_dbe'] . '/DBEPendingReopened.php');
@@ -40,9 +41,9 @@ class CTCurrentActivityReport extends CTCNC
     var $priority      = array();
     var $loggedInUserIsSdManager;
     var $customerFilterList;
-    const CONST_CALLBACK        = 'callback';
-    const CONST_CALLBACK_SEARCH = 'callbackSearch';
-
+    const CONST_CALLBACK                 = 'callback';
+    const CONST_CALLBACK_SEARCH          = 'callbackSearch';
+    const CONST_ALLOCATE_ADDITIONAL_TIME = 'allocateAdditionalTime';
     /**
      * @var BUCustomerItem
      */
@@ -158,12 +159,18 @@ class CTCurrentActivityReport extends CTCNC
             case self::CONST_CALLBACK_SEARCH:
                 echo json_encode($this->callBackSearch());
                 break;
+            case self::CONST_ALLOCATE_ADDITIONAL_TIME:
+                echo json_encode($this->allocateAdditionalTime());
+                break;
             default:
                 $this->setTemplate();
                 break;
         }
     }
 
+    /**
+     * @throws \CNCLTD\Exceptions\ColumnOutOfRangeException
+     */
     private function renderQueue($queueNo)
     {
         if ($queueNo == self::FIXED_AWAITING_CLOSURE) {
@@ -178,7 +185,7 @@ class CTCurrentActivityReport extends CTCNC
         }
         $result = [];
         while ($serviceRequests->fetchNext()) {
-            $result[] = ServiceRequestSummaryDTO::fromDBEJProblem($serviceRequests);
+            $result[] = ServiceRequestSummaryDTO::fromDBEJProblem($serviceRequests, $this->getDbeUser());
         }
         return $result;
     }
@@ -202,7 +209,7 @@ class CTCurrentActivityReport extends CTCNC
     function getAllocatedUsers()
     {
         $dbeUser = new DBEUser($this);
-        $dbeUser->getRows('firstName');
+        $dbeUser->getActiveUsers();
         $allocatedUser = array();
         while ($dbeUser->fetchNext()) {
 
@@ -295,6 +302,7 @@ class CTCurrentActivityReport extends CTCNC
                         'cpUrlCustomer'       => $urlCustomer,
                         'cpBgColor'           => $bgColour,
                         'cpCount'             => $count,
+                        'emailSubject'        => $customerRaisedRequests->Record['emailSubject']
                     )
                 );
             } while ($customerRaisedRequests->next_record());
@@ -587,7 +595,6 @@ class CTCurrentActivityReport extends CTCNC
         $problemID         = $body->problemID;
         $customerID        = $body->customerID;
         $contactID         = $body->contactID;
-        $callActivityID    = $body->callActivityID;
         $description       = $body->description;
         $callback_datetime = $body->date . ' ' . $body->time . ':00';
         $notifyTeamLead    = $body->notifyTeamLead ? 1 : 0;
@@ -604,7 +611,6 @@ class CTCurrentActivityReport extends CTCNC
             
             `consID`,
             `problemID`,
-            `callActivityID`,
             `contactID`,
             `description`,
             `callback_datetime`,
@@ -616,7 +622,6 @@ class CTCurrentActivityReport extends CTCNC
             (              
               :consID,
               :problemID,
-              :callActivityID,
               :contactID,
               :description,
               :callback_datetime,
@@ -631,7 +636,6 @@ class CTCurrentActivityReport extends CTCNC
             [
                 "consID"            => $this->dbeUser->getPKValue(),
                 "problemID"         => $problemID,
-                "callActivityID"    => $callActivityID,
                 "contactID"         => $contactID,
                 "description"       => $description,
                 "callback_datetime" => $callback_datetime,
@@ -703,18 +707,21 @@ class CTCurrentActivityReport extends CTCNC
                 $body       = $twig->render(
                     '@internal/callBackEmail.html.twig',
                     [
-                        'createAt'          => date($dateTimeFormat, strtotime($createAt)),
-                        'urlService'        => $urlService,
-                        'contactName'       => $contactName,
-                        'customerName'      => $customer->getValue(DBECustomer::name),
-                        'serviceRequestId'  => $problemID,
-                        'callback_datetime' => $callDateTime->format($dateTimeFormat),
-                        'reason'            => $description != "" ? "Additional Information: " . $description : "",
+                        'createAt'           => date($dateTimeFormat, strtotime($createAt)),
+                        'urlService'         => $urlService,
+                        'contactName'        => $contactName,
+                        'customerName'       => $customer->getValue(DBECustomer::name),
+                        'serviceRequestId'   => $problemID,
+                        'callback_datetime'  => $callDateTime->format($dateTimeFormat),
+                        'reason'             => $description != "" ? "Additional Information: " . $description : "",
+                        'consultantFullName' => "{$this->dbeUser->getValue(DBEUser::firstName)} {$this->dbeUser->getValue(DBEUser::lastName)}"
                     ]
                 );
                 $buMail->sendSimpleEmail($body, $subject, $to, CONFIG_SUPPORT_EMAIL, $cc);
             }
         }
+        $buActivity = new BUActivity($this);
+        $buActivity->updateInbound($dbeCallActivity->getPKValue(), true);
         return ["status" => true, "callActivityID" => $dbeCallActivity->getPKValue()];
     }
 
@@ -735,7 +742,7 @@ class CTCurrentActivityReport extends CTCNC
             if ($customerID != '') $customerCondition = " and  p.pro_custno = $customerID";
             $unAssigned = "or (p.`pro_consno`is null $teamCondition )";
         }
-        $query      = "SELECT cb.id, cb.consID,cb.problemID,cb.callActivityID,cb.contactID,cb.DESCRIPTION,cb.callback_datetime,cb.createAt,
+        $query      = "SELECT cb.id, cb.consID,cb.problemID,cb.contactID,cb.DESCRIPTION,cb.callback_datetime,cb.createAt,
                     concat(c.con_first_name,' ',c.con_last_name) contactName,
                     cus_name customerName,
                     TIMESTAMPDIFF(MINUTE,NOW(),cb.callback_datetime) timeRemain,
@@ -768,10 +775,9 @@ class CTCurrentActivityReport extends CTCNC
             $problemID  = $dbeCallBack->getValue(DBECallback::problemID);
             $dbeContact = new DBEContact($this);
             $dbeContact->getRow($contactID);
-            $contactName = $dbeContact->getValue(DBEContact::firstName) . " " . $dbeContact->getValue(
+            $contactName     = $dbeContact->getValue(DBEContact::firstName) . " " . $dbeContact->getValue(
                     DBEContact::lastName
                 );
-            // add activity
             $dbeCallActivity = new DBECallActivity($this);
             $dbeCallActivity->setValue(DBECallActivity::callActTypeID, 11);
             $dbeCallActivity->setValue(DBECallActivity::contactID, $contactID);
@@ -779,13 +785,14 @@ class CTCurrentActivityReport extends CTCNC
             $dbeCallActivity->setValue(DBECallActivity::userID, $this->dbeUser->getPKValue());
             $dbeCallActivity->setValue(DBECallActivity::date, date('Y-m-d'));
             $dbeCallActivity->setValue(DBECallActivity::startTime, date('H:i'));
-            // $endTime = new DateTime();
-            // $dbeCallActivity->setValue(DBECallActivity::endTime, $endTime->format('H:i'));
             $dbeCallActivity->setValue(DBECallActivity::reason, 'I have returned the call for ' . $contactName);
-            //$dbeCallActivity->setValue(DBECallActivity::cncNextAction,"Please call $contactName at ".$callDateTime->format('Y-m-d')." at ".$callDateTime->format('H:i'));
             $dbeCallActivity->setValue(DBECallActivity::awaitingCustomerResponseFlag, "N");
             $dbeCallActivity->setValue(DBECallActivity::problemID, $problemID);
             $dbeCallActivity->insertRow();
+            $dbeProblem = new DBEProblem($this);
+            $dbeProblem->getRow($problemID);
+            $dbeProblem->setValue(DBEProblem::status, 'P');
+            $dbeProblem->updateRow();
             return ['status' => true, "callActivityID" => $dbeCallActivity->getPKValue()];
         } catch (Exception $ex) {
             return ['status' => false, 'error' => $ex->getMessage()];
@@ -841,7 +848,7 @@ class CTCurrentActivityReport extends CTCNC
         $from       = $this->getParamOrNull('from');
         $to         = $this->getParamOrNull('to');
         $status     = $this->getParamOrNull('status');
-        $query      = "SELECT cb.id, cb.consID,cb.problemID,cb.callActivityID,cb.contactID,cb.DESCRIPTION,cb.callback_datetime,cb.createAt,
+        $query      = "SELECT cb.id, cb.consID,cb.problemID,cb.contactID,cb.DESCRIPTION,cb.callback_datetime,cb.createAt,
         concat(c.con_first_name,' ',c.con_last_name) contactName,
         cus_name customerName,
         TIMESTAMPDIFF(MINUTE,NOW(),cb.callback_datetime) timeRemain,
@@ -869,5 +876,45 @@ class CTCurrentActivityReport extends CTCNC
                 "status"     => $status
             ]
         );
+    }
+
+    /**
+     * @throws Exception
+     */
+    function allocateAdditionalTime()
+    {
+        $this->setMethodName('allocateAdditionalTime');
+        $body     = $this->getBody();
+        $buHeader = new BUHeader($this);
+        /** @var $dsHeader DataSet */
+        $buHeader->getHeader($dsHeader);
+        $minutesInADay = $dsHeader->getValue(DBEHeader::smallProjectsTeamMinutesInADay);
+        /* validate if this is a POST request */
+        $minutes   = 0;
+        $teamLevel = $this->buActivity->getQueueTeamLevel($body->queueID);
+        switch ($body->allocatedTimeAmount) {
+            case 'minutes':
+                $minutes = $body->allocatedTimeValue;
+                break;
+            case 'hours':
+                $minutes = $body->allocatedTimeValue * 60;
+                break;
+            case 'days':
+                $minutes = $minutesInADay * $body->allocatedTimeValue;
+        }
+        $this->buActivity->allocateAdditionalTime(
+            $body->problemID,
+            $teamLevel,
+            $minutes,
+            $body->comments,
+            $this->dbeUser
+        );
+        $dbeTeam = new DBETeam($this);
+        $dbeTeam->getRow($body->teamID);
+        $this->buActivity->logOperationalActivity(
+            $body->problemID,
+            "<p>Additional time allocated to {$this->buActivity->getTeamName($teamLevel)} Team: {$minutes} minutes</p><p>{$body->comments}</p>"
+        );
+        return ["status" => true];
     }
 }

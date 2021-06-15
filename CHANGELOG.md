@@ -8,6 +8,328 @@ This project changes will be shown here.
 - Issue 914 - Customer Page Customer Notes, Projects, Portal Documents Rewrite
 - Issue 915 - Customer Page Sites Rewrite
 
+## [v5.13.1] - 2021-06-11
+### Fixed
+- Fixed issue with Supplier field outline in supplier selector react component.
+- Fixed issue with box missing around options in Customer picker at StreamOneCustomerLicenses.
+- Fixed issue with Pre-Pay.
+- Fixed issue with saving Item without renewal type.
+- Fixed issue with sales orders labour lines not having the right supplier.
+- Fixed issue with forcibly closing Service Requests.
+- Fixed issue with Source of Requests chart not picking the right date range.
+
+## [v5.13.0] - 2021-06-10
+### Changed
+- Issue 1431 - StreamOne count current and old part code
+### Fixed
+- Issue 1437 -  Password page for referred customers doesn't load
+- Issue 1436 - Signable Customer Order documents doubling up.
+
+## [v5.12.3] - 2021-06-08
+### Fixed
+- Fix issue with closing Service Request.
+
+## [v5.12.2] - 2021-06-07
+### Fixed
+- Fixed issue with Prepay.
+
+## [v5.12.1] - 2021-06-04
+### Fixed
+- Fixed issue with salesFigures in the home page.
+- Fixed issue with mySettingsComponent not building properly.
+- Fixed issue with CreateSalesRequests not having the message filled in properly on load.
+
+## [v5.12.0] - 2021-06-03
+### Added
+- Issue 1402 - Standard Rate Card.
+- Issue 1379 - Change status of Sales Orders & Purchase Orders
+### Changed
+- Issue 1399 - Force Customer Name when creating Templated Sales Quotation.
+- Issue 1368 - convert StarterLeaverManagement.php,  RootCause.php, UtilityEmails.php, IgnoredADDomains.php, Office365Licenses.php and SRSource.php
+- Issue 1421 - Show On Hold Date & Time on SR
+- Issue 1418 - SR Statistics to breakdown visible and proactive SRs.
+- Issue 1420 - Include numbers of FTF & Source in Meeting Agenda
+- Issue 1428 - Only show active staff on Team Management Modal
+- Issue 1423 - Project Report showing budgets
+
+## [v5.11.12] - 2021-06-01
+### Fixed
+- Fixed issue with alarm date time not being parsed properly when running AutoCompletion task.
+- Fixed issue with Fixed service requests having open activities.
+
+## [v5.11.11] - 2021-05-28
+### Fixed
+- Fixed issue with Automated Import Requests.
+
+## [v5.11.10] - 2021-05-27
+### Fixed
+- Fixed issue with Header losing the value for ExpensesNextProcessingDate when saving.
+- Fixed issue with SR Asset information.
+
+## [v5.11.9] - 2021-05-24
+### Fixed
+- Fixed issue with SecondSiteBackupValidation
+- Fixed issue with RequestDashboard
+
+## [v5.11.8] - 2021-05-24
+### Fixed
+- Fixed issue with graphs
+
+## [v5.11.7] - 2021-05-21
+### Fixed
+- Fixed issue with Daily Stats and performance stats.
+
+## [v5.11.6] - 2021-05-21
+### Fixed
+- Fixed issue with OffsiteBackupStatus when doing "check now" on a suspended server.
+
+## [v5.11.5] - 2021-05-21
+### Fixed
+- Fixed issue with RequestDashboard.
+- Fixed several warnings that show up in the error log.
+
+## [v5.11.4] - 2021-05-20
+### Changed
+- Change createSalesRequest button to Submit.
+- Make "Other Request" option the default one, and enforce an option to be selected to continue.
+### Fixed
+- Fixed issue in Office365Licenses while trying to add a new record.
+- Fixed issue when a user is trying to cancel a chargeable request.
+
+## [v5.11.3] - 2021-05-18
+### Fixed
+- Fixed issue with Office365 license export.
+- Fixed issue with ServiceRequestsByCustomerReport permissions.
+- Fixed issue with Password not clearing form after adding a password.
+
+## [v5.11.2] - 2021-05-17
+### Fixed
+- Fixe issue with Broadband contracts.
+
+## [v5.11.1] - 2021-05-14
+### Fixed
+- Fixed issue with receipts not having the right path.
+- Fixed issue with SLAPerformance showing errors.
+
+## [v5.11.0] - 2021-05-14
+### Added
+- Issue 1385 - Send notification when a new customer is added.
+### Changed
+- Issue 1229 - Rearrange external files location
+- Issue 1372 - Improved Error handling for Removing qsystem assigned SRs
+- Issue 1380 - Edit Items within contracts & renewals
+- Issue 1364 - Update Header.php to be in react and update app exception
+- Issue 1363 - Make homepage Daily Stats clickable to show results
+- Issue 1389 - Customer Feedback date criteria.
+- Issue 1395 - Set Call backs as Inbound Customer Contact.
+- Issue 1392 - Direct Debit email formatting changes.
+### Fixed
+- Issue 1393 - Parts Used Send button issue.
+- Issue 1382 - IP Range restriction error.
+- Issue 1396 - Double quote characters not displaying on password page.
+### Removed
+- Issue 1375 - Error logged for DailySalesRequestEmail.php.
+
+## [v5.10.4] - 2021-05-13
+### Fixed
+- Fixed issue with PrePay contracts when fixing a Service Request.
+
+## [v5.10.3] - 2021-05-12
+## Fixed 
+- Fixed issue with customer stats.
+- Created one off script to fix issue with callbacks setting the wrong responded hours value.
+
+## [v5.10.2] - 2021-05-10
+### Fixed
+- Fix issue with BCC on customer emails flag
+
+## [v5.10.1] - 2021-05-07
+### Changed
+- Change Daily Stats "Daily Contact" text colour
+### Fixed
+- OSSupportDates fails to load
+
+## [v5.10.0] - 2021-05-05
+### Added
+- Issue 1355 - Added a one off script to create Microsoft 365 Support items in contracts for customers.
+- Issue 1223 - Update Patch Management Contract numbers automatically
+- Issue 1358 - Include Tasklist in the SR History Popup.
+- Issue 1117 - CKEditor allow pasting embedded image.
+- Issue 1240 - Designate Customer Contact as Inbound or Outbound.
+- Issue 1370 - Include Percentage of values in SR Source report
+### Changed
+- Issue 1359 - Change priority from Current Service Request page.
+- Issue 1357 - Enter reason when cancelling a chargeable customer request.
+- Issue 1361 - Add option to Force Completion of an SR
+- Issue 1356 - Show Asset on Fixed Summary page
+- Issue 1367 - Project Options GUI tweak
+### Fixed
+- Issue 1360 - Creating sales orders for customers with incomplete details.
+
+## [v5.9.3] - 2021-05-04
+### Fixed
+- Fixed issue with Meeting agenda showing repeated months in Recent Service Requests graph.
+
+## [v5.9.2] - 2021-05-01
+### Fixed
+- Fixed issue with SLAPerformance
+
+## [v5.9.1] - 2021-04-29
+### Fixed
+- Fixed issue with ensuring HD had at least 3 minutes not working as intended.
+
+## [v5.9.0] - 2021-04-28
+### Added
+- Issue 1280 - Duo Usage Portal in Portal.
+- Issue 1342 - Add Call back icon within the SR
+- Issue 1347 - Mass deletion of Initial Service Requests
+- Issue 1311 - Show related requests when raising new ones.
+### Changed
+- Issue 1217 - Force T&M when SR has Call Out Expense.
+- Issue 1305 - Deleting SR that has a callback is prevented.
+- Issue 1331 - Asset list export field types
+- Issue 1344 - Show pending call backs against the SR in the queue
+- Issue 1341 - Allocate a minimum of 3 helpdesk minutes to open SRs
+- Issue 1346 - Sales Requests auto assignment
+- Issue 1339 - Update item master price from Sales Order
+- Issue 1350 - Grammar Exclusions for Spellchecker
+- Issue 1343 - Paste into the Fixed Explanation when the SR is hidden from customer
+- Issue 1348 - Mass SR Assignment enhancements
+- Issue 1330 - Review Meeting Agenda Enhancements
+### Fixed
+- Issue 1226 - StreamOne error handling
+- Issue 1349 - Duplicate Duplicate Contact Warning.
+
+## [v5.8.6] - 2021-04-22
+### Fixed
+- Fixed inability to add new passwords.
+
+## [v5.8.5] - 2021-04-20
+### Fixed
+- Fixed UpdatePriceItemFromStreamOne not sending information in the emails sent regarding missing licenses.
+- Fixed Item.php discontinued filter been swapped.
+
+## [v5.8.4] - 2021-04-19
+### Fixed
+- Fixe issue with Password not working from SR link
+
+## [v5.8.3] - 2021-04-19
+### Fixed
+- Fixed issue with sales order page not reloading when inserting template
+- Fixed issue with sales password handling
+- Removed Password link from customer page
+- Fixed Office 365 Backup license calculation
+
+## [v5.8.2] - 2021-04-14
+### Fixed
+- Fixed issue preventing from saving new items.
+- Fixed issue with CSV not showing new fields from RenewalsDashboard.
+- Fixed issue that allowed to change a PO that is in Part Received state.
+
+## [v5.8.1] - 2021-04-13
+### Added
+- Added the possibility of providing dates to the customerSatisfactionScore API endpoint.
+### Changed
+- Made UserName, Service and password columns in Password.php non-wrapping.
+- Moved copy-to-clipboard icon before the field text in the columns to improve alignment.
+- Prevent First Time Fix modal from showing when logging a new SR that is a change and not a fix.
+### Fixed
+- Fixed wrong math in customerSatisfactionScore.
+- Fixed wrong customer item link in SupportedCustomerAssets web version pointing to the contract and not to the machine.
+
+## [v5.8.0] - 2021-04-12
+### Added
+- Issue 1286 - Add Generate Password Icon to Edit SR page
+- Issue 1288 - Add the columns for Cost Price/Annum and Sales Price/Annum for these tabs: Renewals,Domains,Web Hosting.
+- Issue 1289 - Add SR what3Words icon.
+- Issue 1291 - Add In Stock check to sales order.
+- Issue 1290 - Update prices in new order line from "copy to order".
+- Issue 1308 - Added Allocate more time modal.
+- Issue 1329 - Add sales order to RequestDashboard
+- Issue 1328 - Starting SR from a call back can cause SLA to fail
+- Issue 1323 - Include Mailbox Additional Permission in Office 365 Mailbox Export
+- Issue 1322 - Allow Mass assignment of SRs.
+### Changed
+- Issue 1276 - Monitored SR email, Change Status: Awaiting Customer to Status: On Hold
+- Issue 1310 - Show sales orders on overtime page.
+- Issue 1296 - Make Project Stage required and set default value to Pre-planning
+- Issue 1316 - On site Visit Confirmation CC & BCC changes
+- Issue 1292 - Call Back processing open in a new tab
+- Issue 1273 - Include email subject into CurrentActivityReport.php and auto populate the Email Subject Summary from the email subject TBL
+- Issue 1298 - Ask if request is a change or a fix when logging
+- Issue 1318 - Allocate SRs from Aged SRs page
+- Issue 1309 - Allow manual SR summary reason when creating SRs from Sales Orders
+- Issue 1319 - Don't allow SR to be Fixed when there's an outstanding call back
+- Issue 1258 - upgrade LeadStatusTypes.php,CustomerType.php,Sector.php,ItemType.php,ExpenseType.php,Manufacturer.php,Team.php,createSalesRequest.php,Item.php,Password.php
+- Issue 1313 - Call back email to include the name of the person that took it
+- Issue 1320 - Project page report enhancements
+- Issue 1287 - New SR from Pending Reopen re-write
+- Issue 1326 - Supported Customer Assets Refinements.
+### Fixed
+- Issue 1314 - Scheduled SRs that are due on Mondays don't get created.
+- Issue 1317 - Duplication of lines in Sales Orders
+- Issue 1315 - OBRS update path & Check Now
+- Issue 1312 - Amending a line in a Sales Order opens a new tab
+- Issue 1324 - KPI Reports - Billed Consultancy Data showing wrong values
+
+## [v5.7.6] - 2021-04-06
+### Changed
+- Added means of getting more information about failed queries
+### Fixed
+- Fixed issue with Team Performance not showing any data.
+- Fixed issue with Feedback email getting sent
+
+## [v5.7.5] - 2021-04-21
+### Fixed
+- Asset extract information not pulling serial numbers
+- Files in AssetListExport.zip has misaligned headers
+- Print invoice process fails to update the invoice printed date and year/month field
+- Trans.csv file does not have the date column filled in
+- Updating user resets the consultant.Callbackemail
+
+## [v5.7.4] - 2021-03-30
+### Fixed
+- Only notify Non UK active contacts of UK National Holidays
+
+## [v5.7.3] - 2021-03-29
+### Added
+- Create a new one off script that allows to get the sage files sent for any given printed date
+### Fixed
+- Fixed issue with supplier search causing issues while trying to add sales orders lines
+- Fixed issue with sending invoices to clients
+- Fixed issue with OutstandingActiveActivitiesEmail failing to send
+
+## [v5.7.2] - 2021-03-26
+### Fixed
+- Fixed issue with wrong assignment of item id when creating a sales order line
+
+## [v5.7.1] - 2021-03-26
+### Fixed
+- ContactImport failing to import
+- Customer Feedback time format
+- Fixed issue with Webroot/Automate duplicated raised SR's not having asset title breaking the activity pages
+- Fixed issue with internal documents not showing on load
+- Fixed issue with saving User losing the siteCustomer assigned
+### Removed
+- Remove the logging of SR when a webroot endpoint should be deactivated.
+
+## [v5.7.0] - 2021-03-25
+### Added
+- Issue 1247 - Customer approval for extra chargeable work.
+- Issue 1254 - Report on duplicate MS Office licenses.
+- Issue 1265 - Calculate and store the amount of OBRS storage per customer / server
+- Issue 1249 - Webroot & Automate asset comparison and resolution.
+### Changed
+- Issue 648 - Move contacts that are linked to a supplier to their own table.
+- Issue 1230 - Show supported / unsupported customer assets.
+- Issue 1294 - Import customers from CSV v2.
+- Issue 1297 - Task List Modal, refine list of items.
+- Issue 1267 - Customer Feedback Improvements.
+- Issue 1284 - Office 365 Backup Error Handling
+### Fixed
+- Issue 1299 - Unexpected characters in PDF quotes
+- Issue 1300 - Remove 'leave this site' warning from Edit SR page.
+
 ## [v5.6.5] - 2021-03-22
 ### Fixed
 - Fixed changes with page title/header
@@ -616,7 +938,6 @@ informing about this odd issue.
 - Issue 921 - Record the source of a SR, phone, email or portal
 - Issue 895 - Leased line contract expiry notification
 - Issue 539 - Office 365 license API with Techdata
-
 ### Changed
 - Issue 818 - Confirm Report Logic / calculations
 - Issue 925 - Improve Double Quote handling in passwords fields

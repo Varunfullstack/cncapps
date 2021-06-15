@@ -38,7 +38,7 @@ class RenewalsDashboardComponent extends MainComponent {
             {id: this.TAB_CONTRACT, title: "Contracts", icon: null},
             {id: this.TAB_INTERNET, title: "Internet", icon: null},
             {id: this.TAB_DOMAIN, title: "Domains", icon: null},
-            {id: this.TAB_HOSTING, title: "Hosting", icon: null},
+            {id: this.TAB_HOSTING, title: "Web Hosting", icon: null},
         ];
     }
 

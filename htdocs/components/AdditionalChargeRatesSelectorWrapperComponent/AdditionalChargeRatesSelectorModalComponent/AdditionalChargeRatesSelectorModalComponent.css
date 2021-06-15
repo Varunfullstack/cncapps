@@ -1,0 +1,7 @@
+tr.line-select {
+    cursor: pointer;
+}
+
+tr.line-select:hover {
+    background-color: blue;
+}

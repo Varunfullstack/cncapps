@@ -9,72 +9,75 @@ require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBEUser extends DBEntity
 {
-    const userID                    = "userID";
-    const managerID                 = "managerID";
-    const name                      = "name";
-    const salutation                = "salutation";
-    const add1                      = "add1";
-    const add2                      = "add2";
-    const add3                      = "add3";
-    const town                      = "town";
-    const county                    = "county";
-    const postcode                  = "postcode";
-    const username                  = "username";
-    const employeeNo                = "employeeNo";
-    const petrolRate                = "petrolRate";
-    const perms                     = "perms";
-    const signatureFilename         = "signatureFilename";
-    const jobTitle                  = "jobTitle";
-    const firstName                 = "firstName";
-    const lastName                  = "lastName";
-    const activeFlag                = "activeFlag";
-    const helpdeskFlag              = "helpdeskFlag";
-    const hourlyPayRate             = "hourlyPayRate";
-    const teamID                    = "teamID";
-    const receiveSdManagerEmailFlag = "receiveSdManagerEmailFlag";
-    const changePriorityFlag        = "changePriorityFlag";
-    const appearInQueueFlag         = "appearInQueueFlag";
-    const standardDayHours          = "standardDayHours";
-    const admin                     = 'admin';
-    const excludeFromStatsFlag      = "excludeFromStatsFlag";
-    const queueManager              = 'queueManager';
-    const projectManagementFlag     = 'projectManagementFlag';
+    const userID                                          = "userID";
+    const managerID                                       = "managerID";
+    const name                                            = "name";
+    const salutation                                      = "salutation";
+    const add1                                            = "add1";
+    const add2                                            = "add2";
+    const add3                                            = "add3";
+    const town                                            = "town";
+    const county                                          = "county";
+    const postcode                                        = "postcode";
+    const username                                        = "username";
+    const employeeNo                                      = "employeeNo";
+    const petrolRate                                      = "petrolRate";
+    const perms                                           = "perms";
+    const signatureFilename                               = "signatureFilename";
+    const jobTitle                                        = "jobTitle";
+    const firstName                                       = "firstName";
+    const lastName                                        = "lastName";
+    const activeFlag                                      = "activeFlag";
+    const helpdeskFlag                                    = "helpdeskFlag";
+    const hourlyPayRate                                   = "hourlyPayRate";
+    const teamID                                          = "teamID";
+    const receiveSdManagerEmailFlag                       = "receiveSdManagerEmailFlag";
+    const changePriorityFlag                              = "changePriorityFlag";
+    const appearInQueueFlag                               = "appearInQueueFlag";
+    const standardDayHours                                = "standardDayHours";
+    const admin                                           = 'admin';
+    const excludeFromStatsFlag                            = "excludeFromStatsFlag";
+    const queueManager                                    = 'queueManager';
+    const projectManagementFlag                           = 'projectManagementFlag';
+    const encryptedDateOfBirth                            = "encryptedDateOfBirth";
+    const startDate                                       = "startDate";
+    const companyHealthcareStartDate                      = "companyHealthcareStartDate";
+    const enhancedCNC2YearPensionStartDate                = "enhancedCNC2YearPensionStartDate";
+    const encryptedPensionAdditionalPayments              = "encryptedPensionAdditionalPayments";
+    const encryptedSalary                                 = "encryptedSalary";
+    const encryptedSalarySacrifice                        = "encryptedSalarySacrifice";
+    const hoursWorkedInAWeek                              = "hoursWorkedInAWeek";
+    const encryptedNationalInsuranceNumber                = "encryptedNationalInsuranceNumber";
+    const encryptedAddress1                               = "encryptedAddress1";
+    const encryptedAddress2                               = "encryptedAddress2";
+    const encryptedAddress3                               = "encryptedAddress3";
+    const encryptedTown                                   = "encryptedTown";
+    const encryptedCounty                                 = "encryptedCounty";
+    const encryptedPostcode                               = "encryptedPostcode";
+    const staffAppraiserFlag                              = 'staffAppraiserFlag';
+    const passwordLevel                                   = 'passwordLevel';
+    const changeSRContractsFlag                           = 'changeSRContractsFlag';
+    const starterLeaverQuestionManagementFlag             = 'starterLeaverQuestionManagementFlag';
+    const offsiteBackupAdditionalPermissionsFlag          = 'offsiteBackupAdditionalPermissionsFlag';
+    const salesPasswordAccess                             = 'salesPasswordAccess';
+    const createRenewalSalesOrdersFlag                    = "createRenewalSalesOrdersFlag";
+    const expenseApproverID                               = 'expenseApproverID';
+    const autoApproveExpenses                             = 'autoApproveExpenses';
+    const isExpenseApprover                               = "isExpenseApprover";
+    const globalExpenseApprover                           = "globalExpenseApprover";
+    const additionalTimeLevelApprover                     = "additionalTimeLevelApprover";
+    const sendEmailWhenAssignedService                    = "sendEmailAssignedService";
+    const basedAtCustomerSite                             = "basedAtCustomerSite";
+    const siteCustId                                      = "siteCustId";
+    const streamOneLicenseManagement                      = "streamOneLicenseManagement";
+    const excludeFromSDManagerDashboard                   = "excludeFromSDManagerDashboard";
+    const holdAllSRsforQAReview                           = "holdAllSRsforQAReview";
+    const bccOnCustomerEmails                             = "bccOnCustomerEmails";
+    const callBackEmail                                   = "callBackEmail";
+    const massDeletionOnUnstartedServiceRequestPermission = "massDeletionOnUnstartedServiceRequestPermission";
+    const forceClosingPermission                          = "forceClosingPermission";
+    const changeSalesOrdersStatusPermission               = "changeSalesOrdersStatusPermission";
 
-    const encryptedDateOfBirth                   = "encryptedDateOfBirth";
-    const startDate                              = "startDate";
-    const companyHealthcareStartDate             = "companyHealthcareStartDate";
-    const enhancedCNC2YearPensionStartDate       = "enhancedCNC2YearPensionStartDate";
-    const encryptedPensionAdditionalPayments     = "encryptedPensionAdditionalPayments";
-    const encryptedSalary                        = "encryptedSalary";
-    const encryptedSalarySacrifice               = "encryptedSalarySacrifice";
-    const hoursWorkedInAWeek                     = "hoursWorkedInAWeek";
-    const encryptedNationalInsuranceNumber       = "encryptedNationalInsuranceNumber";
-    const encryptedAddress1                      = "encryptedAddress1";
-    const encryptedAddress2                      = "encryptedAddress2";
-    const encryptedAddress3                      = "encryptedAddress3";
-    const encryptedTown                          = "encryptedTown";
-    const encryptedCounty                        = "encryptedCounty";
-    const encryptedPostcode                      = "encryptedPostcode";
-    const staffAppraiserFlag                     = 'staffAppraiserFlag';
-    const passwordLevel                          = 'passwordLevel';
-    const changeSRContractsFlag                  = 'changeSRContractsFlag';
-    const starterLeaverQuestionManagementFlag    = 'starterLeaverQuestionManagementFlag';
-    const offsiteBackupAdditionalPermissionsFlag = 'offsiteBackupAdditionalPermissionsFlag';
-    const salesPasswordAccess                    = 'salesPasswordAccess';
-    const createRenewalSalesOrdersFlag           = "createRenewalSalesOrdersFlag";
-    const expenseApproverID                      = 'expenseApproverID';
-    const autoApproveExpenses                    = 'autoApproveExpenses';
-    const isExpenseApprover                      = "isExpenseApprover";
-    const globalExpenseApprover                  = "globalExpenseApprover";
-    const additionalTimeLevelApprover            = "additionalTimeLevelApprover";
-    const sendEmailWhenAssignedService           = "sendEmailAssignedService";
-    const basedAtCustomerSite                    = "basedAtCustomerSite";
-    const siteCustId                             = "siteCustId";
-    const streamOneLicenseManagement             = "streamOneLicenseManagement";
-    const excludeFromSDManagerDashboard          = "excludeFromSDManagerDashboard";
-    const holdAllSRsforQAReview                  = "holdAllSRsforQAReview";
-    const bccOnCustomerEmails                    = "bccOnCustomerEmails";
-    const callBackEmail                          = "callBackEmail";
     /**
      * calls constructor()
      * @access public
@@ -411,7 +414,10 @@ class DBEUser extends DBEntity
         $this->addColumn(self::sendEmailWhenAssignedService, DA_BOOLEAN, DA_NOT_NULL, null, 1);
         $this->addColumn(self::holdAllSRsforQAReview, DA_BOOLEAN, DA_NOT_NULL, null, 0);
         $this->addColumn(self::bccOnCustomerEmails, DA_BOOLEAN, DA_NOT_NULL, null, 0);
-        $this->addColumn(self::callBackEmail, DA_BOOLEAN, DA_NOT_NULL, null, 0);        
+        $this->addColumn(self::callBackEmail, DA_BOOLEAN, DA_NOT_NULL, null, 0);
+        $this->addColumn(self::massDeletionOnUnstartedServiceRequestPermission, DA_BOOLEAN, DA_NOT_NULL, null, 0);
+        $this->addColumn(self::forceClosingPermission, DA_BOOLEAN, DA_NOT_NULL, null, 0);
+        $this->addColumn(self::changeSalesOrdersStatusPermission, DA_BOOLEAN, DA_NOT_NULL, null, 0);
         $this->setPK(0);
         $this->setAddColumnsOff();
     }
@@ -421,16 +427,15 @@ class DBEUser extends DBEntity
         return $this->getValue(DBEUser::username) . '@' . CONFIG_PUBLIC_DOMAIN;
     }
 
-    function getRows($activeOnly = true)
+    function getRows($sortColumn = 'firstName, lastName', $orderDirection = '')
     {
 
         $this->setMethodName("getRows");
         $queryString = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName(
             ) . " JOIN team ON team.teamID = consultant.teamID";
-        if ($activeOnly) {
-            $queryString .= ' WHERE consultant.activeFlag = "Y"';
+        if ($sortColumn) {
+            $queryString .= " order by $sortColumn";
         }
-        $queryString .= ' ORDER BY firstName, lastName';
         $this->setQueryString($queryString);
         return (parent::getRows());
     }
@@ -528,6 +533,37 @@ class DBEUser extends DBEntity
                     )  order by cns_name";
         $this->setQueryString($query);
         return parent::getRows();
+    }
+
+    public function isSDManager()
+    {
+        return $this->getValue(self::receiveSdManagerEmailFlag) == 'Y';
+    }
+
+    public function isSRQueueManager()
+    {
+        return $this->getValue(self::queueManager);
+    }
+
+    public function getFullName()
+    {
+        return "{$this->getValue(self::firstName)} {$this->getValue(self::lastName)}";
+    }
+
+
+    public function canMassDeleteUnstartedSRs()
+    {
+        return $this->getValue(DBEUser::massDeletionOnUnstartedServiceRequestPermission);
+    }
+
+    public function isAllowedForceClosingSR()
+    {
+        return $this->getValue(DBEUser::forceClosingPermission);
+    }
+
+    public function canChangeSalesOrdersAndPurchaseOrdersStatus(): bool
+    {
+        return $this->getValue(DBEUser::changeSalesOrdersStatusPermission);
     }
 }
 

@@ -4,6 +4,9 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+
+use CNCLTD\Data\DBEItem;
+
 global $cfg;
 require_once($cfg ["path_gc"] . "/Business.inc.php");
 require_once($cfg ["path_bu"] . "/BUCustomerItem.inc.php");
@@ -30,7 +33,7 @@ class BURenQuotation extends Business
     function __construct(&$owner)
     {
         parent::__construct($owner);
-        $this->dbeRenQuotation = new DBECustomerItem($this);
+        $this->dbeRenQuotation  = new DBECustomerItem($this);
         $this->dbeJRenQuotation = new DBEJRenQuotation ($this);
     }
 
@@ -41,7 +44,6 @@ class BURenQuotation extends Business
             $dsData,
             $this->dbeRenQuotation
         );
-
         return TRUE;
     }
 
@@ -68,19 +70,18 @@ class BURenQuotation extends Business
         ));
     }
 
-    function createNewRenewal(
-        $customerID,
-        $itemID,
-        &$customerItemID,
-        $salePrice,
-        $costPrice,
-        $qty,
-        $siteNo = 0
+    function createNewRenewal($customerID,
+                              $itemID,
+                              &$customerItemID,
+                              $salePrice,
+                              $costPrice,
+                              $qty,
+                              $siteNo = 0
     )
     {
         // create a customer item
         $dbeCustomerItem = new DBECustomerItem ($this);
-        $dsCustomerItem = new DataSet ($this);
+        $dsCustomerItem  = new DataSet ($this);
         $dsCustomerItem->copyColumnsFrom($dbeCustomerItem);
         $dsCustomerItem->setUpdateModeInsert();
         $dsCustomerItem->setValue(
@@ -99,16 +100,11 @@ class BURenQuotation extends Business
             DBECustomerItem::siteNo,
             $siteNo
         );
-
         $dsCustomerItem->post();
-
         $buCustomerItem = new BUCustomerItem ($this);
         $buCustomerItem->update($dsCustomerItem);
-
         $customerItemID = $dsCustomerItem->getPKValue();
-
         $this->dbeRenQuotation->getRow($customerItemID);
-
         $this->dbeRenQuotation->setValue(
             DBEJRenQuotation::customerItemID,
             $customerItemID
@@ -133,28 +129,22 @@ class BURenQuotation extends Business
             DBEJRenQuotation::grantNumber,
             null
         );
-
         $this->dbeRenQuotation->updateRow();
-
         return;
     }
 
     function emailRenewalsQuotationsDue($toEmail = CONFIG_SALES_MANAGER_EMAIL)
     {
         $this->dbeJRenQuotation->getRenewalsDueRows();
-
-        $buMail = new BUMail($this);
+        $buMail      = new BUMail($this);
         $senderEmail = CONFIG_SALES_EMAIL;
-
-        $hdrs =
-            array(
-                'From'         => $senderEmail,
-                'To'           => $toEmail,
-                'Subject'      => 'Quotation Renewals Due Today',
-                'Date'         => date("r"),
-                'Content-Type' => 'text/html; charset=UTF-8'
-            );
-
+        $hdrs        = array(
+            'From'         => $senderEmail,
+            'To'           => $toEmail,
+            'Subject'      => 'Quotation Renewals Due Today',
+            'Date'         => date("r"),
+            'Content-Type' => 'text/html; charset=UTF-8'
+        );
         ob_start(); ?>
         <HTML lang="en">
         <BODY>
@@ -174,22 +164,17 @@ class BURenQuotation extends Business
         </BODY>
         </HTML>
         <?php
-
         $message = ob_get_contents();
         ob_end_clean();
-
         $buMail->mime->setHTMLBody($message);
-
         $mime_params = array(
             'text_encoding' => '7bit',
             'text_charset'  => 'UTF-8',
             'html_charset'  => 'UTF-8',
             'head_charset'  => 'UTF-8'
         );
-        $body = $buMail->mime->get($mime_params);
-
-        $hdrs = $buMail->mime->headers($hdrs);
-
+        $body        = $buMail->mime->get($mime_params);
+        $hdrs        = $buMail->mime->headers($hdrs);
         $buMail->putInQueue(
             $senderEmail,
             $toEmail,
@@ -202,19 +187,15 @@ class BURenQuotation extends Business
     function emailRecentlyGeneratedQuotes($toEmail = CONFIG_SALES_MANAGER_EMAIL)
     {
         $this->dbeJRenQuotation->getRecentQuotesRows();
-
-        $buMail = new BUMail($this);
+        $buMail      = new BUMail($this);
         $senderEmail = CONFIG_SALES_EMAIL;
-
-        $hdrs =
-            array(
-                'From'         => $senderEmail,
-                'To'           => $toEmail,
-                'Subject'      => 'Quotation Renewals Generated in Past 2 Weeks',
-                'Date'         => date("r"),
-                'Content-Type' => 'text/html; charset=UTF-8'
-            );
-
+        $hdrs        = array(
+            'From'         => $senderEmail,
+            'To'           => $toEmail,
+            'Subject'      => 'Quotation Renewals Generated in Past 2 Weeks',
+            'Date'         => date("r"),
+            'Content-Type' => 'text/html; charset=UTF-8'
+        );
         ob_start(); ?>
         <HTML lang="en">
         <BODY>
@@ -234,23 +215,17 @@ class BURenQuotation extends Business
         </BODY>
         </HTML>
         <?php
-
         $message = ob_get_contents();
         ob_end_clean();
-
         $buMail->mime->setHTMLBody($message);
-
         $mime_params = array(
             'text_encoding' => '7bit',
             'text_charset'  => 'UTF-8',
             'html_charset'  => 'UTF-8',
             'head_charset'  => 'UTF-8'
         );
-
-        $body = $buMail->mime->get($mime_params);
-
-        $hdrs = $buMail->mime->headers($hdrs);
-
+        $body        = $buMail->mime->get($mime_params);
+        $hdrs        = $buMail->mime->headers($hdrs);
         $buMail->putInQueue(
             $senderEmail,
             $toEmail,
@@ -262,23 +237,19 @@ class BURenQuotation extends Business
 
     function createRenewalsQuotations()
     {
-        $buSalesOrder = new BUSalesOrder ($this);
-
+        $buSalesOrder          = new BUSalesOrder ($this);
         $dbeRenQuotationUpdate = new DBECustomerItem($this);
-
         $this->dbeJRenQuotation->getRenewalsDueRows();
-        $dbeJCustomerItem = new DBEJCustomerItem ($this);
-        $dbeOrdline = new DBEOrdline ($this);
-        $dbeOrdhead = new DBEOrdhead($this);
-        $dbeCustomer = new DBECustomer ($this);
-
-        $previousCustomerID = 99999;
-        $previousRenQuotationType = null;
-
+        $dbeJCustomerItem           = new DBEJCustomerItem ($this);
+        $dbeOrdline                 = new DBEOrdline ($this);
+        $dbeOrdhead                 = new DBEOrdhead($this);
+        $dbeCustomer                = new DBECustomer ($this);
+        $previousCustomerID         = 99999;
+        $previousRenQuotationType   = null;
         $custItemsSharingSalesOrder = [];
-        $previousOrdHeadID = null;
-        $line = 0;
-        $dsOrdhead = new DataSet($this);
+        $previousOrdHeadID          = null;
+        $line                       = 0;
+        $dsOrdhead                  = new DataSet($this);
         while ($this->dbeJRenQuotation->fetchNext()) {
             ?>
             quotation
@@ -307,7 +278,6 @@ class BURenQuotation extends Business
                                 DBEJCustomerItem::renQuotationTypeID
                             ) . "</div>";
                     }
-
                     echo "<div>Creating a new Sales Order</div>";
                     /*
                      *  create order header
@@ -323,22 +293,16 @@ class BURenQuotation extends Business
                         $dsOrdline,
                         $dsCustomer
                     );
-
-                    $line = -1;    // initialise sales order line seq
-
+                    $line                  = -1;    // initialise sales order line seq
                     $quotationIntroduction = 'Please find detailed below a quote for your ' . $this->dbeJRenQuotation->getValue(
                             DBEJRenQuotation::type
                         ) . ' renewal.';
-
                     $dbeOrdhead->getRow($dsOrdhead->getValue(DBEOrdhead::ordheadID));
-
                     echo '<div>The new order id is: ' . $dsOrdhead->getValue(DBEOrdhead::ordheadID) . "</div>";
-
                     $dbeOrdhead->setValue(
                         DBEOrdhead::quotationIntroduction,
                         $quotationIntroduction
                     );
-
                     $dbeOrdhead->setValue(
                         DBEOrdhead::quotationSubject,
                         ucwords(
@@ -347,12 +311,9 @@ class BURenQuotation extends Business
                             ) . ' renewal.'
                         )
                     );
-
                     $dbeOrdhead->updateRow();
-
                     if ($previousOrdHeadID) {
                         echo '<div>These are the item that are going to be sharing this sales order:</div>';
-
                         echo '<ul>';
                         foreach ($custItemsSharingSalesOrder as $custItemID) {
                             echo "<li>$custItemID</li>";
@@ -368,24 +329,18 @@ class BURenQuotation extends Business
                             $dbeRenQuotationUpdate->updateRow();
                         }
                         echo '</ul>';
-
                         $custItemsSharingSalesOrder = [];
                     }
-
                     $previousOrdHeadID = $dsOrdhead->getValue(DBEOrdhead::ordheadID);
                 }
                 $custItemsSharingSalesOrder[] = $this->dbeJRenQuotation->getValue(DBEJRenQuotation::customerItemID);
-
                 $line++;
-
-
                 // renewal type comment line
                 if ($this->dbeJRenQuotation->getValue(DBEJRenQuotation::comment)) {
                     $comment = $this->dbeJRenQuotation->getValue(DBEJRenQuotation::comment);
                 } else {
                     $comment = $this->dbeJRenQuotation->getValue(DBEJRenQuotation::type) . ' Renewal';
                 }
-
                 $dbeOrdline->setValue(
                     DBEOrdline::lineType,
                     'C'
@@ -446,11 +401,8 @@ class BURenQuotation extends Business
                     DBEOrdline::curUnitCost,
                     0
                 );
-
                 $dbeOrdline->insertRow();
-
                 $line++;
-
                 /*
                  * Get stock category from item table
                  */
@@ -464,7 +416,6 @@ class BURenQuotation extends Business
                     DBEOrdline::stockcat,
                     $dsItem->getValue(DBEItem::stockcat)
                 );
-
                 $dbeOrdline->setValue(
                     DBEOrdline::renewalCustomerItemID,
                     $this->dbeJRenQuotation->getValue(DBEJRenQuotation::customerItemID)
@@ -517,14 +468,12 @@ class BURenQuotation extends Business
                     DBEOrdline::curUnitCost,
                     $this->dbeJRenQuotation->getValue(DBEJRenQuotation::costPrice)
                 );
-
                 $dbeOrdline->insertRow();
                 /**
                  * add installation charge
                  */
                 if ($this->dbeJRenQuotation->getValue(DBEJRenQuotation::addInstallationCharge) == 'Y') {
                     $line++;
-
                     /*
                      * Get stock category from item table
                      */
@@ -537,7 +486,6 @@ class BURenQuotation extends Business
                         DBEOrdline::stockcat,
                         $dsItem->getValue(DBEItem::stockcat)
                     );
-
                     $dbeOrdline->setValue(
                         DBEOrdline::renewalCustomerItemID,
                         0
@@ -594,16 +542,13 @@ class BURenQuotation extends Business
                         DBEOrdline::curUnitCost,
                         $dsItem->getValue(DBEItem::curUnitSale)
                     );
-
                     $dbeOrdline->insertRow();
                 }
-
-
                 // period comment line
                 $line++;
-                $description =
-                    $this->dbeJRenQuotation->getValue(DBEJRenQuotation::grantNumber) . ' ' .
-                    ' Expires: ' . $this->dbeJRenQuotation->getValue(DBEJRenQuotation::nextPeriodStartDate);
+                $description = $this->dbeJRenQuotation->getValue(
+                        DBEJRenQuotation::grantNumber
+                    ) . ' ' . ' Expires: ' . $this->dbeJRenQuotation->getValue(DBEJRenQuotation::nextPeriodStartDate);
                 $dbeOrdline->setValue(
                     DBEOrdline::lineType,
                     'C'
@@ -664,7 +609,6 @@ class BURenQuotation extends Business
                     DBEOrdline::curUnitCost,
                     0
                 );
-
                 $dbeOrdline->insertRow();
                 /*
                  * set generated date
@@ -679,14 +623,11 @@ class BURenQuotation extends Business
                     date(DATE_MYSQL_DATE)
                 );
                 $dbeRenQuotationUpdate->updateRow();
-
-                $previousCustomerID = $dbeJCustomerItem->getValue(DBEJCustomerItem::customerID);
+                $previousCustomerID       = $dbeJCustomerItem->getValue(DBEJCustomerItem::customerID);
                 $previousRenQuotationType = $dbeJCustomerItem->getValue(DBEJCustomerItem::renQuotationTypeID);
             }
         }
-
         echo '<div>These are the item that are going to be sharing this sales order:</div>';
-
         echo '<ul>';
         foreach ($custItemsSharingSalesOrder as $custItemID) {
             echo "<li>$custItemID</li>";
@@ -713,9 +654,7 @@ class BURenQuotation extends Business
             $customerItemID
         );
         $this->dbeRenQuotation->getRowsByColumn(DBEJRenQuotation::customerItemID);
-
         $dbRenQuotationUpdate = new DBECustomerItem($this);
-
         if ($this->dbeRenQuotation->fetchNext()) {
             $this->dbeRenQuotation->addYearToStartDate($this->dbeRenQuotation->getPKValue());
             if ($convertToOrder) {
@@ -737,14 +676,11 @@ class BURenQuotation extends Business
     function isCompleted($customerItemID)
     {
         $this->dbeRenQuotation->getRow($customerItemID);
-
-        if
-        (
-            $this->dbeRenQuotation->getValue(DBEJRenQuotation::startDate) AND
-            $this->dbeRenQuotation->getValue(DBEJRenQuotation::qty) > 0 AND
-            $this->dbeRenQuotation->getValue(DBEJRenQuotation::salePrice) > 0 AND
-            $this->dbeRenQuotation->getValue(DBEJRenQuotation::costPrice) > 0
-        ) {
+        if ($this->dbeRenQuotation->getValue(DBEJRenQuotation::startDate) and $this->dbeRenQuotation->getValue(
+                DBEJRenQuotation::qty
+            ) > 0 and $this->dbeRenQuotation->getValue(
+                DBEJRenQuotation::salePrice
+            ) > 0 and $this->dbeRenQuotation->getValue(DBEJRenQuotation::costPrice) > 0) {
             return true;
         } else {
             return FALSE;

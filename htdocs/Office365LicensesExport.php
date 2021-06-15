@@ -7,6 +7,7 @@
  */
 
 use CNCLTD\LoggerCLI;
+use CNCLTD\Office365LicensesExportPowerShellCommand;
 
 require_once("config.inc.php");
 global $cfg;
@@ -18,7 +19,6 @@ require_once($cfg["path_dbe"] . "/DBEOffice365License.php");
 require_once($cfg["path_dbe"] . "/DBEProblem.inc.php");
 require_once($cfg["path_dbe"] . "/DBEJCallActivity.php");
 require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
-require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 require_once($cfg['path_bu'] . '/BUHeader.inc.php');
 require_once($cfg['path_bu'] . '/BUPassword.inc.php');
 global $db;
@@ -89,10 +89,10 @@ $buPassword           = new BUPassword($thing);
 $dbeOffice365Licenses = new DBEOffice365License($thing);
 do {
     try {
-        $commandRunner = new \CNCLTD\Office365LicensesExportPowerShellCommand(
+        $commandRunner = new Office365LicensesExportPowerShellCommand(
             $dbeCustomer, $logger, $debugMode, $alertMode, $reuseData, $generateMonthYear
         );
-    } catch (\Exception $exception) {
+    } catch (Exception $exception) {
         continue;
     }
 } while ($dbeCustomer->fetchNext());

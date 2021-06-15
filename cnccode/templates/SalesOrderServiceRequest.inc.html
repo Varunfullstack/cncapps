@@ -41,12 +41,17 @@
     }
 
 </script>
+<style>
+    form .formInput {
+        min-width: 360px;
+    }
+</style>
 <form name="inputForm"
       method="post"
       action="{urlSubmit}"
 >
 
-    <table style="width: 100%;">
+    <table>
         <tr>
             <td>ETA</td>
             <td>
@@ -56,6 +61,7 @@
                        id="etaDate"
                        value="{etaDate}"
                        autocomplete="off"
+                       class="formInput"
                 >
 
             </td>
@@ -66,6 +72,7 @@
                 <select required
                         id="serviceRequestCustomerItemID"
                         name="inputForm[1][serviceRequestCustomerItemID]"
+                        class="formInput"
                 >
                     <option value="">Please select</option>
                     <option value="-1">T &amp; M</option>
@@ -85,6 +92,7 @@
                 <select required
                         id="serviceRequestPriority"
                         name="inputForm[1][serviceRequestPriority]"
+                        class="formInput"
                 >
                     <option value="">Please select</option>
                     <!-- BEGIN priorityBlock -->
@@ -98,6 +106,17 @@
             </td>
         </tr>
         <tr>
+            <td>Email Subject Summary</td>
+            <td colspan="2">
+                <input required
+                       name="inputForm[1][emailSubjectSummary]"
+                       value="{emailSubjectSummary}"
+                       class="formInput"
+                >
+                <span class="formErrorMessage">{priorityMessage}</span>
+            </td>
+        </tr>
+        <tr>
             <td>Standard Text</td>
             <td colspan="1"
                 valign="top"
@@ -106,6 +125,7 @@
                         name="standardText"
                         multiple="multiple"
                         size="16"
+                        class="formInput"
                 >
                     <!-- BEGIN standardTextBlock -->
                     <option value="{standardTextContent}"

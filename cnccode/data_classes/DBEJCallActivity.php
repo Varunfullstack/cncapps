@@ -5,9 +5,11 @@
  * Date: 30/03/2018
  * Time: 11:10
  */
+
+use CNCLTD\Data\DBConnect;
+
 global $cfg;
 require_once __DIR__ . '/DBECallActivity.inc.php';
-require_once($cfg["path_dbe"] . "/DBConnect.php");
 
 /*
 * Call activity join
@@ -65,7 +67,9 @@ class DBEJCallActivity extends DBECallActivity
     const caaConsno                           = "caa_consno";
     const assetName                           = "assetName";
     const assetTitle                          = "assetTitle";
+    const emptyAssetReason                    = "emptyAssetReason";
     const emailSubjectSummary                 = "emailSubjectSummary";
+    const prePayChargeApproved                = "prePayChargeApproved";
 
     var $fromString;
 
@@ -141,7 +145,7 @@ class DBEJCallActivity extends DBECallActivity
         );
         $this->addColumn(
             self::customerID,
-            DA_STRING,
+            DA_ID,
             DA_ALLOW_NULL,
             "problem.pro_custno"
         );
@@ -371,6 +375,18 @@ class DBEJCallActivity extends DBECallActivity
             DA_TEXT,
             DA_ALLOW_NULL,
             "problem.assetTitle"
+        );
+        $this->addColumn(
+            self::emptyAssetReason,
+            DA_TEXT,
+            DA_ALLOW_NULL,
+            "problem.emptyAssetReason"
+        );
+        $this->addColumn(
+            self::prePayChargeApproved,
+            DA_BOOLEAN,
+            DA_NOT_NULL,
+            "problem.prePayChargeApproved"
         );
         $this->setAddColumnsOff();
         $this->fromString = $this->getTableName(

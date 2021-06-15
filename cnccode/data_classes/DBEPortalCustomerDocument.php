@@ -61,4 +61,19 @@ class DBEPortalCustomerDocument extends DBEPortalCustomerDocumentWithoutFile
         $this->resetQueryString();
     }
 
+    public function getDUODocumentForCustomer(int $customerId, string $DUO_USERS_AND_LOGS)
+    {
+        $queryString = "select " . $this->getDBColumnNamesAsString(
+            ) . " from " . $this->tableName . " where " . $this->getDBColumnName(
+                self::customerID
+            ) . " = $customerId and " . $this->getDBColumnName(
+                self::description
+            ) . " = '$DUO_USERS_AND_LOGS' limit 1";
+        $this->queryString = $queryString;
+
+        $this->getRows();
+        $this->fetchFirst();
+        $this->resetQueryString();
+    }
+
 }

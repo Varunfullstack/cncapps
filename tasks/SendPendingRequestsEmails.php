@@ -1,7 +1,11 @@
 <?php
 
+use CNCLTD\Business\BUActivity;
+use CNCLTD\Data\DBEJProblem;
 use CNCLTD\LoggerCLI;
+use CNCLTD\PendingChangeRequestTwigDTO;
 use CNCLTD\PendingTimeRequestsWithoutServiceRequestCollection;
+use CNCLTD\PendingTimeRequestTwigDTO;
 
 require_once(__DIR__ . "/../htdocs/config.inc.php");
 global $cfg;
@@ -23,7 +27,6 @@ if (isset($options['d'])) {
 }
 require_once($cfg['path_dbe'] . '/DBECallActivity.inc.php');
 require_once($cfg["path_dbe"] . "/DBEJCallActivity.php");
-require_once($cfg["path_bu"] . "/BUActivity.inc.php");
 require_once($cfg["path_bu"] . "/BUHeader.inc.php");
 $thing = null;
 processTimeRequestsEmails();
@@ -31,14 +34,14 @@ processChangeRequestsEmails();
 function processChangeRequestsEmails()
 {
     $dbejCallActivity = new DBEJCallActivity($thing);
-    $dbejCallActivity->getPendingChangeRequestRows(true,true,true,true);
+    $dbejCallActivity->getPendingChangeRequestRows(true, true, true, true);
     $pendingHDRequests = [];
     $pendingESRequests = [];
     $pendingIMRequests = [];
     while ($dbejCallActivity->fetchNext()) {
-        $problemID  = $dbejCallActivity->getValue(DBEJCallActivity::problemID);
-        $srURL      = SITE_URL . "/SRActivity.php?serviceRequestId={$problemID}";
-        $processURL = SITE_URL . "/RequestDashboard.php";
+        $problemID        = $dbejCallActivity->getValue(DBEJCallActivity::problemID);
+        $srURL            = SITE_URL . "/SRActivity.php?serviceRequestId={$problemID}";
+        $processURL       = SITE_URL . "/RequestDashboard.php";
         $requestingUserID = $dbejCallActivity->getValue(DBEJCallActivity::userID);
         $requestingUser   = new DBEUser($thing);
         $requestingUser->getRow($requestingUserID);
@@ -56,7 +59,7 @@ function processChangeRequestsEmails()
             case 4:
                 $storeArray = &$pendingIMRequests;
         }
-        $storeArray[] = new \CNCLTD\PendingChangeRequestTwigDTO(
+        $storeArray[] = new PendingChangeRequestTwigDTO(
             $dbejCallActivity->getValue(DBEJCallActivity::customerName),
             $srURL,
             $dbejCallActivity->getValue(DBEJCallActivity::userName),
@@ -90,12 +93,12 @@ function addPendingTimeRequestToArray(&$array,
 )
 {
 
-    $srURL = SITE_URL . "/SRActivity.php?serviceRequestId=" . $DBEJCallActivity->getValue(
+    $srURL        = SITE_URL . "/SRActivity.php?serviceRequestId=" . $DBEJCallActivity->getValue(
             DBEJCallActivity::problemID
         );
-    $processURL = SITE_URL . '/RequestDashboard.php';
+    $processURL   = SITE_URL . '/RequestDashboard.php';
     $leftOnBudget = $assignedMinutes - $usedMinutes;
-    $array[] = new \CNCLTD\PendingTimeRequestTwigDTO(
+    $array[]      = new PendingTimeRequestTwigDTO(
         $DBEJCallActivity->getValue(DBEJCallActivity::customerName),
         $srURL,
         $DBEJCallActivity->getValue(DBEJCallActivity::reason),
@@ -113,7 +116,7 @@ function addPendingTimeRequestToArray(&$array,
 function processTimeRequestsEmails()
 {
     $dbejCallActivity = new DBEJCallActivity($thing);
-    $dbejCallActivity->getPendingTimeRequestRows(true,true,true,true);
+    $dbejCallActivity->getPendingTimeRequestRows(true, true, true, true);
     $pendingHDRequests      = [];
     $pendingESRequests      = [];
     $pendingIMRequests      = [];
@@ -231,14 +234,17 @@ function processTimeRequestsEmails()
 function sendNoSRIDInTimeRequestEmails(PendingTimeRequestsWithoutServiceRequestCollection $activitiesWithoutProblemIdPerTeamLeaderMap
 )
 {
-    $thing  = null;
-    $buMail = new BUMail($thing);
+    $thing       = null;
+    $buMail      = new BUMail($thing);
     $senderEmail = CONFIG_SUPPORT_EMAIL;
     global $twig;
     foreach ($activitiesWithoutProblemIdPerTeamLeaderMap as $activitiesLeaderMap) {
-        $body = $twig->render('@internal/pendingTimeRequestsWithoutProblemID.twig', ["items" => $activitiesLeaderMap]);
+        $body    = $twig->render(
+            '@internal/pendingTimeRequestsWithoutProblemID.twig',
+            ["items" => $activitiesLeaderMap]
+        );
         $toEmail = $activitiesLeaderMap->getLeaderEmail();
-        $hdrs = array(
+        $hdrs    = array(
             'From'         => $senderEmail,
             'To'           => $toEmail,
             'Subject'      => "Pending Time Requests Without Service Request Assigned",
@@ -252,8 +258,8 @@ function sendNoSRIDInTimeRequestEmails(PendingTimeRequestsWithoutServiceRequestC
             'html_charset'  => 'UTF-8',
             'head_charset'  => 'UTF-8'
         );
-        $body = $buMail->mime->get($mime_params);
-        $hdrs = $buMail->mime->headers($hdrs);
+        $body        = $buMail->mime->get($mime_params);
+        $hdrs        = $buMail->mime->headers($hdrs);
         $buMail->putInQueue(
             $senderEmail,
             $toEmail,
@@ -271,13 +277,16 @@ function sendTimeRequestsEmail($teamEmail,
     if (!count($requests)) {
         return;
     }
-    $thing  = null;
-    $buMail = new BUMail($thing);
+    $thing       = null;
+    $buMail      = new BUMail($thing);
     $senderEmail = CONFIG_SUPPORT_EMAIL;
     global $twig;
-    $body = $twig->render('@internal/pendingTimeRequestsEmail.html.twig', ["items" => $requests,"requestDashUrl"=>SITE_URL."/RequestDashBoard.php"]);
+    $body    = $twig->render(
+        '@internal/pendingTimeRequestsEmail.html.twig',
+        ["items" => $requests, "requestDashUrl" => SITE_URL . "/RequestDashBoard.php"]
+    );
     $toEmail = $teamEmail;
-    $hdrs = array(
+    $hdrs    = array(
         'From'         => $senderEmail,
         'To'           => $toEmail,
         'Subject'      => "Pending Time Requests",
@@ -291,8 +300,8 @@ function sendTimeRequestsEmail($teamEmail,
         'html_charset'  => 'UTF-8',
         'head_charset'  => 'UTF-8'
     );
-    $body = $buMail->mime->get($mime_params);
-    $hdrs = $buMail->mime->headers($hdrs);
+    $body        = $buMail->mime->get($mime_params);
+    $hdrs        = $buMail->mime->headers($hdrs);
     $buMail->putInQueue(
         $senderEmail,
         $toEmail,
@@ -310,12 +319,12 @@ function sendChangeRequestsEmail($teamEmail,
         return;
     }
     global $twig;
-    $thing  = null;
-    $buMail = new BUMail($thing);
+    $thing       = null;
+    $buMail      = new BUMail($thing);
     $senderEmail = CONFIG_SUPPORT_EMAIL;
-    $body    = $twig->render('@internal/pendingChangeRequestsEmail.html.twig', ["items" => $requests]);
-    $toEmail = $teamEmail;
-    $hdrs = array(
+    $body        = $twig->render('@internal/pendingChangeRequestsEmail.html.twig', ["items" => $requests]);
+    $toEmail     = $teamEmail;
+    $hdrs        = array(
         'From'         => $senderEmail,
         'To'           => $toEmail,
         'Subject'      => "Pending Change Requests",
@@ -329,8 +338,8 @@ function sendChangeRequestsEmail($teamEmail,
         'html_charset'  => 'UTF-8',
         'head_charset'  => 'UTF-8'
     );
-    $body = $buMail->mime->get($mime_params);
-    $hdrs = $buMail->mime->headers($hdrs);
+    $body        = $buMail->mime->get($mime_params);
+    $hdrs        = $buMail->mime->headers($hdrs);
     $buMail->putInQueue(
         $senderEmail,
         $toEmail,

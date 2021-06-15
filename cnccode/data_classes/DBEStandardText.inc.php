@@ -5,17 +5,18 @@
 * @authors Karim Ahmed
 * @access public
 */
+global $cfg;
 require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBEStandardText extends DBEntity
 {
 
-    const stt_standardtextno = "stt_standardtextno";
-    const stt_desc = "stt_desc";
-    const stt_text = "stt_text";
-    const stt_standardtexttypeno = "stt_standardtexttypeno";
-    const salesRequestEmail = 'salesRequestEmail';
-    const salesRequestUnassignFlag = 'salesRequestUnassignFlag';
+    const stt_standardtextno                 = "stt_standardtextno";
+    const stt_desc                           = "stt_desc";
+    const stt_text                           = "stt_text";
+    const stt_standardtexttypeno             = "stt_standardtexttypeno";
+    const salesRequestEmail                  = 'salesRequestEmail';
+    const salesRequestUnassignFlag           = 'salesRequestUnassignFlag';
     const salesRequestDoNotNotifySalesOption = 'salesRequestDoNotNotifySalesOption';
 
     /**
@@ -53,19 +54,16 @@ class DBEStandardText extends DBEntity
             DA_NOT_NULL,
             'stt_standardtexttypeno'
         );
-
         $this->addColumn(
             self::salesRequestEmail,
             DA_STRING,
             DA_ALLOW_NULL
         );
-
         $this->addColumn(
             self::salesRequestUnassignFlag,
             DA_YN_FLAG,
             DA_ALLOW_NULL
         );
-
         $this->addColumn(
             self::salesRequestDoNotNotifySalesOption,
             DA_BOOLEAN,
@@ -73,18 +71,15 @@ class DBEStandardText extends DBEntity
             null,
             0
         );
-
         $this->setPK(0);
         $this->setAddColumnsOff();
     }
 
-    function getRows($sortColumn = '')
+    function getRows($sortColumn = '', $orderDirection = '')
     {
         $this->setMethodName("getRows");
         if ($this->getQueryString() == "") {
-            $queryString =
-                "SELECT " . $this->getDBColumnNamesAsString() .
-                " FROM " . $this->getTableName();
+            $queryString = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName();
             if ($sortColumn != '') {
                 $sortColumnNo = ($this->columnExists($sortColumn));
                 if ($sortColumnNo == DA_OUT_OF_RANGE) {
@@ -110,19 +105,14 @@ class DBEStandardText extends DBEntity
     function getRowsByTypeID($standardTextTypeID, $orderColumn = null)
     {
         $this->setMethodName("getRowsInGroup");
-
-        $query = "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " WHERE stt_standardtexttypeno = " . $standardTextTypeID;
-
+        $query = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName(
+            ) . " WHERE stt_standardtexttypeno = " . $standardTextTypeID;
         if ($orderColumn) {
             $query .= ' ORDER BY ' . $this->getDBColumnName($orderColumn);
         } else {
             $query .= $this->defaultOrdering();
         }
-
         $this->setQueryString($query);
-
         return (parent::getRows());
     }
 

@@ -75,7 +75,10 @@ class BUSageExport extends Business
           FROM
             contact
           WHERE
-            contact.con_conto = customer.statementContactId
+            con_custno = inh_custno
+          AND
+            con_mailflag4 = 'Y'
+          LIMIT 1
         ) as email,stc_sal_nom,inl_qty,if((inl_qty * inl_unit_price) < 0, 'SC', 'SI') AS trans_type,inl_qty * inl_unit_price AS gross_amount,inh_date_printed,inh_vat_code,inh_vat_rate FROM invhead 
             INNER  JOIN invline ON inh_invno = inl_invno 
             INNER  JOIN stockcat ON inl_stockcat = stc_stockcat 

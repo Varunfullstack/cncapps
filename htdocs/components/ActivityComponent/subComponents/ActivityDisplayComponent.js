@@ -1,5 +1,5 @@
 import APIActivity from "../../services/APIActivity.js";
-import {Chars, maxLength, padEnd, params} from "../../utils/utils.js";
+import {Chars, dateFormatExcludeNull, maxLength, padEnd, params} from "../../utils/utils.js";
 import ToolTip from "../../shared/ToolTip.js";
 import MainComponent from "../../shared/MainComponent.js";
 import * as React from 'react';
@@ -13,9 +13,14 @@ import Modal from "../../shared/Modal/modal";
 import Table from "../../shared/table/table";
 import {LinkServiceRequestOrder} from "./LinkserviceRequestOrder.js";
 import moment from "moment";
-import {InternalNotesListComponent} from "../../shared/InternalNotesListComponent/InternalNotesListComponent";
 import {InternalNotes} from "./InternalNotesComponent";
 import {TaskListComponent} from "./TaskListComponent";
+import AdditionalChargeRequestModal from "./Modals/AdditionalTimeRequestModal";
+import ExistingAdditionalChargeableWorkRequestModal from "./Modals/ExistingAdditionalChargeableWorkRequestModal";
+import CallbackModal from "../../shared/CallbackModal/CallbackModal";
+import {format} from "../../../../stencil/cncapps-components/src/utils/utils";
+import * as PropTypes from "prop-types";
+import {TEMPlATE_TYPES, TemplateModal} from "./Modals/TemplateModal";
 
 // noinspection EqualityComparisonWithCoercionJS
 const emptyAssetReasonCharactersToShow = 30;
@@ -23,6 +28,8 @@ const emptyAssetReasonCharactersToShow = 30;
 
 class ActivityDisplayComponent extends MainComponent {
     api = new APIActivity();
+    additionalTimeRequestResolve;
+    additionalTimeRequestReject;
 
     constructor(props) {
         super(props);
@@ -34,14 +41,9 @@ class ActivityDisplayComponent extends MainComponent {
                 isSDManager: false
             },
             data: null,
+            _loadedData: false,
             currentActivity: null,
-            _showModal: false,
-            templateOptions: [],
-            templateOptionId: null,
-            templateDefault: '',
-            templateValue: '',
-            templateType: '',
-            templateTitle: '',
+            templateType: null,
             selectedChangeRequestTemplateId: null,
             showSalesOrder: false,
             filters: {
@@ -51,7 +53,9 @@ class ActivityDisplayComponent extends MainComponent {
                 criticalSR: false,
                 monitorSR: false,
                 holdForQA: false
-            }
+            },
+            showAdditionalTimeRequestModal: false,
+            showCallbackModal: false,
         }
     }
 
@@ -90,7 +94,7 @@ class ActivityDisplayComponent extends MainComponent {
         filters.monitorSR = res.monitoringFlag == "1";
         filters.criticalSR = res.criticalFlag == "1";
         filters.holdForQA = res.holdForQA;
-        this.setState({filters, data: res, currentActivity: +res.callActivityID, currentUser});
+        this.setState({filters, data: res, currentActivity: +res.callActivityID, currentUser, _loadedData: true});
         return '';
 
     }
@@ -127,18 +131,33 @@ class ActivityDisplayComponent extends MainComponent {
         }
         return (
             <div style={{display: "flex", flexDirection: "column"}}>
-                <a
-                    className={data?.customerNameDisplayClass}
-                    href={`Customer.php?action=dispEdit&customerId=${data?.customerId}`}
-                    target="_blank"
-                >
-                    {data?.customerName + ", " +
-                    data?.siteAdd1 + ", " +
-                    data?.siteAdd2 + ", " +
-                    data?.siteAdd3 + ", " +
-                    data?.siteTown + ", " +
-                    data?.sitePostcode}
-                </a>
+                <div style={{display: "flex", alignItems: "center"}}>
+                    <a
+                        className={data?.customerNameDisplayClass}
+                        href={`Customer.php?action=dispEdit&customerId=${data?.customerId}`}
+                        target="_blank"
+                    >
+                        {data?.customerName + ", " +
+                        data?.siteAdd1 + ", " +
+                        data?.siteAdd2 + ", " +
+                        data?.siteAdd3 + ", " +
+                        data?.siteTown + ", " +
+                        data?.sitePostcode}
+                    </a>
+                    {data.what3Words ?
+                        <ToolTip
+                            title="What3words"
+                            width={30}
+                            content={<a
+                                className="fal fa-map-marker-alt fa-x m-5 pointer icon"
+                                href={`https://what3words.com/${data?.what3Words}`}
+                                target="_blank"
+                                rel="noreferrer"></a>
+                            }
+                        /> : null
+                    }
+                </div>
+
                 <div>
                     <a href={`Customer.php?action=dispEdit&customerId=${data?.customerId}`}
                        target="_blank"
@@ -185,215 +204,291 @@ class ActivityDisplayComponent extends MainComponent {
         const {data, currentUser} = this.state;
         return <div>
             {
-                data?.problemStatus !== "C" &&  data?.problemStatus !== "F"  ?
-                <div style={{marginBottom:-40}}>
-                    <ToolTip title="SR currently assigned to" width={150}>
-                        <div style={{display:"flex",alignItems:"center"}}>
-                    <i className="fal fa-user-hard-hat fa-2x m-5 pointer icon"></i>
-                    <label>
-                    {
-                        data?.requestEngineerName
-                    }
-                    </label>
-                    </div>
-                    </ToolTip>
-                </div>:null
+                data?.problemStatus !== "C" && data?.problemStatus !== "F" ?
+                    <div style={{marginBottom: -40}}>
+                        <ToolTip title="SR currently assigned to"
+                                 width={150}
+                        >
+                            <div style={{display: "flex", alignItems: "center"}}>
+                                <i className="fal fa-user-hard-hat fa-2x m-5 pointer icon"></i>
+                                <label>
+                                    {
+                                        data?.requestEngineerName
+                                    }
+                                </label>
+                            </div>
+                        </ToolTip>
+                    </div> : null
             }
-        <div
-            className="activities-container"
-            style={{display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center"}}
-        >
+            <div
+                className="activities-container"
+                style={{display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center"}}
+            >
+                {data?.problemStatus !== "C" ? <ToolTip
+                    title="Call Back"
+                    content={<a
+                        className="fal fa-phone fa-2x m-5 pointer icon"
+                        onClick={this.showCallbackModal}
+                    />
+                    }
+                /> : null
+                }
+                {this.getSpacer()}
+                {
+                    data?.problemStatus !== "C" ? <ToolTip
+                            title="Follow On"
+                            content={<i className="fal fa-play fa-2x m-5 pointer icon"
+                                        onClick={this.handleFollowOn}
+                            />}
+                        />
+                        : null
+                }
+                <ToolTip
+                    title="History"
+                    content={<a
+                        className="fal fa-history fa-2x m-5 pointer icon"
+                        href={`Activity.php?action=problemHistoryPopup&problemID=${data?.problemID}&htmlFmt=popup`}
+                        target="_blank"
+                    />
+                    }
+                />
+
+                <ToolTip
+                    title="Passwords"
+                    content={<a
+                        className="fal fa-unlock-alt fa-2x m-5 pointer icon"
+                        href={`Password.php?action=list&customerID=${data?.customerId}`}
+                        target="_blank"
+                    />
+                    }
+                />
+
+                {this.getSpacer()}
+                {data?.canEdit == 'ALL_GOOD' ? <ToolTip
+                    title="Edit"
+                    content={<a
+                        className="fal fa-edit fa-2x m-5 pointer icon"
+                        href={`SRActivity.php?action=editActivity&callActivityID=${data?.callActivityID}`}
+                    />
+                    }
+                /> : null
+                }
 
 
+                {data?.canEdit !== 'ALL_GOOD' ? <ToolTip
+                    title={data?.canEdit}
+                    content={<i className="fal fa-edit fa-2x m-5 pointer icon-disable"/>
+                    }
+                /> : null}
 
-
-
-            {
-                data?.problemStatus !== "C" ? <ToolTip
-                        title="Follow On"
-                        content={<i className="fal fa-play fa-2x m-5 pointer icon"
-                                    onClick={this.handleFollowOn}
+                {(data?.canDelete) ? <ToolTip
+                        title={data?.activities.length == 1 ? "Delete Request" : "Delete Activity"}
+                        content={<i
+                            className="fal fa-trash-alt fa-2x m-5 pointer icon"
+                            onClick={() => this.handleDelete(data)}
                         />}
                     />
                     : null
-            }
-            <ToolTip
-                title="History"
-                content={<a
-                    className="fal fa-history fa-2x m-5 pointer icon"
-                    href={`Activity.php?action=problemHistoryPopup&problemID=${data?.problemID}&htmlFmt=popup`}
-                    target="_blank"
-                />
                 }
-            />
-
-            <ToolTip
-                title="Passwords"
-                content={<a
-                    className="fal fa-unlock-alt fa-2x m-5 pointer icon"
-                    href={`Password.php?action=list&customerID=${data?.customerId}`}
-                    target="_blank"
-                />
-                }
-            />
-
-            {this.getSpacer()}
-            {data?.canEdit == 'ALL_GOOD' ? <ToolTip
-                title="Edit"
-                content={<a
-                    className="fal fa-edit fa-2x m-5 pointer icon"
-                    href={`SRActivity.php?action=editActivity&callActivityID=${data?.callActivityID}`}
-                />
-                }
-            /> : null
-            }
-
-
-            {data?.canEdit !== 'ALL_GOOD' ? <ToolTip
-                title={data?.canEdit}
-                content={<i className="fal fa-edit fa-2x m-5 pointer icon-disable"/>
-                }
-            /> : null}
-
-            {(data?.canDelete) ? <ToolTip
-                    title={data?.activities.length == 1 ? "Delete Request" : "Delete Activity"}
-                    content={<i
-                        className="fal fa-trash-alt fa-2x m-5 pointer icon"
-                        onClick={() => this.handleDelete(data)}
-                    />}
-                />
-                : null
-            }
-            {this.getSpacer()}
-            {data?.linkedSalesOrderID ? <ToolTip
+                {this.getSpacer()}
+                {data?.linkedSalesOrderID ? <ToolTip
+                        title="Sales Order"
+                        content={<a
+                            className="fal fa-tag fa-2x m-5 pointer icon"
+                            href={`SalesOrder.php?action=displaySalesOrder&ordheadID=${data?.linkedSalesOrderID}`}
+                            target="_blank"
+                        />}
+                    />
+                    : null}
+                {!data?.linkedSalesOrderID ? <ToolTip
                     title="Sales Order"
                     content={<a
                         className="fal fa-tag fa-2x m-5 pointer icon"
-                        href={`SalesOrder.php?action=displaySalesOrder&ordheadID=${data?.linkedSalesOrderID}`}
+                        onClick={() => this.handleSalesOrder(data?.callActivityID, data?.problemID)}
+                    />
+                    }
+                /> : null}
+                {data?.linkedSalesOrderID ? <ToolTip
+                    title="Unlink Sales order"
+                    content={<a
+                        className="fal fa-unlink fa-2x m-5 pointer icon"
+                        onClick={() => this.handleUnlink(data?.linkedSalesOrderID, data?.problemID, data?.callActivityID)}
+                    />
+                    }
+                /> : null}
+                <ToolTip
+                    title="Renewal Information"
+                    content={<a
+                        className="fal fa-tasks fa-2x m-5 pointer icon"
+                        href={`RenewalReport.php?action=produceReport&customerID=${data?.customerId}`}
                         target="_blank"
+                    />
+                    }
+                />
+
+
+                <ToolTip title="Generate Password"
+                         content={<a className="fal fa-magic fa-2x m-5 pointer icon"
+                                     onClick={this.handleGeneratePassword}
+                         />}
+                />
+                <ToolTip
+                    title="Contracts"
+                    content={<a
+                        className="fal fa-file-contract fa-2x m-5 pointer icon"
+                        href={`Activity.php?action=contractListPopup&customerID=${data?.customerId}`}
+                        target="_blank"
+                    />
+                    }
+                />
+
+                {this.getSpacer()}
+                <ToolTip
+                    title="Contact SR History"
+                    content={<a
+                        className="fal fa-id-card fa-2x m-5 pointer icon"
+                        onClick={() => this.handleContactSRHistory(data?.contactID)}
                     />}
                 />
-                : null}
-            {!data?.linkedSalesOrderID ? <ToolTip
-                title="Sales Order"
-                content={<a
-                    className="fal fa-tag fa-2x m-5 pointer icon"
-                    onClick={() => this.handleSalesOrder(data?.callActivityID, data?.problemID)}
+                <ToolTip
+                    title="Third Party Contacts"
+                    content={<a
+                        className="fal fa-users fa-2x m-5 pointer icon"
+                        href={`ThirdPartyContact.php?action=list&customerID=${data?.customerId}`}
+                        target="_blank"
+                    />
+                    }
                 />
-                }
-            /> : null}
-            {data?.linkedSalesOrderID ? <ToolTip
-                title="Unlink Sales order"
-                content={<a
-                    className="fal fa-unlink fa-2x m-5 pointer icon"
-                    onClick={() => this.handleUnlink(data?.linkedSalesOrderID, data?.problemID, data?.callActivityID)}
-                />
-                }
-            /> : null}
-            <ToolTip
-                title="Renewal Information"
-                content={<a
-                    className="fal fa-tasks fa-2x m-5 pointer icon"
-                    href={`RenewalReport.php?action=produceReport&customerID=${data?.customerId}`}
-                    target="_blank"
-                />
-                }
-            />
 
+                {this.getSpacer()}
+                {this.shouldShowExpenses(data, currentUser) ? <ToolTip
+                    title="Expenses"
+                    content={<a
+                        className="fal fa-coins fa-2x m-5 pointer icon"
+                        href={`Expense.php?action=view&callActivityID=${data?.callActivityID}`}
+                    />
+                    }
+                /> : this.getSpacer()}
+                {data?.problemStatus !== "C" ? <ToolTip
+                    title="Add Travel"
+                    content={<a
+                        className="fal fa-car fa-2x m-5 pointer icon"
+                        href={`Activity.php?action=createFollowOnActivity&callActivityID=${data?.callActivityID}&callActivityTypeID=22`}
+                    />
+                    }
+                /> : null}
+                {currentUser.isSDManager && data?.problemHideFromCustomerFlag == 'Y' ? <ToolTip
+                        title="Unhide SR"
+                        content={<i
+                            className="fal fa-eye-slash fa-2x m-5 pointer icon"
+                            onClick={() => this.handleUnhideSR(data)}
+                        />}
+                    />
+                    : this.getSpacer()}
+                <TimeBudgetElement
+                    currentUserTeamId={currentUser?.teamID}
+                    hdRemainMinutes={data?.hdRemainMinutes}
+                    esRemainMinutes={data?.esRemainMinutes}
+                    imRemainMinutes={data?.imRemainMinutes}
+                    projectRemainMinutes={data?.projectRemainMinutes}
+                    onExtraTimeRequest={() => this.handleExtraTime(data)}
+                />
+                {this.getSpacer()}
+                <ToolTip
+                    title="Calendar"
+                    content={<a
+                        className="fal fa-calendar-alt fa-2x m-5 pointer icon"
+                        href={`Activity.php?action=addToCalendar&callActivityID=${data?.callActivityID}`}
+                    />
+                    }
+                />
+                <ToolTip
+                    title="Time Breakdown"
+                    content={<a
+                        className="fal fa-calculator-alt fa-2x m-5 pointer icon"
+                        onClick={() => window.open(`Popup.php?action=timeBreakdown&problemID=${data?.problemID}`, 'popup', 'width=800,height=400')}
+                    />
+                    }
+                />
+                {data?.isOnSiteActivity ? <ToolTip
+                        title="Send client a visit confirmation email"
+                        content={<i
+                            className="fal fa-envelope fa-2x m-5 pointer icon"
+                            onClick={() => this.handleConfirmEmail(data)}
+                        />}
+                    />
+                    : this.getSpacer()}
+                {this.renderChargeableWorkIcon()}
+                {this.renderForceCompletionAction()}
+            </div>
+        </div>
+    }
 
-            <ToolTip title="Generate Password"
-                     content={<a className="fal fa-magic fa-2x m-5 pointer icon"
-                                 onClick={this.handleGeneratPassword}
+    renderChargeableWorkIcon = () => {
+        const {data} = this.state;
+        if (!data || data.problemHideFromCustomerFlag == 'Y') {
+            return '';
+        }
+        let title = "Additional Charges";
+        let icon = "fa-envelope-open-dollar";
+        let handler = this.handleRequestCustomerApproval;
+        if (data.chargeableWorkRequestId) {
+            title = "Chargeable request in process";
+            icon = "fa-hands-usd";
+            handler = this.handleCurrentChargeableWorkRequest
+        }
+        return (
+            <ToolTip title={title}
+                     content={<a className={`fal ${icon}  fa-2x m-5 pointer icon`}
+                                 onClick={handler}
                      />}
             />
-            <ToolTip
-                title="Contracts"
-                content={<a
-                    className="fal fa-file-contract fa-2x m-5 pointer icon"
-                    href={`Activity.php?action=contractListPopup&customerID=${data?.customerId}`}
-                    target="_blank"
-                />
-                }
-            />
+        )
+    }
 
-            {this.getSpacer()}
-            <ToolTip
-                title="Contact SR History"
-                content={<a
-                    className="fal fa-id-card fa-2x m-5 pointer icon"
-                    onClick={() => this.handleContactSRHistory(data?.contactID)}
-                />}
-            />
-            <ToolTip
-                title="Third Party Contacts"
-                content={<a
-                    className="fal fa-users fa-2x m-5 pointer icon"
-                    href={`ThirdPartyContact.php?action=list&customerID=${data?.customerId}`}
-                    target="_blank"
-                />
-                }
-            />
+    showAdditionalTimeRequestModal = async () => {
+        return new Promise((resolve, reject) => {
+            this.setState({showAdditionalTimeRequestModal: true});
+            this.additionalTimeRequestResolve = resolve;
+            this.additionalTimeRequestReject = reject;
+        })
+    }
 
-            {this.getSpacer()}
-            {this.shouldShowExpenses(data, currentUser) ? <ToolTip
-                title="Expenses"
-                content={<a
-                    className="fal fa-coins fa-2x m-5 pointer icon"
-                    href={`Expense.php?action=view&callActivityID=${data?.callActivityID}`}
-                />
+    handleRequestCustomerApproval = async () => {
+        const {problemID: serviceRequestId} = this.state.data;
+        try {
+            const {
+                reason,
+                timeRequested,
+                selectedContactId,
+                selectedAdditionalChargeId
+            } = await this.showAdditionalTimeRequestModal();
+            try {
+                await this.api.addAdditionalTimeRequest(serviceRequestId, reason, timeRequested, selectedContactId, selectedAdditionalChargeId);
+                const {currentActivity} = this.state;
+                await this.loadCallActivity(currentActivity);
+                let defaultAlertText = 'Request Sent';
+                if (selectedAdditionalChargeId) {
+                    defaultAlertText = 'Saved successfully';
                 }
-            /> : this.getSpacer()}
-            {data?.problemStatus !== "C" ? <ToolTip
-                title="Add Travel"
-                content={<a
-                    className="fal fa-car fa-2x m-5 pointer icon"
-                    href={`Activity.php?action=createFollowOnActivity&callActivityID=${data?.callActivityID}&callActivityTypeID=22`}
-                />
+                this.alert(defaultAlertText);
+            } catch (error) {
+                let message = error;
+                if (typeof (error) === 'object' && "message" in error) {
+                    message = error.message;
                 }
-            /> : null}
-            {currentUser.isSDManager && data?.problemHideFromCustomerFlag == 'Y' ? <ToolTip
-                    title="Unhide SR"
-                    content={<i
-                        className="fal fa-eye-slash fa-2x m-5 pointer icon"
-                        onClick={() => this.handleUnhideSR(data)}
-                    />}
-                />
-                : this.getSpacer()}
-            <TimeBudgetElement
-                currentUserTeamId={currentUser?.teamID}
-                hdRemainMinutes={data?.hdRemainMinutes}
-                esRemainMinutes={data?.esRemainMinutes}
-                imRemainMinutes={data?.imRemainMinutes}
-                projectRemainMinutes={data?.projectRemainMinutes}
-                onExtraTimeRequest={() => this.handleExtraTime(data)}
-            />
-            {this.getSpacer()}
-            <ToolTip
-                title="Calendar"
-                content={<a
-                    className="fal fa-calendar-alt fa-2x m-5 pointer icon"
-                    href={`Activity.php?action=addToCalendar&callActivityID=${data?.callActivityID}`}
-                />
-                }
-            />
-            <ToolTip
-                title="Time Breakdown"
-                content={<a
-                    className="fal fa-calculator-alt fa-2x m-5 pointer icon"
-                    onClick={() => window.open(`Popup.php?action=timeBreakdown&problemID=${data?.problemID}`, 'popup', 'width=800,height=400')}
-                />
-                }
-            />
-            {data?.isOnSiteActivity ? <ToolTip
-                    title="Send client a visit confirmation email"
-                    content={<i
-                        className="fal fa-envelope fa-2x m-5 pointer icon"
-                        onClick={() => this.handleConfirmEmail(data)}
-                    />}
-                />
-                : this.getSpacer()}
-        </div>
-        </div>
+                this.alert(`Failed to save request:${message}`);
+            }
+        } catch (rejectedPromise) {
+
+        }
+    }
+    handleCurrentChargeableWorkRequest = async () => {
+        const shouldReload = await this.showAdditionalTimeRequestModal();
+        if (shouldReload) {
+            const {currentActivity} = this.state;
+            await this.loadCallActivity(currentActivity);
+        }
     }
 
     shouldShowExpenses(data, currentUser) {
@@ -401,7 +496,22 @@ class ActivityDisplayComponent extends MainComponent {
     }
 
     getSpacer = () => {
-        return this.el('span', {style: {width: 35}})
+        return <span style={{width: "35px"}}/>
+    }
+
+    getCallbackModal = () => {
+        const {showCallbackModal, data} = this.state;
+        if (!showCallbackModal)
+            return null;
+        return <CallbackModal key="modal"
+                              show={showCallbackModal}
+                              onClose={this.handleCallbackClose}
+                              contactID={data.contactID}
+                              customerID={data.customerId}
+                              problemID={data.problemID}
+                              contactName={data.contactName}
+        >
+        </CallbackModal>
     }
     handleConfirmEmail = async (data) => {
         if (!data.customerNotes) {
@@ -446,7 +556,7 @@ class ActivityDisplayComponent extends MainComponent {
         this.setState({showFollowOn: true});
     }
 
-    handleGeneratPassword = () => {
+    handleGeneratePassword = () => {
         window.open("Password.php?action=generate&htmlFmt=popup", 'reason', 'scrollbars=yes,resizable=yes,height=524,width=855,copyhistory=no, menubar=0');
     }
     handleSalesOrder = async (activityId, serviceRequestId) => {
@@ -733,32 +843,7 @@ class ActivityDisplayComponent extends MainComponent {
         );
 
     }
-    getNotesElement = () => {
-        const {data} = this.state;
-        return (
-            <div className="round-container">
-                <div className="flex-row">
-                    <label className="label mt-5 mr-3 ml-1 mb-5"
-                           style={{display: "block"}}
-                    >
-                        Internal Notes
-                    </label>
-                    <ToolTip
-                        width="15"
-                        title="These are internal notes only and not visible to the customer. These are per Service Request."
-                        content={
-                            <i className="fal fa-info-circle mt-5 pointer icon"/>
-                        }
-                    >
 
-                    </ToolTip>
-                </div>
-                <div className="internalNotesContainer">
-                    <InternalNotesListComponent internalNotes={data?.internalNotes}/>
-                </div>
-            </div>
-        )
-    }
     getcustomerNotesElement = () => {
         const {el} = this;
         const {data} = this.state;
@@ -778,100 +863,140 @@ class ActivityDisplayComponent extends MainComponent {
         );
     }
 
-    async deleteDocument(id) {
-        const {data} = this.state;
-        if (await this.confirm('Are you sure you want to remove this document?')) {
-            await this.api.deleteDocument(this.state.currentActivity, id);
-            data.documents = data.documents.filter(d => d.id !== id);
-            this.setState({data});
-        }
-    }
-
     getContentElement = () => {
         const {data} = this.state;
         const {el} = this;
 
 
-        return el('div', {className: "activities-container"},
-            el('table', {style: {width: "100%"}},
-                el('tbody', null,
-                    el('tr', null,
-                        el('td', {className: "display-label", style: {width: "80px"}}, "Status"),
-                        el('td', {className: "display-content"}, data?.problemStatusDetials + this.getAwaitingTitle(data)),
-                        el('td', {className: "display-label"}, data?.authorisedBy ? "Authorised by" : ''),
-                        el('td', {className: "display-content"}, data?.authorisedBy),
-                        el('td', {className: "display-label"}, "Type"),
-                        el('td', {colSpan: 3, className: "nowrap"}, data?.activityType),
-                    ),
+        return (
+            <div className="activities-container">
+                <table style={{width: '100%'}}>
+                    <tbody>
+                    <tr>
+                        <td className="display-label"
+                            style={{width: "80px"}}
+                        >Status
+                        </td>
+                        <td className="display-content">{data?.problemStatusDetials + this.getAwaitingTitle(data)}</td>
+                        <td className="display-label">{data?.authorisedBy ? "Authorised by" : ''}</td>
+                        <td className="display-content">{data?.authorisedBy}</td>
+                        <td className="display-label">Type</td>
+                        <td colSpan="3"
+                            className="nowrap display-content"
 
-                    el('tr', null,
-                        el('td', {className: "display-label"}, "Priority"),
-                        el('td', {className: "display-content"}, data?.priority),
-                        (
-                            <td style={{textAlign: "center"}}
-                                colSpan="1"
-                            >
-                                {this.getHiddenSRElement(data)}
-                            </td>
-                        ),
-                        el('td', null),
+                        >
+                            <div style={{display: "flex", alignItems: "center"}}>
+                                <label className="mr-3">{data?.activityType}</label>
+                                {this.getInboundIcon()}
+                            </div>
+                        </td>
+                    </tr>
 
-                        el('td', {className: "display-label"}, "Date"),
-                        el('td', {colSpan: 3, className: "display-content"}, moment(data?.date).format("DD/MM/YYYY")),
-                    ),
 
-                    el('tr', null,
-                        el('td', {className: "display-label"}, "Contract"),
-                        el('td', {className: "display-content"}, data?.contractType),
-                        el('td', {className: "display-label"}, "Completed On"),
-                        el('td', {className: "display-content"}, data?.completeDate ? moment(data?.completeDate).format("DD/MM/YYYY") : null),
+                    <tr>
+                        <td className="display-label">Priority</td>
+                        <td className="display-content">{data?.priority}</td>
+                        <td style={{textAlign: "center"}}
+                            colSpan="1"
+                        >
+                            {this.getHiddenSRElement(data)}
+                        </td>
+                        <td/>
+                        <td className="display-label">Date</td>
+                        <td colSpan="3"
+                            className="display-content"
+                        > {moment(data?.date).format("DD/MM/YYYY")}</td>
+                    </tr>
 
-                        el('td', {className: "display-label"}, "Time From"),
-                        el('td', {style: {width: 10}}, data?.startTime),
-                        el('td', {className: "display-label", style: {width: 10}}, data?.endTime ? "To" : ""),
-                        el('td', null, data?.endTime),
-                    ),
+                    <tr>
+                        <td className="display-label">Contract</td>
+                        <td className="display-content">{data?.contractType}</td>
+                        <td className="display-label">Completed On</td>
+                        <td className="display-content">{data?.completeDate ? moment(data?.completeDate).format("DD/MM/YYYY") : null}</td>
 
-                    el('tr', null,
-                        el('td', {className: "display-label"}, "Root Cause"),
-                        el('td', {className: "display-content"}, data?.rootCauseDescription),
-                        el('td', {className: "display-label"}, "Top-Up Value"),
-                        el('td', null, data?.curValue),
-                        el('td', {className: "display-label"}, "User"),
-                        el('td', {colSpan: 3, className: "display-content"}, data?.engineerName),
-                    ),
+                        <td className="display-label">Time From</td>
+                        <td style={{width: 10}}>{data?.startTime}</td>
+                        <td className="display-label"
+                            style={{width: 10}}
+                        >{data?.endTime ? "To" : ""}</td>
+                        <td>{data?.endTime}</td>
+                    </tr>
 
-                    el('tr', null,
-                        el('td', {className: "display-label"}, "Summary"),
-                        el('td', {className: "display-content",colSpan:3}, data?.emailsubjectsummary),
-                        el('td', {className: "display-label"}, "Asset"),
-                        el('td', {colSpan: 3, className: "nowrap"}, data?.assetName || (data?.emptyAssetReason) || ''),
-                    ),
+                    <tr>
+                        <td className="display-label">Root Cause</td>
+                        <td className="display-content">{data?.rootCauseDescription}</td>
+                        <td className="display-label">Top-Up Value</td>
+                        <td>{data?.curValue}</td>
+                        <td className="display-label">User</td>
+                        <td colSpan="3"
+                            className="display-content"
+                        >{data?.engineerName}</td>
+                    </tr>
 
-                    data?.currentUser ? el('tr', null,
-                        el('td', {
-                            colSpan: 8,
-                            style: {backgroundColor: data?.currentUserBgColor, textAlign: "center"}
-                        }, data?.currentUser),
-                    ) : null,
-                )));
+                    <tr>
+                        <td className="display-label">Summary</td>
+                        <td className="display-content"
+                            colSpan="3"
+                        >{data?.emailsubjectsummary}</td>
+                        <td className="display-label">Asset</td>
+                        <td colSpan="3"
+                            className="nowrap"
+                        >
+                            {this.getAssetName(data)}
+                        </td>
+                    </tr>
+                    {
+                        data?.currentUser ? (
+                            <tr>
+                                <td
+                                    colSpan="8"
+                                    style={{backgroundColor: data?.currentUserBgColor, textAlign: "center"}}
+                                > {data?.currentUser}</td>
+                            </tr>
+
+                        ) : null
+                    }
+                    </tbody>
+                </table>
+            </div>
+        )
+    }
+
+    getAssetName(data) {
+        if (!data) {
+            return '';
+        }
+        if (data.emptyAssetReason) {
+            return data.emptyAssetReason;
+        }
+        return (
+            <React.Fragment>
+                <span>
+                    {data?.assetName}
+                </span>
+                {
+                    data.unsupportedCustomerAsset ? <i className="fa  fa-do-not-enter"
+                                                       style={{verticalAlign: "middle", paddingLeft: "0.5em"}}
+                    /> : ''
+                }
+            </React.Fragment>
+        )
 
     }
+
     getAwaitingTitle = (data) => {
-        if (data?.problemStatus !== "F" && data?.problemStatus !== "C") {
-            if (data?.awaitingCustomerResponseFlag == 'N')
-                return " - Awaiting CNC";
-            else if (data?.awaitingCustomerResponseFlag == 'Y')
-                return " - On Hold";
-            else
-                return "";
-        } else return "";
+        if (!(data?.problemStatus !== "F" && data?.problemStatus !== "C")) {
+            return "";
+        }
+        if (data?.awaitingCustomerResponseFlag == 'N')
+            return " - Awaiting CNC";
 
-    }
+        if (data?.awaitingCustomerResponseFlag == 'Y') {
+            const dateTime = dateFormatExcludeNull(`${data.alarmDate} ${data.alarmTime}:00`, null, 'DD/MM/YYYY HH:mm')
+            return ` - On Hold until ${dateTime}`;
+        }
+        return "";
 
-    handleUpload() {
-        const {currentActivity} = this.state;
-        this.loadCallActivity(currentActivity);
     }
 
     getExpensesElement = () => {
@@ -937,139 +1062,52 @@ class ActivityDisplayComponent extends MainComponent {
             })
         );
     }
-    // Parts used, change requestm and sales request
-    handleTemplateChanged = (event) => {
 
-        const id = event.target.value;
-        const {templateOptions} = this.state;
-        let templateDefault;
-        let templateOptionId = null;
-        let templateValue = '';
-        if (id >= 0) {
-            const op = templateOptions.filter(s => s.id == id)[0];
-            templateDefault = op.template;
-            templateValue = op.template;
-            templateOptionId = op.id;
-        } else {
-            templateDefault = '';
-        }
-        this.setState({templateDefault, templateOptionId, templateValue});
-    }
-    handleTemplateValueChange = (data) => {
-        this.setState({templateValue: data})
-    }
-    handleTemplateSend = async (type) => {
-        const {templateValue, templateOptionId, data, currentActivity} = this.state;
-        if (templateValue == '') {
-            this.alert('Please enter detials');
-            return;
-        }
-        const payload = new FormData();
-        payload.append("message", templateValue);
-        payload.append("type", templateOptionId);
-        switch (type) {
-            case "changeRequest":
-                await this.api.sendChangeRequest(data.problemID, payload);
-                this.alert('Change Request Sent');
-                break;
-            case "partsUsed":
-                const object = {
-                    message: templateValue,
-                    callActivityID: currentActivity,
-                };
-                const result = await this.api.sendPartsUsed(object);
-                this.alert('Parts Used Sent');
-                break;
-            case "salesRequest":
-                await this.api.sendSalesRequest(
-                    data.customerId,
-                    data.problemID,
-                    payload
-                );
-                this.alert('Sales Request Sent');
-                break;
-        }
-        this.loadCallActivity(currentActivity);
-        this.setState({_showModal: false})
-    }
     getTemplateModal = () => {
-        const {templateDefault, templateOptions, _showModal, templateTitle, templateType} = this.state;
-        const {el} = this;
-        return el(
-            Modal, {
-                width: 900, key: templateType, onClose: () => this.setState({_showModal: false}),
-                title: templateTitle,
-                show: _showModal,
-                content: el('div', {key: 'conatiner'},
-                    templateOptions.length > 0 ? el('select', {
-                            onChange: this.handleTemplateChanged,
-                            autoFocus: true,
-                            value: ''
-                        },
-                        el('option', {key: 'empty', value: -1}, "-- Pick an option --"),
-                        templateOptions.map(s => el('option', {key: s.id, value: s.id}, s.name))) : null,
-                    el('div', {className: 'modal_editor'},
-                        el('div', {id: 'top2'}),
-                        el(CNCCKEditor, {
-                            key: "salesRequestEditor",
-                            name: "salesRequest",
-                            value: templateDefault,
-                            type: "inline",
-                            onChange: this.handleTemplateValueChange,
-                            sharedSpaces: true,
-                            top: "top2",
-                            bottom: "bottom2"
-                        }),
-                        el('div', {id: 'bottom2'}),
-                    )
-                ),
-                footer: el('div', {key: "footer"},
-                    el('button', {onClick: () => this.handleTemplateSend(templateType)}, "Send"),
-                    el('button', {onClick: () => this.setState({_showModal: false})}, "Cancel"),
-                )
-            }
+
+        const {
+            templateType,
+            data: {customerId, problemID: serviceRequestId},
+            currentActivity: activityId,
+        } = this.state;
+
+        if (!templateType) {
+            return '';
+        }
+        return (
+            <TemplateModal key={templateType}
+                           templateType={templateType}
+                           onClose={
+                               (isSent) => {
+                                   if (isSent) this.loadCallActivity(activityId);
+                                   this.setState({templateType: null})
+                               }
+                           }
+                           customerId={customerId}
+                           serviceRequestId={serviceRequestId}
+                           activityId={activityId}
+            />
         )
     }
     handleTemplateDisplay = async (type) => {
-        let options = [];
-        let templateTitle = '';
-        switch (type) {
-            case "salesRequest":
-                options = await this.api.getSalesRequestOptions();
-                templateTitle = "Sales Request";
-                break;
-            case "changeRequest":
-                options = await this.api.getChangeRequestOptions();
-                templateTitle = "Change Request";
-                break;
-            case "partsUsed":
-                templateTitle = "Parts Used";
-                break;
-        }
-        const templateDefault = '';
-        this.setState({templateOptions: options, _showModal: true, templateType: type, templateTitle, templateDefault})
-    }
-
-    onTaskListUpdated = () => {
-        const {currentActivity} = this.state;
-        this.loadCallActivity(currentActivity);
+        this.setState({templateType: type});
     }
 
     getFooter = () => {
         return (
             <div className="activities-container">
                 <button className="m-5 btn-info"
-                        onClick={() => this.handleTemplateDisplay("partsUsed")}
+                        onClick={() => this.handleTemplateDisplay(TEMPlATE_TYPES.partsUsed)}
                 >
                     Parts Used
                 </button>
                 <button className="m-5 btn-info"
-                        onClick={() => this.handleTemplateDisplay("salesRequest")}
+                        onClick={() => this.handleTemplateDisplay(TEMPlATE_TYPES.salesRequest)}
                 >
                     Sales Request
                 </button>
                 <button className="m-5 btn-info"
-                        onClick={() => this.handleTemplateDisplay("changeRequest")}
+                        onClick={() => this.handleTemplateDisplay(TEMPlATE_TYPES.changeRequest)}
                 >
                     Change Request
                 </button>
@@ -1093,17 +1131,11 @@ class ActivityDisplayComponent extends MainComponent {
 
     getTaskListElement() {
         const {data} = this.state;
-        if (!data) {
+        if (!data || data.entire) {
             return '';
         }
         return (
-            <TaskListComponent
-                taskListUpdatedAt={data.taskListUpdatedAt}
-                taskListUpdatedBy={data.taskListUpdatedBy}
-                taskList={data.taskList}
-                problemId={data.problemID}
-                onUpdatedTaskList={this.onTaskListUpdated}
-            />
+            <TaskListComponent serviceRequestId={data.problemID}/>
         );
     }
 
@@ -1111,32 +1143,91 @@ class ActivityDisplayComponent extends MainComponent {
         this.loadCallActivity(this.state.currentActivity)
     }
 
+    handleAdditionalTimeRequestModalOnChange = (data) => {
+        if (this.additionalTimeRequestResolve) {
+            this.additionalTimeRequestResolve(data);
+        }
+        this.hideAdditionalTimeRequestModal();
+    }
+
+    hideAdditionalTimeRequestModal = () => {
+        this.setState({showAdditionalTimeRequestModal: false})
+    }
+
+    getAdditionalChargeModal = () => {
+        const {data, showAdditionalTimeRequestModal} = this.state;
+
+        if (!data || !showAdditionalTimeRequestModal) {
+            return '';
+        }
+        if (data.chargeableWorkRequestId) {
+            return (
+                <ExistingAdditionalChargeableWorkRequestModal
+                    key="existingAdditionalChargeRequest"
+                    chargeableWorkRequestId={data.chargeableWorkRequestId}
+                    show={showAdditionalTimeRequestModal}
+                    onClose={this.handleExistingAdditionalChargeableWorkRequestModalOnClose}
+                />
+            )
+        }
+        return (
+            <AdditionalChargeRequestModal key="additionalTimeRequestModal"
+                                          show={showAdditionalTimeRequestModal}
+                                          onChange={this.handleAdditionalTimeRequestModalOnChange}
+                                          onCancel={this.handleAdditionalTimeRequestModalOnCancel}
+                                          serviceRequestData={data}
+            />
+        )
+    }
+    handleCallbackClose = () => {
+        this.setState({showCallbackModal: false});
+    }
+
+    getInboundIcon = () => {
+        const {data} = this.state;
+        switch (data.Inbound) {
+            case true:
+                return (
+                    <ToolTip title="Inbound Contact" width={15}>
+                        <i className="fal fa-sign-in pointer icon"></i>
+                    </ToolTip>
+                );
+            case false:
+                return (
+                    <ToolTip title="Outbound Contact" width={15}>
+                        <i className="fal fa-sign-out  pointer icon"></i>
+                    </ToolTip>
+                );
+            default:
+                return null;
+        }
+    }
+
     render() {
-        const {data, showSalesOrder} = this.state;
+        const {data, showSalesOrder, _loadedData} = this.state;
+
+        if (!_loadedData) {
+            return <div className="loading"/>
+        }
+
         return (
             <div style={{width: "90%"}}>
+                {this.getAdditionalChargeModal()}
                 {this.getAlert()}
                 {this.getConfirm()}
                 {this.getPrompt()}
                 {this.getFollowOnElement()}
                 {this.getProjectsElement()}
                 {this.getHeader()}
+                {this.getCallbackModal()}
                 {this.getActions()}
                 {this.getActivitiesElement()}
                 {this.getContentElement()}
                 {this.getDetailsElement()}
                 {this.getcustomerNotesElement()}
-                <InternalNotes onNoteAdded={this.onNoteAdded}
-                               data={data}
-                />
+                <InternalNotes serviceRequestId={data?.problemID}/>
                 {this.getTaskListElement()}
-                <CustomerDocumentUploader
-                    onDeleteDocument={(id) => this.deleteDocument(id)}
-                    onFilesUploaded={() => this.handleUpload()}
-                    serviceRequestId={data?.problemID}
-                    activityId={data?.callActivityID}
-                    documents={data?.documents}
-                />
+                <CustomerDocumentUploader serviceRequestId={data?.problemID}/>
                 <InternalDocumentsComponent serviceRequestId={data?.problemID}/>
                 {this.getExpensesElement()}
                 {this.getTemplateModal()}
@@ -1145,7 +1236,7 @@ class ActivityDisplayComponent extends MainComponent {
                                                            customerId={data?.customerId}
                                                            show={showSalesOrder}
                                                            onClose={this.handleSalesOrderClose}
-                ></LinkServiceRequestOrder> : null}
+                /> : null}
             </div>
         );
     }
@@ -1155,6 +1246,58 @@ class ActivityDisplayComponent extends MainComponent {
             return this.loadCallActivity(res.data);
         })
     }
+
+    handleAdditionalTimeRequestModalOnCancel = () => {
+        if (this.additionalTimeRequestReject) {
+            this.additionalTimeRequestReject();
+        }
+        this.hideAdditionalTimeRequestModal();
+    };
+    handleExistingAdditionalChargeableWorkRequestModalOnClose = (closingValue) => {
+        if (this.additionalTimeRequestResolve) {
+            this.additionalTimeRequestResolve(closingValue);
+        }
+        this.hideAdditionalTimeRequestModal();
+    };
+
+    showCallbackModal = () => {
+        this.setState({showCallbackModal: true});
+    };
+    forceClosingSR = async () => {
+        const {filters, data} = this.state;
+        if (filters.holdForQA) {
+            this.alert('Please clear the QA flag before marking this Service Request as complete.');
+            return;
+        }
+        const answer = await this.confirm('Please confirm you want to mark this Service Request as completed.')
+        if (!answer) {
+            return;
+        }
+        try {
+            const res = await this.api.forceCloseServiceRequest(data.problemID);
+            window.location.reload();
+        } catch (error) {
+            console.log(error);
+            let message = "Failed to close service request";
+            if ('error' in error) {
+                message = error.error.message;
+            }
+            this.alert(message);
+        }
+    };
+
+    renderForceCompletionAction = () => {
+        const {data} = this.state;
+
+        if (!data.isAllowedForceClosingSR || data.problemStatus !== 'F' || ![1, 2, 3].includes(data.priorityNumber)) {
+            return null;
+        }
+        return (
+            <ToolTip title={'Force Early SR Completion'}>
+                <a className={`fal fa-door-closed fa-2x m-5 pointer icon`} onClick={this.forceClosingSR}/>
+            </ToolTip>
+        )
+    };
 }
 
 export default ActivityDisplayComponent;

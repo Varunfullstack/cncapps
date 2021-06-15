@@ -3,6 +3,7 @@
 * @authors Karim Ahmed
 * @access public
 */
+global $cfg;
 require_once($cfg["path_dbe"] . "/DBCNCEntity.inc.php");
 
 class DBEVat extends DBCNCEntity
@@ -44,11 +45,10 @@ class DBEVat extends DBCNCEntity
     }
 
     // Note: no PK
-    function getRow()
+    function getRow($pkValue = null)
     {
         $this->setQueryString(
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName()
+            "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName()
         );
         return (parent::getRow());
     }
@@ -58,7 +58,7 @@ class DBEVat extends DBCNCEntity
     {
     }
 
-    function deleteRow()
+    function deleteRow($pkValue = null)
     {
     }
 

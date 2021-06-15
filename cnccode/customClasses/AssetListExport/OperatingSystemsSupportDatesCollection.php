@@ -1,7 +1,8 @@
 <?php
 
 namespace CNCLTD\AssetListExport;
-
+global $cfg;
+require_once($cfg["path_dbe"] . "/DBEOSSupportDates.php");
 use DBEOSSupportDates;
 
 class OperatingSystemsSupportDatesCollection

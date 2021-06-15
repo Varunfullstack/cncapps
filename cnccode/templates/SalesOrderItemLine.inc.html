@@ -3,6 +3,15 @@
     onMouseOut="this.bgColor='';"
     data-line-id="{lineId}"
     data-sequence-no="{sequenceNo}"
+    data-line-type="{lineType}"
+    data-item-id="{itemId}"
+    data-supplier-id="{supplierId}"
+    data-item-updated-by="{itemUpdatedBy}"
+    data-item-updated-at="{itemUpdatedAt}"
+    data-item-cost="{itemCost}"
+    data-item-sale="{itemSale}"
+    data-show-stock="{showStock}"
+    data-amount-in-stock="{amountInStock}"
 >
     <td class="orderLineItem handle salesOrderButton">
         <i class="fal fa-sort fa-2x"></i>
@@ -31,14 +40,17 @@
         >
     </td>
     <td class="orderLineItem">{renewalIcon}</td>
+    <td class="orderLineItem stock-level-container">
+
+    </td>
     <td class="orderLineItem">
-        <DIV align="left"> {salesOrderLineDesc}</DIV>
+        <DIV align="left">{salesOrderLineDesc}</DIV>
     </td>
     <td class="orderLineItem">
         <DIV align="left"> {partNo}</DIV>
     </td>
-    <td class="orderLineItem">
-        <DIV align="left"> {lineSupplierName}</DIV>
+    <td class="orderLineItem" >
+        <DIV align="left" class="supplier-name"> {lineSupplierName}</DIV>
     </td>
     <td class="orderLineItem">
         <INPUT {readOnly}

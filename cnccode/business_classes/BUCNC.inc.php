@@ -4,6 +4,7 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+global $cfg;
 require_once($cfg["path_gc"] . "/Business.inc.php");
 
 class BUCNC extends Business
@@ -29,10 +30,10 @@ class BUCNC extends Business
      */
     function getData(&$dbSource, &$dsDestination)
     {
-        if (gettype($dbSource) != "object")
-            $this->raiseError("dbSource is not initialised");
-        if (!is_subclass_of($dbSource, DA_CLASSNAME_DBENTITY))
-            $this->raiseError("dbSource must be subclass of " . DA_CLASSNAME_DBENTITY);
+        if (gettype($dbSource) != "object") $this->raiseError("dbSource is not initialised");
+        if (!is_subclass_of($dbSource, DA_CLASSNAME_DBENTITY)) $this->raiseError(
+            "dbSource must be subclass of " . DA_CLASSNAME_DBENTITY
+        );
         $dsDestination = $dbSource;
         return ($dsDestination->rowCount() > 0);
     }

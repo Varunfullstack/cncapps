@@ -4,6 +4,9 @@ import APIStandardText from "../../services/APIStandardText";
 import React from 'react';
 
 import striptags from "striptags";
+import ToolTip from "../ToolTip";
+import CNCCKEditor from "../CNCCKEditor";
+import PropTypes from "prop-types";
 
 export const ASSET_SELECTED_TYPE = {
     NO_ASSET_REASON: "NO_ASSET_REASON",
@@ -21,24 +24,27 @@ export default class AssetListSelectorComponent extends React.PureComponent {
     constructor(props, context) {
         super(props, context);
 
-
         this.state = {
-            noAssetReasons: [],
+            emptyAssetReasons: [],
             assets: [],
             maxUserNameLength: 0,
             maxComputerNameLength: 0,
-            selectedOption: null
+            maxBiosVerLength: 0,
+            selectedOption: null,
+            isUnsupported: false
         }
-        if (this.props.noAssetReason) {
-            this.state.selectedOption = {isAsset: false, template: this.props.noAssetReason};
+        if (this.props.emptyAssetReason) {
+            this.state.selectedOption = {isAsset: false, template: this.props.emptyAssetReason};
         }
         if (this.props.assetName) {
-            const [, userName, biosVer] = this.props.assetTitle.split(' ');
+
+            const [, userName, biosVer] = (this.props.assetTitle || '').split(' ');
             this.state.selectedOption = {
                 isAsset: true,
                 name: this.props.assetName,
                 lastUsername: userName == "undefined" ? "" : userName,
-                biosVer: biosVer == "undefined" ? "" : biosVer
+                biosVer: biosVer == "undefined" ? "" : biosVer,
+                unsupported: this.props.unsupportedCustomerAsset
             };
         }
     }
@@ -52,7 +58,7 @@ export default class AssetListSelectorComponent extends React.PureComponent {
         await Promise.all([
             this.APICustomer.getCustomerAssets(customerId),
             this.APIStandardText.getOptionsByType("Missing Asset Reason")
-        ]).then(([assets, noAssetReasons]) => {
+        ]).then(([assets, emptyAssetReasons]) => {
             assets = assets.map((asset) => {
                 if (
                     asset.biosName &&
@@ -63,12 +69,12 @@ export default class AssetListSelectorComponent extends React.PureComponent {
                 }
                 return asset;
             });
-            noAssetReasons = noAssetReasons.map(x => ({
+            emptyAssetReasons = emptyAssetReasons.map(x => ({
                 ...x,
                 template: striptags(x.template)
             })).sort((a, b) => a.template.localeCompare(b.template));
 
-            const {maxComputerNameLength, maxUserNameLength} = assets.reduce(
+            const {maxComputerNameLength, maxUserNameLength, maxBiosVerLength} = assets.reduce(
                 (acc, asset) => {
 
                     if (asset.name && asset.name.length > acc.maxComputerNameLength) {
@@ -77,17 +83,21 @@ export default class AssetListSelectorComponent extends React.PureComponent {
                     if (asset.lastUsername && asset.lastUsername.length > acc.maxUserNameLength) {
                         acc.maxUserNameLength = asset.lastUsername.length;
                     }
+                    if (asset.biosVer && asset.biosVer.length > acc.maxBiosVerLength) {
+                        acc.maxBiosVerLength = asset.biosVer.length;
+                    }
                     return acc;
-                }, {maxComputerNameLength: 0, maxUserNameLength: 0})
-            this.setState({noAssetReasons, assets, maxUserNameLength, maxComputerNameLength});
+                }, {maxComputerNameLength: 0, maxUserNameLength: 0, maxBiosVerLength: 0})
+            this.setState({emptyAssetReasons, assets, maxUserNameLength, maxComputerNameLength, maxBiosVerLength});
         })
     }
 
     getOptions() {
-        const {noAssetReasons, assets} = this.state;
+
+        const {emptyAssetReasons, assets} = this.state;
         return [
             ...assets.map(x => ({...x, isAsset: true})),
-            ...noAssetReasons.map(x => ({...x, isAsset: false}))
+            ...emptyAssetReasons.map(x => ({...x, isAsset: false}))
         ];
     }
 
@@ -135,8 +145,8 @@ export default class AssetListSelectorComponent extends React.PureComponent {
     }
 
     render() {
-        const {maxUserNameLength, maxComputerNameLength, selectedOption} = this.state;
-
+        const {maxUserNameLength, maxComputerNameLength, maxBiosVerLength, selectedOption} = this.state;
+        const {showUnsupportedWhileSelected} = this.props;
 
         if (selectedOption) {
             return (
@@ -151,6 +161,16 @@ export default class AssetListSelectorComponent extends React.PureComponent {
                     >
                         X
                     </button>
+                    {
+                        showUnsupportedWhileSelected && selectedOption.unsupported ?
+                            <ToolTip title="Asset is not covered by support contract"
+                                     style={{display: "inline-block", verticalAlign: 'middle'}}
+                            >
+                                <i className="fa fa-2x fa-do-not-enter"
+                                   style={{verticalAlign: "middle"}}
+                                />
+                            </ToolTip> : ''
+                    }
                 </div>
             )
         }
@@ -167,31 +187,52 @@ export default class AssetListSelectorComponent extends React.PureComponent {
                                       <React.Fragment>
                                           <div style={{
                                               display: "inline-block",
-                                              width: `${maxComputerNameLength + 4}ch`, fontSize: 12,
+                                              fontSize: 12,
                                               fontFamily: "Arial",
-                                              letterSpacing: "normal"
+                                              letterSpacing: "normal",
+                                              whiteSpace: 'nowrap',
+                                              minWidth: "2em"
+                                          }}
+                                          >
+                                              {value.unsupported ? <i className="fa fa-2x fa-do-not-enter"
+                                              /> : ''}
+                                          </div>
+                                          <div style={{
+                                              display: "inline-block",
+                                              minWidth: `${maxComputerNameLength + 4}ch`, fontSize: 12,
+                                              fontFamily: "Arial",
+                                              letterSpacing: "normal",
+                                              whiteSpace: 'nowrap',
+                                              paddingLeft: "1em"
                                           }}
                                           >
                                               {value.name}
                                           </div>
                                           <div style={{
-                                              display: "inline-block", width: `${maxUserNameLength + 4}ch`,
+                                              display: "inline-block",
+                                              minWidth: `${maxUserNameLength + 4}ch`,
                                               fontSize: 12,
                                               fontFamily: "Arial",
-                                              letterSpacing: "normal"
+                                              letterSpacing: "normal",
+                                              whiteSpace: 'nowrap',
+                                              paddingLeft: "1em"
                                           }}
                                           >
                                               {value.lastUsername}
                                           </div>
                                           <div style={{
                                               display: "inline-block",
+                                              minWidth: `${maxBiosVerLength + 4}ch`,
                                               fontSize: 12,
                                               fontFamily: "Arial",
-                                              letterSpacing: "normal"
+                                              letterSpacing: "normal",
+                                              whiteSpace: 'nowrap',
+                                              paddingLeft: "1em"
                                           }}
                                           >
                                               {value.biosVer}
                                           </div>
+
                                       </React.Fragment>
                                   )
                               }
@@ -221,5 +262,12 @@ export default class AssetListSelectorComponent extends React.PureComponent {
             />
         );
     }
-
 }
+
+AssetListSelectorComponent.propTypes = {
+    emptyAssetReason: PropTypes.string,
+    assetName: PropTypes.string,
+    assetTitle: PropTypes.string,
+    customerId: PropTypes.number,
+    onChange: PropTypes.func
+};

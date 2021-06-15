@@ -16,16 +16,16 @@ class LoggerCLI
     /**
      * LoggerCLI constructor.
      * @param $logName
-     * @throws \Exception
+     * @param int $loggerLevel
      */
-    public function __construct($logName)
+    public function __construct($logName, int $loggerLevel = Logger::INFO)
     {
         $date        = new \DateTime();
         $this->log   = new Logger('logger');
         $logFileName = $logName . ".log";
         $logPath     = APPLICATION_LOGS . '/' . $logFileName;
         $this->log->pushHandler(new \Monolog\Handler\RotatingFileHandler($logPath, 14, Logger::INFO));
-        $consoleHandler = new StreamHandler('php://stdout', Logger::INFO);
+        $consoleHandler = new StreamHandler('php://stdout', $loggerLevel);
         $consoleHandler->setFormatter(new ColoredLineFormatter());
         $this->log->pushHandler($consoleHandler);
     }
@@ -45,9 +45,14 @@ class LoggerCLI
         $this->log->notice($message);
     }
 
-    public function warning($message)
+    public function warning($message, $context = [])
     {
-        $this->log->warning($message);
+        $this->log->warning($message, $context);
+    }
+
+    public function debug($message, $context = [])
+    {
+        $this->log->debug($message, $context);
     }
 }
 

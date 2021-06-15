@@ -65,6 +65,8 @@ class CTSLAPerformance extends CTCNC
         $this->buTeamPerformance->initialiseSearchForm($dsSearchForm);
 
         $this->setTemplateFiles(array('SLAPerformance' => 'SLAPerformance.inc'));
+        $this->loadReactCSS('SpinnerHolderComponent.css');
+        $this->loadReactScript('SpinnerHolderComponent.js');
 
         if (isset($_REQUEST ['searchForm'])) {
 

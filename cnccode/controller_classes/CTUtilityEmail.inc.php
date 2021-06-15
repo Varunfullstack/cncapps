@@ -1,14 +1,12 @@
 <?php
-/**
- * Expense controller class
- * CNC Ltd
- *
- * @access public
- * @authors Karim Ahmed - Sweet Code Limited
- */
+use CNCLTD\Business\BUActivity;
+
+global $cfg;
+
+use CNCLTD\Exceptions\APIException;
+
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_dbe'] . '/DBEUtilityEmail.inc.php');
-require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 
 // Actions
 class CTUtilityEmail extends CTCNC
@@ -16,7 +14,7 @@ class CTUtilityEmail extends CTCNC
     /** @var BUActivity */
     public $buActivity;
     public $dsUtilityEmail;
-
+    const CONST_EMAILS='emails';
     function __construct($requestMethod,
                          $postVars,
                          $getVars,
@@ -47,167 +45,116 @@ class CTUtilityEmail extends CTCNC
     function defaultAction()
     {
         switch ($this->getAction()) {
-            case 'delete':
-                if (!$this->getParam('id')) {
-                    http_response_code(400);
-                    throw new Exception('ID is missing');
+            case self::CONST_EMAILS:
+                switch ($this->requestMethod) {
+                    case 'GET':
+                        echo  json_encode($this->getEmails(),JSON_NUMERIC_CHECK);
+                        break;
+                    case 'POST':
+                         echo  json_encode($this->addEmail(),JSON_NUMERIC_CHECK);
+                         break;
+                    case 'PUT':
+                        echo  json_encode($this->updateEmail(),JSON_NUMERIC_CHECK);
+                         break;
+                    case 'DELETE':
+                          echo  json_encode($this->deleteEmail(),JSON_NUMERIC_CHECK);
+                          break;
                 }
-
-                $dbeUtilityEmail = new DBEUtilityEmail($this);
-
-                $dbeUtilityEmail->getRow($this->getParam('id'));
-
-                if (!$dbeUtilityEmail->rowCount) {
-                    http_response_code(404);
-                    exit;
-                }
-                $dbeUtilityEmail->setLogSQLOn();
-                $dbeUtilityEmail->deleteRow();
-                echo json_encode(["status" => "ok"]);
-                break;
-            case 'update':
-
-                if (!$this->getParam('id')) {
-                    throw new Exception('ID is missing');
-                }
-
-                $dbeUtilityEmail = new DBEUtilityEmail($this);
-
-                $dbeUtilityEmail->getRow($this->getParam('id'));
-
-                if (!$dbeUtilityEmail->rowCount) {
-                    http_response_code(404);
-                    exit;
-                }
-
-                $dbeUtilityEmail->setValue(
-                    DBEUtilityEmail::firstPart,
-                    $this->getParam('firstPart')
-                );
-                $dbeUtilityEmail->setValue(
-                    DBEUtilityEmail::lastPart,
-                    $this->getParam('lastPart')
-                );
-
-                $dbeUtilityEmail->updateRow();
-                echo json_encode(["status" => "ok"]);
-                break;
-            case 'create':
-                $dbeUtilityEmail = new DBEUtilityEmail($this);
-
-                $dbeUtilityEmail->setValue(
-                    DBEUtilityEmail::firstPart,
-                    $this->getParam('firstPart')
-                );
-                $dbeUtilityEmail->setValue(
-                    DBEUtilityEmail::lastPart,
-                    $this->getParam('lastPart')
-                );
-
-                $dbeUtilityEmail->insertRow();
-
-                echo json_encode(
-                    [
-                        "id"        => $dbeUtilityEmail->getValue(DBEUtilityEmail::utilityEmailID),
-                        "firstPart" => $dbeUtilityEmail->getValue(DBEUtilityEmail::firstPart),
-                        "lastPart"  => $dbeUtilityEmail->getValue(DBEUtilityEmail::lastPart)
-                    ],
-                    JSON_NUMERIC_CHECK
-                );
-
-                break;
-            case 'getData':
-                $dbeUtilityEmails = new DBEUtilityEmail($this);
-
-                $dbeUtilityEmails->getRows();
-                $data = [];
-                while ($dbeUtilityEmails->fetchNext()) {
-                    $data[] = [
-                        "id"        => $dbeUtilityEmails->getValue(DBEUtilityEmail::utilityEmailID),
-                        "firstPart" => $dbeUtilityEmails->getValue(DBEUtilityEmail::firstPart),
-                        "lastPart"  => $dbeUtilityEmails->getValue(DBEUtilityEmail::lastPart)
-                    ];
-                }
-                echo json_encode($data, JSON_NUMERIC_CHECK);
-                break;
-            case 'displayForm':
+                exit;
             default:
-                $this->displayForm();
+                $this->displayList();
                 break;
         }
     }
 
     /**
-     * Export expenses that have not previously been exported
+     * Display list of Emails
      * @access private
      * @throws Exception
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
      */
-    function displayForm()
+    function displayList()
     {
+        //--------new
         $this->setPageTitle('Utility Emails');
         $this->setTemplateFiles(
-            'UtilityEmail',
-            'UtilityEmail.inc'
+            array('UtilityEmail' => 'UtilityEmail.inc')
         );
-
+        $this->loadReactScript('UtilityEmailsComponent.js');
+        $this->loadReactCSS('UtilityEmailsComponent.css');
         $this->template->parse(
             'CONTENTS',
             'UtilityEmail',
             true
         );
-
-        $URLDeleteItem = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            [
-                'action' => 'delete'
-            ]
-        );
-
-        $URLUpdateItem = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            [
-                'action' => 'update'
-            ]
-        );
-
-        $URLCreateItem = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            [
-                'action' => 'create'
-            ]
-        );
-
-        $URLGetData = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            [
-                'action' => 'getData'
-            ]
-        );
-        $this->template->setVar(
-            [
-                "URLDeleteItem" => $URLDeleteItem,
-                "URLUpdateItem" => $URLUpdateItem,
-                "URLAddItem"    => $URLCreateItem,
-                "URLGetData"    => $URLGetData
-            ]
-        );
-
         $this->parsePage();
     }
+    function getEmails(){
+        $dbeUtilityEmails = new DBEUtilityEmail($this);
 
-    function parsePage()
-    {
-        $urlLogo = '';
-        $this->template->set_var(
-            array(
-                'urlLogo' => $urlLogo,
-                'txtHome' => 'Home'
-            )
-        );
-        parent::parsePage();
+        $dbeUtilityEmails->getRows();
+        $data = [];
+        while ($dbeUtilityEmails->fetchNext()) {
+            $data[] = [
+                "id"        => $dbeUtilityEmails->getValue(DBEUtilityEmail::utilityEmailID),
+                "firstPart" => $dbeUtilityEmails->getValue(DBEUtilityEmail::firstPart),
+                "lastPart"  => $dbeUtilityEmails->getValue(DBEUtilityEmail::lastPart)
+            ];
+        }
+        return $this->success($data);
     }
+    function updateEmail()
+    {
+        $body=$this->getBody(true);
+        $id=@$body["id"];
+        if (!$id) {
+            return $this->fail(APIException::badRequest,"Missing parameters");
+        }
+        $dbeUtilityEmail = new DBEUtilityEmail($this);
+        $dbeUtilityEmail->getRow($id);
+        if (!$dbeUtilityEmail->rowCount) {
+            return $this->fail(APIException::notFound,"Not found");
+        }
+
+        $dbeUtilityEmail->setValue(
+            DBEUtilityEmail::firstPart,
+            $body['firstPart']
+        );
+        $dbeUtilityEmail->setValue(
+            DBEUtilityEmail::lastPart,
+            $body['lastPart']
+        );
+
+        $dbeUtilityEmail->updateRow();
+        return $this->success();
+    }
+    function addEmail(){
+        $body=$this->getBody();
+        $dbeUtilityEmail = new DBEUtilityEmail($this);
+        $dbeUtilityEmail->setValue(
+            DBEUtilityEmail::firstPart,
+            $body->firstPart
+        );
+        $dbeUtilityEmail->setValue(
+            DBEUtilityEmail::lastPart,
+            $body->lastPart
+        );
+
+        $dbeUtilityEmail->insertRow();
+        return $this->success();
+    }
+    function deleteEmail(){
+        $id=@$_REQUEST["id"];
+        if (!$id) {
+            return $this->fail(APIException::badRequest);
+        }
+        $dbeUtilityEmail = new DBEUtilityEmail($this);
+        $dbeUtilityEmail->getRow($id);
+        if (!$dbeUtilityEmail->rowCount) {
+            return $this->fail(APIException::notFound);
+        }
+        $dbeUtilityEmail->setLogSQLOn();
+        $dbeUtilityEmail->deleteRow();
+        return $this->success();
+    }
+
 }// end of class

@@ -10,11 +10,15 @@
  * @authors Karim Ahmed - Sweet Code Limited
  */
 
+use CNCLTD\Business\BUActivity;
+use CNCLTD\Business\StandardTextNotFoundException;
+use CNCLTD\core\domain\usecases\AssignToBeLoggedToServiceRequest;
+use CNCLTD\Data\DBEJProblem;
+use CNCLTD\Exceptions\JsonHttpException;
 use CNCLTD\ServiceRequestInternalNote\infra\ServiceRequestInternalNotePDORepository;
 use CNCLTD\Utils;
 
 global $cfg;
-require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 require_once($cfg['path_bu'] . '/BUHeader.inc.php');
 require_once($cfg['path_bu'] . '/BUProject.inc.php');
 require_once($cfg['path_bu'] . '/BUExpense.inc.php');
@@ -147,7 +151,6 @@ class CTActivity extends CTCNC
     const EDIT_LINKED_SALES_ORDER                      = 'editLinkedSalesOrder';
     const EDIT_SERVICE_REQUEST_HEADER                  = 'editServiceRequestHeader';
     const DISPLAY_OPEN_SRS                             = 'displayOpenSrs';
-    const EDIT_VALUE_ONLY_SERVICE_REQUEST              = 'editValueOnlyServiceRequest';
     const DISPLAY_LAST_ACTIVITY                        = 'displayLastActivity';
     const DISPLAY_FIRST_ACTIVITY                       = 'displayFirstActivity';
     const DISPLAY_SERVICE_REQUEST_FOR_CONTACT_POPUP    = 'displayServiceRequestForContactPopup';
@@ -292,9 +295,6 @@ class CTActivity extends CTCNC
                 break;
             case self::DISPLAY_LAST_ACTIVITY:
                 $this->displayLastActivity();
-                break;
-            case self::EDIT_VALUE_ONLY_SERVICE_REQUEST:
-                $this->editValueOnlyServiceRequest();
                 break;
             case self::DISPLAY_OPEN_SRS:
                 $this->displayOpenSrs();
@@ -449,15 +449,15 @@ class CTActivity extends CTCNC
             case self::ASSIGN_TO_BE_LOGGED_TO_SERVICE_REQUEST:
                 $data = $this->getJSONData();
                 if (!isset($data['toBeLogged'])) {
-                    throw new \CNCLTD\Exceptions\JsonHttpException(51, 'To Be logged id is required');
+                    throw new JsonHttpException(400, 'To Be logged id is required');
                 }
                 if (!isset($data['serviceRequestId'])) {
-                    throw new \CNCLTD\Exceptions\JsonHttpException(51, 'Service request id is required');
+                    throw new JsonHttpException(400, 'Service request id is required');
                 }
                 try {
                     $this->assignToBeLoggedToServiceRequest($data['toBeLogged'], $data['serviceRequestId']);
                 } catch (Exception $exception) {
-                    throw new \CNCLTD\Exceptions\JsonHttpException(51, $exception->getMessage());
+                    throw new JsonHttpException(400, $exception->getMessage());
                 }
                 echo json_encode(["status" => "ok"]);
                 exit;
@@ -1201,7 +1201,7 @@ class CTActivity extends CTCNC
     {
         // user selection
         $dbeUser = new DBEUser($this);
-        $dbeUser->getRows();
+        $dbeUser->getActiveUsers();
         $this->template->set_block(
             $templateName,
             'userBlock',
@@ -1494,7 +1494,7 @@ class CTActivity extends CTCNC
 
     }
 
-    private function checkMonitoring($problemID)
+    private function checkMonitoring($problemID): bool
     {
         return $this->buActivity->checkMonitoringFlag($problemID);
     }
@@ -1598,7 +1598,7 @@ class CTActivity extends CTCNC
      * @return string
      * @throws Exception
      */
-    private function getServiceRequestForContactLink($contactID)
+    private function getServiceRequestForContactLink($contactID): string
     {
         $contactHistory = Controller::buildLink(
             'Activity.php',
@@ -1800,104 +1800,6 @@ class CTActivity extends CTCNC
 
     }
 
-    /**
-     * edit a value only SR
-     * @access private
-     * @throws Exception
-     */
-    function editValueOnlyServiceRequest()
-    {
-        $this->setMethodName('editValueOnlyServiceRequest');
-        $this->validateSession();
-        $this->setTemplateFiles(
-            'ServiceRequestValueEdit',
-            'ServiceRequestValueEdit.inc'
-        );
-        // Parameters
-        $this->setPageTitle("Create Activity: Value");
-        $error = [];
-        /* validate if this is a POST request */
-        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $sessionValue = $this->getSessionParam($this->sessionKey);
-            if (!$sessionValue) {
-                $sessionValue = [];
-            }
-            if ($this->getParam('curValue') && !is_numeric($this->getParam('curValue'))) {
-                $error['curValue'] = 'Enter a currency value';
-            }
-            if (!$this->getParam('contractCustomerItemID')) {
-                $error['contractCustomerItemID'] = 'Required';
-            } else {
-                $sessionValue['contractCustomerItemID'] = $this->getParam('contractCustomerItemID');
-
-            }
-            if (count($error) == 0) {
-                $sessionValue['callActivityID']         = 0;
-                $sessionValue['date']                   = date('d/m/Y');
-                $sessionValue['curValue']               = $this->getParam('curValue');
-                $sessionValue['startTime']              = date('H:i');
-                $sessionValue['status']                 = 'C';
-                $sessionValue['contractCustomerItemID'] = $this->getParam('contractCustomerItemID');
-                $sessionValue['userID']                 = $GLOBALS['auth']->is_authenticated();
-                $this->setSessionParam($this->sessionKey, $sessionValue);
-                $dsCallActivity = $this->buActivity->createActivityFromSession($this->sessionKey);
-                $callActivityID = $dsCallActivity->getValue(DBEJCallActivity::callActivityID);
-                unset ($_SESSION[$this->sessionKey]); // clear the session variable
-                $nextURL = Controller::buildLink(
-                    'SRActivity.php',
-                    array(
-                        'action'         => 'displayActivity',
-                        'callActivityID' => $callActivityID
-                    )
-                );
-                header('Location: ' . $nextURL);
-
-            }
-        }// end IF POST
-        $this->setTemplateFiles(
-            'ServiceRequestValueEdit',
-            'ServiceRequestValueEdit.inc'
-        );
-        $submitURL = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            array('action' => 'editValueOnlyServiceRequest')
-        );
-        $backURL   = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            array('action' => 'activityCreate1')
-        );
-        $this->template->set_var(
-            array(
-                'customerName'                  => $_SESSION[$this->sessionKey]['customerName'],
-                'renewalsLink'                  => $this->getRenewalsLink($_SESSION[$this->sessionKey]['customerID']),
-                'curValue'                      => $_SESSION[$this->sessionKey]['curValue'],
-                'curValueMessage'               => $error['curValue'],
-                'contractCustomerItemID'        => $_SESSION[$this->sessionKey]['contractCustomerItemID'],
-                'contractCustomerItemIDMessage' => $error['contractCustomerItemID'],
-                'submitURL'                     => $submitURL,
-                'backURL'                       => $backURL
-            )
-        );
-        $this->contractDropdown(
-            $_SESSION[$this->sessionKey]['customerID'],
-            $_SESSION[$this->sessionKey]['contractCustomerItemID'],
-            'ServiceRequestValueEdit',
-            'contractBlock'
-        );
-        $this->template->parse(
-            'activityWizardHeader',
-            'ActivityWizardHeader',
-            true
-        );
-        $this->template->parse(
-            'CONTENTS',
-            'ServiceRequestValueEdit',
-            true
-        );
-        $this->parsePage();
-
-    }  // end finaliseProblem
-
     function validateSession()
     {
 
@@ -1922,7 +1824,7 @@ class CTActivity extends CTCNC
             $this->getParam('customerID'),
             $dsCustomer
         );
-        $title = "Existing Service Requests for " . $dsCustomer->getValue(DBECustomer::name);
+        $title  = "Existing Service Requests for " . $dsCustomer->getValue(DBECustomer::name);
         $header = $title;
         if ($dsCustomer->getValue(DBECustomer::specialAttentionFlag) == 'Y') {
             $header .= "<span style='color: red'> On Special Attention</span>";
@@ -2294,7 +2196,7 @@ class CTActivity extends CTCNC
                 'thirdPartyContactLink'       => $this->getThirdPartyContactLink(
                     @ $_SESSION[$this->sessionKey]['customerID']
                 ),
-                'emailSubjectSummary'          => @$_SESSION[$this->sessionKey]['emailSubjectSummary'],
+                'emailSubjectSummary'         => @$_SESSION[$this->sessionKey]['emailSubjectSummary'],
                 'generatePasswordLink'        => $this->getGeneratePasswordLink(),
                 'DISABLED'                    => $disabled,
                 'submitURL'                   => $submitURL,
@@ -2620,7 +2522,7 @@ class CTActivity extends CTCNC
         $dbeJContract = new DBEJContract($this);
         $title        = $problemId . ' - ' . $dbeProblem->getValue(
                 DBEJProblem::customerName
-            ) . $this->getProblemRaiseIcon($dbeProblem);
+            );
         $this->template->set_block(
             'ActivityReasonPopup',
             'activityBlock',
@@ -2732,7 +2634,7 @@ class CTActivity extends CTCNC
                 'callActivityID' => $lastActivityID,
             )
         );
-        $link = "<a href='" . $url . "' target='_blank'>$title</a>";
+        $link = "<a href='" . $url . "' target='_blank'>$title{$this->getProblemRaiseIcon($dbeProblem)}</a>";
         $this->setPageTitle($title, $link);
         if ($activitiesByProblemID->getValue(DBEJCallActivity::contractCustomerItemID)) {
             $dbeJContract->getRowByContractID(
@@ -2757,7 +2659,8 @@ class CTActivity extends CTCNC
                 'lastActivityText'    => $lastActivityText,
                 'lastActivityReason'  => $lastActivityReason,
                 'lastCncNextAction'   => $lastCncNextAction,
-                'lastCustomerSummary' => $lastCustomerSummary
+                'lastCustomerSummary' => $lastCustomerSummary,
+                'taskListContent'     => $dbeProblem->getValue(DBEProblem::taskList)
             )
         );
         $this->template->parse(
@@ -3422,7 +3325,11 @@ class CTActivity extends CTCNC
             $GLOBALS['auth']->is_authenticated(),
             $this->getParam('moveToUsersQueue')
         );
-        $urlNext       = Controller::buildLink(
+        if (isset($_REQUEST["inbound"])) $this->buActivity->updateInbound(
+            $newActivityID,
+            $_REQUEST["inbound"] == "true" ? true : false
+        );
+        $urlNext = Controller::buildLink(
         //$_SERVER['PHP_SELF'],
             "SRActivity.php",
             array(
@@ -3580,7 +3487,7 @@ class CTActivity extends CTCNC
         } else {
             $endTime = $dsCallActivity->getValue(DBEJCallActivity::endTime);
         }
-        $urlActivity    = SITE_URL . Controller::buildLink(
+        $urlActivity    = SITE_URL . '/' . Controller::buildLink(
                 'SRActivity.php',
                 array(
                     'callActivityID' => $dsCallActivity->getValue(DBEJCallActivity::callActivityID),
@@ -4628,6 +4535,15 @@ class CTActivity extends CTCNC
         $message   = $this->getParam('message');
         $problemID = $this->getParam('problemID');
         $type      = $this->getParam('type');
+        if (!$type) {
+            throw new JsonHttpException(400, "Type is required");
+        }
+        if (!$message) {
+            throw new JsonHttpException(400, "Message is required");
+        }
+        if (!$problemID) {
+            throw new JsonHttpException(400, "Service Request Id is required");
+        }
         try {
 
             $this->buActivity->sendSalesRequest(
@@ -4635,8 +4551,11 @@ class CTActivity extends CTCNC
                 $message,
                 $type
             );
+        } catch (StandardTextNotFoundException $exception) {
+            throw new JsonHttpException(400, $exception->getMessage());
         } catch (Exception $exception) {
-            return ["status" => "error", "message" => $exception->getMessage()];
+            error_log($exception->getMessage());
+            throw new JsonHttpException(500, 'Failed to create sales request');
         }
         return ["status" => "ok"];
     }
@@ -4731,7 +4650,7 @@ WHERE caa_problemno = ?
 
     private function assignToBeLoggedToServiceRequest($toBeLogged, $serviceRequestId)
     {
-        $usecase = new \CNCLTD\core\domain\usecases\AssignToBeLoggedToServiceRequest();
+        $usecase = new AssignToBeLoggedToServiceRequest();
         $usecase->__invoke($toBeLogged, $serviceRequestId, $this->dbeUser);
     }
 
@@ -4745,18 +4664,18 @@ WHERE caa_problemno = ?
 
             if (!$dbeSalesOrder->getRow($salesOrderId)) {
                 error_log('sales order does not exist ..return json error');
-                throw new \CNCLTD\Exceptions\JsonHttpException(123, "Sales Order Does Not Exist");
+                throw new JsonHttpException(400, "Sales Order Does Not Exist");
             }
             $dbeProblem = new DBEProblem($this);
             if (!$dbeProblem->getRow($serviceRequestId)) {
-                throw new \CNCLTD\Exceptions\JsonHttpException(123, "Service Request Does Not Exist");
+                throw new JsonHttpException(400, "Service Request Does Not Exist");
             }
             if ($dbeProblem->getValue(DBEProblem::linkedSalesOrderID)) {
-                throw new \CNCLTD\Exceptions\JsonHttpException(123, "Service Request already has a linked sales order");
+                throw new JsonHttpException(400, "Service Request already has a linked sales order");
             }
             if ($dbeSalesOrder->getValue(DBEOrdhead::customerID) !== $dbeProblem->getValue(DBEProblem::customerID)) {
-                throw new \CNCLTD\Exceptions\JsonHttpException(
-                    123, "The given sales order does not belong to the customer of the Service Request"
+                throw new JsonHttpException(
+                    400, "The given sales order does not belong to the customer of the Service Request"
                 );
             }
             $dbeProblem->setValue(

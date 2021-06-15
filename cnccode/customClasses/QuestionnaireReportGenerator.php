@@ -4,6 +4,7 @@ namespace CNCLTD;
 
 use DateTime;
 use DateTimeInterface;
+use Template;
 
 class QuestionnaireReportGenerator
 {
@@ -394,6 +395,71 @@ class QuestionnaireReportGenerator
         $startDateUnix   = strtotime($period);
         $this->startDate = new DateTime($startDateUnix);
         $this->endDate   = new DateTime($endDateUnix);
+    }
+
+    function getRespondantsCsv()
+    {
+        global $cfg;
+        $template = new Template ($cfg["path_templates"], "remove");
+        $respondants = $this->getRespondantsUniqueSurveyContact();
+        $template->set_block('page', 'rowBlock', 'rows');
+        while ($row = $respondants->fetch_object()) {
+
+            $template->set_var(
+                array(
+                    'customer'       => $row->customer,
+                    'requestContact' => $row->requestContact,
+                    'surveyContact'  => $row->surveyContact,
+                    'srNumbers'      => $row->srNumbers
+                )
+            );
+            $template->parse('rows', 'rowBlock', true);
+
+        }
+        $template->parse('output', 'page', true);
+        return $template->get_var('output');
+    }
+
+    function getRespondantsUniqueSurveyContact()
+    {
+        $sql = "SELECT
+          ans_name AS surveyContact,
+          pro_contno AS contactID,
+          CONCAT( con_first_name, ' ', con_last_name ) AS requestContact,
+          cus_name AS customer,
+          GROUP_CONCAT( DISTINCT pro_problemno ORDER BY pro_problemno SEPARATOR ' ' ) AS srNumbers
+         
+         FROM
+           answer
+           JOIN question ON ans_questionno = que_questionno
+           JOIN problem ON ans_problemno = pro_problemno
+           JOIN contact ON pro_contno = con_contno
+           JOIN customer ON cus_custno = pro_custno
+           
+          WHERE
+           ans_date BETWEEN ? AND ?
+           AND que_questionnaireno = ?
+           AND mailshot
+          GROUP BY
+            ans_name           ";
+        return $this->db->preparedQuery(
+            $sql,
+            [
+                [
+                    "type"  => "s",
+                    "value" => $this->startDate->format(DATE_MYSQL_DATE)
+                ],
+                [
+                    "type"  => "s",
+                    "value" => $this->endDate->format(DATE_MYSQL_DATE)
+                ],
+                [
+                    "type"  => "i",
+                    "value" => $this->questionnaireId
+                ],
+            ]
+        );
+
     }
 
     function getQuestionnaireDescription()

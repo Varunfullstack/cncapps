@@ -8,6 +8,7 @@
  */
 global $cfg;
 
+use CNCLTD\Exceptions\APIException;
 use CNCLTD\FavouriteMenu;
 use CNCLTD\MenuItem;
 use CNCLTD\SideMenu;
@@ -17,7 +18,6 @@ require_once($cfg ['path_gc'] . '/Controller.inc.php');
 require_once($cfg ['path_dbe'] . '/DBEJUser.inc.php');
 require_once($cfg ['path_dbe'] . '/DBETeam.inc.php');
 require_once($cfg['path_bu'] . '/BUUser.inc.php');
-require_once($cfg["path_dbe"] . "/DBConnect.php");
 define(
     'CTCNC_ACT_DISP_CUST_POPUP',
     'dispCustPopup'
@@ -393,7 +393,7 @@ class CTCNC extends Controller
             $SDManagerSection["icon"],
             $SDManagerSection["key"],
             $this->isAppraiser(),
-            223,
+            224,
             "Staff Appraisals",
             "StaffAppraisalQuestionnaire.php",
             $SDManagerSection["label"]
@@ -657,7 +657,7 @@ class CTCNC extends Controller
                 "href"  => "SLAPerformance.php"
             ],
             [
-                "id"    => 224,
+                "id"    => 225,
                 "label" => "SR Source",
                 "href"  => "SRSource.php"
             ],
@@ -708,21 +708,26 @@ class CTCNC extends Controller
             ],
             [
                 "id"    => 219,
+                "label" => "Keyword Matching Ignores",
+                "href"  => "KeywordMatchingIgnores.php"
+            ],
+            [
+                "id"    => 220,
                 "label" => "OS Support Dates",
                 "href"  => "OSSupportDates.php"
             ],
             [
-                "id"    => 220,
+                "id"    => 221,
                 "label" => "Office 365 Licenses",
                 "href"  => "Office365Licenses.php"
             ],
             [
-                "id"    => 221,
+                "id"    => 222,
                 "label" => "Password Services",
                 "href"  => "PasswordServices.php"
             ],
             [
-                "id"    => 225,
+                "id"    => 226,
                 "label" => "Customer Feedback",
                 "href"  => "CustomerFeedback.php"
             ],
@@ -760,28 +765,28 @@ class CTCNC extends Controller
             ],
             [
                 "id"    => 304,
+                "label" => "Items",
+                "href"  => "Item.php"
+            ],
+            [
+                "id"    => 305,
                 "label" => "Create Sales Request",
                 "href"  => "createSalesRequest.php",
             ],
             [
-                "id"    => 305,
+                "id"    => 306,
                 "label" => "Contracts",
                 "href"  => "ContractReport.php",
             ],
             [
-                "id"    => 306,
+                "id"    => 307,
                 "label" => "Renewal Report",
                 "href"  => "RenewalReport.php",
             ],
             [
-                "id"    => 307,
+                "id"    => 308,
                 "label" => "Goods In",
                 "href"  => "GoodsIn.php",
-            ],
-            [
-                "id"    => 308,
-                "label" => "Stock Levels",
-                "href"  => "StockLevel.php",
             ],
             [
                 "id"    => 309,
@@ -798,11 +803,11 @@ class CTCNC extends Controller
                 "label" => "Quote Templates",
                 "href"  => "QuoteTemplates.php",
             ],
-            // [
-            //     "id"    => 313,
-            //     "label" => "TechData Orders",
-            //     "href"  => "CustomerLicenses.php?action=searchOrders",
-            // ],
+            [
+                "id"    => 312,
+                "label" => "Additional Charge Rates",
+                "href"  => "AdditionalChargeRate.php",
+            ],
         ];
     }
 
@@ -1029,11 +1034,6 @@ class CTCNC extends Controller
                 "href"  => "ItemType.php",
             ],
             [
-                "id"    => 812,
-                "label" => "Items",
-                "href"  => "Item.php"
-            ],
-            [
                 "id"    => 806,
                 "label" => "Standard Text",
                 "href"  => "StandardText.php",
@@ -1194,12 +1194,12 @@ class CTCNC extends Controller
 
     protected function isSRQueueManager()
     {
-        return $this->dbeUser->getValue(DBEJUser::queueManager);
+        return $this->dbeUser->isSRQueueManager();
     }
 
     protected function isSdManager()
     {
-        return $this->dbeUser->getValue(DBEJUser::receiveSdManagerEmailFlag) == 'Y';
+        return $this->dbeUser->isSDManager();
     }
 
     protected function setMenuId(int $int)
@@ -1239,9 +1239,9 @@ class CTCNC extends Controller
         echo $js_code;
     }
 
-    function getBody()
+    function getBody($associative = false)
     {
-        return json_decode(file_get_contents('php://input'));
+        return json_decode(file_get_contents('php://input'), $associative);
     }
 
     function hideMenu()
@@ -1272,5 +1272,16 @@ class CTCNC extends Controller
     {
         http_response_code($code);
         return ["status" => false, "error" => $message];
+    }
+
+    public function success($data = null)
+    {
+        return ["state" => true, "data" => $data];
+    }
+
+    public function fail($code, $message = "")
+    {
+        return new APIException($code, $message);
+
     }
 }

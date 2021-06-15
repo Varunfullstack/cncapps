@@ -202,6 +202,11 @@ class DBEntity extends DataAccess
             $this->firstRowFetched = FALSE;
             $ret                   = TRUE;
         } else {
+            try {
+                throw new Exception('try to get trace');
+            } catch (\Exception $exception) {
+                error_log($exception->getTraceAsString());
+            }
             throw new DBQueryException($this->db->Error, $this->queryString);
         }
         return $ret;
@@ -661,6 +666,7 @@ class DBEntity extends DataAccess
             }
             $this->setQueryString($query);
         }
+        //echo $query; exit;
         $ret = $this->runQuery();
         $this->resetQueryString();
         return $ret;

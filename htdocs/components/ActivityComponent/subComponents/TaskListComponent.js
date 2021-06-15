@@ -15,32 +15,44 @@ export class TaskListComponent extends React.Component {
             taskListEdit: '',
             taskListEditModalShow: false,
             allStandardTexts: [],
+            value: '',
+            lastUpdatedAt: '',
+            lastUpdatedBy: '',
         }
     }
 
     componentDidMount() {
         this.apiStandardText.getAllTypes().then(allStandardTexts => {
+            allStandardTexts = allStandardTexts.filter(x => [1, 3].indexOf(x.typeId) > -1);
             this.setState({allStandardTexts})
         });
+
+        this.fetchTaskList();
+    }
+
+    async fetchTaskList() {
+        const {serviceRequestId} = this.props;
+        const response = await fetch(`/SRActivity.php?action=getTaskList&serviceRequestId=${serviceRequestId}`)
+        const res = await response.json();
+        const {value, lastUpdatedAt, lastUpdatedBy} = res.data;
+        this.setState({value, lastUpdatedAt, lastUpdatedBy});
     }
 
     updateTaskList = async (value) => {
-        const {problemId, onUpdatedTaskList} = this.props;
+        const {serviceRequestId} = this.props;
         try {
             const response = await fetch('?action=saveTaskList', {
                 method: 'POST',
                 body: JSON.stringify(
-                    {content: value, serviceRequestId: problemId}
+                    {content: value, serviceRequestId}
                 )
             });
             const res = await response.json();
             if (!res.status === 'ok') {
                 throw new Error('Failed to save task list');
             }
-            debugger;
-            if (onUpdatedTaskList) {
-                onUpdatedTaskList();
-            }
+
+            this.fetchTaskList();
         } catch (error) {
             console.error(error);
             alert(error);
@@ -49,10 +61,10 @@ export class TaskListComponent extends React.Component {
     }
 
     editTaskList = () => {
-        const {taskList} = this.props;
+        const {value} = this.state;
         this.setState({
             taskListEditModalShow: true,
-            taskListEdit: taskList,
+            taskListEdit: value,
         })
     }
 
@@ -80,6 +92,7 @@ export class TaskListComponent extends React.Component {
     }
 
     render() {
+        const {lastUpdatedBy, lastUpdatedAt, value} = this.state;
         return <div className="round-container">
             {this.getEditTaskListModalComponent()}
             <div className="flex-row">
@@ -101,11 +114,12 @@ export class TaskListComponent extends React.Component {
             </div>
             <div className="internalNotesContainer">
                 {
-                    !this.props.taskListUpdatedAt ?
+                    !lastUpdatedAt ?
                         '' :
-                        <InternalNoteItemComponent updatedAt={moment(this.props.taskListUpdatedAt).format("DD/MM/YYYY HH:mm")}
-                                                   updatedBy={this.props.taskListUpdatedBy}
-                                                   content={this.props.taskList}
+                        <InternalNoteItemComponent
+                            updatedAt={moment(lastUpdatedAt).format("DD/MM/YYYY HH:mm")}
+                            updatedBy={lastUpdatedBy}
+                            content={value}
                         />
                 }
 
@@ -115,9 +129,5 @@ export class TaskListComponent extends React.Component {
 }
 
 TaskListComponent.propTypes = {
-    taskListUpdatedAt: PropTypes.string,
-    taskListUpdatedBy: PropTypes.string,
-    taskList: PropTypes.string,
-    problemId: PropTypes.number,
-    // onUpdatedTaskList: PropTypes.func
+    serviceRequestId: PropTypes.number
 };

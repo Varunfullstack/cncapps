@@ -1,6 +1,7 @@
 import React from 'react';
 import {getEditorNamespace} from 'ckeditor4-integrations-common';
 import PropTypes from 'prop-types';
+
 //readOnly, type, onBeforeLoad, style, value, disableClipboard
 class CNCCKEditor extends React.Component {
     onChangeListener = null;
@@ -25,6 +26,7 @@ class CNCCKEditor extends React.Component {
         config.readOnly = readOnly;
 
         getEditorNamespace(CNCCKEditor.editorUrl, null).then(CKEDITOR => {
+
             // (#94)
             if (this._destroyed) {
                 return;
@@ -45,7 +47,8 @@ class CNCCKEditor extends React.Component {
             // We must force editability of the inline editor to prevent `element-conflict` error.
             // It can't be done via config due to CKEditor 4 upstream issue (#57, ckeditor/ckeditor4#3866).
             if (type === 'inline' && !readOnly) {
-                editor.on('instanceReady', () => {
+                editor.on('instanceReady', (event) => {
+                    event.editor.element.title = false;
                     editor.setReadOnly(this.props.readOnly);
                     editor.container.setStyles(style);
                 }, null, null, -1);
@@ -177,7 +180,7 @@ class CNCCKEditor extends React.Component {
                 ["Font", "FontSize"],
                 ["Link"],
             ],
-            extraPlugins: "font,wordcount",
+            extraPlugins: "font,wordcount,pastebase64",
             fontSize_sizes:
                 "8/8pt;9/9pt;10/10pt;11/11pt;12/12pt;14/14pt;16/16pt;18/18pt;20/20pt;22/22pt;24/24pt;26/26pt;28/28pt;36/36pt;48/48pt;72/72pt",
             wordcount: {
@@ -221,6 +224,7 @@ CNCCKEditor.propTypes = {
     readOnly: PropTypes.bool,
     onBeforeLoad: PropTypes.func,
     minCharCount: PropTypes.number,
+    onChange: PropTypes.func
 };
 
 CNCCKEditor.defaultProps = {

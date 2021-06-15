@@ -8,59 +8,144 @@
 <script>
     let partNumberRow;
     let itemIdInput;
+    let lineTypeSelectorElement;
+    let itemDescriptionInput;
+    let qtyOrderedInput;
+    let curUnitCostInput;
+    let curUnitSaleInput
+    let reactSupplierContainer;
+    let supplierIDElement;
+    let isReactElementRendered = false;
+    let hookedListeners = false;
+    let itemSearchRowElement;
+    let autocompleteItemElement;
+    let itemDescriptionLabelElement;
+    let itemDescription = {itemDescription}
+
+    document.addEventListener('beforeunload', () => {
+        window.opener.location.reload();
+    })
     document.addEventListener('DOMContentLoaded', () => {
+        reactSupplierContainer = document.getElementById('reactSupplierSearchContainer');
+        supplierIDElement = document.getElementById('supplierID');
+        lineTypeSelectorElement = document.getElementById('lineType');
+        itemSearchRowElement = document.getElementById('itemSearchRow');
+        autocompleteItemElement = document.getElementById('autocompleteItem');
+        itemDescriptionLabelElement = document.getElementById('itemDescriptionLabel');
+        itemDescriptionInput = document.getElementById("itemDescription");
+        qtyOrderedInput = document.getElementById("qtyOrdered");
+        curUnitCostInput = document.getElementById("curUnitCost");
+        curUnitSaleInput = document.querySelector("input[name='ordline[1][curUnitSale]']");
         itemIdInput = document.getElementById('itemID');
-        itemIdInput.addEventListener('change', ($event) => {
-            updatePartNumber();
-        })
+
+        let props = {
+            autocompleteSelectedCallBack: (selectedItem) => {
+                props.value = selectedItem.label;
+                itemIdInput.value = selectedItem.value;
+                curUnitCostInput.value = selectedItem.curUnitCost;
+                curUnitSaleInput.value = selectedItem.curUnitSale;
+                itemDescriptionInput.value = selectedItem.label;
+                updatePartNumber(selectedItem.partNumber);
+                document.renderTypeAheadComponent(props, autocompleteItemElement)
+                if (selectedItem.supplierId) {
+                    supplierIDElement.value = selectedItem.supplierId;
+                }
+                checkInputs();
+            },
+            searchRequest: (term, itemsToShow, responseCB) => {
+                fetch(
+                        '/Item.php?action=SEARCH_ITEMS_JSON',
+                        {
+                            method: 'POST',
+                            body: JSON.stringify({term: props.value, limit: itemsToShow + 1})
+                        }
+                )
+                        .then(x => x.json())
+                        .then(response => {
+                            if (response.status !== 'ok') {
+                                throw new Error(response.message);
+                            }
+
+                            responseCB(response.data.map(x => ({
+                                label: x.description,
+                                value: x.itemID,
+                                curUnitCost: x.curUnitCost,
+                                curUnitSale: x.curUnitSale,
+                                supplierId: x.supplierId,
+                                partNumber: x.partNo
+                            })))
+                        })
+            },
+            value: itemDescription,
+            onInputChange: (value) => {
+                props.value = value;
+                document.renderTypeAheadComponent(props, autocompleteItemElement)
+            },
+            readOnly: false,
+            showClear: false,
+        }
+
+        document.renderTypeAheadComponent(props, autocompleteItemElement);
         partNumberRow = document.getElementById('partNumberRow');
         updatePartNumber();
+        checkInputs();
     })
 
-    async function updatePartNumber() {
-        const itemId = itemIdInput.value;
+    function clearSupplier() {
+        supplierIDElement.value = "";
+        checkInputs();
+    }
+
+    async function updatePartNumber(partNumber) {
         let display = 'none';
         let text = '';
-        if (itemId) {
-            const response = await fetch('/Item.php?action=GET_ITEM&itemId=' + itemId);
-            const r = await response.json();
+        if (partNumber) {
             display = 'table-row';
-            text = r.data.partNo;
+            text = partNumber;
         }
         partNumberRow.style.display = display;
         partNumberRow.querySelector('.field').textContent = text;
     }
 
-    function checkFunctionKey(field) {
-        if (event.keyCode == 120) {			// F9 - edit
-            switch (field.id) {
-                case "itemDescription":
-                    if (document.getElementById("itemID").value != "0") {
-                        window.open(
-                            '{urlItemEdit}&itemID=' +
-                            escape(document.getElementById("itemID").value) +
-                            '&parentIDField=itemID' +
-                            '&parentDescField=itemDescription',
-                            'item',
-                            'scrollbars=yes,resizable=yes,width=610,height=550,copyhistory=no, menubar=0'
-                        );
-                    }
-                    break;
-                case "supplierName":
-                    if (document.getElementById("supplierID").value != "0") {
-                        window.open('{urlSupplierEdit}&supplierID=' +
-                            escape(document.getElementById("supplierID").value),
-                            'suppliers',
-                            'scrollbars=yes,resizable=no,height=400,width=450,copyhistory=no, menubar=0');
-                    }
-                    break;
+    function checkInputs() {
+        const lineType = lineTypeSelectorElement.value;
+
+        if (lineType === 'I') {
+            qtyOrderedInput.disabled = false;
+            curUnitCostInput.disabled = false;
+            curUnitSaleInput.disabled = false;
+            itemSearchRowElement.style.display = 'table-row';
+            itemDescriptionLabelElement.textContent = "Description";
+            document.renderSupplierSearchComponent(reactSupplierContainer, {
+                inputId: 'supplierID',
+                supplierId: Number(supplierIDElement.value)
+            })
+            isReactElementRendered = true;
+        } else {
+            itemSearchRowElement.style.display = 'none';
+            itemDescriptionLabelElement.textContent = "Comment";
+            if (isReactElementRendered) {
+                document.unmountComponentAtNode(reactSupplierContainer);
+                isReactElementRendered = false;
             }
+            qtyOrderedInput.disabled = true;
+            curUnitCostInput.disabled = true;
+            curUnitSaleInput.disabled = true;
         }
-        return;
     }
 
-    function itemIdChanged($event) {
-        console.log($event.target.value);
+    function validate() {
+        if (lineTypeSelectorElement.value == "I") {
+            if (!supplierIDElement.value) {
+                alert("Please Select Supplier");
+                return false;
+            }
+            if (!qtyOrderedInput.value) {
+                alert("Please Enter Quantity")
+                return false;
+            }
+        }
+        return true;
     }
 </SCRIPT>
 <table width="910px"
@@ -114,6 +199,10 @@
            name="ordline[1][isRecurring]"
            value="{isRecurring}"
     />
+    <input type="hidden"
+           name="isPopup"
+           value="{isPopup}"
+    >
     <table width="500px"
            border="0"
            cellspacing="0"
@@ -126,6 +215,7 @@
                         type="text"
                         id="lineType"
                         name="ordline[1][lineType]"
+                        onchange="checkInputs()"
                 >
                     <!-- BEGIN lineTypeBlock -->
                     <option {lineTypeSelected}
@@ -136,21 +226,31 @@
                 </select>
             </td>
         </tr>
+        <tr id="itemSearchRow"
+            style="display: none"
+        >
+            <td class="promptText">Selected Item</td>
+            <td class="field">
+                <div id="autocompleteItem"></div>
+            </td>
+        </tr>
         <tr>
-            <td class="promptText">Item</td>
+            <td class="promptText"
+                id="itemDescriptionLabel"
+            >Item
+            </td>
             <td class="field">
                 <input type="text"
                        name="ordline[1][description]"
                        id="itemDescription"
                        value="{description}"
-                       onChange="javascript:validateItemDescription()"
-                       onKeydown="javascript:checkFunctionKey(itemDescription)"
                        size="70"
                        maxlength="70"
                 >
                 <font class="formErrorMessage">{descriptionMessage}</font>
             </td>
         </tr>
+
         <tr id="partNumberRow"
             style="display: none"
         >
@@ -162,17 +262,7 @@
         <tr>
             <td class="promptText">Supplier</td>
             <td class="field">
-                <input
-                        type="text"
-                        name="ordline[1][supplierName]"
-                        id="supplierName"
-                        value="{supplierName}"
-                        onChange="javascript:validateSupplierName()"
-                        onKeydown="javascript:checkFunctionKey(supplierName)"
-                        size="50"
-                        maxlength="50"
-                >
-                <font class="formErrorMessage">{supplierNameMessage}</font>
+                <div id="reactSupplierSearchContainer"></div>
             </td>
         </tr>
         <tr>
@@ -211,6 +301,7 @@
             <td class="promptText">Sale Price</td>
             <td class="field">
                 <input
+                        id="curUnitSale"
                         type="text"
                         name="ordline[1][curUnitSale]"
                         value="{curUnitSale}"
@@ -228,12 +319,12 @@
                 <input type="button"
                        name="Submit"
                        value="Submit"
-                       onClick="submit();"
+                       onClick="validate()&&submit();"
                 >
                 <input type="button"
                        name="Cancel"
                        value="Cancel"
-                       onClick="document.location='{urlCancel}';"
+                       onClick="window.close();"
                 >
                 <input type="reset"
                        name="Reset"

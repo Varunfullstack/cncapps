@@ -1,0 +1,37 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.2.xsd">
+    <changeSet author="pavwebdev" id="release-v5.7.1-0">
+        <tagDatabase tag="release-v5.7.1"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="release-v5.7.1-1">
+        <sql>
+            UPDATE
+                consultant
+            SET consultant.`basedAtCustomerSite` = 1,
+                consultant.`siteCustId`          =
+                    CASE
+                        WHEN consultant.`cns_consno` IN (131, 132)
+                            THEN 3474
+                        WHEN consultant.`cns_consno` IN (141, 144, 159)
+                            THEN 6585
+                        ELSE consultant.`siteCustId`
+                        END
+            WHERE consultant.`cns_consno` IN (131, 132, 141, 144, 159);
+
+            UPDATE
+                problem
+            SET problem.`raiseTypeId` = 4
+            WHERE (
+                    problem.`pro_custno` = 3474
+                    AND problem.`pro_consno` IN (131, 132)
+                )
+               OR (
+                    problem.`pro_custno` = 6585
+                    AND problem.`pro_consno` IN (141, 144, 159)
+                );
+        </sql>
+        <rollback/>
+    </changeSet>
+</databaseChangeLog>

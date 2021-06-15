@@ -5,6 +5,10 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+
+use CNCLTD\Business\BUActivity;
+use CNCLTD\Data\DBEItem;
+
 global $cfg;
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_dbe"] . "/DBEJOrdhead.inc.php");
@@ -162,24 +166,6 @@ class BUSalesOrder extends Business
     }
 
     /**
-     * Get all users
-     * @parameter DataSet &$dsResults results
-     * @param $dsResults
-     * @return bool : Success
-     * @access public
-     */
-    function getAllUsers(&$dsResults)
-    {
-        $this->setMethodName('getAllUsers');
-        $dbeUser = new DBEUser($this);
-        $dbeUser->getRows();
-        return ($this->getData(
-            $dbeUser,
-            $dsResults
-        ));
-    }
-
-    /**
      * Get one users
      * @parameter integer $userID user
      * @parameter DataSet &$dsResults results
@@ -278,7 +264,7 @@ class BUSalesOrder extends Business
         );
         // delete quote docs from DB and quote directory
         while ($dsQuotation->fetchNext()) {
-            $quoteFile = 'quotes/' . $dsQuotation->getValue(DBEQuotation::ordheadID) . '_' . $dsQuotation->getValue(
+            $quoteFile = QUOTES_DIR . $dsQuotation->getValue(DBEQuotation::ordheadID) . '_' . $dsQuotation->getValue(
                     DBEQuotation::versionNo
                 ) . '.' . $dsQuotation->getValue(DBEQuotation::fileExtension);
             $this->deleteQuotationDoc($dsQuotation->getValue(DBEQuotation::quotationID));
@@ -561,6 +547,11 @@ class BUSalesOrder extends Business
             $dsSite->getValue(DBESite::phone)
         );
         $dsContact = new DataSet($this);
+        if (!$dsSite->getValue(DBESite::invoiceContactID)) {
+            throw new Exception(
+                "The site {$dsSite->getValue(DBESite::siteNo)} for customer $customerID does not have an invoice contact set!"
+            );
+        }
         $buCustomer->getContactByID(
             $dsSite->getValue(DBESite::invoiceContactID),
             $dsContact
@@ -1553,61 +1544,6 @@ class BUSalesOrder extends Business
         $dbeOrdhead->post();
     }
 
-    function updateServiceRequestDetails($ordheadID,
-                                         $serviceRequestCustomerItemID,
-                                         $serviceRequestPriority,
-                                         $serviceRequestInternalNote,
-                                         $serviceRequestTaskList
-    )
-    {
-        if (!$ordheadID) {
-            $this->raiseError('ordheadID not passed');
-        }
-        $dbeOrdhead = new DBEOrdhead($this);
-        if (!$dbeOrdhead->getRow($ordheadID)) {
-            $this->raiseError('order not found');
-        }
-        $dbeOrdhead->setUpdateModeUpdate();
-        $dbeOrdhead->setValue(
-            DBEOrdhead::serviceRequestCustomerItemID,
-            $serviceRequestCustomerItemID
-        );
-        $dbeOrdhead->setValue(
-            DBEOrdhead::serviceRequestPriority,
-            $serviceRequestPriority
-        );
-        $dbeOrdhead->setValue(
-            DBEOrdhead::serviceRequestInternalNote,
-            $serviceRequestInternalNote
-        );
-        $dbeOrdhead->setValue(
-            DBEOrdhead::serviceRequestTaskList,
-            $serviceRequestTaskList
-        );
-        $dbeOrdhead->post();
-    }
-
-    function deleteServiceRequestDetails($ordheadID)
-    {
-        if (!$ordheadID) {
-            $this->raiseError('ordheadID not passed');
-        }
-        $dbeOrdhead = new DBEOrdhead($this);
-        if (!$dbeOrdhead->getRow($ordheadID)) {
-            $this->raiseError('order not found');
-        }
-        $dbeOrdhead->setUpdateModeUpdate();
-        $dbeOrdhead->setValue(
-            DBEOrdhead::serviceRequestCustomerItemID,
-            null
-        );
-        $dbeOrdhead->setValue(
-            DBEOrdhead::serviceRequestInternalNote,
-            null
-        );
-        $dbeOrdhead->post();
-    }
-
     /**
      * get list of order lines for given order
      * amalgamate same item lines onto one
@@ -1629,7 +1565,7 @@ class BUSalesOrder extends Business
             $this->raiseError('order not found');
         }
         $dbeOrdlinePO = new DBEOrdlinePO($this);
-        $dbeOrdlinePO->getRows($ordheadID);
+        $dbeOrdlinePO->getRowsReadyForGenerationOfPurchaseOrders($ordheadID);
         return ($this->getData(
             $dbeOrdlinePO,
             $dsOrdline
@@ -1751,6 +1687,8 @@ class BUSalesOrder extends Business
     )
     {
         $this->setMethodName('pasteLinesFromOrder');
+        $dbeOrderHead = new DBEOrdhead($this);
+        $dbeOrderHead->getRow($toOrdheadID);
         $dbeFromOrdline = new DBEOrdline($this);
         $colCount       = $dbeFromOrdline->colCount();
         $dbeToOrdline   = new DBEOrdline($this);
@@ -1771,6 +1709,7 @@ class BUSalesOrder extends Business
             DBEOrdline::sequenceNo
         );
         $dbeToOrdline->resetQueryString();
+        if (!$dbeFromOrdline->rowCount) return false;
         while ($dbeFromOrdline->fetchNext()) {
 
             for ($i = 0; $i < $colCount; $i++) {
@@ -1800,6 +1739,20 @@ class BUSalesOrder extends Business
                 DBEOrdline::renewalCustomerItemID,
                 0
             );
+            if ($dbeOrderHead->getValue(DBEOrdhead::type) == 'Q') {
+                // get new prices
+                $dbeItem = new DBEItem($this);
+                $dbeItem->getRow($dbeToOrdline->getValue(DBEOrdline::itemID));
+                if ($dbeItem->rowCount > 0) {
+                    $curUnitCost = $dbeItem->getValue(DBEItem::curUnitCost);
+                    $curUnitSale = $dbeItem->getValue(DBEItem::curUnitSale);
+                    $qty         = $dbeToOrdline->getValue(DBEOrdline::qtyOrdered);
+                    $dbeToOrdline->setValue(DBEOrdline::curUnitCost, $curUnitCost);
+                    $dbeToOrdline->setValue(DBEOrdline::curUnitSale, $curUnitSale);
+                    $dbeToOrdline->setValue(DBEOrdline::curTotalCost, round($qty * $curUnitCost, 2));
+                    $dbeToOrdline->setValue(DBEOrdline::curTotalSale, round($qty * $curUnitSale, 2));
+                }
+            }
             $dbeToOrdline->insertRow();
             $sequenceNumber = null;
             if ($dbeToOrdline->getValue(DBEOrdline::isRecurring) && $recurringSequenceNumber) {

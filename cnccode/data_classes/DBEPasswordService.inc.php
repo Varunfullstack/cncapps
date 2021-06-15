@@ -48,7 +48,7 @@ class DBEPasswordService extends DBEntity
         );
         $this->addColumn(
             self::sortOrder,
-            DA_INTEGER,
+            DA_FLOAT,
             DA_ALLOW_NULL
         );
 

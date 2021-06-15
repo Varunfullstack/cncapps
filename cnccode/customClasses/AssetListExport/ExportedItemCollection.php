@@ -2,16 +2,26 @@
 
 namespace CNCLTD\AssetListExport;
 
+use BUHeader;
+use DataSet;
+use DateInterval;
 use DateTime;
+use DBEHeader;
 use PDO;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
 
 class ExportedItemCollection
 {
-    private $pcs          = 0;
-    private $servers      = 0;
-    private $labTechData  = [];
-    private $summaryData  = [];
-    private $customerData = [];
+    private $pcs                              = 0;
+    private $servers                          = 0;
+    private $labTechData                      = [];
+    private $summaryData                      = [];
+    private $customerData                     = [];
+    private $patchManagementEligibleComputers = 0;
+    /**
+     * @var array|bool|float|int|string|null
+     */
+    private $offlineAgentThresholdDays;
 
 
     /**
@@ -25,6 +35,10 @@ class ExportedItemCollection
                                 \PDO $labTechDB
     )
     {
+        $BUHeader  = new BUHeader($this);
+        $dbeHeader = new DataSet($this);
+        $BUHeader->getHeader($dbeHeader);
+        $this->offlineAgentThresholdDays = $dbeHeader->getValue(DBEHeader::offlineAgentThresholdDays);
         /** @noinspection SqlIdentifierLength */
         $query                = /** @lang MySQL */
             'SELECT
@@ -34,17 +48,17 @@ class ExportedItemCollection
   SUBSTRING_INDEX(lastusername, "\\\\", - 1) AS lastUser,
    DATE_FORMAT(
     computers.lastContact,
-    "%d/%m/%Y %H:%i:%s"
+    "%Y-%m-%d %H:%i:%s"
   ) AS lastContact,
   inv_chassis.productname AS model,
  IF(inv_chassis.productname LIKE "%VMware%", "Not Applicable",COALESCE(
      (SELECT
-        DATE_FORMAT(STR_TO_DATE(`plugin_sd_warranty_looker_upper_lookups`.`start_date`,"%c/%e/%Y"),"%d/%m/%Y") 
+        DATE_FORMAT(STR_TO_DATE(`plugin_sd_warranty_looker_upper_lookups`.`start_date`,"%c/%e/%Y"),"%Y-%m-%d 00:00:00") 
       FROM
         plugin_sd_warranty_looker_upper_lookups
       WHERE plugin_sd_warranty_looker_upper_lookups.`computerid` = computers.computerid ), "Unknown")) AS warrantyStartDate,
   IF(inv_chassis.productname LIKE "%VMware%", "Not Applicable",COALESCE((SELECT
-        DATE_FORMAT(STR_TO_DATE(`plugin_sd_warranty_looker_upper_lookups`.`end_date`,"%c/%e/%Y"),"%d/%m/%Y") 
+        DATE_FORMAT(STR_TO_DATE(`plugin_sd_warranty_looker_upper_lookups`.`end_date`,"%c/%e/%Y"),"%Y-%m-%d 00:00:00") 
       FROM
         plugin_sd_warranty_looker_upper_lookups
       WHERE plugin_sd_warranty_looker_upper_lookups.`computerid` = computers.computerid), "Unknown")) AS warrantyExpiryDate,
@@ -106,9 +120,13 @@ IF(
   ) AS "isAzureADJoined",
        SUBSTRING_INDEX(REPLACE(REPLACE(sf.`Name`, "Microsoft Office ",""),"Microsoft 365","365")," - ",1) AS officeVersion,
   virusscanners.name AS antivirus,
-  DATE_FORMAT(
-    STR_TO_DATE(computers.VirusDefs, "%Y%m%d"),
-    "%d/%m/%Y"
+  IF(
+    virusscanners.name IS NOT NULL,
+    DATE_FORMAT(
+      STR_TO_DATE(computers.VirusDefs, "%Y%m%d"),
+      "%Y-%m-%d 00:00:00"
+    ),
+    NULL
   ) AS antivirusDefinition
 FROM
   computers 
@@ -199,15 +217,15 @@ SELECT
       `plugin_sd_warranty_looker_upper_esx_lookups`.`start_date`,
       "%c/%e/%Y"
     ),
-    "%d/%m/%Y"
+    "%Y-%m-%d 00:00:00"
   ) AS warrantyStartDate,
   DATE_FORMAT(
     STR_TO_DATE(
       `plugin_sd_warranty_looker_upper_esx_lookups`.`end_date`,
       "%c/%e/%Y"
     ),
-    "%d/%m/%Y"
-  ) AS warrantyStartDate,
+    "%Y-%m-%d 00:00:00"
+  ) AS warrantyExpiryDate,
   ROUND(
     TIMESTAMPDIFF(
       YEAR,
@@ -272,7 +290,7 @@ FROM
     ON clients.`ClientID` = locations.`ClientID`
     WHERE `clients`.`ExternalID` = ?
 GROUP BY plugin_vm_esxhosts.`DeviceId`
-ORDER BY location, operatingSystem desc, computerName';
+ORDER BY location, operatingSystem DESC, computerName';
         $statement            = $labTechDB->prepare($query);
         $queryExecutionResult = $statement->execute(
             [$customer->getValue(\DBECustomer::customerID), $customer->getValue(\DBECustomer::customerID)]
@@ -290,40 +308,45 @@ ORDER BY location, operatingSystem desc, computerName';
         $labtechData = $statement->fetchAll(PDO::FETCH_CLASS, LabtechAssetDTO::class);
         // we have to build the information from labtech and os support dates collection
         foreach ($labtechData as $labtechDatum) {
-            $supportDates        = $collection->getMatchingOperatingSystemSupportInformation(
+            $supportDates          = $collection->getMatchingOperatingSystemSupportInformation(
                 $labtechDatum->getOperatingSystem(),
                 $labtechDatum->getVersion()
             );
-            $isServer            = false;
-            $endOfLifeDate       = null;
-            $this->labTechData[] = ["dataItem" => $labtechDatum, "supportDates" => $supportDates];
+            $isServer              = false;
+            $endOfLifeDate         = null;
+            $this->labTechData[]   = ["dataItem" => $labtechDatum, "supportDates" => $supportDates];
+            $operatingSystemString = str_replace('Microsoft Windows', "", $labtechDatum->getOperatingSystem());
             if ($supportDates) {
                 $isServer      = $supportDates[\DBEOSSupportDates::isServer];
                 $dateString    = $supportDates[\DBEOSSupportDates::endOfLifeDate];
                 $dateTime      = \DateTime::createFromFormat(DATE_MYSQL_DATE, $dateString);
-                $endOfLifeDate = $dateTime->format(DATE_CNC_DATE_FORMAT);
+                $endOfLifeDate = Date::PHPToExcel($dateTime->getTimestamp());
+                if (isset($supportDates[\DBEOSSupportDates::friendlyName])) {
+                    $operatingSystemString = "{$operatingSystemString} ({$supportDates[\DBEOSSupportDates::friendlyName]})";
+                }
             }
+            $this->countPatchManagementElegible($labtechDatum);
             $genericRow           = [
                 $labtechDatum->getLocation(),
                 $labtechDatum->getComputerName(),
                 $labtechDatum->getLastUser(),
-                $labtechDatum->getLastContact(),
+                $labtechDatum->lastContactAsExcelDate(),
                 $labtechDatum->getModel(),
-                $labtechDatum->getWarrantyStartDate(),
-                $labtechDatum->getWarrantyExpiryDate(),
+                $labtechDatum->getWarrantyStartDateAsOfficeDate(),
+                $labtechDatum->getWarrantyEndDateAsOfficeDate(),
                 $labtechDatum->getAgeInYears(),
                 $labtechDatum->getSerialNumber(),
                 $labtechDatum->getCpu(),
                 $labtechDatum->getMemory(),
                 $labtechDatum->getTotalDisk(),
                 $labtechDatum->getDriveEncryption(),
-                str_replace('Microsoft Windows', "", $labtechDatum->getOperatingSystem()),
+                $operatingSystemString,
                 $labtechDatum->getVersion(),
                 $endOfLifeDate,
                 $labtechDatum->getDomain(),
                 $labtechDatum->getOfficeVersion(),
                 $labtechDatum->getAntivirus(),
-                $labtechDatum->getAntivirusDefinition()
+                $labtechDatum->antivirusDefinitionAsExcelDate()
             ];
             $this->customerData[] = $genericRow;
             $summaryRow           = array_merge([$customer->getValue(\DBECustomer::name)], $genericRow);
@@ -334,6 +357,24 @@ ORDER BY location, operatingSystem desc, computerName';
                 $this->pcs++;
             }
         }
+    }
+
+    public function countPatchManagementElegible(LabtechAssetDTO $labtechDatum)
+    {
+        if (strpos(strtolower($labtechDatum->getOperatingSystem()), "microsoft") === false) {
+            return;
+        }
+        $lastContactDateTime = $labtechDatum->getLastContact();
+        if (!$lastContactDateTime || $lastContactDateTime == "N/A") {
+            return;
+        }
+        $date = DateTime::createFromFormat(DATE_MYSQL_DATETIME, $lastContactDateTime);
+        $date->add(new DateInterval('P' . $this->offlineAgentThresholdDays . 'D'));
+        $today = new DateTime();
+        if ($date < $today) {
+            return;
+        }
+        $this->patchManagementEligibleComputers++;
     }
 
     public function getOSEndOfSupportDate($index): ?DateTime
@@ -380,5 +421,41 @@ ORDER BY location, operatingSystem desc, computerName';
     public function getOperatingSystem($index)
     {
         return $this->labTechData[$index]["dataItem"]->getOperatingSystem();
+    }
+
+    public function isServerAsset($index): bool
+    {
+        if (!isset($this->labTechData[$index]) || !isset($this->labTechData[$index]["supportDates"]) || !$this->labTechData[$index]["supportDates"]["isServer"]) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * @param int $key
+     * @return mixed|null
+     */
+    public function getAsset(int $key): ?LabtechAssetDTO
+    {
+        if (!isset($this->labTechData[$key]) || !isset($this->labTechData[$key]["dataItem"])) {
+            return null;
+        }
+        return $this->labTechData[$key]["dataItem"];
+    }
+
+    public function is3CX(int $index): bool
+    {
+        if (!isset($this->labTechData[$index])) {
+            return false;
+        }
+        return $this->labTechData[$index]["dataItem"]->is3CX();
+    }
+
+    /**
+     * @return mixed
+     */
+    public function patchManagementEligibleComputers()
+    {
+        return $this->patchManagementEligibleComputers;
     }
 }

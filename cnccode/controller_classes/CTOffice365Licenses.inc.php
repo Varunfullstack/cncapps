@@ -6,9 +6,16 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+
+use CNCLTD\Business\BUActivity;
+
+global $cfg;
+
+use CNCLTD\Exceptions\APIException;
+
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_dbe'] . '/DBEOffice365License.php');
-require_once($cfg['path_bu'] . '/BUActivity.inc.php');
+
 
 // Actions
 class CTOffice365Licenses extends CTCNC
@@ -16,6 +23,7 @@ class CTOffice365Licenses extends CTCNC
     /** @var BUActivity */
     public $buActivity;
     public $dsOffice365License;
+    const CONST_LICENSES = "licenses";
 
     function __construct($requestMethod,
                          $postVars,
@@ -35,7 +43,7 @@ class CTOffice365Licenses extends CTCNC
             Header("Location: /NotAllowed.php");
             exit;
         }
-        $this->setMenuId(220);
+        $this->setMenuId(221);
         $this->buActivity = new BUActivity($this);
     }
 
@@ -52,201 +60,153 @@ class CTOffice365Licenses extends CTCNC
     function defaultAction()
     {
         switch ($this->getAction()) {
-            case 'delete':
-                if (!$this->getParam('id')) {
-                    http_response_code(400);
-                    throw new Exception('ID is missing');
+            case self::CONST_LICENSES:
+                switch ($this->requestMethod) {
+                    case 'GET':
+                        echo json_encode($this->getLicneses(), JSON_NUMERIC_CHECK);
+                        break;
+                    case 'POST':
+                        echo json_encode($this->addLicense(), JSON_NUMERIC_CHECK);
+                        break;
+                    case 'PUT':
+                        echo json_encode($this->updateLicense(), JSON_NUMERIC_CHECK);
+                        break;
+                    case 'DELETE':
+                        echo json_encode($this->deleteLicense(), JSON_NUMERIC_CHECK);
+                        break;
                 }
-
-                $dbeOffice365License = new DBEOffice365License($this);
-
-                $dbeOffice365License->getRow($this->getParam('id'));
-
-                if (!$dbeOffice365License->rowCount) {
-                    http_response_code(404);
-                    exit;
-                }
-                $dbeOffice365License->deleteRow();
-                echo json_encode(["status" => "ok"]);
-                break;
-            case 'update':
-
-                if (!$this->getParam('id')) {
-                    throw new Exception('ID is missing');
-                }
-
-                $dbeOffice365License = new DBEOffice365License($this);
-
-                $dbeOffice365License->getRow($this->getParam('id'));
-
-                if (!$dbeOffice365License->rowCount) {
-                    http_response_code(404);
-                    exit;
-                }
-
-                $dbeOffice365License->setValue(
-                    DBEOffice365License::replacement,
-                    $this->getParam('replacement')
-                );
-                $dbeOffice365License->setValue(
-                    DBEOffice365License::mailboxLimit,
-                    $this->getParam('mailboxLimit')
-                );
-
-                $dbeOffice365License->setValue(DBEOffice365License::license, $this->getParam('license'));
-                $dbeOffice365License->setValue(
-                    DBEOffice365License::reportOnSpareLicenses,
-                    json_decode($this->getParam('reportOnSpareLicenses'))
-                );
-
-                $dbeOffice365License->setValue(
-                    DBEOffice365License::includesDefender,
-                    json_decode($this->getParam('includesDefender'))
-                );
-                $dbeOffice365License->updateRow();
-
-                echo json_encode(["status" => "ok"]);
-                break;
-            case 'create':
-                $dbeOffice365License = new DBEOffice365License($this);
-
-                $dbeOffice365License->setValue(
-                    DBEOffice365License::replacement,
-                    $this->getParam('replacement')
-                );
-                $dbeOffice365License->setValue(
-                    DBEOffice365License::mailboxLimit,
-                    $this->getParam('mailboxLimit')
-                );
-
-                $dbeOffice365License->setValue(DBEOffice365License::license, $this->getParam('license'));
-                $dbeOffice365License->setValue(
-                    DBEOffice365License::reportOnSpareLicenses,
-                    (bool)$this->getParam('reportOnSpareLicenses')
-                );
-                $dbeOffice365License->setValue(
-                    DBEOffice365License::includesDefender,
-                    (bool)$this->getParam('includesDefender')
-                );
-                $dbeOffice365License->insertRow();
-
-                echo json_encode(
-                    [
-                        "id"                    => $dbeOffice365License->getValue(DBEOffice365License::id),
-                        "replacement"           => $dbeOffice365License->getValue(DBEOffice365License::replacement),
-                        "license"               => $dbeOffice365License->getValue(DBEOffice365License::license),
-                        "mailboxLimit"          => $dbeOffice365License->getValue(DBEOffice365License::mailboxLimit),
-                        "reportOnSpareLicenses" => $dbeOffice365License->getValue(
-                            DBEOffice365License::reportOnSpareLicenses
-                        ),
-                        "includesDefender"           => $dbeOffice365License->getValue(DBEOffice365License::includesDefender)
-                    ],
-                    JSON_NUMERIC_CHECK
-                );
-
-                break;
-            case 'getData':
-                $dbeOffice365Licenses = new DBEOffice365License($this);
-
-                $dbeOffice365Licenses->getRows(DBEOffice365License::replacement);
-                $data = [];
-                while ($dbeOffice365Licenses->fetchNext()) {
-                    $data[] = [
-                        "id"                    => $dbeOffice365Licenses->getValue(DBEOffice365License::id),
-                        "replacement"           => $dbeOffice365Licenses->getValue(DBEOffice365License::replacement),
-                        "license"               => $dbeOffice365Licenses->getValue(DBEOffice365License::license),
-                        "mailboxLimit"          => $dbeOffice365Licenses->getValue(DBEOffice365License::mailboxLimit),
-                        "reportOnSpareLicenses" => $dbeOffice365Licenses->getValue(
-                            DBEOffice365License::reportOnSpareLicenses
-                        ),
-                        "includesDefender"           => $dbeOffice365Licenses->getValue(DBEOffice365License::includesDefender)
-                    ];
-                }
-                echo json_encode($data, JSON_NUMERIC_CHECK);
-                break;
-            case 'displayForm':
+                exit;
             default:
-                $this->displayForm();
+                $this->displayList();
                 break;
         }
     }
 
     /**
-     * Export expenses that have not previously been exported
+     * Display list of types
      * @access private
      * @throws Exception
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
      */
-    function displayForm()
+    function displayList()
     {
+        //--------new
         $this->setPageTitle('Office 365 Licenses');
         $this->setTemplateFiles(
-            'Office365License',
-            'Office365Licenses'
+            array('Office365Licenses' => 'Office365Licenses')
         );
-
+        $this->loadReactScript('Office365LicensesComponent.js');
+        $this->loadReactCSS('Office365LicensesComponent.css');
         $this->template->parse(
             'CONTENTS',
-            'Office365License',
+            'Office365Licenses',
             true
         );
-
-        $URLDeleteItem = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            [
-                'action' => 'delete'
-            ]
-        );
-
-        $URLUpdateItem = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            [
-                'action' => 'update'
-            ]
-        );
-
-        $URLCreateItem = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            [
-                'action' => 'create'
-            ]
-        );
-
-        $URLGetData = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            [
-                'action' => 'getData'
-            ]
-        );
-        $this->template->setVar(
-            [
-                "URLDeleteItem" => $URLDeleteItem,
-                "URLUpdateItem" => $URLUpdateItem,
-                "URLAddItem"    => $URLCreateItem,
-                "URLGetData"    => $URLGetData
-            ]
-        );
-
         $this->parsePage();
     }
 
-    function update()
+    function getLicneses()
     {
-        $this->defaultAction();
+        $dbeOffice365Licenses = new DBEOffice365License($this);
+        $dbeOffice365Licenses->getRows(DBEOffice365License::replacement);
+        $data = [];
+        while ($dbeOffice365Licenses->fetchNext()) {
+            $data[] = [
+                "id"                    => $dbeOffice365Licenses->getValue(DBEOffice365License::id),
+                "replacement"           => $dbeOffice365Licenses->getValue(DBEOffice365License::replacement),
+                "license"               => $dbeOffice365Licenses->getValue(DBEOffice365License::license),
+                "mailboxLimit"          => $dbeOffice365Licenses->getValue(DBEOffice365License::mailboxLimit),
+                "reportOnSpareLicenses" => $dbeOffice365Licenses->getValue(
+                    DBEOffice365License::reportOnSpareLicenses
+                ),
+                "includesDefender"      => $dbeOffice365Licenses->getValue(
+                    DBEOffice365License::includesDefender
+                ),
+                "includesOffice"        => $dbeOffice365Licenses->getValue(
+                    DBEOffice365License::includesOffice
+                )
+            ];
+        }
+        return $this->success($data);
     }
 
-//    function parsePage()
-//    {
-//        $urlLogo = '';
-//        $this->template->set_var(
-//            array(
-//                'urlLogo' => $urlLogo,
-//                'txtHome' => 'Home'
-//            )
-//        );
-//        parent::parsePage();
-//    }
+    function addLicense()
+    {
+        $body                = $this->getBody();
+        $dbeOffice365License = new DBEOffice365License($this);
+        $dbeOffice365License->setValue(
+            DBEOffice365License::replacement,
+            $body->replacement
+        );
+        $dbeOffice365License->setValue(
+            DBEOffice365License::mailboxLimit,
+            $body->mailboxLimit
+        );
+        $dbeOffice365License->setValue(DBEOffice365License::license, $body->license);
+        $dbeOffice365License->setValue(
+            DBEOffice365License::reportOnSpareLicenses,
+            $body->reportOnSpareLicenses
+        );
+        $dbeOffice365License->setValue(
+            DBEOffice365License::includesDefender,
+            $body->includesDefender
+        );
+        $dbeOffice365License->setValue(
+            DBEOffice365License::includesOffice,
+            $body->includesOffice
+        );
+        $dbeOffice365License->insertRow();
+        return $this->success();
+    }
+
+    function updateLicense()
+    {
+        $body = $this->getBody();
+        $id = @$body->id;
+        if (!$id) {
+            return $this->fail(APIException::badRequest);
+        }
+        $dbeOffice365License = new DBEOffice365License($this);
+        $dbeOffice365License->getRow($id);
+        if (!$dbeOffice365License->rowCount) {
+            return $this->fail(APIException::notFound);
+        }
+        $dbeOffice365License->setValue(
+            DBEOffice365License::replacement,
+            $body->replacement
+        );
+        $dbeOffice365License->setValue(
+            DBEOffice365License::mailboxLimit,
+            $body->mailboxLimit
+        );
+        $dbeOffice365License->setValue(DBEOffice365License::license, $body->license);
+        $dbeOffice365License->setValue(
+            DBEOffice365License::reportOnSpareLicenses,
+            $body->reportOnSpareLicenses
+        );
+        $dbeOffice365License->setValue(
+            DBEOffice365License::includesDefender,
+            $body->includesDefender
+        );
+        $dbeOffice365License->setValue(
+            DBEOffice365License::includesOffice,
+            $body->includesOffice
+        );
+        $dbeOffice365License->updateRow();
+        return $this->success();
+    }
+
+    function deleteLicense()
+    {
+        $id = @$_REQUEST["id"];
+        if (!$id) {
+            return $this->fail(APIException::badRequest);
+        }
+        $dbeOffice365License = new DBEOffice365License($this);
+        $dbeOffice365License->getRow($id);
+        if (!$dbeOffice365License->rowCount) {
+            return $this->fail(APIException::notFound);
+        }
+        $dbeOffice365License->deleteRow();
+        return $this->success();
+    }
 }// end of class

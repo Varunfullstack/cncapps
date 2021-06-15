@@ -88,7 +88,7 @@ export default class RepProjects extends MainComponent {
                 //content:(project)=><div>{this.getCorrectDate(project.startDate)}</div>
             },
         ]
-        return <div style={{maxWidth: 1000}}>
+        return <div  >
             <Table
                 columns={columns}
                 pk={"projectID"}

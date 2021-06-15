@@ -1,0 +1,7 @@
+.form-group{
+    display: flex;
+    flex-direction: column;
+}
+.cke_editable_inline {
+    display: inline-table;
+}

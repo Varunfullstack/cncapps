@@ -1,9 +1,6 @@
 <?php
 
-
 namespace CNCLTD\StreamOneProcessing;
-
-
 class ContractsByEmail
 {
     private $streamOneEmail;
@@ -20,10 +17,10 @@ class ContractsByEmail
     public function __construct($streamOneEmail, $customerName)
     {
 
-        $this->streamOneEmail = $streamOneEmail;
-        $this->customerName = $customerName;
+        $this->streamOneEmail     = $streamOneEmail;
+        $this->customerName       = $customerName;
         $this->contractsToConfirm = [];
-        $this->contractsBySKU = [];
+        $this->contractsBySKU     = [];
     }
 
     /**
@@ -33,7 +30,6 @@ class ContractsByEmail
     public function addContract(ContractData $contractData)
     {
         $this->contractsToConfirm[$contractData->getContractId()] = new ContractDataNotConfirmed($contractData);
-
         if (isset($this->contractsBySKU[$contractData->getSku()])) {
             throw new ContractWithDuplicatedSKU(
                 $contractData->getSku(),
@@ -41,7 +37,6 @@ class ContractsByEmail
                 $contractData
             );
         }
-
         $this->contractsBySKU[$contractData->getSku()] = $contractData->getContractId();
         if ($contractData->getOldSku()) {
             if (isset($this->contractsBySKU[$contractData->getOldSku()])) {
@@ -57,6 +52,7 @@ class ContractsByEmail
 
     public function flagSKU($sku)
     {
+        $sku = strtolower($sku);
         if (!isset($this->contractsBySKU[$sku])) {
             return;
         }

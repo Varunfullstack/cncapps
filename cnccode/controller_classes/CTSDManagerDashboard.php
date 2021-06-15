@@ -1,17 +1,25 @@
 <?php
 global $cfg;
 
+use CNCLTD\Business\BUActivity;
+use CNCLTD\Data\CallBackStatus;
+use CNCLTD\Data\DBConnect;
+use CNCLTD\Data\DBEJProblem;
+use CNCLTD\Exceptions\JsonHttpException;
 use CNCLTD\SDManagerDashboard\ServiceRequestSummaryDTO;
 
 require_once($cfg['path_ct'] . '/CTCurrentActivityReport.inc.php');
 require_once($cfg['path_bu'] . '/BUSecondSite.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
-require_once($cfg["path_dbe"] . "/DBConnect.php");
 
 class CTSDManagerDashboard extends CTCurrentActivityReport
 {
-    const DAILY_STATS_SUMMARY = "dailyStatsSummary";
-    const CONST_MISSED_CALL_BACK        = "missedCallBack";
+    const DAILY_STATS_SUMMARY        = "dailyStatsSummary";
+    const CONST_MISSED_CALL_BACK     = "missedCallBack";
+    const CONST_MOVE_SR              = "moveSR";
+    const CONST_USER_PROBLEM_SUMMARY = "userProblemsSummary";
+    const CONST_UNASSIGNED_SUMMARY   = "unassignedSummary";
+
     function __construct($requestMethod,
                          $postVars,
                          $getVars,
@@ -71,6 +79,15 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
             case self::CONST_MISSED_CALL_BACK:
                 echo json_encode($this->missedCallBack(), JSON_NUMERIC_CHECK);
                 exit;
+            case self::CONST_MOVE_SR:
+                echo json_encode($this->moveSR());
+                exit;
+            case self::CONST_USER_PROBLEM_SUMMARY:
+                echo json_encode($this->getUserProblemsSummary(), JSON_NUMERIC_CHECK);
+                exit;
+            case self::CONST_UNASSIGNED_SUMMARY:
+                echo json_encode($this->getUnassignedSummary(), JSON_NUMERIC_CHECK);
+                exit;
             case "react":
             default:
                 $this->setTemplate();
@@ -81,14 +98,14 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
     function getQueue()
     {
 
-        $queue = $_REQUEST["queue"] ;
+        $queue = $_REQUEST["queue"];
         if (!isset($queue)) return [];
         $buProblem         = new BUActivity($this);
         $isP5              = $_REQUEST["p5"] == "true";
         $showHelpDesk      = $_REQUEST["hd"] == "true";
         $showEscalation    = $_REQUEST["es"] == "true";
         $showSmallProjects = $_REQUEST["sp"] == "true";
-        $showProjects      = $_REQUEST["p"]  == "true";
+        $showProjects      = $_REQUEST["p"] == "true";
         $limit             = $_REQUEST["limit"] ?? 10;
         $code              = 'shortestSLARemaining';
         if ($queue == 9) {
@@ -210,7 +227,7 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
             return $result;
         }
         while ($problems->fetchNext()) {
-            $result[] = ServiceRequestSummaryDTO::fromDBEJProblem($problems, true);
+            $result[] = ServiceRequestSummaryDTO::fromDBEJProblem($problems, $this->getDbeUser(), true);
         }
         return $result;
     }
@@ -227,16 +244,11 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
         $raisedStartTodaySummary    = $this->getRaisedAndStartedToday();
         $uniqueCustomerTodaySummary = $this->getUniqueCustomer();
         $breachedSLATodaySummary    = $this->getBreachedSLA();
-        $buProblem         = new BUActivity($this);
-        $nearFixSLABreach= $this->renderQueueJson(
+        $buProblem                  = new BUActivity($this);
+        $nearFixSLABreach           = $this->renderQueueJson(
             $buProblem->getSDDashBoardData(
                 10000,
-                "shortestSLAFixRemaining",
-                false,
-                true,
-                true,
-                true,
-                true
+                "shortestSLAFixRemaining"
             )
         );
         return [
@@ -250,7 +262,8 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
             "raisedStartTodaySummary"    => $raisedStartTodaySummary,
             'breachedSLATodaySummary'    => $breachedSLATodaySummary,
             'uniqueCustomerTodaySummary' => $uniqueCustomerTodaySummary,
-            "nearFixSLABreach"           => count($nearFixSLABreach)
+            "nearFixSLABreach"           => count($nearFixSLABreach),
+            "inboundOutbound"            => $this->getInboundOutboundSummary()
         ];
     }
 
@@ -366,13 +379,15 @@ WHERE pro_custno <> 282
     private function getReopenToday(): array
     {
         $query = "SELECT
-COUNT(*)  AS total
-  FROM
+  COUNT(*) AS total
+FROM
   problem
-  LEFT JOIN callactivity AS FIXED ON problem.`pro_problemno` = fixed.`caa_problemno` AND fixed.`caa_date` = CURDATE() AND fixed.`caa_callacttypeno` = 57
+  JOIN callactivity AS FIXED
+    ON problem.`pro_problemno` = fixed.`caa_problemno`
+    AND fixed.`caa_callacttypeno` = 57
 WHERE pro_custno <> 282
   AND `pro_reopened_date` = CURDATE()
-  AND (fixed.`caa_callactivityno` IS NULL OR fixed.`caa_consno` <> 67)";
+  AND fixed.`caa_consno` <> 67";
         return DBConnect::fetchOne($query, []);
     }
 
@@ -443,7 +458,6 @@ WHERE pro_custno <> 282
 
     function setTemplate()
     {
-        $isP5 = isset($_REQUEST['showP5']);
         $this->setPageTitle('SD Manager Dashboard');
         $this->setTemplateFiles(
             array('SDManagerDashboard' => 'SDManagerDashboard.rct')
@@ -466,8 +480,10 @@ WHERE pro_custno <> 282
             $string
         );
     }
-    function missedCallBack(){
-        $query="SELECT cb.id, cb.consID,cb.problemID,cb.callActivityID,cb.contactID,cb.DESCRIPTION,cb.callback_datetime,cb.createAt,
+
+    function missedCallBack()
+    {
+        $query = "SELECT cb.id, cb.consID,cb.problemID,cb.contactID,cb.DESCRIPTION,cb.callback_datetime,cb.createAt,
         concat(c.con_first_name,' ',c.con_last_name) contactName,
         cus_name customerName,
         TIMESTAMPDIFF(MINUTE,NOW(),cb.callback_datetime) timeRemain,
@@ -480,23 +496,180 @@ WHERE pro_custno <> 282
         JOIN consultant cons on cons.cns_consno=p.`pro_consno`
     WHERE cb.status=:status 
      AND TIMESTAMPDIFF(HOUR,cb.callback_datetime,NOW()) <=72  ";
-
-        if ($_REQUEST['hd']=='false') {
+        if ($_REQUEST['hd'] == 'false') {
             $query .= ' and pro_queue_no <> 1 ';
         }
-        if ($_REQUEST['es']=='false') {
+        if ($_REQUEST['es'] == 'false') {
             $query .= ' and pro_queue_no <> 2 ';
         }
-        if ($_REQUEST['sp']=='false') {
+        if ($_REQUEST['sp'] == 'false') {
             $query .= ' and pro_queue_no <> 3 ';
         }
-        if ($_REQUEST['p']=='false') {
+        if ($_REQUEST['p'] == 'false') {
             $query .= ' and pro_queue_no <> 5 ';
         }
         $limit = $_REQUEST['limit'];
-        $query .=" order by timeRemain asc limit ".$limit;
-        // echo  $query;
-        // exit;
-        return DBConnect::fetchAll( $query,["status"=>CallBackStatus::AWAITING]);
+        $query .= " order by timeRemain asc limit " . $limit;
+        return DBConnect::fetchAll($query, ["status" => CallBackStatus::AWAITING]);
+    }
+
+
+    function moveSR()
+    {
+        if (!$this->isSRQueueManager() && !$this->isSdManager()) {
+            throw new JsonHttpException(400, 'Not authorized');
+        }
+        $body       = $this->getBody(true);
+        $fromUserId = @$body["from"];
+        $toUserId   = @$body["to"];
+        $option     = @$body["option"];
+        $customerID = @$body["customerID"];
+        $queue      = @$body['queue'];
+        $exchange   = @$body['exchange'];
+        if ($fromUserId === $toUserId) {
+            throw new JsonHttpException(400, 'Cannot reassign to the same user!');
+        }
+        if (empty($option)) {
+            return ["status" => false, "Missing Parameters"];
+        }
+        if (!$queue && (!$fromUserId || !$toUserId)) {
+            throw new JsonHttpException(400, "Cannot assign to unassigned or from unassigned if no queue is provided");
+        }
+        $select           = " select pro_problemno id from problem ";
+        $where            = " where pro_consno is null ";
+        $exchangeToWhere  = " where pro_consno is null";
+        $params           = [];
+        $exchangeToParams = [];
+        if ($fromUserId) {
+            $where                     = " where pro_consno = :fromEngineer";
+            $params   ["fromEngineer"] = $fromUserId;
+        }
+        if ($toUserId) {
+            $exchangeToWhere                = " where pro_consno = :toEngineer";
+            $exchangeToParams['toEngineer'] = $toUserId;
+        }
+        if ($queue) {
+            if (!$fromUserId) {
+                $where           .= " and pro_queue_no = :queue ";
+                $params['queue'] = $queue;
+            }
+            if (!$toUserId) {
+                $exchangeToWhere           .= " and pro_queue_no = :queue ";
+                $exchangeToParams['queue'] = $queue;
+            }
+        }
+        $additionalParams = [];
+        switch ($option) {
+            case 2:
+                $additionalWhere = " and pro_status='I' ";
+                break;
+            case 3:
+                $additionalWhere = " and pro_status='P' ";
+                break;
+            case 4:
+                $additionalWhere = " and pro_awaiting_customer_response_flag ='Y' and pro_status in ('P','I')  ";
+                break;
+            case 5:
+                $additionalWhere                = " and pro_custno = :customerID  and pro_status in ('P','I') ";
+                $additionalParams['customerID'] = $customerID;
+                break;
+            default:
+                $additionalWhere = " and pro_status in ('I','P') ";
+        }
+        $where                   .= $additionalWhere;
+        $exchangeToWhere         .= $additionalWhere;
+        $params                  = array_merge($params, $additionalParams);
+        $exchangeToParams        = array_merge($exchangeToParams, $additionalParams);
+        $query                   = $select . $where;
+        $exchangeQuery           = $select . $exchangeToWhere;
+        $serviceRequests         = DBConnect::fetchAll($query, $params);
+        $exchangeServiceRequests = DBConnect::fetchAll($exchangeQuery, $exchangeToParams);
+        foreach ($serviceRequests as $problem) {
+            $this->allocateProblem($problem["id"], $toUserId);
+        }
+        if ($exchange) {
+            foreach ($exchangeServiceRequests as $serviceRequest) {
+                $this->allocateProblem($serviceRequest['id'], $fromUserId);
+            }
+        }
+        return ["status" => true];
+    }
+
+    function allocateProblem($problemID, $userID)
+    {
+        $this->buActivity->allocateUserToRequest(
+            $problemID,
+            $userID,
+            $this->getDbeUser()
+        );
+    }
+
+    function getUserProblemsSummary()
+    {
+
+        $option     = @$_REQUEST["option"];
+        $customerID = @$_REQUEST["customerID"];
+        $queue      = @$_REQUEST['queueId'];
+        if (empty($option)) {
+            return ["status" => false, "Missing Parameters"];
+        }
+        $select  = "SELECT pro_consno id,COUNT(pro_problemno ) total ";
+        $from    = " from problem ";
+        $where   = " where pro_consno is not null ";
+        $groupBy = " group by pro_consno";
+        $params  = [];
+        if ($queue) {
+            $select          = "select pro_consno id, SUM((pro_consno IS NULL) OR pro_consno IS NOT NULL) total";
+            $where           = " where pro_queue_no = :queue ";
+            $params["queue"] = $queue;
+        }
+        switch ($option) {
+            case 2:// unstarted
+                $where .= " and pro_status = 'I' ";
+                break;
+            case 3: // in progress
+                $where .= " and pro_status = 'P' ";
+                break;
+            case 4: // in hold
+                $where .= " and pro_awaiting_customer_response_flag = 'Y'  and pro_status in ('P','I') ";
+                break;
+            case 5: // in customer
+                if (!$customerID) {
+                    throw new JsonHttpException(400, "Customer ID required for customer type search");
+                }
+                $where                .= " and pro_custno = :customerID and pro_status in ('P','I') ";
+                $params["customerID"] = $customerID;
+                break;
+            default:
+                $where .= " and pro_status in ('P','I') ";
+        }
+        $query    = $select . $from . $where . $groupBy;
+        $problems = DBConnect::fetchAll($query, $params);
+        return ["status" => 'ok', "data" => $problems];
+    }
+
+    function getUnassignedSummary()
+    {
+        $hd    = isset($_REQUEST["hd"]) ?? false;
+        $es    = isset($_REQUEST["es"]) ?? false;
+        $p     = isset($_REQUEST["p"]) ?? false;
+        $sp    = isset($_REQUEST["sp"]) ?? false;
+        $query = "SELECT count(*) AS total 
+        FROM  problem JOIN  callactivity c ON c.caa_problemno=pro_problemno                     
+        WHERE pro_consno IS   NULL     
+        ";
+        if (!$hd) $query .= " and  pro_queue_no<> 1 ";
+        if (!$es) $query .= " and  pro_queue_no<> 2 ";
+        if (!$p) $query .= " and  pro_queue_no<> 5 ";
+        if (!$sp) $query .= " and  pro_queue_no<> 3 ";
+        $problems = DBConnect::fetchAll($query);
+        return $problems;
+    }
+
+    function getInboundOutboundSummary()
+    {
+        return DBConnect::fetchOne(
+            "SELECT COUNT(IF(isInbound=1,1,NULL)) inbound,COUNT(IF(isInbound=0,1,NULL)) outbound FROM callactivity_customer_contact WHERE DATE_FORMAT(create_at,'%Y-%m-%d')=DATE_FORMAT(NOW(),'%Y-%m-%d')"
+        );
     }
 }

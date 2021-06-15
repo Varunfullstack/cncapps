@@ -442,7 +442,7 @@
                         }
 
                         if (row.status === 'Pending') {
-                            return '<button onclick="approveExpense(' + row.id + ', ' + row.expenseTypeId + ')" data-expense-id="row.id"><i class="fa fa-check"></i></button><button onclick="denyExpense(' + row.id + ')"><i class="fa fa-times"></i></button><button onclick="deleteExpense(' + row.id + ')"><i class="fa fa-trash"></i></button> ';
+                            return '<button onclick="approveExpense(' + row.id + ', ' + row.expenseTypeId + ')" data-expense-id="row.id"><i class="fa fa-check"></i></button><button onclick="denyExpense(' + row.id + ')"><i class="fa fa-times"></i></button><button onclick="deleteExpense(' + row.id + ')"><i class="fa fa-trash-alt"></i></button> ';
                         }
                         return "";
                     }
@@ -499,6 +499,14 @@
                 {
                     data: "serviceRequestId", name: "serviceRequestId", render: (data, type, row, meta) => {
                         return '<a href="SRActivity.php?action=displayActivity&callActivityID=' + row.activityId + '" target="_blank">' + data + '</a>';
+                    }
+                },
+                {
+                    data: "linkedOrderId", name: "linkedOrderId", render: (data, type, row, meta) => {
+                        if (!row.linkedOrderId) {
+                            return '';
+                        }
+                        return '<a href="SalesOrder.php?action=displaySalesOrder&ordheadID=' + row.linkedOrderId + '" target="_blank">' + data + '</a>';
                     }
                 },
                 {
@@ -562,7 +570,7 @@
                         }
 
                         if (row.status === 'Pending') {
-                            return '<button onclick="approveOvertime(' + row.activityId + ',' + row.overtimeDuration + ')" data-expense-id="row.id"><i class="fa fa-check"></i></button><button onclick="denyOvertime(' + row.activityId + ')"><i class="fa fa-times"></i></button><button onclick="deleteOvertime(' + row.activityId + ')"><i class="fa fa-trash"></i></button>';
+                            return '<button onclick="approveOvertime(' + row.activityId + ',' + row.overtimeDuration + ')" data-expense-id="row.id"><i class="fa fa-check"></i></button><button onclick="denyOvertime(' + row.activityId + ')"><i class="fa fa-times"></i></button><button onclick="deleteOvertime(' + row.activityId + ')"><i class="fa fa-trash-alt"></i></button>';
                         }
                         return "";
                     },
@@ -661,6 +669,9 @@
         </th>
         <th>
             SR Number
+        </th>
+        <th>
+            SO Number
         </th>
         <th>
             Customer

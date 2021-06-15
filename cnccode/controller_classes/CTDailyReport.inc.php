@@ -12,7 +12,6 @@ require_once($cfg ['path_bu'] . '/BUCustomer.inc.php');
 require_once($cfg ['path_dbe'] . '/DSForm.inc.php');
 require_once($cfg["path_bu"] . "/BUHeader.inc.php");
 
-use CNCLTD\Utils;
 class CTDailyReport extends CTCNC
 {
     private $buDailyReport;

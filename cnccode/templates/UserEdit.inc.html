@@ -146,13 +146,13 @@
             const data = $(this).data();
 
             generateInput(
-                data.name,
-                $(this).closest('td'),
-                {decryptedData: ''},
-                data.extraData,
-                data.customClass,
-                data.customFunction,
-                data.additionalAttributes
+                    data.name,
+                    $(this).closest('td'),
+                    {decryptedData: ''},
+                    data.extraData,
+                    data.customClass,
+                    data.customFunction,
+                    data.additionalAttributes
             );
         })
     }
@@ -178,20 +178,21 @@
 
         parent.find('button').hide();
     }
-    window.onload =function(){   
-        $('#basedAtCustomerSiteCheckbox')[0].addEventListener('change',function($event){
-            if($event.target.checked)
+
+    window.onload = function () {
+        $('#basedAtCustomerSiteCheckbox')[0].addEventListener('change', function ($event) {
+            if ($event.target.checked)
                 $('#siteCustomerString')[0].removeAttribute('disabled');
             else
-                $('#siteCustomerString')[0].setAttribute('disabled','disabled');
+                $('#siteCustomerString')[0].setAttribute('disabled', 'disabled');
 
         })
-        if(!$('#basedAtCustomerSiteCheckbox')[0].checked)
-            $('#siteCustomerString')[0].setAttribute('disabled','disabled');
+        if (!$('#basedAtCustomerSiteCheckbox')[0].checked)
+            $('#siteCustomerString')[0].setAttribute('disabled', 'disabled');
         $('#siteCustomerString')[0].addEventListener('autocompleteselect', function ($event) {
-                $('#siteCustId').val($event.detail.item.value);
-            });
-        }
+            $('#siteCustId').val($event.detail.item.value);
+        });
+    }
 </script>
 <TABLE width="200px"
        border="0"
@@ -221,6 +222,11 @@
         <input type="hidden"
                name="user[1][userID]"
                value="{userID}"
+        >
+        <input style="display: none;"
+               type="checkbox"
+               name="user[1][callBackEmail]"
+               {callBackEmailChecked}
         >
         <tr>
             <td class="promptText">Name</td>
@@ -323,33 +329,35 @@
             <td class="fieldText">
                 <input name="user[1][basedAtCustomerSite]"
                        type="checkbox"
-                        id="basedAtCustomerSiteCheckbox"                        
+                       id="basedAtCustomerSiteCheckbox"
                        {DISABLED}
                        {basedAtCustomerSiteChecked}
-                        
-                 />
+
+                />
             </td>
         </tr>
         <tr>
             <td class="promptText">Customer</td>
             <td class="fieldText">
                 <input
-                type="hidden"
-                name="user[1][siteCustId]"
-                id="siteCustId"
-                value="{siteCustId}"
-        />
-                <input type="text" 
-                id="siteCustomerString" 
-                name="siteCustomerString" 
-                value="{siteCustomerString}" size="50" maxlength="50" 
-                customer-search="" 
-                class="ui-autocomplete-input" 
-                autocomplete="off"
-                {DISABLED}>
+                        type="hidden"
+                        name="user[1][siteCustId]"
+                        id="siteCustId"
+                        value="{siteCustId}"
+                />
+                <input type="text"
+                       id="siteCustomerString"
+                       name="siteCustomerString"
+                       value="{siteCustomerString}"
+                       size="50"
+                       maxlength="50"
+                       customer-search=""
+                       class="ui-autocomplete-input"
+                       autocomplete="off"
+                       {DISABLED}
+                >
 
-                
-                
+
             </td>
         </tr>
         <tr>
@@ -712,24 +720,13 @@
             <td class="promptText">Hold all SRs for QA Review</td>
             <td class="fieldText">
                 <input name="user[1][holdAllSRsforQAReview]"
-                       type="checkbox"  
-                       value="true"                                          
+                       type="checkbox"
+                       value="true"
                        {DISABLED}
                        {holdAllSRsforQAReviewChecked}
                 />
             </td>
         </tr>
-        <!-- <tr>
-            <td class="promptText">BCC on customer emails</td>
-            <td class="fieldText">
-                <input name="user[1][bccOnCustomerEmails]"
-                       type="checkbox"
-                       value="true"
-                       {DISABLED}
-                       {bccOnCustomerEmailsChecked}
-                />
-            </td>
-        </tr> -->
         <tr>
             <td class="promptText">&nbsp;</td>
             <td class="fieldText">&nbsp;</td>
@@ -956,14 +953,16 @@
         </tr>
         <tr>
             <td class="promptText">
-                <div class="tooltip" style="justify-content: flex-end;">SR Queue Manager
+                <div class="tooltip"
+                     style="justify-content: flex-end;"
+                >SR Queue Manager
                     <div class="tooltiptext tooltip-bottom">
                         Change Initial Activity Date And Time, allocate time, change queues and re-open SRs
                     </div>
                 </div>
-                
+
             </td>
-            
+
             <td class="fieldText">
                 <input name="user[1][queueManager]"
                        type="checkbox"
@@ -976,14 +975,16 @@
         </tr>
         <tr>
             <td class="promptText">
-                <div class="tooltip" style="justify-content: flex-end;">Exclude from SDManger Dashboard
+                <div class="tooltip"
+                     style="justify-content: flex-end;"
+                >Exclude from SDManger Dashboard
                     <div class="tooltiptext tooltip-bottom">
                         Exclude from SDManger Dashboard
                     </div>
                 </div>
-                
+
             </td>
-            
+
             <td class="fieldText">
                 <input name="user[1][excludeFromSDManagerDashboard]"
                        type="checkbox"
@@ -991,7 +992,7 @@
                        {DISABLED}
                        {excludeFromSDManagerDashboardChecked}
                 />
-                
+
             </td>
         </tr>
         <tr>
@@ -1010,7 +1011,7 @@
             <td colspan="2">
                 <h3>Specific Permissions</h3>
             </td>
-        </tr>                
+        </tr>
         <tr>
             <td class="promptText">Starter & Leaver question management</td>
             <td class="fieldText">
@@ -1105,6 +1106,39 @@
                        value="Y"
                        {DISABLED}
                        {createRenewalSalesOrdersFlagChecked}
+                />
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Mass deletion of Unstarted Service Requests</td>
+            <td class="fieldText">
+                <input name="user[1][massDeletionOnUnstartedServiceRequestPermission]"
+                       type="checkbox"
+                       value="1"
+                       {DISABLED}
+                       {massDeletionOnUnstartedServiceRequestPermissionChecked}
+                />
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Allow Force Closing of SRs</td>
+            <td class="fieldText">
+                <input name="user[1][forceClosingPermission]"
+                       type="checkbox"
+                       value="1"
+                       {DISABLED}
+                       {forceClosingPermissionChecked}
+                />
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Change Sales Orders/Purchase Orders Status</td>
+            <td class="fieldText">
+                <input name="user[1][changeSalesOrdersStatusPermission]"
+                       type="checkbox"
+                       value="1"
+                       {DISABLED}
+                       {changeSalesOrdersStatusPermissionChecked}
                 />
             </td>
         </tr>

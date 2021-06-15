@@ -5,6 +5,9 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+
+use CNCLTD\Data\DBEItem;
+
 global $cfg;
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_bu"] . "/BUHeader.inc.php");
@@ -14,9 +17,9 @@ require_once($cfg["path_bu"] . '/BUItem.inc.php');
 class BUCustomerAnalysisReport extends Business
 {
 
-    const searchFormCustomerID = "customerID";
+    const searchFormCustomerID     = "customerID";
     const searchFormStartYearMonth = "startYearMonth";
-    const searchFormEndYearMonth = "endYearMonth";
+    const searchFormEndYearMonth   = "endYearMonth";
 
     function __construct(&$owner)
     {
@@ -43,115 +46,86 @@ class BUCustomerAnalysisReport extends Business
         $buHeader = new BUHeader($this);
         $dsHeader = new DataSet($this);
         $buHeader->getHeader($dsHeader);
-
         $customerID = $searchForm->getValue(self::searchFormCustomerID);
-
         $startDate = DateTime::createFromFormat(
             "m/Y",
             $searchForm->getValue(self::searchFormStartYearMonth)
         )->modify('first day of this month ');
-        $endDate = DateTime::createFromFormat(
+        $endDate   = DateTime::createFromFormat(
             "m/Y",
             $searchForm->getValue(self::searchFormEndYearMonth)
         )->modify('last day of this month');
-
         $numberOfMonths = $startDate->diff($endDate)->m + 1 + ($startDate->diff($endDate)->y * 12);
-        $hourlyRate = $dsHeader->getValue(DBEHeader::hourlyLabourCost);
-
+        $hourlyRate     = $dsHeader->getValue(DBEHeader::hourlyLabourCost);
         $hourlyLabourChargeItem = new BUItem($this);
         /**
          * @var DataSet $data
          */
         $data = new DataSet($this);
         $hourlyLabourChargeItem->getItemByID(2237, $data);
-
         $hourlyLabourCharge = $data->getValue(DBEItem::curUnitSale);
-
-        $contractItems = $this->getContractItems($customerID);
+        $contractItems      = $this->getContractItems($customerID);
         $contractItemsArray = array();
-
         while ($row = $contractItems->fetch_array()) {
             $contractItemsArray[] = $row;
         }
-
         foreach ($contractItemsArray as $item) {
 
 
-            $labourHoursRow =
-                $this->getContractLabourHours(
-                    $customerID,
-                    $item['ID'],
-                    $startDate,
-                    $endDate
-                );
-
-            $contractValues =
-                $this->getContractValues(
-                    $customerID,
-                    $item['ID']
-                );
-
+            $labourHoursRow = $this->getContractLabourHours(
+                $customerID,
+                $item['ID'],
+                $startDate,
+                $endDate
+            );
+            $contractValues = $this->getContractValues(
+                $customerID,
+                $item['ID']
+            );
             $cost = round($contractValues['perMonthCost'] * $numberOfMonths, 2);
-
             $sales = round($contractValues['perMonthSale'] * $numberOfMonths, 2);
             if ($item['Contract'] === 'Pre-Pay Contract') {
                 $sales = round($hourlyLabourCharge * $labourHoursRow[0], 2);
             }
-
             $labourCost = round($labourHoursRow[0] * $hourlyRate, 2);
-
             $profit = $sales - $cost - $labourCost;
-
             $profitPercent = null;
             if ($sales > 0) {
                 $profitPercent = number_format(100 - (($cost + $labourCost) / $sales) * 100, 2);
             }
-
-            $results[$item['Contract']] =
-                array(
-                    'sales'         => $sales,
-                    'cost'          => $cost,
-                    'profit'        => $profit,
-                    'profitPercent' => $profitPercent,
-                    'labourCost'    => $labourCost,
-                    'labourHours'   => $labourHoursRow[0],
-                    'directDebit'   => $item['directDebit']
-                );
-        }
-
-        $otherSales =
-            $this->getOtherSales(
-                $customerID,
-                $startDate,
-                $endDate
-            );
-
-        $otherSalesHoursRow = $this->getTandMLabourHours($customerID, $startDate, $endDate);
-
-        $cost = round($otherSales['cost'], 2);
-
-        $sales = round($otherSales['sale'], 2);
-
-        $labourCost = round($otherSalesHoursRow['hours'] * $hourlyRate, 2);
-
-        $profit = $sales - $cost - $labourCost;
-
-        $profitPercent = null;
-        if ($sales > 0) {
-            $profitPercent = number_format(100 - (($cost + $labourCost) / $sales) * 100, 2);
-        }
-
-        $results['Other Sales'] =
-            array(
+            $results[$item['Contract']] = array(
                 'sales'         => $sales,
                 'cost'          => $cost,
                 'profit'        => $profit,
                 'profitPercent' => $profitPercent,
                 'labourCost'    => $labourCost,
-                'labourHours'   => $otherSalesHoursRow['hours'],
-                'directDebit'   => 0
+                'labourHours'   => $labourHoursRow[0],
+                'directDebit'   => $item['directDebit']
             );
-
+        }
+        $otherSales = $this->getOtherSales(
+            $customerID,
+            $startDate,
+            $endDate
+        );
+        $otherSalesHoursRow = $this->getTandMLabourHours($customerID, $startDate, $endDate);
+        $cost = round($otherSales['cost'], 2);
+        $sales = round($otherSales['sale'], 2);
+        $labourCost = round($otherSalesHoursRow['hours'] * $hourlyRate, 2);
+        $profit = $sales - $cost - $labourCost;
+        $profitPercent = null;
+        if ($sales > 0) {
+            $profitPercent = number_format(100 - (($cost + $labourCost) / $sales) * 100, 2);
+        }
+        $results['Other Sales'] = array(
+            'sales'         => $sales,
+            'cost'          => $cost,
+            'profit'        => $profit,
+            'profitPercent' => $profitPercent,
+            'labourCost'    => $labourCost,
+            'labourHours'   => $otherSalesHoursRow['hours'],
+            'directDebit'   => 0
+        );
         return $results;
 
     }
@@ -163,8 +137,7 @@ class BUCustomerAnalysisReport extends Business
      */
     function getContractItems($customerID)
     {
-        $sql =
-            "
+        $sql = "
         SELECT
           itm_itemno AS `ID`,
           itm_desc AS `Contract`,
@@ -176,17 +149,13 @@ class BUCustomerAnalysisReport extends Business
         WHERE
           item.renewalTypeID <> 0
           AND declinedFlag = 'N'";
-
         if ($customerID) {
             $sql .= " AND cui_custno = $customerID";
         }
-
-        $sql .=
-            " GROUP BY
+        $sql .= " GROUP BY
           itm_itemno
         ORDER BY
           itm_desc";
-
         return $this->db->query($sql);
     }
 
@@ -199,8 +168,7 @@ class BUCustomerAnalysisReport extends Business
      */
     function getContractLabourHours($customerID, $contractId, DateTimeInterface $startDate, DateTimeInterface $endDate)
     {
-        $sql =
-            "SELECT
+        $sql = "SELECT
         SUM( pro_total_activity_duration_hours ) as hours
         
       FROM
@@ -211,7 +179,6 @@ class BUCustomerAnalysisReport extends Business
         pro_total_activity_duration_hours IS NOT NULL
         AND problem.pro_date_raised BETWEEN '" . $startDate->format('Y-m-d') . "' AND '" . $endDate->format('Y-m-d') . "'
         AND cui_itemno = $contractId";
-
         if ($customerID) {
             $sql .= " AND pro_custno = $customerID";
         }
@@ -220,8 +187,7 @@ class BUCustomerAnalysisReport extends Business
 
     function getContractValues($customerID, $contractId)
     {
-        $sql =
-            "
+        $sql = "
         SELECT
            `salePricePerMonth`  AS salePricePerMonth,
            `costPricePerMonth`  AS costPricePerMonth,
@@ -242,11 +208,10 @@ class BUCustomerAnalysisReport extends Business
           cui_itemno = $contractId
           AND renewalTypeID <> 0          
           AND declinedFlag = 'N'";
-
         if ($customerID) {
             $sql .= " AND custitem.cui_custno = $customerID";
         }
-        $rows = $this->db->query($sql);
+        $rows         = $this->db->query($sql);
         $perMonthCost = 0;
         $perMonthSale = 0;
         while ($row = $rows->fetch_array()) {
@@ -279,8 +244,7 @@ class BUCustomerAnalysisReport extends Business
 
     function getOtherSales($customerID, DateTimeInterface $startDate, DateTimeInterface $endDate)
     {
-        $sql =
-            "
+        $sql = "
     SELECT
       SUM( inl_qty *  inl_cost_price) AS `cost`,
       SUM( inl_qty * inl_unit_price ) AS `sale`
@@ -292,19 +256,16 @@ class BUCustomerAnalysisReport extends Business
       inh_type = 'I'
       AND inl_line_type = 'I'
       AND inh_date_printed_yearmonth BETWEEN '" . $startDate->format('Ym') . "' AND '" . $endDate->format('Ym') . "'
-      AND item.renewalTypeID = 0"; // excludes contracts
-
+      AND item.renewalTypeID is null"; // excludes contracts
         if ($customerID) {
             $sql .= " AND invhead.inh_custno = $customerID";
         }
-
         return $this->db->query($sql)->fetch_array();
     }
 
     function getTandMLabourHours($customerID, DateTimeInterface $startDate, DateTimeInterface $endDate)
     {
-        $sql =
-            "
+        $sql = "
       SELECT
         SUM( inl_qty ) as hours
         
@@ -317,11 +278,9 @@ class BUCustomerAnalysisReport extends Business
         AND inl_line_type = 'I'
         AND inh_date_printed_yearmonth BETWEEN '" . $startDate->format('Ym') . "' AND '" . $endDate->format('Ym') . "'
         AND inl_itemno = " . CONFIG_CONSULTANCY_DAY_LABOUR_ITEMID;
-
         if ($customerID) {
             $sql .= " AND invhead.inh_custno = $customerID";
         }
-
         return $this->db->query($sql)->fetch_array();
     }
 
@@ -335,16 +294,12 @@ class BUCustomerAnalysisReport extends Business
     {
         $d1 = new DateTime($startYearMonth . "-01");
         $d2 = new DateTime($endYearMonth . "-28");
-
         $months = 0;
-
         $d1->add(new DateInterval('P1M'));
-
         while ($d1 <= $d2) {
             $months++;
             $d1->add(new DateInterval('P1M'));
         }
-
         return $months + 1;
     }
 }

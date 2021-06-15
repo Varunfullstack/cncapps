@@ -68,7 +68,7 @@
                 $('#renewalTable tbody input[type=checkbox]').prop('checked', false);
             }
             $(this).prop('indeterminate', false);
-            currentPDFPath = null;
+            pdfFileName = null;
             checkSendSignable(false);
         })
         $('#renewalTable tbody input[type=checkbox]').change(function () {
@@ -91,12 +91,12 @@
             } else {
                 $('#selectAll').prop('indeterminate', false)
             }
-            currentPDFPath = null;
+            pdfFileName = null;
 
             checkSendSignable(false);
         })
     })
-    var currentPDFPath = null;
+    var pdfFileName = null;
 
     function previewPDF() {
 
@@ -124,9 +124,9 @@
             dataType: 'json',
             data: data
         }).then(function (result) {
-            currentPDFPath = result.PDFPath;
-            window.open(result.PDFPath);
-            var signableContact = $('#signableContact').val();
+            pdfFileName = result.fileName;
+            window.open(result.URL);
+            const signableContact = $('#signableContact').val();
             checkSendSignable(signableContact);
             spinnerComponent.hideSpinner();
         });
@@ -134,7 +134,7 @@
 
     function checkSendSignable() {
 
-        if (currentPDFPath && $('#signableContact').val()) {
+        if (pdfFileName && $('#signableContact').val()) {
             $('#sendSignable').prop('disabled', false);
         } else {
             $('#sendSignable').prop('disabled', true);
@@ -151,7 +151,7 @@
 
             var data = {
                 contactID: $('#signableContact').val(),
-                PDFPath: currentPDFPath,
+                fileName: pdfFileName,
                 customerID: {customerID},
             };
 

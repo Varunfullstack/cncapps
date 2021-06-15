@@ -1,9 +1,10 @@
 <!-- Template: ActivityReasonPopup.inc.html -->
 <style>
-    h1 a{
+    h1 a {
         color: #000080;
     }
-    .ml-5{
+
+    .ml-5 {
         margin-left: 5px;
     }
 </style>
@@ -29,15 +30,17 @@
             {lastCncNextAction}
         </td>
     </tr>
-    <tr  >
+    <tr>
         <td></td>
     </tr>
-    <tr  >
+    <tr>
         <td></td>
     </tr>
     <tr>
         <td bgcolor="#bfe8f2">
-            <label for="" style="color: #8c4754;  " >Customer Summary</label>            
+            <label for=""
+                   style="color: #8c4754;  "
+            >Customer Summary</label>
             {lastCustomerSummary}
         </td>
     </tr>
@@ -88,5 +91,17 @@
         </td>
     </tr>
     <!-- END internalNotesBlock -->
+    <tr>
+        <td bgcolor="#cccccc"
+            align="left"
+        >
+            Task List
+        </td>
+    </tr>
+    <tr>
+        <td>
+            {taskListContent}
+        </td>
+    </tr>
 </table>
 <!-- End Template: ActivityReasonPopup.inc.html -->

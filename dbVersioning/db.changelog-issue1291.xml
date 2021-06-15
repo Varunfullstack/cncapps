@@ -1,0 +1,23 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="xavi" id="issue1291-0">
+        <tagDatabase tag="issue1291"/>
+    </changeSet>
+    <changeSet author="Mustafa" id="issue1291-1">
+        <preConditions onFail="MARK_RAN">
+              <not>
+                <columnExists tableName="itemtype" columnName="showStockLevels"  />                
+            </not>  
+        </preConditions>
+        <addColumn tableName="itemtype">
+            <column name="showStockLevels" type="tinyint(1)" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>        
+        <sql>
+            update itemtype set showStockLevels=1 where ity_itemtypeno in (8,12,13,16,18,21,39,41,42,43);
+        </sql>
+    </changeSet>
+</databaseChangeLog>

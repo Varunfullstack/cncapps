@@ -22,7 +22,7 @@ class DBEItemType extends DBCNCEntity
     const showInCustomerReview   = "showInCustomerReview";
     const sortOrder              = "sortOrder";
     const allowGlobalPriceUpdate = "allowGlobalPriceUpdate";
-
+    const showStockLevels        = "showStockLevels";
 
     /**
      * calls constructor()
@@ -76,11 +76,18 @@ class DBEItemType extends DBCNCEntity
         );
         $this->addColumn(
             self::sortOrder,
-            DA_INTEGER,
+            DA_FLOAT,
             DA_NOT_NULL
         );
         $this->addColumn(
             self::allowGlobalPriceUpdate,
+            DA_BOOLEAN,
+            DA_NOT_NULL,
+            null,
+            false
+        );
+        $this->addColumn(
+            self::showStockLevels,
             DA_BOOLEAN,
             DA_NOT_NULL,
             null,

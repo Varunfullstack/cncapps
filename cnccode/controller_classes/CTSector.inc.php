@@ -6,33 +6,18 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+
+use CNCLTD\Exceptions\APIException;
+
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BUSector.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
-// Actions
-define(
-    'CTSECTOR_ACT_DISPLAY_LIST',
-    'sectorList'
-);
-define(
-    'CTSECTOR_ACT_CREATE',
-    'createSector'
-);
-define(
-    'CTSECTOR_ACT_EDIT',
-    'editSector'
-);
-define(
-    'CTSECTOR_ACT_DELETE',
-    'deleteSector'
-);
-define(
-    'CTSECTOR_ACT_UPDATE',
-    'updateSector'
-);
 
 class CTSector extends CTCNC
 {
+    const getCustomerWithoutSector = "getCustomerWithoutSector";
+    const CONST_SECTORS='sectors';
+
     public $dsSector;
     public $buSector;
 
@@ -63,20 +48,27 @@ class CTSector extends CTCNC
     function defaultAction()
     {
         switch ($this->getAction()) {
-            case CTSECTOR_ACT_EDIT:
-            case CTSECTOR_ACT_CREATE:
-                $this->checkPermissions(MAINTENANCE_PERMISSION);
-                $this->edit();
+            case self::CONST_SECTORS:
+                switch ($this->requestMethod) {
+                    case 'GET':
+                        echo  json_encode($this->getSectors(),JSON_NUMERIC_CHECK);
+                        break;
+                    case 'POST':
+                        echo  json_encode($this->addSector(),JSON_NUMERIC_CHECK);
+                        break;
+                    case 'PUT':
+                        echo  json_encode($this->updateSector(),JSON_NUMERIC_CHECK);
+                        break;
+                    case 'DELETE':
+                        echo  json_encode($this->deleteSector(),JSON_NUMERIC_CHECK);
+                        break;
+                    default:
+                        # code...
+                        break;
+                }
+                exit;
                 break;
-            case CTSECTOR_ACT_DELETE:
-                $this->checkPermissions(MAINTENANCE_PERMISSION);
-                $this->delete();
-                break;
-            case CTSECTOR_ACT_UPDATE:
-                $this->checkPermissions(MAINTENANCE_PERMISSION);
-                $this->update();
-                break;
-            case CTSECTOR_ACT_DISPLAY_LIST:
+
             default:
                 $this->checkPermissions(MAINTENANCE_PERMISSION);
                 $this->displayList();
@@ -84,144 +76,6 @@ class CTSector extends CTCNC
         }
     }
 
-/**
-     * Edit/Add Further Action
-     * @access private
-     * @throws Exception
-     */
-    function edit()
-    {
-        $this->setMethodName('edit');
-        $dsSector = &$this->dsSector; // ref to class var
-
-        if (!$this->getFormError()) {
-            if ($this->getAction() == CTSECTOR_ACT_EDIT) {
-                $this->buSector->getSectorByID(
-                    $this->getParam('sectorID'),
-                    $dsSector
-                );
-                $sectorID = $this->getParam('sectorID');
-            } else {                                                                    // creating new
-                $dsSector->initialise();
-                $dsSector->setValue(
-                    DBESector::sectorID,
-                    null
-                );
-                $sectorID = null;
-            }
-        } else {                                                                        // form validation error
-            $dsSector->initialise();
-            $dsSector->fetchNext();
-            $sectorID = $dsSector->getValue(DBESector::sectorID);
-        }
-        $urlDelete = null;
-        $txtDelete = null;
-        if ($this->getAction() == CTSECTOR_ACT_EDIT && $this->buSector->canDelete($this->getParam('sectorID'))) {
-            $urlDelete =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action'   => CTSECTOR_ACT_DELETE,
-                        'sectorID' => $sectorID
-                    )
-                );
-            $txtDelete = 'Delete';
-        }
-        $urlUpdate =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action'   => CTSECTOR_ACT_UPDATE,
-                    'sectorID' => $sectorID
-                )
-            );
-        $urlDisplayList =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action' => CTSECTOR_ACT_DISPLAY_LIST
-                )
-            );
-        $this->setPageTitle('Edit Business Sector');
-        $this->setTemplateFiles(
-            array('SectorEdit' => 'SectorEdit.inc')
-        );
-        $this->template->set_var(
-            array(
-                'sectorID'           => $sectorID,
-                'description'        => Controller::htmlInputText($dsSector->getValue(DBESector::description)),
-                'descriptionMessage' => Controller::htmlDisplayText($dsSector->getMessage(DBESector::description)),
-                'urlUpdate'          => $urlUpdate,
-                'urlDelete'          => $urlDelete,
-                'txtDelete'          => $txtDelete,
-                'urlDisplayList'     => $urlDisplayList
-            )
-        );
-        $this->template->parse(
-            'CONTENTS',
-            'SectorEdit',
-            true
-        );
-        $this->parsePage();
-    }
-
-        /**
-     * Delete Further Action
-     *
-     * @access private
-     * @authors Karim Ahmed - Sweet Code Limited
-     * @throws Exception
-     */
-    function delete()
-    {
-        $this->setMethodName('delete');
-        if (!$this->buSector->deleteSector($this->getParam('sectorID'))) {
-            $this->displayFatalError('Cannot delete this Further Action');
-            exit;
-        } else {
-            $urlNext =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action' => CTSECTOR_ACT_DISPLAY_LIST
-                    )
-                );
-            header('Location: ' . $urlNext);
-            exit;
-        }
-    }// end function editFurther Action()
-
-    /**
-     * Update call Further Action details
-     * @access private
-     * @throws Exception
-     */
-    function update()
-    {
-        $this->setMethodName('update');
-        $this->formError = (!$this->dsSector->populateFromArray($this->getParam('sector')));
-        if ($this->formError) {
-            if (!$this->dsSector->getValue(DBESector::sectorID)) {
-                $this->setAction(CTSECTOR_ACT_EDIT);
-            } else {
-                $this->setAction(CTSECTOR_ACT_CREATE);
-            }
-            $this->edit();
-            exit;
-        }
-
-        $this->buSector->updateSector($this->dsSector);
-
-        $urlNext =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'sectorID' => $this->dsSector->getValue(DBESector::sectorID),
-                    'action'   => CTCNC_ACT_VIEW
-                )
-            );
-        header('Location: ' . $urlNext);
-    }
 
 
     /**
@@ -236,82 +90,74 @@ class CTSector extends CTCNC
         $this->setTemplateFiles(
             array('SectorList' => 'SectorList.inc')
         );
-        $dsSector = new DataSet($this);
-
-        $this->buSector->getAll($dsSector);
-
-        $urlCreate =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action' => CTSECTOR_ACT_CREATE
-                )
-            );
-
-        $this->template->set_var(
-            array('urlCreate' => $urlCreate)
-        );
-
-        if ($dsSector->rowCount() > 0) {
-
-            $this->template->set_block(
-                'SectorList',
-                'SectorBlock',
-                'sectors'
-            );
-
-            while ($dsSector->fetchNext()) {
-
-                $sectorID = $dsSector->getValue(DBESector::sectorID);
-
-                $urlEdit =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action'   => CTSECTOR_ACT_EDIT,
-                            'sectorID' => $sectorID
-                        )
-                    );
-                $txtEdit = '[edit]';
-
-                $urlDelete = null;
-                $txtDelete = null;
-                if ($this->buSector->canDelete($sectorID)) {
-                    $urlDelete =
-                        Controller::buildLink(
-                            $_SERVER['PHP_SELF'],
-                            array(
-                                'action'   => CTSECTOR_ACT_DELETE,
-                                'sectorID' => $sectorID
-                            )
-                        );
-                    $txtDelete = '[delete]';
-                }
-
-                $this->template->set_var(
-                    array(
-                        'sectorID'    => $sectorID,
-                        'description' => Controller::htmlDisplayText($dsSector->getValue(DBESector::description)),
-                        'urlEdit'     => $urlEdit,
-                        'urlDelete'   => $urlDelete,
-                        'txtEdit'     => $txtEdit,
-                        'txtDelete'   => $txtDelete
-                    )
-                );
-
-                $this->template->parse(
-                    'sectors',
-                    'SectorBlock',
-                    true
-                );
-
-            }//while $dsSector->fetchNext()
-        }
         $this->template->parse(
             'CONTENTS',
             'SectorList',
-            true
         );
+
+        $this->loadReactScript('SectorComponent.js');
+        $this->loadReactCSS('SectorComponent.css');
         $this->parsePage();
+    }
+
+    //-----------------------new
+    function getSectors()
+    {
+        $dsSector = new DataSet($this);
+        $this->buSector->getAll($dsSector);
+        $data=[];
+        if ($dsSector->rowCount() > 0) {
+            while ($dsSector->fetchNext()) {
+
+                $sectorID = $dsSector->getValue(DBESector::sectorID);
+                $canDelete = false;
+                if ($this->buSector->canDelete($sectorID)) {
+                    $canDelete=true;
+                }
+                $data []=array(
+                        'id'    => $sectorID,
+                        'description' => Controller::htmlDisplayText($dsSector->getValue(DBESector::description)),
+                        'canDelete'     => $canDelete,
+                    );
+            }//while $dsSector->fetchNext()
+        }
+        return $this->success($data);
+    }
+
+    function addSector(){
+        $body=$this->getBody();
+        $description=$body->description;
+        if(!isset($description))
+            return $this->fail(APIException::badRequest,"Missing Data");
+        $dbeSector=new DBESector($this);
+        $dbeSector->setValue(DBESector::description, $description);
+        $dbeSector->insertRow();
+        return $this->success();
+    }
+    function updateSector()
+    {
+        $body=$this->getBody();
+        if(!isset($body->id))
+        return $this->fail(APIException::badRequest,"Missing Data");
+        $dbeSector=new DBESector($this);
+        $dbeSector->getRow($body->id);
+        if(!$dbeSector->rowCount())
+            return $this->fail(APIException::notFound,"Not Found" );
+        $dbeSector->setValue(DBESector::description, $body->description);
+        $dbeSector->updateRow();
+        return $this->success();
+    }
+    function deleteSector()
+    {
+        $id=@$_REQUEST['id'];
+        if(!isset($id))
+            return $this->fail(APIException::badRequest,"Missing Data");
+
+        $dbeSector=new DBESector($this);
+        $dbeSector->getRow($id);
+        if(!$dbeSector->rowCount())
+            return $this->fail(APIException::notFound,"Not Found" );
+        $dbeSector->deleteRow();
+        return $this->success();
     }
 }

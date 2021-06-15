@@ -101,7 +101,7 @@ class SelectSRComponent extends React.Component {
 
     handleSrTypeChange = (srType) => {
         if (srType == 2)
-            this.props.updateSRData({nextStep: 3})
+            this.props.updateSRData({nextStep: 3,customerSR:this.state.customerSR})
         this.setState({srType});
     }
     getSRTypeElement = () => {

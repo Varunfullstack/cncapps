@@ -28,7 +28,7 @@ class CTOSSupportDates extends CTCNC
             Header("Location: /NotAllowed.php");
             exit;
         }
-        $this->setMenuId(219);
+        $this->setMenuId(220);
         $buHeader = new BUHeader($this);
         $buHeader->getHeader($this->dsSystemHeader);
 
@@ -108,14 +108,22 @@ class CTOSSupportDates extends CTCNC
                 $DBEOSSupportDates->insertRow();
                 echo json_encode(
                     [
-                        "id"               => $DBEOSSupportDates->getValue(DBEOSSupportDates::id),
-                        "name"             => $DBEOSSupportDates->getValue(DBEOSSupportDates::name),
-                        "version"          => $DBEOSSupportDates->getValue(DBEOSSupportDates::version),
-                        "availabilityDate" => $DBEOSSupportDates->getValue(DBEOSSupportDates::availabilityDate),
-                        "endOfLifeDate"    => $DBEOSSupportDates->getValue(DBEOSSupportDates::endOfLifeDate),
-                        "threshold"        => $this->dsSystemHeader->getValue(DBEHeader::OSSupportDatesThresholdDays),
-                        "isServer"         => $DBEOSSupportDates->getValue(DBEOSSupportDates::isServer),
-                        "friendlyName"     => $DBEOSSupportDates->getValue(DBEOSSupportDates::friendlyName),
+                        "id"                             => $DBEOSSupportDates->getValue(DBEOSSupportDates::id),
+                        "name"                           => $DBEOSSupportDates->getValue(DBEOSSupportDates::name),
+                        "version"                        => $DBEOSSupportDates->getValue(DBEOSSupportDates::version),
+                        "availabilityDate"               => $DBEOSSupportDates->getValue(
+                            DBEOSSupportDates::availabilityDate
+                        ),
+                        "endOfLifeDate"                  => $DBEOSSupportDates->getValue(
+                            DBEOSSupportDates::endOfLifeDate
+                        ),
+                        "threshold"                      => $this->dsSystemHeader->getValue(
+                            DBEHeader::OSSupportDatesThresholdDays
+                        ),
+                        "isServer"                       => $DBEOSSupportDates->getValue(DBEOSSupportDates::isServer),
+                        "friendlyName"                   => $DBEOSSupportDates->getValue(
+                            DBEOSSupportDates::friendlyName
+                        ),
                     ],
                     JSON_NUMERIC_CHECK
                 );
@@ -128,14 +136,18 @@ class CTOSSupportDates extends CTCNC
 
 
                     $data[] = [
-                        "id"               => $DBEOSSupportDates->getValue(DBEOSSupportDates::id),
-                        "name"             => $DBEOSSupportDates->getValue(DBEOSSupportDates::name),
-                        "version"          => $DBEOSSupportDates->getValue(DBEOSSupportDates::version),
-                        "availabilityDate" => $DBEOSSupportDates->getValue(DBEOSSupportDates::availabilityDate),
-                        "endOfLifeDate"    => $DBEOSSupportDates->getValue(DBEOSSupportDates::endOfLifeDate),
-                        "threshold"        => $this->dsSystemHeader->getValue(DBEHeader::OSSupportDatesThresholdDays),
-                        "isServer"         => $DBEOSSupportDates->getValue(DBEOSSupportDates::isServer),
-                        "friendlyName"     => $DBEOSSupportDates->getValue(DBEOSSupportDates::friendlyName),
+                        "id"                        => $DBEOSSupportDates->getValue(DBEOSSupportDates::id),
+                        "name"                      => $DBEOSSupportDates->getValue(DBEOSSupportDates::name),
+                        "version"                   => $DBEOSSupportDates->getValue(DBEOSSupportDates::version),
+                        "availabilityDate"          => $DBEOSSupportDates->getValue(
+                            DBEOSSupportDates::availabilityDate
+                        ),
+                        "endOfLifeDate"             => $DBEOSSupportDates->getValue(DBEOSSupportDates::endOfLifeDate),
+                        "threshold"                 => $this->dsSystemHeader->getValue(
+                            DBEHeader::OSSupportDatesThresholdDays
+                        ),
+                        "isServer"                  => $DBEOSSupportDates->getValue(DBEOSSupportDates::isServer),
+                        "friendlyName"              => $DBEOSSupportDates->getValue(DBEOSSupportDates::friendlyName),
                     ];
                 }
                 echo json_encode(

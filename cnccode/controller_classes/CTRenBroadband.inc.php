@@ -76,7 +76,6 @@ class CTRenBroadband extends CTCNC
             case 'emailTo':
                 $this->emailTo();
                 break;
-
             case 'list':
             default:
                 $this->displayList();
@@ -93,7 +92,6 @@ class CTRenBroadband extends CTCNC
     {
         $this->setMethodName('edit');
         $dsRenBroadband = &$this->dsRenBroadband; // ref to class var
-
         $customerItemID = null;
         if (!$this->getFormError()) {
             if ($this->getAction() == 'edit') {
@@ -114,44 +112,39 @@ class CTRenBroadband extends CTCNC
             $dsRenBroadband->fetchNext();
             $customerItemID = $dsRenBroadband->getValue(DBEJRenBroadband::customerItemID);
         }
-
-        $urlUpdate =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action'         => 'update',
-                    'ordheadID'      => $this->getParam('ordheadID'),
-                    'customerItemID' => $customerItemID
-                )
-            );
-        $urlEmailTo =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action'         => 'emailTo',
-                    'customerItemID' => $customerItemID
-                )
-            );
-        $urlDisplayList =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action' => 'list'
-                )
-            );
+        $urlUpdate      = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action'         => 'update',
+                'ordheadID'      => $this->getParam('ordheadID'),
+                'customerItemID' => $customerItemID
+            )
+        );
+        $urlEmailTo     = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action'         => 'emailTo',
+                'customerItemID' => $customerItemID
+            )
+        );
+        $urlDisplayList = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action' => 'list'
+            )
+        );
         $this->setPageTitle('Internet Service');
         $this->setTemplateFiles(
             array('RenBroadbandEdit' => 'RenBroadbandEdit.inc')
         );
-
+        $this->loadReactScript('ItemSelectorWrapperComponent.js');
+        $this->loadReactCSS('ItemSelectorWrapperComponent.css');
         $disabled = CTCNC_HTML_DISABLED;
         $readonly = CTCNC_HTML_READONLY;
-
         if ($this->hasPermissions(RENEWALS_PERMISSION)) {
-            $disabled = null;
-            $readonly = null;
-            $pricePerMonth =
-                '<tr>
+            $disabled      = null;
+            $readonly      = null;
+            $pricePerMonth = '<tr>
             <td class="promptText">Sale Price/Month </td>
             <td class="fieldText">
             <input
@@ -179,24 +172,20 @@ class CTRenBroadband extends CTCNC
                     $dsRenBroadband->getMessage(DBEJRenBroadband::costPricePerMonth)
                 ) . '</span> </td>
         </tr>';
-
-            $urlSiteEdit =
-                Controller::buildLink(
-                    CTCNC_PAGE_SITE,
-                    array(
-                        'action'  => CTCNC_ACT_SITE_EDIT,
-                        'htmlFmt' => CT_HTML_FMT_POPUP
-                    )
-                );
-            $urlSitePopup =
-                Controller::buildLink(
-                    CTCNC_PAGE_SITE,
-                    array(
-                        'action'  => CTCNC_ACT_SITE_POPUP,
-                        'htmlFmt' => CT_HTML_FMT_POPUP
-                    )
-                );
-
+            $urlSiteEdit  = Controller::buildLink(
+                CTCNC_PAGE_SITE,
+                array(
+                    'action'  => CTCNC_ACT_SITE_EDIT,
+                    'htmlFmt' => CT_HTML_FMT_POPUP
+                )
+            );
+            $urlSitePopup = Controller::buildLink(
+                CTCNC_PAGE_SITE,
+                array(
+                    'action'  => CTCNC_ACT_SITE_POPUP,
+                    'htmlFmt' => CT_HTML_FMT_POPUP
+                )
+            );
             $this->template->set_var(
                 array(
                     'pricePerMonth' => $pricePerMonth,
@@ -205,61 +194,49 @@ class CTRenBroadband extends CTCNC
                 )
             );
         }
-
         $this->template->setBlock(
             'RenBroadbandEdit',
             'initialContractLengthBlock',
             'initialContractLengths'
         );
-
         $this->parseInitialContractLength($dsRenBroadband->getValue(DBECustomerItem::initialContractLength));
-
-        $urlItemPopup =
-            Controller::buildLink(
-                CTCNC_PAGE_ITEM,
-                array(
-                    'action'        => CTCNC_ACT_DISP_ITEM_POPUP,
-                    'renewalTypeID' => CONFIG_BROADBAND_RENEWAL_TYPE_ID,
-                    'htmlFmt'       => CT_HTML_FMT_POPUP
-                )
-            );
-        $urlItemEdit =
-            Controller::buildLink(
-                CTCNC_PAGE_ITEM,
-                array(
-                    'action'  => CTCNC_ACT_ITEM_EDIT,
-                    'htmlFmt' => CT_HTML_FMT_POPUP
-                )
-            );
-
-        $urlPrintContract =
-            Controller::buildLink(
-                'CustomerItem.php',
-                array(
-                    'action'         => 'printContract',
-                    'customerItemID' => $customerItemID
-                )
-            );
+        $urlItemPopup = Controller::buildLink(
+            CTCNC_PAGE_ITEM,
+            array(
+                'action'        => CTCNC_ACT_DISP_ITEM_POPUP,
+                'renewalTypeID' => CONFIG_BROADBAND_RENEWAL_TYPE_ID,
+                'htmlFmt'       => CT_HTML_FMT_POPUP
+            )
+        );
+        $urlItemEdit  = Controller::buildLink(
+            CTCNC_PAGE_ITEM,
+            array(
+                'action'  => CTCNC_ACT_ITEM_EDIT,
+                'htmlFmt' => CT_HTML_FMT_POPUP
+            )
+        );
+        $urlPrintContract = Controller::buildLink(
+            'CustomerItem.php',
+            array(
+                'action'         => 'printContract',
+                'customerItemID' => $customerItemID
+            )
+        );
         $this->template->set_var(
             array(
                 'txtPrintContract' => 'Print Contract',
                 'urlPrintContract' => $urlPrintContract
             )
         );
-
         $dsCustomer = new DBECustomer($this);
         $dsCustomer->getRow($dsRenBroadband->getValue(DBEJRenBroadband::customerID));
-
         $isDirectDebitAllowed = $dsCustomer->getValue(DBECustomer::sortCode) && $dsCustomer->getValue(
                 DBECustomer::accountName
             ) && $dsCustomer->getValue(DBECustomer::accountNumber);
-
-
         $installationDate = DateTime::createFromFormat(
             'Y-m-d',
             $dsRenBroadband->getValue(DBECustomerItem::installationDate)
         );
-
         $this->template->set_var(
             array(
                 'itemDescription'                      => Controller::htmlDisplayText(
@@ -498,7 +475,6 @@ class CTRenBroadband extends CTCNC
                 'clientCheckDirectDebit'               => $isDirectDebitAllowed ? 'true' : 'false'
             )
         );
-
         $this->template->set_block(
             'RenBroadbandEdit',
             'TransactionTypesBlock',
@@ -523,7 +499,6 @@ class CTRenBroadband extends CTCNC
                 true
             );
         }
-
         $this->template->parse(
             'CONTENTS',
             'RenBroadbandEdit',
@@ -564,10 +539,9 @@ class CTRenBroadband extends CTCNC
     function editFromSalesOrder()
     {
         $buSalesOrder = new BUSalesOrder($this);
-        $DBEJOrdline = new DBEJOrdline($this);
+        $DBEJOrdline  = new DBEJOrdline($this);
         $DBEJOrdline->getRow($this->getParam('lineId'));
         $renewalCustomerItemID = $DBEJOrdline->getValue(DBEJOrdline::renewalCustomerItemID);
-
         // has the order line get a renewal already?
         if (!$renewalCustomerItemID) {
             // create a new record first
@@ -577,15 +551,12 @@ class CTRenBroadband extends CTCNC
                 $dsOrdhead,
                 $dsDontNeedOrdline
             );
-
             $this->buRenBroadband->createNewRenewal(
                 $dsOrdhead->getValue(DBEJOrdhead::customerID),
                 $DBEJOrdline->getValue(DBEJOrdline::itemID),
                 $renewalCustomerItemID,
                 $dsOrdhead->getValue(DBEJOrdhead::delSiteNo)                // returned by function
             );
-
-
             // For despatch, prevents the renewal appearing again today during despatch process.
             $dbeOrdline = new DBEOrdline($this);
             $dbeOrdline->getRow($DBEJOrdline->getValue(DBEJOrdline::id));
@@ -595,16 +566,13 @@ class CTRenBroadband extends CTCNC
             );
             $dbeOrdline->updateRow();
         }
-
-        $urlNext =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action' => 'edit',
-                    'ID'     => $renewalCustomerItemID
-                )
-            );
-
+        $urlNext = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action' => 'edit',
+                'ID'     => $renewalCustomerItemID
+            )
+        );
         header('Location: ' . $urlNext);
         exit;
     }// end function editActivity()
@@ -623,13 +591,12 @@ class CTRenBroadband extends CTCNC
             $this->displayFatalError('Cannot delete this broadband contract');
             exit;
         } else {
-            $urlNext =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action' => 'list'
-                    )
-                );
+            $urlNext = Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action' => 'list'
+                )
+            );
             header('Location: ' . $urlNext);
             exit;
         }
@@ -653,32 +620,27 @@ class CTRenBroadband extends CTCNC
             $this->edit();
             exit;
         }
-
         $this->buRenBroadband->updateRenBroadband($this->dsRenBroadband);
-
         if ($this->getParam('ordheadID') == 1) {        // see whether more renewals need to be edited for this
             // despatch
-            $urlNext =
-                Controller::buildLink(
-                    'Despatch',
-                    array(
-                        'action' => 'inputRenewals',
-                        'ID'     => $this->getParam('ordheadID')
-                    )
-                );
+            $urlNext = Controller::buildLink(
+                'Despatch',
+                array(
+                    'action' => 'inputRenewals',
+                    'ID'     => $this->getParam('ordheadID')
+                )
+            );
 
         } else {
-            $urlNext =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action' => 'edit',
-                        'ID'     => $this->dsRenBroadband->getValue(DBEJRenBroadband::customerItemID)
-                    )
-                );
+            $urlNext = Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action' => 'edit',
+                    'ID'     => $this->dsRenBroadband->getValue(DBEJRenBroadband::customerItemID)
+                )
+            );
 
         }
-
         header('Location: ' . $urlNext);
     }
 
@@ -703,16 +665,13 @@ class CTRenBroadband extends CTCNC
             $this->getParam('customerItemID'),
             $this->getParam('emailAddress')
         );
-
-        $urlNext =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action' => 'edit',
-                    'ID'     => $this->getParam('customerItemID')
-                )
-            );
-
+        $urlNext = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action' => 'edit',
+                'ID'     => $this->getParam('customerItemID')
+            )
+        );
         header('Location: ' . $urlNext);
 
     }// end function emailTo()
@@ -734,7 +693,6 @@ class CTRenBroadband extends CTCNC
             $dsRenBroadband,
             $this->getParam('orderBy')
         );
-
         if ($dsRenBroadband->rowCount() > 0) {
             $this->template->set_block(
                 'RenBroadbandList',
@@ -744,26 +702,20 @@ class CTRenBroadband extends CTCNC
             while ($dsRenBroadband->fetchNext()) {
 
                 $customerItemID = $dsRenBroadband->getValue(DBEJRenBroadband::customerItemID);
-
-                $urlEdit =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action' => 'edit',
-                            'ID'     => $customerItemID
-                        )
-                    );
-
-                $urlList =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action' => 'list'
-                        )
-                    );
-
+                $urlEdit = Controller::buildLink(
+                    $_SERVER['PHP_SELF'],
+                    array(
+                        'action' => 'edit',
+                        'ID'     => $customerItemID
+                    )
+                );
+                $urlList = Controller::buildLink(
+                    $_SERVER['PHP_SELF'],
+                    array(
+                        'action' => 'list'
+                    )
+                );
                 $txtEdit = '[edit]';
-
                 $this->template->set_var(
                     array(
                         'customerItemID'    => $customerItemID,

@@ -272,7 +272,7 @@
                 let customerIdInput = null;
                 let dataTableTemplate = null;
                 let reportSectionElement = null;
-                $(() => {
+                document.addEventListener('DOMContentLoaded', () => {
                     Mustache.tags = ['{%', '%}'];
                     startDateInput = document.getElementById('startDate');
                     endDateInput = document.getElementById('endDate');
@@ -343,49 +343,136 @@
                     }
                     const getUrl = window.location;
                     const baseUrl = getUrl.protocol + "//" + getUrl.host + "/" + getUrl.pathname.split('/')[1];
-                    const statsURL = new URL('/internal-api/stats', baseUrl);
-                    const breakDownStatsURL = new URL('/internal-api/stats', baseUrl);
-                    breakDownStatsURL.searchParams.append('breakDown', 'true');
-                    const customerStatsURL = new URL('/internal-api/customerStats/' + customerId, baseUrl);
-                    const customerBreakDownStatsURL = new URL('/internal-api/customerStats/' + customerId, baseUrl);
-                    customerBreakDownStatsURL.searchParams.append('breakDown', 'true');
-                    Object.keys(commonParams).forEach(key => {
-                        statsURL.searchParams.append(key, commonParams[key]);
-                        breakDownStatsURL.searchParams.append(key, commonParams[key]);
-                        customerStatsURL.searchParams.append(key, commonParams[key]);
-                        customerBreakDownStatsURL.searchParams.append(key, commonParams[key]);
-                    });
-                    reportSectionElement.innerHTML = "<div class='loading' style='position: absolute'></div>";
-                    Promise.all([
+                    const allCustomersStatsURLString = '/internal-api/stats';
+                    const allCustomersStatsURL = new URL(allCustomersStatsURLString, baseUrl);
+                    const allCustomersBreakdownStatsURL = new URL(allCustomersStatsURLString, baseUrl);
+                    allCustomersBreakdownStatsURL.searchParams.append('breakDown', 'true');
+                    const allCustomersProactiveStatsURL = new URL(allCustomersStatsURLString, baseUrl);
+                    allCustomersProactiveStatsURL.searchParams.append('type', 'proactive');
+                    const allCustomersProactiveBreakdownStatsURL = new URL(allCustomersStatsURLString, baseUrl);
+                    allCustomersProactiveBreakdownStatsURL.searchParams.append('type', 'proactive');
+                    allCustomersProactiveBreakdownStatsURL.searchParams.append('breakDown', 'true');
+                    const allCustomersCustomerFacingStatsURL = new URL(allCustomersStatsURLString, baseUrl);
+                    allCustomersCustomerFacingStatsURL.searchParams.append('type', 'customerFacing');
+                    const allCustomersCustomerFacingBreakdownStatsURL = new URL(allCustomersStatsURLString, baseUrl);
+                    allCustomersCustomerFacingBreakdownStatsURL.searchParams.append('type', 'customerFacing');
+                    allCustomersCustomerFacingBreakdownStatsURL.searchParams.append('breakDown', 'true');
 
-                        fetch(customerBreakDownStatsURL).then(response => {
-                            return response.json();
-                        }),
-                        fetch(customerStatsURL).then(response => {
-                            return response.json();
-                        }),
-                        fetch(breakDownStatsURL).then(response => {
-                            return response.json();
-                        }),
-                        fetch(statsURL).then(response => {
-                            return response.json();
-                        })
-                    ]).then(getContext)
-                        .then((data) => {
-                            const context = {item: data};
-                            reportSectionElement.innerHTML = Mustache.to_html(dataTableTemplate, context);
-                        })
+
+                    const specificCustomerStatsURLString = '/internal-api/customerStats/' + customerId;
+                    const specificCustomerStatsURL = new URL(specificCustomerStatsURLString, baseUrl);
+                    const specificCustomerBreakdownStatsURL = new URL(specificCustomerStatsURLString, baseUrl);
+                    specificCustomerBreakdownStatsURL.searchParams.append('breakDown', 'true');
+                    const specificCustomerProactiveStatsURL = new URL(specificCustomerStatsURLString, baseUrl);
+                    specificCustomerProactiveStatsURL.searchParams.append('type', 'proactive');
+                    const specificCustomerProactiveBreakdownStatsURL = new URL(specificCustomerStatsURLString, baseUrl);
+                    specificCustomerProactiveBreakdownStatsURL.searchParams.append('type', 'proactive');
+                    specificCustomerProactiveBreakdownStatsURL.searchParams.append('breakDown', 'true');
+
+                    const specificCustomerCustomerFacingStatsURL = new URL(specificCustomerStatsURLString, baseUrl);
+                    specificCustomerCustomerFacingStatsURL.searchParams.append('type', 'customerFacing');
+                    const specificCustomerCustomerFacingBreakdownStatsURL = new URL(specificCustomerStatsURLString, baseUrl);
+                    specificCustomerCustomerFacingBreakdownStatsURL.searchParams.append('breakDown', 'true');
+                    specificCustomerCustomerFacingBreakdownStatsURL.searchParams.append('type', 'customerFacing');
+
+
+                    const urls = [
+                        allCustomersStatsURL,
+                        allCustomersBreakdownStatsURL,
+                        allCustomersProactiveStatsURL,
+                        allCustomersProactiveBreakdownStatsURL,
+                        allCustomersCustomerFacingStatsURL,
+                        allCustomersCustomerFacingBreakdownStatsURL,
+                        specificCustomerStatsURL,
+                        specificCustomerBreakdownStatsURL,
+                        specificCustomerProactiveStatsURL,
+                        specificCustomerProactiveBreakdownStatsURL,
+                        specificCustomerCustomerFacingStatsURL,
+                        specificCustomerCustomerFacingBreakdownStatsURL,
+                    ];
+
+                    Object.keys(commonParams).forEach(key => {
+                        urls.forEach(url => url.searchParams.append(key, commonParams[key]))
+                    });
+                    window.spinnerComponent.showSpinner();
+                    Promise.all(urls.map(url => fetch(url.toString()).then(response => response.json()))
+                    ).then(getContext)
+                            .then((data) => {
+                                const context = {item: data};
+                                window.spinnerComponent.hideSpinner();
+                                reportSectionElement.innerHTML = Mustache.to_html(dataTableTemplate, context);
+                            })
                 }
 
-                function getContext([customerBreakDown, customerSummarised, breakDown, summarised]) {
+                function addData(customersData, labels, key, customerP1, allP1, customerP2, allP2, customerP3, allP3, customerP4, allP4, specificCustomerStats, allCustomersStats) {
+                    customersData.push(
+                            {
+                                "description": labels[key].label,
+                                "p1": customerP1 ? labels[key].format(customerP1[key]) : null,
+                                "p1Class": customerP1 ? labels[key].assignClass(customerP1[key], allP1[key]) : null,
+                                "p1Link": customerP1 && labels[key].link ? labels[key].link(customerP1[key], 1) : null,
+                                "p2": customerP2 ? labels[key].format(customerP2[key]) : null,
+                                "p2Class": customerP2 ? labels[key].assignClass(customerP2[key], allP2[key]) : null,
+                                "p2Link": customerP2 && labels[key].link ? labels[key].link(customerP2[key], 2) : null,
+                                "p3": customerP3 ? labels[key].format(customerP3[key]) : null,
+                                "p3Class": customerP3 ? labels[key].assignClass(customerP3[key], allP3[key]) : null,
+                                "p3Link": customerP3 && labels[key].link ? labels[key].link(customerP3[key], 3) : null,
+                                "p4": customerP4 ? labels[key].format(customerP4[key]) : null,
+                                "p4Class": customerP4 ? labels[key].assignClass(customerP4[key], allP4[key]) : null,
+                                "p4Link": customerP4 && labels[key].link ? labels[key].link(customerP4[key], 4) : null,
+                                "all": labels[key].format(specificCustomerStats[key]),
+                                "allClass": labels[key].assignClass(specificCustomerStats[key], allCustomersStats[key]),
+                                "allLink": labels[key].link ? labels[key].link(specificCustomerStats[key]) : null
+                            }
+                    );
+                }
+
+                function addSummaryData(allData, labels, key, allP1, allP2, allP3, allP4, allCustomersStats) {
+                    allData.push(
+                            {
+                                "description": labels[key].label,
+                                "p1": allP1 ? labels[key].format(allP1[key]) : null,
+                                "p2": allP2 ? labels[key].format(allP2[key]) : null,
+                                "p3": allP3 ? labels[key].format(allP3[key]) : null,
+                                "p4": allP4 ? labels[key].format(allP4[key]) : null,
+                                "all": labels[key].format(allCustomersStats[key]),
+                            }
+                    )
+                }
+
+                function percentageFormat(x) {
+                    return x === null ? '' : (x * 100).toFixed(2);
+                }
+
+                function getContext(
+                        [
+                            allCustomersStats,
+                            allCustomersBreakdownStats,
+                            allCustomersProactiveStats,
+                            allCustomersProactiveBreakdownStats,
+                            allCustomersCustomerFacingStats,
+                            allCustomersCustomerFacingBreakdownStats,
+                            specificCustomerStats,
+                            specificCustomerBreakdownStats,
+                            specificCustomerProactiveStats,
+                            specificCustomerProactiveBreakdownStats,
+                            specificCustomerCustomerFacingStats,
+                            specificCustomerCustomerFacingBreakdownStats,
+                        ]
+                ) {
 
                     const higherIsBetter = (customer, allCustomers) => {
-                        return customer >= allCustomers ? "performance-green" : 'performance-warn'
+                        if (customer === null) return '';
+                        if (allCustomers === null) return '';
+                        return customer.toFixed(2) >= allCustomers.toFixed(2) ? "performance-green" : 'performance-warn'
                     };
                     const lowerIsBetter = (customer, allCustomers) => {
-                        return customer <= allCustomers ? "performance-green" : 'performance-warn'
+                        if (customer === null) return '';
+                        if (allCustomers === null) return '';
+                        return customer.toFixed(2) <= allCustomers.toFixed(2) ? "performance-green" : 'performance-warn'
                     };
                     const zeroTolerance = (customer, allCustomers) => {
+                        if (customer === null) return '';
                         return customer ? "performance-warn" : "performance-green";
                     }
                     const noColour = (customer, allCustomers) => {
@@ -419,19 +506,19 @@
                         },
                         "slaMet": {
                             label: "% of Response SLAs Met",
-                            format: x => (x * 100).toFixed(2),
+                            format: percentageFormat,
                             assignClass: higherIsBetter,
                             showInSummary: true
                         },
                         "closedWithin8Hours": {
                             label: "% Closed within 8 hours of being raised",
-                            format: x => (x * 100).toFixed(2),
+                            format: percentageFormat,
                             assignClass: higherIsBetter,
                             showInSummary: true
                         },
                         "reopened": {
                             label: "% Reopened SRs",
-                            format: x => (x * 100).toFixed(2),
+                            format: percentageFormat,
                             assignClass: lowerIsBetter,
                             showInSummary: true
                         },
@@ -474,58 +561,75 @@
                         }
                     };
                     const customersData = [];
+                    const customerProactiveData = [];
+                    const customerCustomerFacingData = [];
                     const allData = [];
+                    const allProactiveData = [];
+                    const allCustomerFacingData = [];
                     const data = [
-                        {name: 'Customer', data: customersData},
-                        {name: 'All Customers', data: allData}
+                        {name: 'Customer - All Service Requests', data: customersData},
+                        {name: 'Customer - Customer Facing Requests', data: customerCustomerFacingData},
+                        {name: 'Customer - Proactive Requests', data: customerProactiveData},
+                        {name: 'All Customers - All Service Requests', data: allData},
+                        {name: 'All Customers - Customer Facing Requests', data: allCustomerFacingData},
+                        {name: 'All Customers - Proactive Requests', data: allProactiveData},
+
                     ];
-                    Object.keys(customerSummarised).forEach(key => {
+
+                    const tableCombinations = [
+                        [
+                            allCustomersStats,
+                            specificCustomerStats,
+                            allCustomersBreakdownStats,
+                            specificCustomerBreakdownStats,
+                            customersData,
+                            allData
+                        ],
+                        [
+                            allCustomersCustomerFacingStats,
+                            specificCustomerCustomerFacingStats,
+                            allCustomersCustomerFacingBreakdownStats,
+                            specificCustomerCustomerFacingBreakdownStats,
+                            customerCustomerFacingData,
+                            allCustomerFacingData
+                        ],
+                        [
+                            allCustomersProactiveStats,
+                            specificCustomerProactiveStats,
+                            allCustomersProactiveBreakdownStats,
+                            specificCustomerProactiveBreakdownStats,
+                            customerProactiveData,
+                            allProactiveData
+                        ]
+                    ];
+
+                    Object.keys(specificCustomerStats).forEach(key => {
                         if (!labels[key]) {
                             return;
                         }
-
-                        const allP1 = breakDown.find(x => x.priority === 1);
-                        const allP2 = breakDown.find(x => x.priority === 2);
-                        const allP3 = breakDown.find(x => x.priority === 3);
-                        const allP4 = breakDown.find(x => x.priority === 4);
-                        const customerP1 = customerBreakDown.find(x => x.priority === 1);
-                        const customerP2 = customerBreakDown.find(x => x.priority === 2);
-                        const customerP3 = customerBreakDown.find(x => x.priority === 3);
-                        const customerP4 = customerBreakDown.find(x => x.priority === 4);
-                        customersData.push(
-                            {
-                                "description": labels[key].label,
-                                "p1": customerP1 ? labels[key].format(customerP1[key]) : null,
-                                "p1Class": customerP1 ? labels[key].assignClass(customerP1[key], allP1[key]) : null,
-                                "p1Link": customerP1 && labels[key].link ? labels[key].link(customerP1[key], 1) : null,
-                                "p2": customerP2 ? labels[key].format(customerP2[key]) : null,
-                                "p2Class": customerP2 ? labels[key].assignClass(customerP2[key], allP2[key]) : null,
-                                "p2Link": customerP2 && labels[key].link ? labels[key].link(customerP2[key], 2) : null,
-                                "p3": customerP3 ? labels[key].format(customerP3[key]) : null,
-                                "p3Class": customerP3 ? labels[key].assignClass(customerP3[key], allP3[key]) : null,
-                                "p3Link": customerP3 && labels[key].link ? labels[key].link(customerP3[key], 3) : null,
-                                "p4": customerP4 ? labels[key].format(customerP4[key]) : null,
-                                "p4Class": customerP4 ? labels[key].assignClass(customerP4[key], allP4[key]) : null,
-                                "p4Link": customerP4 && labels[key].link ? labels[key].link(customerP4[key], 4) : null,
-                                "all": labels[key].format(customerSummarised[key]),
-                                "allClass": labels[key].assignClass(customerSummarised[key], summarised[key]),
-                                "allLink": labels[key].link ? labels[key].link(customerSummarised[key]) : null
-                            }
-                        );
-                        if (!labels[key].showInSummary) {
-                            return;
-                        }
-                        allData.push(
-                            {
-                                "description": labels[key].label,
-                                "p1": allP1 ? labels[key].format(allP1[key]) : null,
-                                "p2": allP2 ? labels[key].format(allP2[key]) : null,
-                                "p3": allP3 ? labels[key].format(allP3[key]) : null,
-                                "p4": allP4 ? labels[key].format(allP4[key]) : null,
-                                "all": labels[key].format(summarised[key]),
-                            }
+                        tableCombinations.forEach(
+                                combination => {
+                                    const allCustomersBreakdownStats = combination[2]
+                                    const allP1 = allCustomersBreakdownStats.find(x => x.priority === 1);
+                                    const allP2 = allCustomersBreakdownStats.find(x => x.priority === 2);
+                                    const allP3 = allCustomersBreakdownStats.find(x => x.priority === 3);
+                                    const allP4 = allCustomersBreakdownStats.find(x => x.priority === 4);
+                                    const specificCustomerBreakdownStats = combination[3];
+                                    const customerP1 = specificCustomerBreakdownStats.find(x => x.priority === 1);
+                                    const customerP2 = specificCustomerBreakdownStats.find(x => x.priority === 2);
+                                    const customerP3 = specificCustomerBreakdownStats.find(x => x.priority === 3);
+                                    const customerP4 = specificCustomerBreakdownStats.find(x => x.priority === 4);
+                                    const customersData = combination[4];
+                                    const specificCustomerStats = combination[1];
+                                    const allCustomersStats = combination[0];
+                                    addData(customersData, labels, key, customerP1, allP1, customerP2, allP2, customerP3, allP3, customerP4, allP4, specificCustomerStats, allCustomersStats);
+                                    if (!labels[key].showInSummary) {
+                                        return;
+                                    }
+                                    const allData = combination[5];
+                                    addSummaryData(allData, labels, key, allP1, allP2, allP3, allP4, allCustomersStats);
+                                }
                         )
-
                     });
                     return data;
                 }
@@ -535,59 +639,69 @@
     </tr>
 </table>
 <style>
+    #reportSection {
+        display: grid;
+        grid-template-rows: 1fr 1fr;
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+
     #reportSection th {
         width: 30px;
     }
 </style>
-<div id="reportSection">
+<div id="reportSection"
+
+>
 
 </div>
 <script id="reportData"
         type="text/template"
 >
     {% #item %}
-    <br>
-    <h3>{% name %}</h3>
-    <table>
-        <thead>
-        <tr>
-            <th style="min-width: 245px;"></th>
-            <th>P1</th>
-            <th>P2</th>
-            <th>P3</th>
-            <th>P4</th>
-            <th>All</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% #data %}
-        <tr>
-            <td>
-                {% description %}
-            </td>
-            <td class="{% p1Class %}"> {% #p1Link %}<a href="{% p1Link %}"
-                                                       target="_blank"
-            >{% p1 %}</a>{% /p1Link %}{% ^p1Link %}{% p1 %}{% /p1Link %}
-            </td>
-            <td class="{% p2Class %}"> {% #p2Link %}<a href="{% p2Link %}"
-                                                       target="_blank"
-            >{% p2 %}</a>{% /p2Link %}{% ^p2Link %}{% p2 %}{% /p2Link %}
-            </td>
-            <td class="{% p3Class %}"> {% #p3Link %}<a href="{% p3Link %}"
-                                                       target="_blank"
-            >{% p3 %}</a>{% /p3Link %}{% ^p3Link %}{% p3 %}{% /p3Link %}
-            </td>
-            <td class="{% p4Class %}"> {% #p4Link %}<a href="{% p4Link %}"
-                                                       target="_blank"
-            >{% p4 %}</a>{% /p4Link %}{% ^p4Link %}{% p4 %}{% /p4Link %}
-            </td>
-            <td class="{% allClass %}"> {% #allLink %}<a href="{% allLink %}"
-                                                         target="_blank"
-            >{% all %}</a>{% /allLink %}{% ^allLink %}{% all %}{% /allLink %}
-            </td>
-        </tr>
-        {% /data %}
-        </tbody>
-    </table>
+    <div>
+        <br>
+        <h3>{% name %}</h3>
+        <table>
+            <thead>
+            <tr>
+                <th style="min-width: 245px;"></th>
+                <th>P1</th>
+                <th>P2</th>
+                <th>P3</th>
+                <th>P4</th>
+                <th>All</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% #data %}
+            <tr>
+                <td>
+                    {% description %}
+                </td>
+                <td class="{% p1Class %}"> {% #p1Link %}<a href="{% p1Link %}"
+                                                           target="_blank"
+                >{% p1 %}</a>{% /p1Link %}{% ^p1Link %}{% p1 %}{% /p1Link %}
+                </td>
+                <td class="{% p2Class %}"> {% #p2Link %}<a href="{% p2Link %}"
+                                                           target="_blank"
+                >{% p2 %}</a>{% /p2Link %}{% ^p2Link %}{% p2 %}{% /p2Link %}
+                </td>
+                <td class="{% p3Class %}"> {% #p3Link %}<a href="{% p3Link %}"
+                                                           target="_blank"
+                >{% p3 %}</a>{% /p3Link %}{% ^p3Link %}{% p3 %}{% /p3Link %}
+                </td>
+                <td class="{% p4Class %}"> {% #p4Link %}<a href="{% p4Link %}"
+                                                           target="_blank"
+                >{% p4 %}</a>{% /p4Link %}{% ^p4Link %}{% p4 %}{% /p4Link %}
+                </td>
+                <td class="{% allClass %}"> {% #allLink %}<a href="{% allLink %}"
+                                                             target="_blank"
+                >{% all %}</a>{% /allLink %}{% ^allLink %}{% all %}{% /allLink %}
+                </td>
+            </tr>
+            {% /data %}
+            </tbody>
+        </table>
+    </div>
     {% /item %}
 </script>

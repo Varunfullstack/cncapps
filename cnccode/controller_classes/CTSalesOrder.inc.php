@@ -8,6 +8,10 @@
  */
 global $cfg;
 
+use CNCLTD\Business\BUActivity;
+use CNCLTD\ChildItem\ChildItemRepository;
+use CNCLTD\Data\DBConnect;
+use CNCLTD\Data\DBEItem;
 use CNCLTD\Exceptions\JsonHttpException;
 
 require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
@@ -30,250 +34,70 @@ require_once($cfg["path_dbe"] . "/DBEQuotationTemplate.inc.php");
 require_once($cfg["path_dbe"] . "/DBESignableEnvelope.inc.php");
 require_once($cfg["path_func"] . "/Common.inc.php");
 require_once($cfg ["path_bu"] . "/BUMail.inc.php");
-require_once($cfg['path_dbe'] . '/DBESupplier.inc.php');
 // Parameters
-define(
-    'CTSALESORDER_VAL_NONE_SELECTED',
-    -1
-);
+const CTSALESORDER_VAL_NONE_SELECTED = -1;
 // Actions
-define(
-    'CTSALESORDER_ACT_DISP_SEARCH',
-    'dispSearch'
-);
-define(
-    'CTSALESORDER_ACT_SEARCH',
-    'search'
-);
-define(
-    'CTSALESORDER_ACT_DELETE_ORDER',
-    'deleteOrder'
-);
-define(
-    'CTSALESORDER_ACT_ORDER_LINES_SUBMIT',
-    'orderLinesSubmit'
-);
-define(
-    'CTSALESORDER_ACT_UPLOAD_QUOTE_DOC',
-    'uploadQuoteDoc'
-);
-define(
-    'CTSALESORDER_ACT_SEND_QUOTE_DOC',
-    'sendQuoteDoc'
-);
-define(
-    'CTSALESORDER_ACT_DELETE_QUOTE_DOC',
-    'deleteQuoteDoc'
-);
-define(
-    'CTSALESORDER_ACT_DISPLAY_QUOTE_DOC',
-    'displayQuoteDoc'
-);
-define(
-    'CTSALESORDER_ACT_CREATE_QUOTE',
-    'createQuote'
-);
-define(
-    'CTSALESORDER_ACT_CREATE_TEMPLATED_QUOTE',
-    'createTemplatedQuote'
-);
-define(
-    'CTSALESORDER_ACT_CREATE_ORDER',
-    'createOrder'
-);
-define(
-    'CTSALESORDER_ACT_COPY_TO_ORDER',
-    'copyToOrder'
-);        // bulk copy to initial order using selector
-define(
-    'CTSALESORDER_ACT_CONVERT_TO_ORDER',
-    'convertToOrder'
-);  // bulk convert to initial order using selector
-define(
-    'CTSALESORDER_ACT_CREATE_MANUAL_ORDER_FORM',
-    'genManualOrderForm'
-);
-define(
-    'CTSALESORDER_ACT_CHANGE_SUPPLIER',
-    'changeSupplier'
-);
-define(
-    'CTSALESORDER_ACT_UPDATE_LINES',
-    'updateLines'
-);                    // bulk update of lines
-define(
-    'CTSALESORDER_ACT_INSERT_FROM_ORDER',
-    'insertFromOrder'
-);// insert lines from another order
-define(
-    'CTSALESORDER_ACT_ADD_ORDLINE',
-    'addOrdline'
-);
-define(
-    'CTSALESORDER_ACT_EDIT_ORDLINE',
-    'editOrdline'
-);
-define(
-    'CTSALESORDER_ACT_UPDATE_ORDLINE',
-    'updtOrdline'
-);
-define(
-    'CTSALESORDER_ACT_INSERT_ORDLINE',
-    'insrtOrdline'
-);
-define(
-    'CTSALESORDER_ACT_MOVE_ORDLINE_UP',
-    'moveUpOrdline'
-);
-define(
-    'CTSALESORDER_ACT_MOVE_ORDLINE_DOWN',
-    'moveDownOrdline'
-);
-define(
-    'CTSALESORDER_ACT_DELETE_ORDLINE',
-    'delOrdline'
-);
-define(
-    'CTSALESORDER_ACT_UPDATE_DEL_ADDRESS',
-    'updDelAdd'
-);
-define(
-    'CTSALESORDER_ACT_UPDATE_INV_ADDRESS',
-    'updInvAdd'
-);
-define(
-    'CTSALESORDER_ACT_UPDATE_DEL_CONTACT',
-    'updDelCon'
-);
-define(
-    'CTSALESORDER_ACT_UPDATE_INV_CONTACT',
-    'updInvCon'
-);
-define(
-    'CTSALESORDER_ACT_UPDATE_HEADER',
-    'updateHead'
-);
+const CTSALESORDER_ACT_DISP_SEARCH              = 'dispSearch';
+const CTSALESORDER_ACT_SEARCH                   = 'search';
+const CTSALESORDER_ACT_DELETE_ORDER             = 'deleteOrder';
+const CTSALESORDER_ACT_ORDER_LINES_SUBMIT       = 'orderLinesSubmit';
+const CTSALESORDER_ACT_UPLOAD_QUOTE_DOC         = 'uploadQuoteDoc';
+const CTSALESORDER_ACT_SEND_QUOTE_DOC           = 'sendQuoteDoc';
+const CTSALESORDER_ACT_DELETE_QUOTE_DOC         = 'deleteQuoteDoc';
+const CTSALESORDER_ACT_DISPLAY_QUOTE_DOC        = 'displayQuoteDoc';
+const CTSALESORDER_ACT_CREATE_QUOTE             = 'createQuote';
+const CTSALESORDER_ACT_CREATE_TEMPLATED_QUOTE   = 'createTemplatedQuote';
+const CTSALESORDER_ACT_CREATE_ORDER             = 'createOrder';
+const CTSALESORDER_ACT_COPY_TO_ORDER            = 'copyToOrder';        // bulk copy to initial order using selector
+const CTSALESORDER_ACT_CONVERT_TO_ORDER         = 'convertToOrder';  // bulk convert to initial order using selector
+const CTSALESORDER_ACT_CREATE_MANUAL_ORDER_FORM = 'genManualOrderForm';
+const CTSALESORDER_ACT_CHANGE_SUPPLIER          = 'changeSupplier';
+const CTSALESORDER_ACT_UPDATE_LINES             = 'updateLines';                    // bulk update of lines
+const CTSALESORDER_ACT_INSERT_FROM_ORDER        = 'insertFromOrder';// insert lines from another order
+const CTSALESORDER_ACT_ADD_ORDLINE              = 'addOrdline';
+const CTSALESORDER_ACT_EDIT_ORDLINE             = 'editOrdline';
+const CTSALESORDER_ACT_UPDATE_ORDLINE           = 'updtOrdline';
+const CTSALESORDER_ACT_INSERT_ORDLINE           = 'insrtOrdline';
+const CTSALESORDER_ACT_MOVE_ORDLINE_UP          = 'moveUpOrdline';
+const CTSALESORDER_ACT_MOVE_ORDLINE_DOWN        = 'moveDownOrdline';
+const CTSALESORDER_ACT_DELETE_ORDLINE           = 'delOrdline';
+const CTSALESORDER_ACT_UPDATE_DEL_ADDRESS       = 'updDelAdd';
+const CTSALESORDER_ACT_UPDATE_INV_ADDRESS       = 'updInvAdd';
+const CTSALESORDER_ACT_UPDATE_DEL_CONTACT       = 'updDelCon';
+const CTSALESORDER_ACT_UPDATE_INV_CONTACT       = 'updInvCon';
+const CTSALESORDER_ACT_UPDATE_HEADER            = 'updateHead';
 // Messages
-define(
-    'CTSALESORDER_MSG_CUSTTRING_REQ',
-    'Please enter customer to search for'
-);
-define(
-    'CTSALESORDER_MSG_NONE_FND',
-    'No customers found'
-);
-define(
-    'CTSALESORDER_MSG_CUSTOMERID_NOT_PASSED',
-    'customerID not passed'
-);
-define(
-    'CTSALESORDER_MSG_CUS_NOT_FND',
-    'Customer not found'
-);
-define(
-    'CTSALESORDER_MSG_SELECT_USER',
-    'User?'
-);
-define(
-    'CTSALESORDER_MSG_SELECT_SALUTATION',
-    'Salutation?'
-);
-define(
-    'CTSALESORDER_MSG_SELECT_INTRODUCTION',
-    'Introduction?'
-);
-define(
-    'CTSALESORDER_MSG_NO_LINES',
-    'Select lines to include'
-);
-define(
-    'CTSALESORDER_MSG_USER_NOT_FND',
-    'User not found'
-);
-define(
-    'CTSALESORDER_MSG_PROBLEM_SENDING_QUOTE',
-    'Quote could not be sent'
-);
-define(
-    'CTSALESORDER_MSG_QUOTEID_NOT_PASSED',
-    'quotationID not passed'
-);
-define(
-    'CTSALESORDER_MSG_CONTACTID_NOT_PASSED',
-    'contactID not passed'
-);
-define(
-    'CTSALESORDER_MSG_QUOTE_NOT_FOUND',
-    'Quote not found'
-);
-define(
-    'CTSALESORDER_MSG_MUST_BE_QUOTE_OR_INITIAL',
-    'Not Quote or Initial Order'
-);
-define(
-    'CTSALESORDER_MSG_ORDHEADID_NOT_PASSED',
-    'ordheadID not passed'
-);
-define(
-    'CTSALESORDER_MSG_ORDER_NOT_FND',
-    'Order not found'
-);
-define(
-    'CTSALESORDER_MSG_ORDLINE_NOT_FND',
-    'Order Line not found'
-);
-define(
-    'CTSALESORDER_MSG_SEQNO_NOT_PASSED',
-    'sequenceNo not passed'
-);
-define(
-    'CTSALESORDER_NOT_NUMERIC',
-    'Must be a number'
-);
-define(
-    'CTSALESORDER_TO_DATE_SMALLER',
-    'End date must be greater than start date'
-);
-define(
-    'CTSALESORDER_CLS_FORM_ERROR',
-    'formError'
-);
-define(
-    'CTSALESORDER_CLS_ORDER_LINE_ITEM',
-    'orderLineItem'
-);
+const CTSALESORDER_MSG_CUSTTRING_REQ            = 'Please enter customer to search for';
+const CTSALESORDER_MSG_NONE_FND                 = 'No customers found';
+const CTSALESORDER_MSG_CUSTOMERID_NOT_PASSED    = 'customerID not passed';
+const CTSALESORDER_MSG_CUS_NOT_FND              = 'Customer not found';
+const CTSALESORDER_MSG_SELECT_USER              = 'User?';
+const CTSALESORDER_MSG_SELECT_SALUTATION        = 'Salutation?';
+const CTSALESORDER_MSG_SELECT_INTRODUCTION      = 'Introduction?';
+const CTSALESORDER_MSG_NO_LINES                 = 'Select lines to include';
+const CTSALESORDER_MSG_USER_NOT_FND             = 'User not found';
+const CTSALESORDER_MSG_PROBLEM_SENDING_QUOTE    = 'Quote could not be sent';
+const CTSALESORDER_MSG_QUOTEID_NOT_PASSED       = 'quotationID not passed';
+const CTSALESORDER_MSG_CONTACTID_NOT_PASSED     = 'contactID not passed';
+const CTSALESORDER_MSG_QUOTE_NOT_FOUND          = 'Quote not found';
+const CTSALESORDER_MSG_MUST_BE_QUOTE_OR_INITIAL = 'Not Quote or Initial Order';
+const CTSALESORDER_MSG_ORDHEADID_NOT_PASSED     = 'ordheadID not passed';
+const CTSALESORDER_MSG_ORDER_NOT_FND            = 'Order not found';
+const CTSALESORDER_MSG_ORDLINE_NOT_FND          = 'Order Line not found';
+const CTSALESORDER_MSG_SEQNO_NOT_PASSED         = 'sequenceNo not passed';
+const CTSALESORDER_NOT_NUMERIC                  = 'Must be a number';
+const CTSALESORDER_TO_DATE_SMALLER              = 'End date must be greater than start date';
+const CTSALESORDER_CLS_FORM_ERROR               = 'formError';
+const CTSALESORDER_CLS_ORDER_LINE_ITEM          = 'orderLineItem';
 //define('CTSALESORDER_CLS_ORDER_LINE_COMMENT', 'orderLineComment');
-define(
-    'CTSALESORDER_CLS_ORDER_LINE_LOSS',
-    'orderLineLoss'
-);
-define(
-    'CTSALESORDER_CLS_ORDER_TOTAL_ITEM',
-    'orderTotalItem'
-);
-define(
-    'CTSALESORDER_CLS_ORDER_TOTAL_LOSS',
-    'orderTotalLoss'
-);
-define(
-    'CTSALESORDER_NOTEPAD_ITEM',
-    'IT'
-);
-define(
-    'CTSALESORDER_TXT_INTRODUCTION',
-    'With reference to your recent enquiry, I have great pleasure in providing you with the following prices:'
-);
+const CTSALESORDER_CLS_ORDER_LINE_LOSS  = 'orderLineLoss';
+const CTSALESORDER_CLS_ORDER_TOTAL_ITEM = 'orderTotalItem';
+const CTSALESORDER_CLS_ORDER_TOTAL_LOSS = 'orderTotalLoss';
+const CTSALESORDER_NOTEPAD_ITEM         = 'IT';
+const CTSALESORDER_TXT_INTRODUCTION     = 'With reference to your recent enquiry, I have great pleasure in providing you with the following prices:';
 //define('CTSALESORDER_TXT_EMAIL_SUBJECT_START', 'Your Quotation Ref:');
-define(
-    'CTSALESORDER_TXT_SEND',
-    'Send'
-);
-define(
-    'CTSALESORDER_TXT_DELETE',
-    'Delete'
-);
-
-
+const CTSALESORDER_TXT_SEND   = 'Send';
+const CTSALESORDER_TXT_DELETE = 'Delete';
 class CTSalesOrder extends CTCNC
 {
     const etaDate                           = 'etaDate';
@@ -296,6 +120,13 @@ class CTSalesOrder extends CTCNC
     const CREATE_PURCHASE_ORDERS            = "CREATE_PURCHASE_ORDERS";
     const COPY_TO_ORDER                     = "COPY_TO_ORDER";
     const CONVERT_TO_ORDER                  = "CONVERT_TO_ORDER";
+    const INITIAL_TO_QUOTATION              = "INITIAL_TO_QUOTATION";
+    const COMPLETED_TO_INITIAL              = "COMPLETED_TO_INITIAL";
+    const serviceRequestCustomerItemID      = "serviceRequestCustomerItemID";
+    const serviceRequestPriority            = "serviceRequestPriority";
+    const serviceRequestInternalNote        = "serviceRequestInternalNote";
+    const serviceRequestTaskList            = "serviceRequestTaskList";
+    const emailSubjectSummary               = "emailSubjectSummary";
     /** @var */
     public $customerID;
     /** @var */
@@ -548,6 +379,16 @@ class CTSalesOrder extends CTCNC
                 $this->checkPermissions(SALES_PERMISSION);
                 $this->uploadQuoteDoc();
                 break;
+            case self::INITIAL_TO_QUOTATION:
+            {
+                echo json_encode($this->initialToQuotationController());
+                break;
+            }
+            case self::COMPLETED_TO_INITIAL:
+            {
+                echo json_encode($this->completedToInitialController());
+                break;
+            }
             case CTSALESORDER_ACT_DISPLAY_QUOTE_DOC:
                 $this->checkPermissions(SALES_PERMISSION);
                 $this->displayQuoteDoc();
@@ -1063,7 +904,7 @@ class CTSalesOrder extends CTCNC
 
     function getTypeDescription($type)
     {
-        return $this->orderTypeArray[$type];
+        return @$this->orderTypeArray[$type];
     }
 
     function getCustomerString()
@@ -1186,11 +1027,16 @@ class CTSalesOrder extends CTCNC
                 return;
             }
             if ($this->getAction() == CTSALESORDER_ACT_CREATE_ORDER) {
-                $this->buSalesOrder->initialiseOrder(
-                    $dsOrdhead,
-                    $dsOrdline,
-                    $dsCustomer
-                );
+                try {
+
+                    $this->buSalesOrder->initialiseOrder(
+                        $dsOrdhead,
+                        $dsOrdline,
+                        $dsCustomer
+                    );
+                } catch (Exception $exception) {
+                    $this->displayFatalError($exception->getMessage());
+                }
             } else {
                 $this->buSalesOrder->InitialiseQuote(
                     $dsOrdhead,
@@ -1205,6 +1051,8 @@ class CTSalesOrder extends CTCNC
         if ($dsOrdhead->getValue(DBEOrdhead::customerID)) {
             $projectLink = BUProject::getCurrentProjectLink($dsOrdhead->getValue(DBEOrdhead::customerID));
         }
+        $this->loadReactCSS('SupplierSearchComponent.css');
+        $this->loadReactScript('SupplierSearchComponent.js');
         $this->setTemplateFiles(
             array(
                 'SalesOrderDisplay'                 => 'SalesOrderDisplay.inc',
@@ -1225,7 +1073,10 @@ class CTSalesOrder extends CTCNC
             )
         );
         $this->loadReactScript('ItemListTypeAheadRenderer.js');
-        $purchaseOrderCount = $this->buSalesOrder->countPurchaseOrders($dsOrdhead->getValue(DBEOrdhead::ordheadID));
+        $canUserChangeSalesOrdersStatus = $this->getDbeUser()->canChangeSalesOrdersAndPurchaseOrdersStatus();
+        $purchaseOrderCount             = $this->buSalesOrder->countPurchaseOrders(
+            $dsOrdhead->getValue(DBEOrdhead::ordheadID)
+        );
         // Initialise an array of actions that may be performed upon this order: they are displayed in a drop-down
         // below the lines section and will be applied to the selected (checked) lines
         $actions            = array();
@@ -1249,6 +1100,14 @@ class CTSalesOrder extends CTCNC
             }
             $actions[self::CREATE_MANUAL_ORDER_FORM]  = 'create manual order form';
             $actions[self::CHANGE_SUPPLIER_FOR_LINES] = 'change supplier';
+        }
+        if ($canUserChangeSalesOrdersStatus) {
+            if ($orderType == 'I') {
+                $actions[self::INITIAL_TO_QUOTATION] = "Initial To Quotation";
+            }
+            if ($orderType == 'C') {
+                $actions[self::COMPLETED_TO_INITIAL] = "Completed To Initial";
+            }
 
         }
         $order = [
@@ -1259,7 +1118,9 @@ class CTSalesOrder extends CTCNC
             self::CREATE_MANUAL_ORDER_FORM,
             self::CHANGE_SUPPLIER_FOR_LINES,
             self::CREATE_SERVICE_REQUEST_FROM_ORDER,
-            self::CREATE_PURCHASE_ORDERS
+            self::CREATE_PURCHASE_ORDERS,
+            self::INITIAL_TO_QUOTATION,
+            self::COMPLETED_TO_INITIAL
         ];
         uksort(
             $actions,
@@ -1279,7 +1140,7 @@ class CTSalesOrder extends CTCNC
                         'SELECTED'          => ($this->getAction() == $action) ? CT_SELECTED : null,
                         'action'            => $action,
                         'actionDescription' => $actionDescription,
-                        'disabled'          => $quickQuoteDisabled && $action == self::CREATE_SIGNABLE_QUOTE ? 'disabled' : null
+                        'disabled'          => $quickQuoteDisabled && $action == self::CREATE_SIGNABLE_QUOTE || $orderType == 'C' && $action != self::COMPLETED_TO_INITIAL ? 'disabled' : null
                     )
                 );
                 $this->template->parse(
@@ -1294,10 +1155,12 @@ class CTSalesOrder extends CTCNC
     than non-value fields.
     */
         if (!$this->hasPermissions(SALES_PERMISSION)) {
-            $restrictedView = CTCNC_HTML_DISABLED;
-            $readOnly       = CTCNC_HTML_DISABLED;
-            $valuesDisabled = CTCNC_HTML_DISABLED;
+            $restrictedView         = CTCNC_HTML_DISABLED;
+            $readOnly               = CTCNC_HTML_DISABLED;
+            $actionSelectorReadOnly = CTCNC_HTML_READONLY;
+            $valuesDisabled         = CTCNC_HTML_DISABLED;
         } else {
+
 
             $restrictedView = null;
             /*
@@ -1307,15 +1170,20 @@ class CTSalesOrder extends CTCNC
                 /*
         Quotes or initial orders allow all
         */
-                $readOnly       = null;
-                $valuesDisabled = null;
+                $actionSelectorReadOnly = null;
+                $readOnly               = null;
+                $valuesDisabled         = null;
 
             } else {
-                $readOnly       = CTCNC_HTML_DISABLED;
-                $valuesDisabled = CTCNC_HTML_DISABLED;
+                $readOnly               = CTCNC_HTML_DISABLED;
+                $valuesDisabled         = CTCNC_HTML_DISABLED;
+                $actionSelectorReadOnly = CTCNC_HTML_READONLY;
             }
             if ($orderType == 'C' && !$this->hasPermissions(ACCOUNTS_PERMISSION)) {
                 $valuesDisabled = null;
+            }
+            if ($orderType == 'C' && $canUserChangeSalesOrdersStatus) {
+                $actionSelectorReadOnly = null;
             }
 
         }
@@ -1578,72 +1446,72 @@ class CTSalesOrder extends CTCNC
         }
         $this->template->set_var(
             array(
-                'customerID'                   => $dsOrdhead->getValue(DBEOrdhead::customerID),
-                'invContact'                   => $dsOrdhead->getValue(
+                'customerID'             => $dsOrdhead->getValue(DBEOrdhead::customerID),
+                'invContact'             => $dsOrdhead->getValue(
                         DBEOrdhead::invContactSalutation
                     ) . ' ' . $dsOrdhead->getValue(
                         DBEOrdhead::invContactName
                     ),
-                'invContactID'                 => $dsOrdhead->getValue(DBEOrdhead::invContactID),
-                'delContactID'                 => $dsOrdhead->getValue(DBEOrdhead::delContactID),
-                'invContactPhone'              => $dsOrdhead->getValue(DBEOrdhead::invContactPhone),
-                'invSitePhone'                 => $dsOrdhead->getValue(DBEOrdhead::invSitePhone),
-                'invContactFax'                => $dsOrdhead->getValue(DBEOrdhead::invContactFax),
-                'invContactEmail'              => $dsOrdhead->getValue(DBEOrdhead::invContactEmail),
-                'invSiteNo'                    => $dsOrdhead->getValue(DBEOrdhead::invSiteNo),
-                'invAdd1'                      => $dsOrdhead->getValue(DBEOrdhead::invAdd1),
-                'invAdd2'                      => $dsOrdhead->getValue(DBEOrdhead::invAdd2),
-                'invAdd3'                      => $dsOrdhead->getValue(DBEOrdhead::invAdd3),
-                'invTown'                      => $dsOrdhead->getValue(DBEOrdhead::invTown),
-                'invCounty'                    => $dsOrdhead->getValue(DBEOrdhead::invCounty),
-                'invPostcode'                  => $dsOrdhead->getValue(DBEOrdhead::invPostcode),
-                'delContact'                   => $dsOrdhead->getValue(
+                'invContactID'           => $dsOrdhead->getValue(DBEOrdhead::invContactID),
+                'delContactID'           => $dsOrdhead->getValue(DBEOrdhead::delContactID),
+                'invContactPhone'        => $dsOrdhead->getValue(DBEOrdhead::invContactPhone),
+                'invSitePhone'           => $dsOrdhead->getValue(DBEOrdhead::invSitePhone),
+                'invContactFax'          => $dsOrdhead->getValue(DBEOrdhead::invContactFax),
+                'invContactEmail'        => $dsOrdhead->getValue(DBEOrdhead::invContactEmail),
+                'invSiteNo'              => $dsOrdhead->getValue(DBEOrdhead::invSiteNo),
+                'invAdd1'                => $dsOrdhead->getValue(DBEOrdhead::invAdd1),
+                'invAdd2'                => $dsOrdhead->getValue(DBEOrdhead::invAdd2),
+                'invAdd3'                => $dsOrdhead->getValue(DBEOrdhead::invAdd3),
+                'invTown'                => $dsOrdhead->getValue(DBEOrdhead::invTown),
+                'invCounty'              => $dsOrdhead->getValue(DBEOrdhead::invCounty),
+                'invPostcode'            => $dsOrdhead->getValue(DBEOrdhead::invPostcode),
+                'delContact'             => $dsOrdhead->getValue(
                         DBEOrdhead::delContactSalutation
                     ) . ' ' . $dsOrdhead->getValue(
                         DBEOrdhead::delContactName
                     ),
-                'delContactPhone'              => $dsOrdhead->getValue(DBEOrdhead::delContactPhone),
-                'delSitePhone'                 => $dsOrdhead->getValue(DBEOrdhead::delSitePhone),
-                'delContactFax'                => $dsOrdhead->getValue(DBEOrdhead::delContactFax),
-                'delContactEmail'              => $dsOrdhead->getValue(DBEOrdhead::delContactEmail),
-                'delSiteNo'                    => $dsOrdhead->getValue(DBEOrdhead::delSiteNo),
-                'delAdd1'                      => $dsOrdhead->getValue(DBEOrdhead::delAdd1),
-                'delAdd2'                      => $dsOrdhead->getValue(DBEOrdhead::delAdd2),
-                'delAdd3'                      => $dsOrdhead->getValue(DBEOrdhead::delAdd3),
-                'delTown'                      => $dsOrdhead->getValue(DBEOrdhead::delTown),
-                'delCounty'                    => $dsOrdhead->getValue(DBEOrdhead::delCounty),
-                'delPostcode'                  => $dsOrdhead->getValue(DBEOrdhead::delPostcode),
-                'ordheadID'                    => $dsOrdhead->getValue(DBEOrdhead::ordheadID),
-                'serviceRequestCustomerItemID' => $dsOrdhead->getValue(DBEOrdhead::serviceRequestCustomerItemID),
-                'serviceRequestText'           => $dsOrdhead->getValue(DBEOrdhead::serviceRequestInternalNote),
-                'markupOriginalQuote'          => $markupOriginalQuote,
-                'urlUpdateDelAddress'          => $urlUpdateDelAddress,
-                'urlUpdateInvAddress'          => $urlUpdateInvAddress,
-                'urlUpdateDelContact'          => $urlUpdateDelContact,
-                'urlUpdateInvContact'          => $urlUpdateInvContact,
-                'urlUpdateHeader'              => $urlUpdateHeader,
-                'urlDeleteOrder'               => $urlDeleteOrder,
-                'txtDeleteOrder'               => $txtDeleteOrder,
-                'urlSitePopup'                 => $urlSitePopup,
-                'urlSiteEdit'                  => $urlSiteEdit,
-                'urlCustomerDisplay'           => $urlCustomerDisplay,
-                'urlContactPopup'              => $urlContactPopup,
-                'urlContactEdit'               => $urlContactEdit,
-                'urlRenewalReport'             => $urlRenewalReport,
-                'txtRenewalReport'             => $txtRenewalReport,
-                'txtCustomerNote'              => $txtCustomerNote,
-                'urlCustomerNote'              => $urlCustomerNote,
-                'linesMessage'                 => $this->getLinesMessage(),
-                'lineValidationError'          => $this->lineValidationError,
-                'restrictedView'               => $restrictedView,
-                'readOnly'                     => $readOnly,
-                'valuesDisabled'               => $valuesDisabled,
-                'updatedTime'                  => $dsOrdhead->getValue(DBEOrdhead::updatedTime),
-                'currentDocumentsLink'         => $this->getCurrentDocumentsLink(
+                'delContactPhone'        => $dsOrdhead->getValue(DBEOrdhead::delContactPhone),
+                'delSitePhone'           => $dsOrdhead->getValue(DBEOrdhead::delSitePhone),
+                'delContactFax'          => $dsOrdhead->getValue(DBEOrdhead::delContactFax),
+                'delContactEmail'        => $dsOrdhead->getValue(DBEOrdhead::delContactEmail),
+                'delSiteNo'              => $dsOrdhead->getValue(DBEOrdhead::delSiteNo),
+                'delAdd1'                => $dsOrdhead->getValue(DBEOrdhead::delAdd1),
+                'delAdd2'                => $dsOrdhead->getValue(DBEOrdhead::delAdd2),
+                'delAdd3'                => $dsOrdhead->getValue(DBEOrdhead::delAdd3),
+                'delTown'                => $dsOrdhead->getValue(DBEOrdhead::delTown),
+                'delCounty'              => $dsOrdhead->getValue(DBEOrdhead::delCounty),
+                'delPostcode'            => $dsOrdhead->getValue(DBEOrdhead::delPostcode),
+                'ordheadID'              => $dsOrdhead->getValue(DBEOrdhead::ordheadID),
+                'markupOriginalQuote'    => $markupOriginalQuote,
+                'urlUpdateDelAddress'    => $urlUpdateDelAddress,
+                'urlUpdateInvAddress'    => $urlUpdateInvAddress,
+                'urlUpdateDelContact'    => $urlUpdateDelContact,
+                'urlUpdateInvContact'    => $urlUpdateInvContact,
+                'urlUpdateHeader'        => $urlUpdateHeader,
+                'urlDeleteOrder'         => $urlDeleteOrder,
+                'txtDeleteOrder'         => $txtDeleteOrder,
+                'urlSitePopup'           => $urlSitePopup,
+                'urlSiteEdit'            => $urlSiteEdit,
+                'urlCustomerDisplay'     => $urlCustomerDisplay,
+                'urlContactPopup'        => $urlContactPopup,
+                'urlContactEdit'         => $urlContactEdit,
+                'urlRenewalReport'       => $urlRenewalReport,
+                'txtRenewalReport'       => $txtRenewalReport,
+                'txtCustomerNote'        => $txtCustomerNote,
+                'urlCustomerNote'        => $urlCustomerNote,
+                'linesMessage'           => $this->getLinesMessage(),
+                'lineValidationError'    => $this->lineValidationError,
+                'restrictedView'         => $restrictedView,
+                'readOnly'               => $readOnly,
+                'actionSelectorReadOnly' => $actionSelectorReadOnly,
+                'valuesDisabled'         => $valuesDisabled,
+                'salesOrderType'         => $dsOrdhead->getValue(DBEOrdhead::type),
+                'updatedTime'            => $dsOrdhead->getValue(DBEOrdhead::updatedTime),
+                'currentDocumentsLink'   => $this->getCurrentDocumentsLink(
                     $dsOrdhead->getValue(DBEOrdhead::customerID),
                     $this->buCustomer
                 ),
-                'projectLink'                  => $projectLink
+                'projectLink'            => $projectLink
             )
         );
         $buRenewal = null;
@@ -2236,6 +2104,7 @@ class CTSalesOrder extends CTCNC
                     'action'      => CTSALESORDER_ACT_EDIT_ORDLINE,
                     'lineId'      => $dsOrdline->getValue(DBEOrdline::id),
                     'updatedTime' => $dsOrdhead->getValue(DBEOrdhead::updatedTime),
+                    'htmlFmt'     => CT_HTML_FMT_POPUP
                 )
             );
             // common to comment and item lines
@@ -2255,7 +2124,9 @@ class CTSalesOrder extends CTCNC
                     'updatedTime' => $dsOrdhead->getValue(DBEOrdhead::updatedTime)
                 )
             );
-            $salesOrderLineDesc = '<A class="updatedTimeLink" href="' . $urlEditLine . '" target="_blank">' . Controller::htmlDisplayText(
+            $salesOrderLineDesc = '<A onclick="editLinePopup(' . $dsOrdline->getValue(
+                    DBEOrdline::id
+                ) . ')" class="updatedTimeLink" href="#">' . Controller::htmlDisplayText(
                     $dsOrdline->getValue(DBEOrdline::description)
                 ) . '</A>';
         } else {
@@ -2274,6 +2145,8 @@ class CTSalesOrder extends CTCNC
         );
         $ordline           = new DBEOrdline($this);
         $ordline->getRow($dsOrdline->getValue(DBEOrdline::id));
+        $dbeItem = new DBEItem($this);
+        $dbeItem->getRow($dsOrdline->getValue(DBEOrdline::itemID));
         $this->template->set_var(
             array(
                 'salesOrderLineDesc' => $salesOrderLineDesc,
@@ -2287,15 +2160,19 @@ class CTSalesOrder extends CTCNC
                     'id',
                     $dsOrdline->getValue(DBEOrdline::id)
                 )) ? CT_CHECKED : null,
-                //                'urlMoveLineUp'      => $urlMoveLineUp,
-                //                'urlMoveLineDown'    => $urlMoveLineDown,
-                //                'moveUpHidden'       => $ordline->isFirst() ? 'hidden' : null,
-                //                'moveDownHidden'     => $ordline->isLast() ? 'hidden' : null,
                 'removeDescription'  => $removeDescription,
                 'urlEditLine'        => $urlEditLine,
                 'urlDeleteLine'      => $urlDeleteLine,
                 'urlAddLine'         => $urlAddLine,
-                'isRecurring'        => $dsOrdline->getValue(DBEOrdline::isRecurring) ? 'true' : 'false'
+                'isRecurring'        => $dsOrdline->getValue(DBEOrdline::isRecurring) ? 'true' : 'false',
+                "itemId"             => $dsOrdline->getValue(DBEOrdline::itemID),
+                "supplierId"         => $dsOrdline->getValue(DBEOrdline::supplierID),
+                "itemUpdatedBy"      => $dbeItem->getValue(DBEItem::updatedBy),
+                "itemUpdatedAt"      => $dbeItem->getValue(DBEItem::updatedAt),
+                "itemCost"           => $dbeItem->getValue(DBEItem::curUnitCost),
+                "itemSale"           => $dbeItem->getValue(DBEItem::curUnitSale),
+                "showStock"          => $dsOrdline->getValue(DBEJOrdline::showStockLevels),
+                "amountInStock"      => $dsOrdline->getValue(DBEJOrdline::qtyInStock)
             )
         );
         if ($dsOrdline->getValue(
@@ -2322,6 +2199,12 @@ class CTSalesOrder extends CTCNC
             } else {
                 $supplierName = Controller::htmlDisplayText($dsOrdline->getValue(DBEJOrdline::supplierName));
             }
+            $showStockLevels = "";
+            if ($dsOrdline->getValue(DBEJOrdline::showStockLevels) && $dsOrdline->getValue(
+                    DBEOrdline::curUnitCost
+                ) > 0 && $dsOrdline->getValue(DBEJOrdline::qtyInStock) >= $dsOrdline->getValue(
+                    DBEOrdline::qtyOrdered
+                )) $showStockLevels = "<i class=\"fal fa-2x fa-boxes color-gray icon\"></i>";
             if (!$restrictedView) {
 
                 $this->template->set_var(
@@ -2347,7 +2230,8 @@ class CTSalesOrder extends CTCNC
                         'percProfit'              => number_format($percProfit, 2),
                         'orderLineProfitClass'    => ($curProfit < 0) ? CTSALESORDER_CLS_ORDER_LINE_LOSS : CTSALESORDER_CLS_ORDER_LINE_ITEM,
                         'orderLineSaleTotalClass' => ($curSaleTotal < 0) ? CTSALESORDER_CLS_ORDER_LINE_LOSS : CTSALESORDER_CLS_ORDER_LINE_ITEM,
-                        'orderLineCostTotalClass' => ($curCostTotal < 0) ? CTSALESORDER_CLS_ORDER_LINE_LOSS : CTSALESORDER_CLS_ORDER_LINE_ITEM
+                        'orderLineCostTotalClass' => ($curCostTotal < 0) ? CTSALESORDER_CLS_ORDER_LINE_LOSS : CTSALESORDER_CLS_ORDER_LINE_ITEM,
+                        'showStockLevels'         => $showStockLevels
                     )
                 );
                 if (!$dsOrdline->getValue(DBEOrdline::isRecurring)) {
@@ -2523,7 +2407,7 @@ class CTSalesOrder extends CTCNC
                     DBEQuotation::fileExtension
                 );        // if no extension in DB then assume PDF
         }
-        return file_exists('quotes/' . $quoteFile);
+        return file_exists(QUOTES_DIR . $quoteFile);
     }
 
     /**
@@ -2535,6 +2419,11 @@ class CTSalesOrder extends CTCNC
                            $parentPage = 'SalesOrderLineEdit'
     )
     {
+        $this->loadReactCSS('SupplierSearchComponent.css');
+        $this->loadReactScript('SupplierSearchComponent.js');
+        $this->loadReactCSS('AdditionalChargeRatesSelectorWrapperComponent.css');
+        $this->loadReactScript('AdditionalChargeRatesSelectorWrapperComponent.js');
+        $this->template->setVar("customerId", $dsOrdhead->getValue(DBEOrdhead::customerID));
         // Lines
         if ($this->dsOrdline->getValue(DBEJOrdline::lineType) != "I") {                    // Comment line
             $this->template->set_var(
@@ -2560,7 +2449,8 @@ class CTSalesOrder extends CTCNC
                     'qtyOrdered'            => $this->dsOrdline->getValue(DBEJOrdline::qtyOrdered),
                     'curUnitCost'           => $this->dsOrdline->getValue(DBEJOrdline::curUnitCost),
                     'curUnitSale'           => $this->dsOrdline->getValue(DBEJOrdline::curUnitSale),
-                    'renewalCustomerItemID' => $this->dsOrdline->getValue(DBEJOrdline::renewalCustomerItemID)
+                    'renewalCustomerItemID' => $this->dsOrdline->getValue(DBEJOrdline::renewalCustomerItemID),
+                    'itemDescription'       => json_encode($this->dsOrdline->getValue(DBEJOrdline::itemDescription))
                 )
             );
         }
@@ -2840,7 +2730,7 @@ class CTSalesOrder extends CTCNC
             return;
         }
         $this->setOrdheadID($this->dsQuotation->getValue(DBEQuotation::ordheadID));
-        $quoteFile = 'quotes/' . $this->dsQuotation->getValue(
+        $quoteFile = QUOTES_DIR . $this->dsQuotation->getValue(
                 DBEQuotation::ordheadID
             ) . '_' . $this->dsQuotation->getValue(
                 DBEQuotation::versionNo
@@ -3045,7 +2935,7 @@ class CTSalesOrder extends CTCNC
         try {
             $updatedTime = $this->buSalesOrder->deleteLines($data['selectedLines']);
             echo json_encode(["status" => "ok", "updatedTime" => $updatedTime]);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             throw new JsonHttpException(500, $exception->getMessage());
         }
     }
@@ -3083,7 +2973,7 @@ class CTSalesOrder extends CTCNC
                 $data['selectedLines']
             );
             echo json_encode(["status" => "ok"]);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             throw new JsonHttpException(500, $exception->getMessage());
         }
     }
@@ -3137,7 +3027,7 @@ class CTSalesOrder extends CTCNC
             throw new Exception(CTSALESORDER_MSG_ORDER_NOT_FND);
         }
         $versionNo = $this->buSalesOrder->getNextQuoteVersion($orderHeadId);
-        $orderFile = 'quotes/' . $orderHeadId . '_' . $versionNo . '.pdf';
+        $orderFile = QUOTES_DIR . $orderHeadId . '_' . $versionNo . '.pdf';
         $this->buSalesOrder->getUserByID(
             $this->userID,
             $this->dsUser
@@ -3529,7 +3419,7 @@ class CTSalesOrder extends CTCNC
             );
             echo json_encode(["status" => "ok"]);
         } catch (Exception $exception) {
-            throw new JsonHttpException('500', $exception->getMessage());
+            throw new JsonHttpException(500, $exception->getMessage());
         }
     }
 
@@ -3587,7 +3477,7 @@ class CTSalesOrder extends CTCNC
             $this->displayFatalError(CTSALESORDER_MSG_ORDER_NOT_FND);
         }
         $versionNo = $this->buSalesOrder->getNextQuoteVersion($this->getOrdheadID());
-        $quoteFile = $GLOBALS['cfg']['quote_path'] . '/' . $this->getOrdheadID() . '_' . $versionNo;//.'.pdf';
+        $quoteFile = QUOTES_DIR . $this->getOrdheadID() . '_' . $versionNo;//.'.pdf';
         $extension = substr(
             $_FILES['quoteFile']['name'],
             strpos(
@@ -3700,8 +3590,8 @@ class CTSalesOrder extends CTCNC
         header("Content-Type: $ctype");
         header("Content-Disposition: attachment; filename=" . $quoteFile . ";");
         header("Content-Transfer-Encoding: binary");
-        header("Content-Length: " . filesize('quotes/' . $quoteFile));
-        readfile('quotes/' . $quoteFile);
+        header("Content-Length: " . filesize(QUOTES_DIR . $quoteFile));
+        readfile(QUOTES_DIR . $quoteFile);
         exit();
     }
 
@@ -3904,6 +3794,8 @@ class CTSalesOrder extends CTCNC
                 'SalesOrderLineEditJS'  => 'SalesOrderLineEditJS.inc' // javascript
             )
         );
+        $this->loadReactScript('ItemListTypeAheadRenderer.js');
+        $this->template->setVar('isPopup', $this->getParam('htmlFmt') ? 'true' : 'false');
         $this->displaySalesOrderHeader($dsOrdhead);
         $this->orderLineForm($dsOrdhead);
         $this->template->parse(
@@ -3933,6 +3825,7 @@ class CTSalesOrder extends CTCNC
      */
     function updateOrderLine()
     {
+
         $this->setMethodName('updateOrderLine');
         $oneOffSequenceNumber = null;
         if ($this->getParam('oneOffSequenceNumber')) {
@@ -3942,7 +3835,7 @@ class CTSalesOrder extends CTCNC
         if ($this->getParam('recurringSequenceNumber')) {
             $recurringSequenceNumber = $this->getParam('recurringSequenceNumber');
         }
-        // pasting lines from another Sales Order
+        $this->setOrdheadID($this->getParam('ordline')[1]['ordheadID']);
         if ($this->getParam('ordline')[1]['lineType'] == 'T') {
             $this->pasteLinesFromQuotationTemplate(
                 $oneOffSequenceNumber,
@@ -3958,6 +3851,7 @@ class CTSalesOrder extends CTCNC
             );
             header('Location: ' . $this->getDisplayOrderURL());
             exit;
+
         }
         $this->dsOrdline = new DataSet($this);
         $dbeOrdline      = new DBEOrdline($this);
@@ -4097,12 +3991,10 @@ class CTSalesOrder extends CTCNC
             if ($this->dsOrdline->getValue(DBEOrdline::lineType) == 'I') {
                 global $db;
                 $itemID              = $this->dsOrdline->getValue(DBEOrdline::itemID);
-                $childItemRepository = new \CNCLTD\ChildItem\ChildItemRepository($db);
+                $childItemRepository = new ChildItemRepository($db);
                 $childItems          = $childItemRepository->getChildItemsForItem($itemID);
                 $oneOffRowCount      = 1;
                 $recurringRowCount   = 1;
-                $dbeSupplier         = new DBESupplier($this);
-                $dbeSupplier->getRow(53);
                 foreach ($childItems as $childItem) {
                     $toInsertChildDsOrdline = new DataSet($this);
                     $toInsertChildDsOrdline->copyColumnsFrom($dbeOrdline);
@@ -4114,7 +4006,7 @@ class CTSalesOrder extends CTCNC
                     $toInsertChildDsOrdline->setValue(DBEOrdline::lineType, 'I');
                     $toInsertChildDsOrdline->setValue(
                         DBEOrdline::supplierID,
-                        $dbeSupplier->getValue(DBESupplier::supplierID)
+                        53
                     );
                     $toInsertChildDsOrdline->setValue(
                         DBEOrdline::qtyOrdered,
@@ -4158,7 +4050,14 @@ class CTSalesOrder extends CTCNC
         } else {
             $this->buSalesOrder->updateOrderLine($this->dsOrdline);
         }
-        header('Location: ' . $this->getDisplayOrderURL());
+        if ($this->getParam('isPopup') && json_decode($this->getParam('isPopup'))) {
+
+            echo "<script>window.opener.location.reload(true); window.close();</script>";
+            exit;
+        } else {
+            header('Location: ' . $this->getDisplayOrderURL());
+            exit;
+        }
     }
 
     /**
@@ -4195,7 +4094,6 @@ class CTSalesOrder extends CTCNC
             $oneOffSequenceNumber,
             $recurringSequenceNumber
         );
-        $this->displayOrder();
     }
 
     /**
@@ -4227,13 +4125,16 @@ class CTSalesOrder extends CTCNC
             $this->displayOrder();
             return;
         }
-        $this->buSalesOrder->pasteLinesFromOrder(
+        if (!$this->buSalesOrder->pasteLinesFromOrder(
             $this->getParam('ordline')[1]['description'],
             $this->getOrdheadID(),
             $oneOffSequenceNumber,
             $recurringSequenceNumber
-        );
-        $this->displayOrder();
+        )) {
+            $this->setFormErrorMessage('The sales order you are trying to paste from does not have lines');
+        }
+        header('Location: ' . $this->getDisplayOrderURL());
+
     }
 
     /**
@@ -4435,84 +4336,72 @@ class CTSalesOrder extends CTCNC
         $dsInput->addColumn(
             self::etaDate,
             DA_DATE,
-            DA_ALLOW_NULL
+            DA_NOT_NULL
         );
         $dsInput->addColumn(
-            DBEOrdhead::serviceRequestCustomerItemID,
+            self::serviceRequestCustomerItemID,
             DA_INTEGER,
-            DA_ALLOW_NULL
+            DA_NOT_NULL
         );
         $dsInput->addColumn(
-            DBEOrdhead::serviceRequestPriority,
+            self::serviceRequestPriority,
             DA_INTEGER,
-            DA_ALLOW_NULL
+            DA_NOT_NULL
         );
         $dsInput->addColumn(
-            DBEOrdhead::serviceRequestInternalNote,
+            self::serviceRequestInternalNote,
             DA_STRING,
             DA_ALLOW_NULL
         );
         $dsInput->addColumn(
-            DBEOrdhead::serviceRequestTaskList,
+            self::serviceRequestTaskList,
             DA_STRING,
             DA_ALLOW_NULL
         );
-        /*
-    get existing values
-    */
-        if (!$dsOrdhead->getValue(DBEOrdhead::serviceRequestInternalNote)) {
-            $dsInput->setValue(
-                DBEOrdhead::serviceRequestInternalNote,
-                $dsOrdhead->getValue(DBEOrdhead::serviceRequestInternalNote)
-            );
-            $dsInput->setValue(
-                DBEOrdhead::serviceRequestCustomerItemID,
-                $dsOrdhead->getValue(DBEOrdhead::serviceRequestCustomerItemID)
-            );
-            $dsInput->setValue(
-                DBEOrdhead::serviceRequestPriority,
-                $dsOrdhead->getValue(DBEOrdhead::serviceRequestPriority)
-            );
-            $dsInput->setValue(
-                DBEOrdhead::serviceRequestTaskList,
-                $dsOrdhead->getValue(DBEOrdhead::serviceRequestInternalNote)
-            );
-        }
+        $dsInput->addColumn(
+            DBEProblem::emailSubjectSummary,
+            DA_STRING,
+            DA_NOT_NULL
+        );
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             $formError = !$dsInput->populateFromArray($this->getParam('inputForm'));
-            if ($dsInput->getValue(DBEOrdhead::serviceRequestCustomerItemID) == 99) {
+            if ($dsInput->getValue(self::serviceRequestCustomerItemID) == 99) {
                 $formError = true;
             }
-            if ($dsInput->getValue(DBEOrdhead::serviceRequestPriority) == 0) {
+            if ($dsInput->getValue(self::serviceRequestPriority) == 0) {
+                $formError = true;
+            }
+            if (!$dsInput->getValue(DBEProblem::emailSubjectSummary)) {
+                $formError = true;
+            }
+            if (!$dsInput->getValue(self::etaDate)) {
                 $formError = true;
             }
             if (!$formError) {
 
                 $queue = $_REQUEST['queue'] == "Create For Small Projects" ? 3 : 5;
-                if ($dsInput->getValue(self::etaDate)) {
-                    $buActivity->createSalesServiceRequest(
-                        $this->getOrdheadID(),
-                        $dsInput,
-                        $this->getParam('selectedLines'),
-                        $queue
-                    );
-                } else {
-                    $this->buSalesOrder->updateServiceRequestDetails(
-                        $this->getOrdheadID(),
-                        $dsInput->getValue(DBEOrdhead::serviceRequestCustomerItemID),
-                        $dsInput->getValue(DBEOrdhead::serviceRequestPriority),
-                        $dsInput->getValue(DBEOrdhead::serviceRequestInternalNote),
-                        $dsInput->getValue(DBEOrdhead::serviceRequestTaskList)
-                    );
-                }
-                /*
-        redirect to order
-        */
+                $buActivity->createSalesServiceRequest(
+                    $this->getOrdheadID(),
+                    $dsInput,
+                    $this->getParam('selectedLines'),
+                    $queue
+                );
                 header('Location: ' . $this->getDisplayOrderURL());
                 exit;
 
             }
+        } else {
+            $dsInput->setValue(
+                DBEProblem::emailSubjectSummary,
+                htmlentities(
+                    $buActivity->getSuitableEmailSubjectSummary($this->getOrdheadID(), $this->getParam('selectedLines'))
+                )
+            );
+            $dsInput->setValue(
+                self::serviceRequestPriority,
+                5
+            );
         }
         $this->setPageTitle("Service Request");
         $this->setTemplateFiles(
@@ -4535,24 +4424,25 @@ class CTSalesOrder extends CTCNC
         );
         $this->template->set_var(
             array(
-                'etaDate'                              => $dsInput->getValue(self::etaDate),
-                'etaDateMessage'                       => $dsInput->getMessage(self::etaDate),
-                DBEOrdhead::serviceRequestInternalNote => $dsInput->getValue(DBEOrdhead::serviceRequestInternalNote),
-                DBEOrdhead::serviceRequestTaskList     => $dsInput->getValue(DBEOrdhead::serviceRequestTaskList),
-                'serviceRequestPriorityMessage'        => $dsInput->getMessage(DBEOrdhead::serviceRequestPriority),
-                'serviceRequestCustomerItemIDMessage'  => $dsInput->getMessage(
-                    DBEOrdhead::serviceRequestCustomerItemID
+                'etaDate'                             => $dsInput->getValue(self::etaDate),
+                'etaDateMessage'                      => $dsInput->getMessage(self::etaDate),
+                self::serviceRequestInternalNote      => $dsInput->getValue(self::serviceRequestInternalNote),
+                self::serviceRequestTaskList          => $dsInput->getValue(self::serviceRequestTaskList),
+                'serviceRequestPriorityMessage'       => $dsInput->getMessage(self::serviceRequestPriority),
+                'emailSubjectSummary'                 => $dsInput->getValue(DBEProblem::emailSubjectSummary),
+                'serviceRequestCustomerItemIDMessage' => $dsInput->getMessage(
+                    self::serviceRequestCustomerItemID
                 ),
-                'urlSubmit'                            => $urlSubmit,
-                'salesOrderHeaderId'                   => $this->getOrdheadID()
+                'urlSubmit'                           => $urlSubmit,
+                'salesOrderHeaderId'                  => $this->getOrdheadID()
             )
         );
         $this->contractDropdown(
             $dsOrdhead->getValue(DBEOrdhead::customerID),
-            $dsInput->getValue(DBEOrdhead::serviceRequestCustomerItemID)
+            $dsInput->getValue(self::serviceRequestCustomerItemID)
         );
         $this->priorityDropdown(
-            $dsInput->getValue(DBEOrdhead::serviceRequestPriority),
+            $dsInput->getValue(self::serviceRequestPriority),
             $buActivity
         );
         $this->standardTextList(
@@ -4742,8 +4632,8 @@ class CTSalesOrder extends CTCNC
             );
             $versionNo       = $this->buSalesOrder->getNextQuoteVersion($ordHeadID);
             $previousVersion = $this->dsQuotation->getValue(DBEQuotation::versionNo);
-            $previousFile    = 'quotes/' . $ordHeadID . '_' . $previousVersion . '.pdf';
-            $newFile         = 'quotes/' . $ordHeadID . '_' . $versionNo . '.pdf';
+            $previousFile    = QUOTES_DIR . $ordHeadID . '_' . $previousVersion . '.pdf';
+            $newFile         = QUOTES_DIR . $ordHeadID . '_' . $versionNo . '.pdf';
             copy(
                 $previousFile,
                 $newFile
@@ -5157,5 +5047,68 @@ class CTSalesOrder extends CTCNC
             }
         } while ($linkedServiceRequests->fetchNext());
         return true;
+    }
+
+    private function inStock($dbeOrderLine)
+    {
+        $dbeItem = new DBEItem($this);
+        $dbeItem->getRow($dbeOrderLine->getValue(DBEOrdline::itemID));
+        $dbeItemType = new DBEItemType($this);
+        $dbeItemType->getRow($dbeItem->getValue(DBEItem::itemTypeID));
+        if (($dbeItemType->getValue(DBEItemType::showStockLevels) && $dbeOrderLine->getValue(
+                DBEOrdline::curUnitCost
+            ) > 0 && $dbeOrderLine->getValue(
+                DBEJOrdline::supplierID
+            ) == CONFIG_SALES_STOCK_SUPPLIERID && $dbeItem->getValue(DBEItem::salesStockQty) >= $dbeOrderLine->getValue(
+                DBEOrdline::qtyOrdered
+            ))) return true;
+        return false;
+    }
+
+    private function initialToQuotationController(): array
+    {
+        if (!$this->getDbeUser()->canChangeSalesOrdersAndPurchaseOrdersStatus()) {
+            throw new JsonHttpException(403, "You are not authorized to perform this action!");
+        }
+        $salesOrderId = @$_GET['salesOrderId'];
+        if (!$salesOrderId) {
+            throw new JsonHttpException(400, "Sales order Id is required!");
+        }
+        $dbeOrdHead = new DBEOrdhead($this);
+        if (!$dbeOrdHead->getRow($salesOrderId)) {
+            throw new JsonHttpException(404, "Could not found Sales order with Id: {$salesOrderId}!");
+        };
+        if ($dbeOrdHead->getValue(DBEOrdhead::type) !== 'I') {
+            throw new JsonHttpException(
+                400, "Sales order with Id: {$salesOrderId} is not in Initial State, cannot change it to Quotation!"
+            );
+        }
+        $dbeOrdHead->setValue(DBEOrdhead::type, 'Q');
+        $dbeOrdHead->updateRow();
+        return ["status" => "ok"];
+    }
+
+    private function completedToInitialController()
+    {
+        if (!$this->getDbeUser()->canChangeSalesOrdersAndPurchaseOrdersStatus()) {
+            throw new JsonHttpException(403, "You are not authorized to perform this action!");
+        }
+        $salesOrderId = @$_GET['salesOrderId'];
+        if (!$salesOrderId) {
+            throw new JsonHttpException(400, "Sales order Id is required!");
+        }
+        $dbeOrdHead = new DBEOrdhead($this);
+        if (!$dbeOrdHead->getRow($salesOrderId)) {
+            throw new JsonHttpException(404, "Could not found Sales order with Id: {$salesOrderId}!");
+        };
+        if ($dbeOrdHead->getValue(DBEOrdhead::type) !== 'C') {
+            throw new JsonHttpException(
+                400, "Sales order with Id: {$salesOrderId} is not in Completed State, cannot change it to Initial!"
+            );
+        }
+        $dbeOrdHead->setValue(DBEOrdhead::type, 'I');
+        $dbeOrdHead->updateRow();
+        return ["status" => "ok"];
+
     }
 }

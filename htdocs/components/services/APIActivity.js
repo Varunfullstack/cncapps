@@ -37,8 +37,8 @@ class APIActivity extends APIMain {
         return fetch(`Activity.php?action=sendVisitEmail&callActivityID=${callActivityID}`);
     }
 
-    deleteDocument(callActivityID, id) {
-        return fetch(`Activity.php?action=deleteFile&callActivityID=${callActivityID}&callDocumentID=${id}`);
+    deleteDocument(id) {
+        return fetch(`SRActivity.php?action=deleteCustomerDocument&documentId=${id}`);
 
     }
 
@@ -107,8 +107,10 @@ class APIActivity extends APIMain {
         return fetch(`${ApiUrls.SRActivity}getCallActivityBasicInfo&callActivityID=${Id}`).then(res => res.json());
     }
 
-    getDocuments(callActivityID, problemID) {
-        return fetch(`${ApiUrls.SRActivity}getDocuments&callActivityID=${callActivityID}&problemID=${problemID}`).then(res => res.json());
+    async getServiceRequestCustomerDocuments(serviceRequestId) {
+        const response = await fetch(`${ApiUrls.SRActivity}getDocuments&serviceRequestId=${serviceRequestId}`);
+        const res = await response.json();
+        return res.data;
     }
 
     saveFixedInformation(body) {
@@ -196,6 +198,59 @@ class APIActivity extends APIMain {
                     throw new Error(res.message);
                 }
             })
+    }
+
+    async addAdditionalTimeRequest(serviceRequestId, reason, timeRequested, selectedContactId, selectedAdditionalChargeId) {
+        const response = await fetch(`${ApiUrls.SRActivity}addAdditionalTimeRequest`,
+            {
+                method: 'POST',
+                body: JSON.stringify({serviceRequestId, reason, timeRequested, selectedContactId, selectedAdditionalChargeId})
+            }
+        )
+        let jsonResponse = null;
+        try {
+            jsonResponse = await response.json();
+        } catch (error) {
+            throw new Error('Failed to parse json response');
+        }
+        if (jsonResponse.status !== 'ok') {
+            throw new Error(jsonResponse.message);
+        }
+    }
+
+    async getAdditionalChargeableWorkRequestInfo(id) {
+        const response = await fetch(`${ApiUrls.SRActivity}getAdditionalChargeableWorkRequestInfo&id=${id}`)
+        const jsonResponse = await response.json();
+        if (jsonResponse.status !== 'ok') {
+            throw new Error(jsonResponse.message);
+        }
+        return jsonResponse.data;
+    }
+
+    async cancelChargeableRequest(id, cancelReason) {
+        return this.post(`${ApiUrls.PendingChargeableRequests}cancelPendingChargeableRequest`, {id, cancelReason})
+    }
+
+    async resendChargeableRequestEmail(id) {
+        return this.post(`${ApiUrls.PendingChargeableRequests}resendPendingChargeableRequestEmail`, {id})
+    }
+
+    async checkServiceRequestPendingCallbacks(serviceRequestId) {
+        return this.post(`${ApiUrls.SRActivity}checkServiceRequestPendingCallbacks`, {serviceRequestId}).then(res => res.json()).then(res => res.data)
+    }
+
+    getPendingReopen(id) {
+        return this.get(`${ApiUrls.SRActivity}pendingReopened&id=${id}`);
+    }
+
+    async deleteUnstartedServiceRequests(search) {
+        const res = await this.post(`${ApiUrls.SRActivity}deleteUnstartedServiceRequests`, {search});
+        return await res.json();
+    }
+
+    async forceCloseServiceRequest(serviceRequestId) {
+        const res = await this.post(`${ApiUrls.SRActivity}forceCloseServiceRequest`, {serviceRequestId});
+        return await res.json();
     }
 }
 

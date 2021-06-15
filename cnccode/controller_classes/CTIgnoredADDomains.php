@@ -6,23 +6,27 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+global $cfg;
+
+use CNCLTD\Exceptions\APIException;
+
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_dbe'] . '/DBEIgnoredADDomain.inc.php');
-require_once($cfg['path_bu'] . '/BUActivity.inc.php');
+
 
 // Actions
 class CTIgnoredADDomains extends CTCNC
 {
     var $buActivity;
     public $dsIgnoredADDomains;
-
-    function __construct($requestMethod,
-                         $postVars,
-                         $getVars,
-                         $cookieVars,
-                         $cfg
-    )
-    {
+    const CONST_DOMAINS = 'domains';
+    function __construct(
+        $requestMethod,
+        $postVars,
+        $getVars,
+        $cookieVars,
+        $cfg
+    ) {
         parent::__construct(
             $requestMethod,
             $postVars,
@@ -37,53 +41,6 @@ class CTIgnoredADDomains extends CTCNC
         $this->setMenuId(218);
     }
 
-
-    function delete()
-    {
-        if (!$this->getParam('id')) {
-            http_response_code(400);
-            throw new Exception('ID is missing');
-        }
-
-        $DBEIgnoredADDomain = new DBEIgnoredADDomain($this);
-
-        $DBEIgnoredADDomain->getRow($this->getParam('id'));
-        if (!$DBEIgnoredADDomain->rowCount) {
-            http_response_code(404);
-            exit;
-        }
-        $DBEIgnoredADDomain->deleteRow();
-        echo json_encode(["status" => "ok"]);
-    }
-
-    function update()
-    {
-        if (!$this->getParam('id')) {
-            throw new Exception('ID is missing');
-        }
-
-        $DBEIgnoredADDomain = new DBEIgnoredADDomain($this);
-
-        $DBEIgnoredADDomain->getRow($this->getParam('id'));
-
-        if (!$DBEIgnoredADDomain->rowCount) {
-            http_response_code(404);
-            exit;
-        }
-
-        $DBEIgnoredADDomain->setValue(
-            DBEIgnoredADDomain::domain,
-            $this->getParam('domain')
-        );
-        $DBEIgnoredADDomain->setValue(
-            DBEIgnoredADDomain::customerID,
-            $this->getParam('customerID')
-        );
-
-        $DBEIgnoredADDomain->updateRow();
-        echo json_encode(["status" => "ok"]);
-    }
-
     /**
      * Route to function based upon action passed
      * @throws Exception
@@ -92,128 +49,127 @@ class CTIgnoredADDomains extends CTCNC
     function defaultAction()
     {
         switch ($this->getAction()) {
-            case 'create':
-                $DBEIgnoredADDomain = new DBEIgnoredADDomain($this);
-
-                $DBEIgnoredADDomain->setValue(
-                    DBEIgnoredADDomain::domain,
-                    $this->getParam('domain')
-                );
-                $DBEIgnoredADDomain->setValue(
-                    DBEIgnoredADDomain::customerID,
-                    $this->getParam('customerID')
-                );
-
-                $DBEIgnoredADDomain->insertRow();
-
-                $customerString = null;
-                if ($DBEIgnoredADDomain->getValue(DBEIgnoredADDomain::customerID)) {
-                    $dbeCustomer = new DBECustomer($this);
-                    $dbeCustomer->getRow($DBEIgnoredADDomain->getValue(DBEIgnoredADDomain::customerID));
-                    $customerString = $dbeCustomer->getValue(DBECustomer::name);
+            case self::CONST_DOMAINS:
+                switch ($this->requestMethod) {
+                    case 'GET':
+                        echo  json_encode($this->getDomains(), JSON_NUMERIC_CHECK);
+                        break;
+                    case 'POST':
+                        echo  json_encode($this->addDomain(), JSON_NUMERIC_CHECK);
+                        break;
+                    case 'PUT':
+                        echo  json_encode($this->updateDomain(), JSON_NUMERIC_CHECK);
+                        break;
+                    case 'DELETE':
+                        echo  json_encode($this->deleteDomain(), JSON_NUMERIC_CHECK);
+                        break;
                 }
-
-                echo json_encode(
-                    [
-                        "id"             => $DBEIgnoredADDomain->getValue(DBEIgnoredADDomain::ignoredADDomainID),
-                        "domain"         => $DBEIgnoredADDomain->getValue(DBEIgnoredADDomain::domain),
-                        "customerID"     => $DBEIgnoredADDomain->getValue(DBEIgnoredADDomain::customerID),
-                        "customerString" => $customerString
-                    ],
-                    JSON_NUMERIC_CHECK
-                );
-
-                break;
-            case 'getData':
-                $DBEIgnoredADDomains = new DBEIgnoredADDomain($this);
-
-                $DBEIgnoredADDomains->getRows();
-                $data = [];
-                while ($DBEIgnoredADDomains->fetchNext()) {
-                    $customerString = null;
-                    if ($DBEIgnoredADDomains->getValue(DBEIgnoredADDomain::customerID)) {
-                        $dbeCustomer = new DBECustomer($this);
-                        $dbeCustomer->getRow($DBEIgnoredADDomains->getValue(DBEIgnoredADDomain::customerID));
-                        $customerString = $dbeCustomer->getValue(DBECustomer::name);
-                    }
-                    $data[] = [
-                        "id"             => $DBEIgnoredADDomains->getValue(DBEIgnoredADDomain::ignoredADDomainID),
-                        "domain"         => $DBEIgnoredADDomains->getValue(DBEIgnoredADDomain::domain),
-                        "customerID"     => $DBEIgnoredADDomains->getValue(DBEIgnoredADDomain::customerID),
-                        "customerString" => $customerString
-                    ];
-                }
-                echo json_encode(
-                    $data,
-                    JSON_NUMERIC_CHECK
-                );
-                break;
-            case 'displayForm':
+                exit;
             default:
-                $this->displayForm();
+                $this->displayList();
                 break;
         }
     }
 
     /**
-     * Export expenses that have not previously been exported
+     * Display list of types
      * @access private
      * @throws Exception
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
      */
-    function displayForm()
+    function displayList()
     {
+        //--------new
         $this->setPageTitle('Ignored AD Domains');
         $this->setTemplateFiles(
-            'IgnoredADDomains',
-            'IgnoredADDomains'
+            array('IgnoredADDomains' => 'IgnoredADDomains')
         );
-
+        $this->loadReactScript('IgnoredADDomainsComponent.js');
+        $this->loadReactCSS('IgnoredADDomainsComponent.css');
         $this->template->parse(
             'CONTENTS',
             'IgnoredADDomains',
             true
         );
-
-        $URLDeleteItem = $this->buildLink(
-            $_SERVER['PHP_SELF'],
-            [
-                'action' => 'delete'
-            ]
-        );
-
-        $URLUpdateItem = $this->buildLink(
-            $_SERVER['PHP_SELF'],
-            [
-                'action' => 'update'
-            ]
-        );
-
-        $URLCreateItem = $this->buildLink(
-            $_SERVER['PHP_SELF'],
-            [
-                'action' => 'create'
-            ]
-        );
-
-        $URLGetData = $this->buildLink(
-            $_SERVER['PHP_SELF'],
-            [
-                'action' => 'getData'
-            ]
-        );
-        $this->template->setVar(
-            [
-                "URLDeleteItem" => $URLDeleteItem,
-                "URLUpdateItem" => $URLUpdateItem,
-                "URLAddItem"    => $URLCreateItem,
-                "URLGetData"    => $URLGetData
-            ]
-        );
-
         $this->parsePage();
+    }
+
+    function getDomains()
+    {
+        $DBEIgnoredADDomains = new DBEIgnoredADDomain($this);
+        $DBEIgnoredADDomains->getRows();
+        $data = [];
+        while ($DBEIgnoredADDomains->fetchNext()) {
+            $customerString = null;
+            if ($DBEIgnoredADDomains->getValue(DBEIgnoredADDomain::customerID)) {
+                $dbeCustomer = new DBECustomer($this);
+                $dbeCustomer->getRow($DBEIgnoredADDomains->getValue(DBEIgnoredADDomain::customerID));
+                $customerString = $dbeCustomer->getValue(DBECustomer::name);
+            }
+            $data[] = [
+                "id"             => $DBEIgnoredADDomains->getValue(DBEIgnoredADDomain::ignoredADDomainID),
+                "domain"         => $DBEIgnoredADDomains->getValue(DBEIgnoredADDomain::domain),
+                "customerID"     => $DBEIgnoredADDomains->getValue(DBEIgnoredADDomain::customerID),
+                "customerString" => $customerString
+            ];
+        }
+        return $this->success($data);
+    }
+
+    function updateDomain()
+    {
+        $body = $this->getBody();
+        $id = @$body->id;
+        if (!$id) {
+            return $this->fail(APIException::notFound);
+        }
+        $DBEIgnoredADDomain = new DBEIgnoredADDomain($this);
+        $DBEIgnoredADDomain->getRow($id);
+        if (!$DBEIgnoredADDomain->rowCount) {
+            return $this->fail(APIException::notFound);
+        }
+
+        $DBEIgnoredADDomain->setValue(
+            DBEIgnoredADDomain::domain,
+            $body->domain
+        );
+        $DBEIgnoredADDomain->setValue(
+            DBEIgnoredADDomain::customerID,
+            $body->customerID
+        );
+
+        $DBEIgnoredADDomain->updateRow();
+        return $this->success();
+    }
+
+    function addDomain()
+    {
+        $body = $this->getBody();
+        $DBEIgnoredADDomain = new DBEIgnoredADDomain($this);
+        $DBEIgnoredADDomain->setValue(
+            DBEIgnoredADDomain::domain,
+            $body->domain
+        );
+        $DBEIgnoredADDomain->setValue(
+            DBEIgnoredADDomain::customerID,
+            $body->customerID
+        );
+
+        $DBEIgnoredADDomain->insertRow();
+        return $this->success();
+    }
+
+    function deleteDomain()
+    {
+        $id = @$_REQUEST["id"];
+        if (!$id) {
+            return $this->fail(APIException::badRequest);
+        }
+        $DBEIgnoredADDomain = new DBEIgnoredADDomain($this);
+        $DBEIgnoredADDomain->getRow($this->getParam('id'));
+        if (!$DBEIgnoredADDomain->rowCount) {
+            return $this->fail(APIException::notFound);
+        }
+        $DBEIgnoredADDomain->deleteRow();
+        return $this->success();
     }
 }// end of class

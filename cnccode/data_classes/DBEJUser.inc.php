@@ -3,23 +3,24 @@
 * @authors Karim Ahmed
 * @access public
 */
+global $cfg;
 require_once($cfg["path_dbe"] . "/DBEUser.inc.php");
 
 class DBEJUser extends DBEUser
 {
 
     const signatureFilename = "signatureFilename";
-    const jobTitle = "jobTitle";
-    const firstName = "firstName";
-    const lastName = "lastName";
-    const activeFlag = "activeFlag";
-    const teamLevel = "teamLevel";
+    const jobTitle          = "jobTitle";
+    const firstName         = "firstName";
+    const lastName          = "lastName";
+    const activeFlag        = "activeFlag";
+    const teamLevel         = "teamLevel";
 
     /**
      * calls constructor()
      * @access public
+     * @param void
      * @return void
-     * @param  void
      * @see constructor()
      */
     function __construct(&$owner)
@@ -56,14 +57,12 @@ class DBEJUser extends DBEUser
             DA_NOT_NULL,
             "consultant.activeFlag"
         );
-       
         $this->addColumn(
             self::teamLevel,
             DA_YN,
             DA_NOT_NULL,
             "team.level"
         );
-
         $this->setAddColumnsOff();
     }
 
@@ -72,29 +71,26 @@ class DBEJUser extends DBEUser
      * @access public
      * @return bool Success
      */
-    function getRows()
+    function getRows($sortColumn = '', $orderDirection = '')
     {
         $this->setMethodName("getRows");
         $this->setQueryString(
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() . ' LEFT JOIN userext ON ' . $this->getTableName(
-            ) . '.' . $this->getPKDBName() . '=userext.userID' .
-            ' WHERE activeFlag = "Y"'
+            "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName(
+            ) . ' LEFT JOIN userext ON ' . $this->getTableName() . '.' . $this->getPKDBName(
+            ) . '=userext.userID' . ' WHERE activeFlag = "Y"'
         );
         return (parent::getRows());
     }
 
-    function getRow()
+    function getRow($pkValue = null)
     {
         $this->setMethodName("getRow");
         $this->setQueryString(
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            ' LEFT JOIN userext ON ' . $this->getTableName() . '.' . $this->getPKDBName() . '=userext.userID ' .
-            ' LEFT JOIN team ON  '. $this->getTableName() . '.'. self::teamID.'=team.teamID '.
-            " WHERE " . $this->getPKWhere()
+            "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName(
+            ) . ' LEFT JOIN userext ON ' . $this->getTableName() . '.' . $this->getPKDBName(
+            ) . '=userext.userID ' . ' LEFT JOIN team ON  ' . $this->getTableName(
+            ) . '.' . self::teamID . '=team.teamID ' . " WHERE " . $this->getPKWhere()
         );
-        
         return (parent::getRow());
     }
 }

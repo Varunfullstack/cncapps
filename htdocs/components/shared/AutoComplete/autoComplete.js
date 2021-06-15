@@ -1,6 +1,8 @@
 "use strict";
 import React from 'react';
 
+import './autoComplete.css';
+
 class AutoComplete extends React.Component {
     constructor(props) {
         super(props);
@@ -9,23 +11,35 @@ class AutoComplete extends React.Component {
             // The active selection's index
             activeSuggestion: 0,
             // The suggestions that match the user's input
-            filteredSuggestions: [],
+            filteredSuggestions: this.props.items || [],
             // Whether or not the suggestion list is shown
             showSuggestions: false,
             // What the user has entered
             userInput: "",
             filtered: false,
-            value: ''
+            value: '',
+            items: []
         };
 
     }
 
     // Event fired when the input value is changed
     onChange = (e) => {
-
         let {items, displayLength, displayColumn} = this.props;
         if (!displayLength) displayLength = 10;
         const userInput = e.currentTarget.value;
+
+        if (this.props.onFilter) {
+            this.props.onFilter(userInput);
+            this.setState({
+                activeSuggestion: e.currentTarget.value.length > 0 ? 0 : -1,
+                showSuggestions: true,
+                userInput: userInput,
+                filtered: true
+            });
+            return;
+        }
+
 
         // Filter our suggestions that don't contain the user's input
         let filteredSuggestions = items
@@ -33,6 +47,7 @@ class AutoComplete extends React.Component {
                 (suggestion) =>
                     (displayColumn ? suggestion[displayColumn] : suggestion).toLowerCase().indexOf(userInput.toLowerCase()) > -1
             );
+
         if (filteredSuggestions.length > displayLength) {
             filteredSuggestions = [
                 {
@@ -55,7 +70,7 @@ class AutoComplete extends React.Component {
     };
     // Event fired when the user clicks on a suggestion
     onClick = (item) => {
-        if (item.id != null) {
+        if (item[this.props.pk] != null) {
             const {displayColumn, onSelect} = this.props;
             // Update the user input and reset the rest of the state
 
@@ -126,8 +141,8 @@ class AutoComplete extends React.Component {
         const {userInput} = this.state;
         displayLength = displayLength ?? 10;
         let {filteredSuggestions} = this.state;
-        if (filteredSuggestions.length == 0 && userInput == '') // display first n of items
-        {
+        if (filteredSuggestions.length == 0 && !userInput) {
+
             filteredSuggestions = items.slice(0, displayLength);
             if (items.length > displayLength) {
                 filteredSuggestions = [
@@ -154,14 +169,14 @@ class AutoComplete extends React.Component {
         }, 200);
     }
 
-    componentDidUpdate(prevProps) {
-
-    }
-
     static getDerivedStateFromProps(props, state) {
         if (props.value != state.value) {
             state.value = props.value;
             state.userInput = props.value;
+            return state;
+        } else if (props.items.length != state.items.length) {
+            state.items = [...props.items];
+            state.filteredSuggestions = [...props.items];
             return state;
         } else return state;
     }
@@ -195,11 +210,12 @@ class AutoComplete extends React.Component {
                         className = "suggestion-active";
                     }
 
-                    return React.createElement("li", {
-                        className: className,
-                        key: pk ? suggestion[pk] : suggestion,
-                        onClick: () => onClick(suggestion)
-                    }, displayColumn ? suggestion[displayColumn] : suggestion);
+                    return <li
+                        className={className}
+                        key={pk ? suggestion[pk] : suggestion}
+                        onClick={() => onClick(suggestion)}>
+                        {displayColumn ? suggestion[displayColumn] : suggestion}
+                    </li>
                 }));
             } else {
                 if (userInput !== "")
@@ -209,17 +225,23 @@ class AutoComplete extends React.Component {
             }
         }
         let defaultValue = this.props.value ? this.props.value : "";
-        return React.createElement("div", null, React.createElement("input", {
-            className: "form-control " + (required ? "required" : ""),
-            type: "text",
-            onChange: onChange,
-            onKeyDown: onKeyDown,
-            value: userInput || (!filtered && defaultValue) || "",
-            onClick: handleOnClick,
-            onBlur: handleOnBlur,
-            style: {width: width || '100%'},
-            autoComplete: "off",
-        }), suggestionsListComponent);
+        return (
+            <div>
+                <input className={`form-control ${required ? "required" : ''}`}
+                       type="text"
+                       onChange={onChange}
+                       onKeyDown={onKeyDown}
+                       value={userInput || (!filtered && defaultValue) || ''}
+                       onClick={handleOnClick}
+                       onBlur={handleOnBlur}
+                       disabled={this.props.disabled}
+                       style={{width: width || '100%'}}
+                       autoComplete="off"
+                       placeholder={this.props.placeholder}
+                />
+                {suggestionsListComponent}
+            </div>
+        )
     }
 }
 

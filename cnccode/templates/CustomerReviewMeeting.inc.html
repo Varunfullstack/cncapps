@@ -3,6 +3,46 @@
         src="CommonJS.js"
 ></script>
 <style>
+     .table-no-border {
+        margin-top: 20px;
+        border: none;
+        border-collapse: collapse;
+
+    }
+
+    .table-no-border table,
+    .table-no-border tr,
+    .table-no-border td,
+    .table-no-border th {
+        border: none !important;
+    }
+
+    .table-no-border td,
+    .table-no-border th {
+        padding: 0.2rem 0.5rem;
+
+    }
+
+    .table-border {
+        margin-top: 20px;       
+       
+
+    }
+
+    .table-border table,
+    .table-border tr,
+    .table-border td,
+    .table-border th {
+        border: none !important;
+    }
+
+    .table-border td,
+    .table-border th {
+        padding: 0.2rem 0.5rem;
+
+    }
+</style>
+<style>
     .ul3 {
         margin: 0 auto;
         padding: 0;
@@ -55,8 +95,9 @@
         $('#create-pdf').click(function () {
             $(this).attr('disabled', true);
             //loop through sections looking for large tables
-            updateTables();
             handleEditableText();
+            updateTables();
+           
             var sections = 1;
             $('h2').each(function () {
                 $(this).prepend(sections + '. ');
@@ -116,7 +157,6 @@
 
         $('.reportSection table').each(function () {
             var rowCount = $('tbody tr', $(this)).length;
-
             if (this.id === 'servicesTable') {
                 return;
             }
@@ -271,7 +311,10 @@
         width: 100%;
         padding-bottom: 30px;
     }
-
+    .subSection {
+        width: 100%;
+        padding-bottom: 20px;
+    }
     .reportSection.newPage {
         page-break-before: always;
     }
@@ -313,7 +356,15 @@
         white-space: pre-wrap;
     }
 </style>
-
+<script>
+    function getCustomerStats(){
+        const customerID=document.getElementById("customerID").value;
+        console.log('customerID',customerID);
+        // fetch(`/internal-api/customerStats/`+customerID).then((res) => res.json()).then(res=>{
+        //     console.log(res);
+        // })
+    }
+</script>
 
 <P class="formErrorMessage">{formError}</P>
 <form name="searchForm"
@@ -350,6 +401,7 @@
                     size="50"
                     maxlength="50"
                     customer-search
+                    required
             > <font class="formErrorMessage"> {customerIDMessage} </font></td>
         </tr>
         <tr>
@@ -366,6 +418,7 @@
                         placeholder="MM/YYYY"
                         size="10"
                         maxlength="7"
+                        required
                 > <font class="formErrorMessage"> {startYearMonthMessage} </font></td>
         </tr>
         <tr>
@@ -382,6 +435,7 @@
                         placeholder="MM/YYYY"
                         size="10"
                         maxlength="7"
+                        required
                 > <font class="formErrorMessage"> {endYearMonthMessage} </font></td>
         </tr>
         <tr>
@@ -399,6 +453,7 @@
                        size="10"
                        maxlength="10"
                        autocomplete="off"
+                       required
                 >
                 <font class="formErrorMessage"> {meetingDateMessage} </font></td>
         </tr>
@@ -408,6 +463,7 @@
                 <input type="submit"
                        name="Search"
                        value="Generate"
+                       onclick="getCustomerStats()"
                 >
         </tr>
     </table>

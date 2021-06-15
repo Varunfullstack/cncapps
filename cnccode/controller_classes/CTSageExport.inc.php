@@ -111,7 +111,7 @@ class CTSageExport extends CTCNC
             $this->select();
             exit();
         }
-        if (!$this->getParam('includeSales') AND !$this->getParam('includePurchases')) {
+        if (!$this->getParam('includeSales') && !$this->getParam('includePurchases')) {
             $this->setFormErrorMessage('Choose at least one report to produce');
             $this->select();
             exit();

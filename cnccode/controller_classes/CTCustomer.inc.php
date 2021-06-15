@@ -7,7 +7,11 @@
  * @authors Karim Ahmed - Sweet Code Limited
  */
 
+use CNCLTD\Business\BUActivity;
+use CNCLTD\Data\DBConnect;
+use CNCLTD\Data\DBEJProblem;
 use CNCLTD\Encryption;
+use CNCLTD\SupportedCustomerAssets\UnsupportedCustomerAssetService;
 use CNCLTD\Utils;
 
 global $cfg;
@@ -18,14 +22,13 @@ require_once($cfg['path_bu'] . '/BUSector.inc.php');
 require_once($cfg['path_dbe'] . '/DBEJOrdhead.inc.php');
 require_once($cfg['path_bu'] . '/BUPortalCustomerDocument.inc.php');
 require_once($cfg["path_bu"] . "/BURenBroadband.inc.php");
-require_once($cfg["path_bu"] . "/BURenContract.inc.php");
+require_once($cfg["path_bu"] . "/Burencontract.php");
 require_once($cfg["path_bu"] . "/BURenQuotation.inc.php");
 require_once($cfg["path_bu"] . "/BURenDomain.inc.php");
 require_once($cfg["path_bu"] . "/BURenHosting.inc.php");
 require_once($cfg["path_bu"] . "/BUExternalItem.inc.php");
 require_once($cfg["path_bu"] . "/BUCustomerItem.inc.php");
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
-require_once($cfg["path_dbe"] . "/DBConnect.php");
 // Parameters
 define(
     'CTCUSTOMER_VAL_NONE_SELECTED',
@@ -322,10 +325,6 @@ class CTCustomer extends CTCNC
             $this->dsContact->setValue(
                 DBEContact::customerID,
                 @$value['customerID']
-            );
-            $this->dsContact->setValue(
-                DBEContact::supplierID,
-                @$value['supplierID']
             );
             $this->dsContact->setValue(
                 DBEContact::siteNo,
@@ -1109,7 +1108,7 @@ class CTCustomer extends CTCNC
                 echo $this->getCurrentUser();
                 exit;
             case "searchCustomers":
-                echo json_encode($this->searchCustomers(),JSON_NUMERIC_CHECK);
+                echo json_encode($this->searchCustomers(), JSON_NUMERIC_CHECK);
                 exit;
             case "getCustomerSR":
                 echo json_encode($this->getCustomerSR());
@@ -1876,14 +1875,6 @@ class CTCustomer extends CTCNC
             )
         );
         $renewalLink             = '<a href="' . $renewalLinkURL . '" target="_blank" title="Renewals">Renewal Information</a>';
-        $passwordLinkURL         = Controller::buildLink(
-            'Password.php',
-            array(
-                'action'     => 'list',
-                'customerID' => $this->getCustomerID()
-            )
-        );
-        $passwordLink            = '<a href="' . $passwordLinkURL . '" target="_blank" title="Passwords">Service Passwords</a>';
         $thirdPartyLinkURL       = Controller::buildLink(
             'ThirdPartyContact.php',
             [
@@ -1970,6 +1961,9 @@ class CTCustomer extends CTCNC
                 'mailshotFlagChecked'                     => $this->getChecked(
                     $this->dsCustomer->getValue(DBECustomer::mailshotFlag)
                 ),
+                'excludeFromWebrootChecksChecked'         => $this->dsCustomer->getValue(
+                    DBECustomer::excludeFromWebrootChecks
+                ) ? 'checked' : '',
                 'referredFlagChecked'                     => $this->getChecked(
                     $this->dsCustomer->getValue(DBECustomer::referredFlag)
                 ),
@@ -2016,7 +2010,6 @@ class CTCustomer extends CTCNC
                 ),
                 'submitURL'                               => $submitURL,
                 'renewalLink'                             => $renewalLink,
-                'passwordLink'                            => $passwordLink,
                 'thirdPartyContactsLink'                  => $thirdPartyLink,
                 'deleteCustomerURL'                       => $deleteCustomerURL,
                 'deleteCustomerText'                      => $deleteCustomerText,
@@ -3002,9 +2995,9 @@ class CTCustomer extends CTCNC
                 concat(contact.con_first_name,' ',contact.con_last_name) contact_name,                
                 contact.con_first_name,
                 contact.con_last_name,
-                contact.con_phone,
+                concat(contact.con_phone, ' ') as con_phone,
                 contact.con_notes,
-                address.add_phone,
+                concat(address.add_phone,' ') as add_phone,
                 supportLevel,
                 con_position,
                 cus_referred,
@@ -3093,7 +3086,9 @@ class CTCustomer extends CTCNC
                     'urlProblemHistoryPopup' => $urlProblemHistoryPopup,
                     'priority'               => $dsActiveSrs->getValue(DBEJProblem::priority),
                     'status'                 => $dsActiveSrs->getValue(DBEJProblem::status),
-                    'isSpecialAttention'     => $this->isSpecialAttention($dsActiveSrs)
+                    'isSpecialAttention'     => $this->isSpecialAttention($dsActiveSrs),
+                    "assetName"              => $dsActiveSrs->getValue('assetName'),
+                    "emailSubjectSummary"    => $dsActiveSrs->getValue('emailSubjectSummary'),
                 )
             );
         }
@@ -3165,8 +3160,14 @@ ORDER BY NAME,
   biosVer
         ";
         $statement  = $labtechDB->prepare($query);
-        $statement->execute([$customerId, $customerId,]);
-        return $statement->fetchAll(PDO::FETCH_ASSOC);
+        $statement->execute([$customerId, $customerId]);
+        $customerAssets                   = $statement->fetchAll(PDO::FETCH_ASSOC);
+        $unsupportedCustomerAssetsService = new UnsupportedCustomerAssetService();
+        $unsupportedCustomerAssets        = $unsupportedCustomerAssetsService->getAllForCustomer($customerId);
+        foreach ($customerAssets as $key => $customerAsset) {
+            $customerAssets[$key]['unsupported'] = in_array($customerAsset['name'], $unsupportedCustomerAssets);
+        }
+        return $customerAssets;
     }
 
     /**
@@ -3180,7 +3181,9 @@ ORDER BY NAME,
         $dbeContact = new DBEContact($this);
         $dbeSite    = new DBESite($this);
         $dbeContact->getRowsByCustomerID($customerID, true);
-        $contacts = array();
+        $buCustomer     = new BUCustomer($this);
+        $primaryContact = $buCustomer->getPrimaryContact($customerID);
+        $contacts       = array();
         while ($dbeContact->fetchNext()) {
             $dbeSite->setValue(
                 DBESite::customerID,
@@ -3208,7 +3211,10 @@ ORDER BY NAME,
                     "mobilePhone"  => $dbeContact->getValue(DBEContact::mobilePhone),
                     "email"        => $dbeContact->getValue(DBEContact::email),
                     'supportLevel' => $dbeContact->getValue(DBEContact::supportLevel),
-                    "notes"        => $dbeContact->getValue(DBEContact::notes)
+                    "notes"        => $dbeContact->getValue(DBEContact::notes),
+                    "isPrimary"    => $primaryContact && $primaryContact->getValue(
+                            DBEContact::contactID
+                        ) === $dbeContact->getValue(DBEContact::contactID)
                 )
             );
         }
@@ -3279,7 +3285,8 @@ ORDER BY NAME,
                 $this->buCustomer->insertCustomer(
                     $this->dsCustomer,
                     $this->dsSite,
-                    $this->dsContact
+                    $this->dsContact,
+                    $this->dbeUser
                 );
                 $this->dsCustomer->initialise();
                 $this->dsCustomer->fetchNext();

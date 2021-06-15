@@ -465,18 +465,10 @@ class Controller extends BaseObject
      */
     function displayFatalError($errorMessage)
     {
-        $this->setPageTitle('A Problem Has Occurred');
+        $this->setPageTitle('Oooops! A Problem Has Occurred!');
         $this->setTemplateFiles(array("FatalError" => "FatalError.inc"));
-        $this->template->set_var(
-            array(
-                "errorMessage" => $errorMessage,
-                "className"    => $this->getClassName(),
-                "methodName"   => $this->getMethodName(),
-                "trace"        => $this->generateCallTrace(),
-                "url"          => $_SERVER['PHP_SELF'],
-                "arguments"    => isset($_SERVER['argv']) ? $_SERVER['argv'] : null
-            )
-        );
+        $trace = $this->generateCallTrace();
+        error_log($errorMessage . " " . $trace);
         $this->template->parse(
             "CONTENTS",
             "FatalError",
@@ -486,17 +478,8 @@ class Controller extends BaseObject
         exit;
     }
 
-    /**
-     * Set template files, automatically includes the page template then calls
-     * the PHPLib template set_file method
-     *
-     * @access private
-     */
-    function setTemplateFiles($handle,
-                              $fileName = ""
-    )
+    function setContainerTemplate()
     {
-
         switch ($this->getHTMLFmt()) {
             case CT_HTML_FMT_PRINTER:
                 $file = array("page" => "printer.inc." . $this->getDocType());
@@ -511,6 +494,21 @@ class Controller extends BaseObject
                 $file = array("page" => "screen.inc." . $this->getDocType());
                 break;
         }
+        $this->template->setFile($file);
+    }
+
+    /**
+     * Set template files, automatically includes the page template then calls
+     * the PHPLib template set_file method
+     *
+     * @access private
+     */
+    function setTemplateFiles($handle,
+                              $fileName = ""
+    )
+    {
+
+        $this->setContainerTemplate();
         if (!is_array($handle)) {
 // FOR DOS $file[$handle] = $this->template->fileName($fileName);
             $file[$handle] = $fileName . '.' . $this->getDocType();
@@ -747,6 +745,7 @@ class Controller extends BaseObject
             default:
                 try {
                     $this->defaultAction();
+
                 } catch (\CNCLTD\Exceptions\JsonHttpException $exception) {
                     echo $exception->getMessage();
                     http_response_code($exception->getResponseCode());

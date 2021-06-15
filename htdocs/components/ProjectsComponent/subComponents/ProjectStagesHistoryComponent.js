@@ -75,7 +75,7 @@ export default class ProjectStagesHistoryComponent extends MainComponent {
      },
       
     ]
-    return<div style={{maxWidth:1000}}> <Table
+    return<div  > <Table
     columns={columns}
     pk={"id"}
     data={stages}

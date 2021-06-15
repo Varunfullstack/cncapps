@@ -5,6 +5,7 @@ namespace CNCLTD\AssetListExport;
 use BUCustomer;
 use BUHeader;
 use BUPassword;
+use CNCLTD\Business\BURenContract;
 use DataSet;
 use DateInterval;
 use DateTime;
@@ -15,6 +16,7 @@ use DBEPortalCustomerDocument;
 use Exception;
 use PDO;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
@@ -145,6 +147,7 @@ class AssetListExporter
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
         $sheet->getStyle($sheet->calculateWorksheetDimension())->getAlignment()->setHorizontal('center');
+        $this->setDateFormats($sheet);
         $writer   = new Xlsx($spreadsheet);
         $fileName = $this->getFileDestinationPath($customerId, $generateWithMonthYear);
         try {
@@ -174,7 +177,7 @@ class AssetListExporter
         $currentSummaryRow = 2;
         $this->setHeaderRowToBold($summarySheet);
         foreach ($this->customersTabularDataItems as $customersTabularDataItem) {
-            $toExportData = $customersTabularDataItem->getExportData();
+            $toExportData = $customersTabularDataItem->getSummaryData();
             $summarySheet->fromArray($toExportData, null, "A$currentSummaryRow");
             for ($i = 0; $i < count($toExportData); $i++) {
 
@@ -182,16 +185,18 @@ class AssetListExporter
                     $customersTabularDataItem,
                     $i,
                     $summarySheet,
-                    $currentSummaryRow
+                    $currentSummaryRow,
+                    true
                 );
                 $this->setLastContactColorForCurrentRow(
                     $toExportData[$i],
                     $i,
                     $summarySheet,
                     $currentSummaryRow,
-                    $customersTabularDataItem
+                    $customersTabularDataItem,
+                    true
                 );
-                $this->setWarrantyColorForCurrentRow($toExportData[$i], $summarySheet, $currentSummaryRow);
+                $this->setWarrantyColorForCurrentRow($toExportData[$i], $summarySheet, $currentSummaryRow, true);
                 $currentSummaryRow++;
             }
         }
@@ -337,14 +342,14 @@ class AssetListExporter
         return null;
     }
 
-    private function getLastContactColor($exportArray): ?string
+    private function getLastContactColor($exportArray, $isSummary = false): ?string
     {
-        $index               = self::LAST_CONTACT_COLUMN_INDEX - 1;
+        $index               = self::LAST_CONTACT_COLUMN_INDEX - 1 + $isSummary;
         $lastContactDateTime = $exportArray[$index];
         if (!$lastContactDateTime || $lastContactDateTime == "N/A") {
             return null;
         }
-        $date = DateTime::createFromFormat(DATE_CNC_DATE_TIME_FORMAT, $lastContactDateTime);
+        $date = Date::excelToDateTimeObject($lastContactDateTime);
         $date->add(new DateInterval('P' . $this->offlineAgentThresholdDays . 'D'));
         $today = new DateTime();
         if ($date > $today) {
@@ -361,7 +366,7 @@ class AssetListExporter
         if (!$warrantyExpiryDate || $warrantyExpiryDate == "Unknown" || $warrantyExpiryDate == "Not Applicable") {
             return null;
         }
-        $date  = DateTime::createFromFormat(DATE_CNC_DATE_FORMAT, $warrantyExpiryDate);
+        $date = Date::excelToDateTimeObject($warrantyExpiryDate);
         $today = new DateTime();
         if ($date > $today) {
             return null;
@@ -374,21 +379,27 @@ class AssetListExporter
      * @param int $i
      * @param Worksheet $sheet
      * @param int $currentRow
+     * @param bool $isSummary
      * @return void
      */
     private function setEndOfSupportDateColorForCurrentRow(ExportedItemCollection $tabularData,
                                                            int $i,
                                                            Worksheet $sheet,
-                                                           int $currentRow
+                                                           int $currentRow,
+                                                           $isSummary = false
     ): void
     {
         $OSEndOfSupportDateColor = $this->getOSEndOfSupportDateColor($tabularData, $i);
         if ($OSEndOfSupportDateColor) {
-            $columnCoordinate = Coordinate::stringFromColumnIndex(self::OS_END_OF_SUPPORT_DATE_COLUMN_INDEX);
+            $columnCoordinate = Coordinate::stringFromColumnIndex(
+                self::OS_END_OF_SUPPORT_DATE_COLUMN_INDEX + $isSummary
+            );
             $this->setCellSolidColor($sheet, "{$columnCoordinate}{$currentRow}", $OSEndOfSupportDateColor);
-            $columnCoordinate = Coordinate::stringFromColumnIndex(self::OPERATING_SYSTEM_COLUMN_INDEX);
+            $columnCoordinate = Coordinate::stringFromColumnIndex(self::OPERATING_SYSTEM_COLUMN_INDEX + $isSummary);
             $this->setCellSolidColor($sheet, "{$columnCoordinate}{$currentRow}", $OSEndOfSupportDateColor);
-            $columnCoordinate = Coordinate::stringFromColumnIndex(self::OPERATING_SYSTEM_VERSION_COLUMN_INDEX);
+            $columnCoordinate = Coordinate::stringFromColumnIndex(
+                self::OPERATING_SYSTEM_VERSION_COLUMN_INDEX + $isSummary
+            );
             $this->setCellSolidColor($sheet, "{$columnCoordinate}{$currentRow}", $OSEndOfSupportDateColor);
         }
     }
@@ -399,22 +410,20 @@ class AssetListExporter
      * @param Worksheet $sheet
      * @param int $currentRow
      * @param ExportedItemCollection $tabularData
+     * @param bool $isSummary
      */
     private function setLastContactColorForCurrentRow($exportArray,
                                                       int $i,
                                                       Worksheet $sheet,
                                                       int $currentRow,
-                                                      ExportedItemCollection $tabularData
+                                                      ExportedItemCollection $tabularData,
+                                                      $isSummary = false
     )
     {
-        $lastContactColor = $this->getLastContactColor($exportArray);
+        $lastContactColor = $this->getLastContactColor($exportArray, $isSummary);
         if ($lastContactColor) {
-            $columnCoordinate = Coordinate::stringFromColumnIndex(self::LAST_CONTACT_COLUMN_INDEX);
+            $columnCoordinate = Coordinate::stringFromColumnIndex(self::LAST_CONTACT_COLUMN_INDEX + $isSummary);
             $this->setCellSolidColor($sheet, "{$columnCoordinate}{$currentRow}", $lastContactColor);
-            $operatingSystem = $tabularData->getOperatingSystem($i);
-            if (strpos(strtolower($operatingSystem), "microsoft") > -1) {
-                $this->patchManagementEligibleComputers++;
-            }
         }
     }
 
@@ -422,12 +431,17 @@ class AssetListExporter
      * @param $exportArray
      * @param Worksheet $sheet
      * @param int $currentRow
+     * @param bool $isSummary
      */
-    private function setWarrantyColorForCurrentRow($exportArray, Worksheet $sheet, int $currentRow): void
+    private function setWarrantyColorForCurrentRow($exportArray,
+                                                   Worksheet $sheet,
+                                                   int $currentRow,
+                                                   $isSummary = false
+    ): void
     {
         $warrantyColor = $this->getWarrantyColor($exportArray);
         if ($warrantyColor) {
-            $columnCoordinate = Coordinate::stringFromColumnIndex(self::WARRANTY_EXPIRY_DATE_COLUMN_INDEX);
+            $columnCoordinate = Coordinate::stringFromColumnIndex(self::WARRANTY_EXPIRY_DATE_COLUMN_INDEX + $isSummary);
             $this->setCellSolidColor($sheet, "{$columnCoordinate}{$currentRow}", $warrantyColor);
         }
     }
@@ -492,8 +506,16 @@ class AssetListExporter
         $updateCustomer->getRow($customerId);
         $updateCustomer->setValue(DBECustomer::noOfPCs, $tabularData->getNumberOfPcs());
         $updateCustomer->setValue(DBECustomer::noOfServers, $tabularData->getNumberOfServers());
-        $updateCustomer->setValue(DBECustomer::eligiblePatchManagement, $this->patchManagementEligibleComputers);
+        $updateCustomer->setValue(
+            DBECustomer::eligiblePatchManagement,
+            $tabularData->patchManagementEligibleComputers()
+        );
         $updateCustomer->updateRow();
+        $buContract = new BURenContract($this);
+        $buContract->updatePatchManagementContractForCustomer(
+            $customerId,
+            $tabularData->patchManagementEligibleComputers()
+        );
     }
 
     /**
@@ -515,9 +537,24 @@ class AssetListExporter
         $fileDescription = "Current Asset List Extract.xlsx";
         if ($generateWithMonthYear) {
             $date            = new DateTime();
-            $fileDescription = "Asset List - {$date->format('F Y')}.xls";
+            $fileDescription = "Asset List - {$date->format('F Y')}.xlsx";
         }
         return $folderName . $fileDescription;
+    }
+
+    /**
+     * @param Worksheet $sheet
+     */
+    private function setDateFormats(Worksheet $sheet): void
+    {
+        $range = Coordinate::stringFromColumnIndex(6) . ":" . Coordinate::stringFromColumnIndex(7);
+        $sheet->getStyle($range)->getNumberFormat()->setFormatCode('dd/mm/yyyy');
+        $range = Coordinate::stringFromColumnIndex(4) . ":" . Coordinate::stringFromColumnIndex(4);
+        $sheet->getStyle($range)->getNumberFormat()->setFormatCode('dd/mm/yyyy h:mm:ss');
+        $range = Coordinate::stringFromColumnIndex(16) . ":" . Coordinate::stringFromColumnIndex(16);
+        $sheet->getStyle($range)->getNumberFormat()->setFormatCode('dd/mm/yyyy');
+        $range = Coordinate::stringFromColumnIndex(20) . ":" . Coordinate::stringFromColumnIndex(20);
+        $sheet->getStyle($range)->getNumberFormat()->setFormatCode('dd/mm/yyyy');
     }
 
 

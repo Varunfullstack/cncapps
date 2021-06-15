@@ -116,6 +116,9 @@ class CurrentActivityService extends APIMain {
     getCallbackSearch(consID,customerID,from,to,status){
         return this.get(`${this.baseURL}callbackSearch&consID=${consID}&customerID=${customerID}&from=${from}&to=${to}&status=${status}`);
     }    
+    allocateAdditionalTime(data){
+        return this.post(`${this.baseURL}allocateAdditionalTime`,data);
+    }  
 }
 
 export default CurrentActivityService;

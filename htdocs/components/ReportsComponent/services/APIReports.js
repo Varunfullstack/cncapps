@@ -10,7 +10,7 @@ export default class APIReports extends APIMain {
     return this.get(`${ApiUrls.Reports}categoryReports&categoryID=${categoryID}`);
  }
 
- getReportParamters(reportID){
+ getReportParameters(reportID){
    return this.get(`${ApiUrls.Reports}reportParamters&reportID=${reportID}`);
  }
 

@@ -15,7 +15,7 @@ import ServiceRequestsRaisedByContract from "./subComponents/ServiceRequestsRais
 import APISDManagerDashboard from '../SDManagerDashboardComponent/services/APISDManagerDashboard';
 import ServiceRequestComponent from './subComponents/ServiceRequestComponent';
 import DailySourceComponent from './subComponents/DailySourceComponent';
-
+import DailyContactComponent from './subComponents/DailyContactComponent';
 import {groupBy} from '../utils/utils';
 
 import BillingConsultancyComponent from './subComponents/BillingConsultancyComponent';
@@ -39,7 +39,7 @@ export default class KPIReportComponent extends MainComponent {
     REP_SERVICE_REQUEST_SOURCE = 'serviceRequestSource';
     apiSDManagerDashboard = new APISDManagerDashboard();
     REP_CONFIRMED_BILLED_PER_ENGINEER = 'confirmedBilledPerEngineer';
-
+    REP_DAILY_CONTACT='DailyContact'
     /**
      * SRS_BY_CONTRAC
      * @param props
@@ -164,11 +164,20 @@ export default class KPIReportComponent extends MainComponent {
                     this.reportparameters.consName,
                     this.reportparameters.teams
                 ]
-            }
+            },
+            {
+                id: this.REP_DAILY_CONTACT,
+                title: "Daily Contact",
+                parameters: [
+                    this.reportparameters.dateFrom,
+                    this.reportparameters.dateTo,  
+                    this.reportparameters.resultType,                 
+                ]
+            },
         ];
         reports.sort((a, b) => a.title.localeCompare(b.title));
         if (!activeReport)
-            activeReport = reports[4];
+            activeReport = reports[5];
         this.setState({reports, activeReport}, () => this.handleReportView());
     }
 
@@ -302,10 +311,15 @@ export default class KPIReportComponent extends MainComponent {
                                         value={filter.consName}
                                         onChange={(event) => this.setFilter('consName', event.target.value)}
                                 >
-                                    <option>All</option>
-                                    {consultants.map(c => <option key={c.id}
-                                                                  value={c.name}
-                                    >{c.name}</option>)}
+                                    <option value=''>All</option>
+                                    {
+                                        consultants
+                                            .filter(c => c.active)
+                                            .map(c => <option key={c.id}
+                                                              value={c.name}
+                                                >{c.name}</option>
+                                            )
+                                    }
                                 </select>
                             </td>
                         </React.Fragment>
@@ -361,8 +375,7 @@ export default class KPIReportComponent extends MainComponent {
         //     return;
         // }
         if (activeReport && activeReport.parameters.indexOf(this.reportparameters.consName) >= 0 && consultants.length == 0) {
-            //console.log('have users');
-            consultants = await this.apiUsers.getActiveUsers();
+            consultants = await this.apiUsers.getAllUsers();
             this.setState({consultants});
         }
         switch (activeReport?.id) {
@@ -428,7 +441,20 @@ export default class KPIReportComponent extends MainComponent {
                     this.processData(data, false, false, false);
                 });
                 break;
-
+            case this.REP_DAILY_CONTACT:
+                this.api.getDailyContact(filter.from, filter.to).then((result) => {
+                    let data = groupBy(result, 'date');
+                    data = data.map(g => {
+                        const getItemType = (type) => g.items.find(s => s.type == type)?.total || 0;
+                        return {
+                            "date": g.groupName,
+                            "Inbound": getItemType("Inbound"),
+                            "Outbound": getItemType("Outbound"),                            
+                        }
+                    });
+                    this.processData(data, false);              
+                });
+                break;
         }
 
 
@@ -483,6 +509,11 @@ export default class KPIReportComponent extends MainComponent {
                                                     consultants={consultants}
                 >
                 </BillingConsultancyComponent>;
+            case this.REP_DAILY_CONTACT:
+            return <DailyContactComponent data={data}
+            filter={filter}>
+
+            </DailyContactComponent>
             default:
                 return null;
         }

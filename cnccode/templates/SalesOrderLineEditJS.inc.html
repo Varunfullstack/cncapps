@@ -21,34 +21,6 @@
         }
     }
 
-    function validateSupplierName() {
-        if (document.getElementById("supplierName").value != "") {
-            window.open(
-                '{urlSupplierPopup}&supplierName=' +
-                escape(document.getElementById("supplierName").value) +
-                '&parentIDField=supplierID' +
-                '&parentDescField=supplierName',
-                'suppliers',
-                'scrollbars=yes,resizable=no,width=450,height=400,copyhistory=no, menubar=0'
-            )
-        }
-    }
-
-    function validateUpdateSupplierName() {
-        if (document.getElementById("updateSupplierName").value != "") {
-            window.open(
-                '{urlSupplierPopup}&supplierName=' +
-                escape(document.getElementById("updateSupplierName").value) +
-                '&parentIDField=updateSupplierID' +
-                '&parentDescField=updateSupplierName',
-                'suppliers',
-                'scrollbars=yes,resizable=no,width=450,height=400,copyhistory=no, menubar=0'
-            )
-        }
-    }
-
-
-
     function submitOnReturn() {
         if (event.keyCode == 13) {
             document.ordline.submit();

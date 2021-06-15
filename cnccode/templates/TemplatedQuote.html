@@ -1,12 +1,29 @@
 <script>
+
+    let createButton;
+    let customerInput;
+    let customerIdInput;
+    let templateSelector;
+    let existingQuotationId;
     window.addEventListener('DOMContentLoaded', function () {
-        $('#customerString')[0].addEventListener('autocompleteselect', function ($event) {
-            $('#customerID').val($event.detail.item.value);
+        customerIdInput = document.getElementById('customerID');
+        createButton = document.getElementById('createButton');
+        customerInput = document.getElementById('customerString');
+        templateSelector = document.getElementById('templateSelector');
+        existingQuotationId = document.getElementById("existingQuotationId");
+
+        customerInput.addEventListener('autocompleteselect', function ($event) {
+            customerIdInput.value = $event.detail.item.value;
+            createButton.removeAttribute('disabled');
         });
     });
 
     function clearForm() {
-        document.createTemplatedQuotationForm.reset();
+        customerIdInput.value = "";
+        customerInput.value = "";
+        templateSelector.value = "";
+        createButton.removeAttribute('disabled');
+        existingQuotationId.value = '';
     }
 
     const openTabURL = '{openTabURL}';
@@ -45,6 +62,7 @@
                 <select name="form[templates][]"
                         multiple
                         required
+                        id="templateSelector"
                         size="20"
                 >
                     <!-- BEGIN templatesBlock -->
@@ -62,12 +80,16 @@
                 <input type="text"
                        value="{existingQuotationID}"
                        name="form[existingQuotationID]"
+                       id="existingQuotationId"
                 >
             </td>
         </tr>
         </tbody>
     </table>
-    <button>Create</button>
+    <button disabled
+            id="createButton"
+    >Create
+    </button>
     <button type="button"
             onclick="clearForm();"
     >Clear

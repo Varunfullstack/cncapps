@@ -35,6 +35,40 @@ export default class LogServiceRequestComponent extends MainComponent {
         }
     }
 
+    componentDidMount() {
+        this.api.getCurrentUser().then(user => {
+            const {data} = this.state;
+            data.currentUser = user;
+            this.setState({data});
+        });
+        this.loadCustomerProblem();
+        // check pending Reopen
+        this.checkPendingReopen();
+    }
+    checkPendingReopen=()=>{
+        const pendingReopenedID=params.get("pendingReopenedID");
+        const emailSubjectSummary=params.get("emailSubjectSummary");
+        if(pendingReopenedID)
+        {
+            //loading reopen data
+            this.api.getPendingReopen(pendingReopenedID).then(res=>{
+                // init data;
+                //customer, customerID: customer.cus_custno, nextStep: 2
+                const {data}=this.state;
+                data.customerID=res.customerID;
+                data.customer={cus_custno:res.customerID,cus_name:res.cus_name,con_contno:res.contactID};
+                data.emailSubjectSummary=emailSubjectSummary;
+                data.reason=res.reason;
+                data.pendingReopenedID=pendingReopenedID;
+                data.contactID=res.contactID;
+                data.deletePending='true';
+                this.setState({data});
+                this.setActiveStep(2);
+                this.setActiveStep(3);
+            })
+        }
+    }
+
     initSteps = () => {
         this.steps = [
             {id: 1, title: "Select Customer", display: true, active: true, disabled: false},
@@ -63,14 +97,7 @@ export default class LogServiceRequestComponent extends MainComponent {
         );
     };
 
-    componentDidMount() {
-        this.api.getCurrentUser().then(user => {
-            const {data} = this.state;
-            data.currentUser = user;
-            this.setState({data});
-        });
-        this.loadCustomerProblem();
-    }
+   
 
     loadCustomerProblem = () => {
         const Id = params.get("customerproblemno");

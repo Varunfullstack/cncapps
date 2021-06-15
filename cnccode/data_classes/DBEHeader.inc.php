@@ -114,6 +114,7 @@ class DBEHeader extends DBEntity
     const numberOfAllowedMistakes                        = "numberOfAllowedMistakes";
     const antivirusOutOfDateThresholdDays                = "antivirusOutOfDateThresholdDays";
     const offlineAgentThresholdDays                      = "offlineAgentThresholdDays";
+    const keywordMatchingPercent                         = "keywordMatchingPercent";
 
     /**
      * calls constructor()
@@ -621,6 +622,12 @@ class DBEHeader extends DBEntity
             null,
             30
         );
+        $this->addColumn(
+            self::keywordMatchingPercent,
+            DA_FLOAT,
+            DA_NOT_NULL,            
+        );
+        
         $this->setPK(0);
         $this->setAddColumnsOff();
     }

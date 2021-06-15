@@ -50,8 +50,8 @@ class InboxPendingReopenedComponent extends MainComponent {
                     raiseTypeId: 1,
                     emailSubjectSummary: value
                 };
-
-                this.redirectPost("Activity.php", data);
+                window.location=`LogServiceRequest.php?pendingReopenedID=${problem.pendingReopenedID}&&emailSubjectSummary=${value}`;
+                //this.redirectPost("Activity.php", data);
             })
         }
     }

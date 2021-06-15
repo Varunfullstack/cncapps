@@ -6,34 +6,29 @@
  * Time: 10:05
  */
 
+use CNCLTD\Business\BUActivity;
 
 global $cfg;
 require_once("config.inc.php");
 require_once($cfg["path_ct"] . "/CTLeadStatusReport.inc.php");
 require_once($cfg['path_bu'] . '/BURenBroadband.inc.php');
-require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
 require_once($cfg['path_bu'] . '/BUCustomerItem.inc.php');
-$thing = null;
+$thing          = null;
 $dsRenBroadband = new DataSet($thing);
-
-$template = new Template (
-    $GLOBALS ["cfg"] ["path_templates"],
-    "remove"
+$template       = new Template (
+    $GLOBALS ["cfg"] ["path_templates"], "remove"
 );
-
 $template->setFile(
     'RenBroadbandList',
     'LeasedLinesContractExpiryList.html'
 );
-
 $buRenBroadband = new BURenBroadband($thing);
 $lowerBoundDays = 59;
 $upperBoundDays = 67;
 if (isset($_GET['lowerBoundDays'])) {
     $lowerBoundDays = $_GET['lowerBoundDays'];
 }
-
 if (isset($_GET['upperBoundDays'])) {
     $upperBoundDays = $_GET['upperBoundDays'];
 }
@@ -44,7 +39,6 @@ $buRenBroadband->getLeasedLinesToExpire(
     $lowerBoundDays,
     $upperBoundDays
 );
-
 if ($dsRenBroadband->rowCount()) {
     $template->set_block(
         'RenBroadbandList',
@@ -70,8 +64,6 @@ if ($dsRenBroadband->rowCount()) {
                 SET contractExpireNotified = 1 where cui_cuino=$customerItemID";
             $db->query($sql);
         }
-
-
         $template->set_var(
             array(
                 'customerItemID'     => $customerItemID,

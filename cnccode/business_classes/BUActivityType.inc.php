@@ -4,11 +4,15 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+
+use CNCLTD\Data\DBConnect;
+
+global $cfg;
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_dbe"] . "/DBECallActType.inc.php");
 require_once($cfg["path_dbe"] . "/DBEJCallActType.php");
 require_once($cfg["path_dbe"] . "/DBECallActivity.inc.php");
-require_once($cfg["path_dbe"] . "/DBConnect.php");
+
 class BUActivityType extends Business
 {
     /** @var DBECallActType|DataSet */
@@ -26,7 +30,7 @@ class BUActivityType extends Business
     function __construct(&$owner)
     {
         parent::__construct($owner);
-        $this->dbeCallActType = new DBECallActType($this);
+        $this->dbeCallActType  = new DBECallActType($this);
         $this->dbeJCallActType = new DBEJCallActType($this);                // join to item table
     }
 
@@ -90,19 +94,17 @@ class BUActivityType extends Business
         $dbeCallActivity->setValue(DBECallactivity::callActTypeID, $ID);
         return $dbeCallActivity->countRowsByColumn(DBECallactivity::callActTypeID) < 1;
     }
+
     /**
      * @param $Id int
      * @return boolean
      * check if activity type in expenses or not
      */
     public static function hasExpenses($Id)
-    {  
-        if(!isset($Id))
-        return false;
-       $query="SELECT   COUNT(*) total FROM expensetypeactivityavailability WHERE activityTypeID=$Id";
-       $result=DBConnect::fetchOne($query);
-       if($result["total"]>0)
-       return true;
-       else return false;       
+    {
+        if (!isset($Id)) return false;
+        $query  = "SELECT   COUNT(*) total FROM expensetypeactivityavailability WHERE activityTypeID=$Id";
+        $result = DBConnect::fetchOne($query);
+        if ($result["total"] > 0) return true; else return false;
     }
 }

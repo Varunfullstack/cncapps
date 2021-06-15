@@ -50,14 +50,12 @@ class DBEJContract extends DBECustomerItem
             DA_NOT_NULL,
             "DATE_FORMAT( DATE_ADD(custitem.installationDate, INTERVAL custitem.totalInvoiceMonths + custitem.invoicePeriodMonths MONTH ), '%d/%m/%Y')"
         );
-
         $this->addColumn(
             self::invoiceFromDateYMD,
             DA_DATE,
             DA_NOT_NULL,
             "DATE_FORMAT( DATE_ADD(custitem.installationDate, INTERVAL custitem.totalInvoiceMonths MONTH ), '%Y-%m-%d') as invoiceFromDateYMD"
         );
-
         $this->addColumn(
             self::invoiceToDateYMD,
             DA_DATE,
@@ -73,16 +71,11 @@ class DBEJContract extends DBECustomerItem
         if ($customerID == '') {
             $this->raiseError('customerID not passed');
         }
-        $queryString =
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " JOIN item ON cui_itemno = itm_itemno" .
-            " JOIN renewalType ON renewalType.renewalTypeID = item.renewalTypeID" .
-            " JOIN address ON add_siteno = cui_siteno AND add_custno = cui_custno " .
-            " WHERE " . $this->getDBColumnName(self::customerID) . "=" . $customerID .
-            "  AND renewalType.allowSrLogging = 'Y'
+        $queryString = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName(
+            ) . " JOIN item ON cui_itemno = itm_itemno" . " JOIN renewalType ON renewalType.renewalTypeID = item.renewalTypeID" . " JOIN address ON add_siteno = cui_siteno AND add_custno = cui_custno " . " WHERE " . $this->getDBColumnName(
+                self::customerID
+            ) . "=" . $customerID . "  AND renewalType.allowSrLogging = 'Y'
          AND declinedFlag <> 'Y'";
-
         if ($itemID) {
             $queryString .= " and cui_itemno = " . $itemID;
         }
@@ -97,17 +90,9 @@ class DBEJContract extends DBECustomerItem
         if ($customerItemID == '') {
             $this->raiseError('customerItemID not passed');
         }
-        $queryString =
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM custitem_contract " .
-            " JOIN custitem ON cic_contractcuino = cui_cuino" .
-            " JOIN item ON cui_itemno = itm_itemno" .
-            " JOIN renewalType ON renewalType.renewalTypeID = item.renewalTypeID" .
-            " JOIN address ON add_siteno = cui_siteno AND add_custno = cui_custno " .
-            " WHERE cic_cuino=" . $customerItemID .
-            "   AND renewalType.allowSrLogging = 'Y'
+        $queryString = "SELECT " . $this->getDBColumnNamesAsString(
+            ) . " FROM custitem_contract " . " JOIN custitem ON cic_contractcuino = cui_cuino" . " JOIN item ON cui_itemno = itm_itemno" . " JOIN renewalType ON renewalType.renewalTypeID = item.renewalTypeID" . " JOIN address ON add_siteno = cui_siteno AND add_custno = cui_custno " . " WHERE cic_cuino=" . $customerItemID . "   AND renewalType.allowSrLogging = 'Y'
        ORDER BY renewalType.description, itm_desc";
-
         $this->setQueryString($queryString);
         return (parent::getRows());
     }
@@ -115,14 +100,10 @@ class DBEJContract extends DBECustomerItem
     function getRowByContractID($contractID)
     {
         $this->setMethodName('getRowsByContractID');
-        $queryString =
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " JOIN item ON cui_itemno = itm_itemno" .
-            " JOIN renewalType ON renewalType.renewalTypeID = item.renewalTypeID" .
-            " JOIN address ON add_siteno = cui_siteno AND add_custno = cui_custno " .
-            " WHERE " . $this->getDBColumnName(self::customerItemID) . "=" . $contractID;
-
+        $queryString = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName(
+            ) . " JOIN item ON cui_itemno = itm_itemno" . " JOIN renewalType ON renewalType.renewalTypeID = item.renewalTypeID" . " JOIN address ON add_siteno = cui_siteno AND add_custno = cui_custno " . " WHERE " . $this->getDBColumnName(
+                self::customerItemID
+            ) . "=" . $contractID;
         $this->setQueryString($queryString);
         return (parent::getRow());
     }
@@ -139,76 +120,60 @@ class DBEJContract extends DBECustomerItem
         $dsHeader = new DataSet($this);
         $buHeader->getHeader($dsHeader);
         $dsHeader->fetchNext();
-
         $this->setMethodName('getPrePayContracts');
         $queryString = "
-      SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " JOIN item ON cui_itemno = itm_itemno
+      SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName() . " JOIN item ON cui_itemno = itm_itemno
             JOIN renewalType ON renewalType.renewalTypeID = item.renewalTypeID
             JOIN address ON add_siteno = cui_siteno AND add_custno = cui_custno
 	  	WHERE
-	  		cui_custno = " . $customerID .
-            " AND cui_itemno = " . $dsHeader->getValue(DBEHeader::gscItemID) .
-            " AND cui_expiry_date >= now()" . // and is not expired
+	  		cui_custno = " . $customerID . " AND cui_itemno = " . $dsHeader->getValue(
+                DBEHeader::gscItemID
+            ) . " AND cui_expiry_date >= now()" . // and is not expired
             " AND renewalStatus  <> 'D' and declinedFlag <> 'Y'";
-
         $this->setQueryString($queryString);
-
         return (parent::getRows());
     }
 
     function getServerCareContracts($customerID, $valid = true)
     {
         $queryString = "
-      SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " JOIN item ON cui_itemno = itm_itemno
+      SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName() . " JOIN item ON cui_itemno = itm_itemno
              JOIN renewalType ON renewalType.renewalTypeID = item.renewalTypeID
              JOIN address ON add_siteno = cui_siteno AND add_custno = cui_custno
 	  	WHERE
 	  		cui_custno = " . $customerID . " and itm_servercare_flag = 'Y' AND itm_desc LIKE '%ServerCare%'";
         if ($valid) {
-            $queryString .=
-                " AND cui_expiry_date >= now() AND	renewalStatus  <> 'D' and declinedFlag <> 'Y'";
+            $queryString .= " AND cui_expiry_date >= now() AND	renewalStatus  <> 'D' and declinedFlag <> 'Y'";
         }
         $this->setQueryString($queryString);
-
         return (parent::getRows());
     }
 
     function getServiceDeskContracts($customerID, $valid = true)
     {
         $queryString = "
-      SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " JOIN item ON cui_itemno = itm_itemno
+      SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName() . " JOIN item ON cui_itemno = itm_itemno
              JOIN renewalType ON renewalType.renewalTypeID = item.renewalTypeID
              JOIN address ON add_siteno = cui_siteno AND add_custno = cui_custno
 	  	WHERE
 	  		cui_custno = " . $customerID . " and itm_servercare_flag = 'Y' AND itm_desc LIKE '%ServiceDesk%'";
         if ($valid) {
-            $queryString .=
-                " AND cui_expiry_date >= now() AND	renewalStatus  <> 'D' and declinedFlag <> 'Y'";
+            $queryString .= " AND cui_expiry_date >= now() AND	renewalStatus  <> 'D' and declinedFlag <> 'Y'";
         }
         $this->setQueryString($queryString);
-
         return (parent::getRows());
     }
 
     public function getServerWatchContracts($customerID, $valid = true)
     {
         $queryString = "
-      SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " JOIN item ON cui_itemno = itm_itemno
+      SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName() . " JOIN item ON cui_itemno = itm_itemno
              JOIN renewalType ON renewalType.renewalTypeID = item.renewalTypeID
              JOIN address ON add_siteno = cui_siteno AND add_custno = cui_custno
 	  	WHERE
 	  		cui_custno = " . $customerID . " and itm_servercare_flag = 'Y' AND itm_desc LIKE '%ServerWatch%'";
         if ($valid) {
-            $queryString .=
-                " AND renewalStatus  <> 'D' and declinedFlag <> 'Y'";
+            $queryString .= " AND renewalStatus  <> 'D' and declinedFlag <> 'Y'";
         }
         $this->setQueryString($queryString);
         return (parent::getRows());

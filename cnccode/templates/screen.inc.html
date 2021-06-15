@@ -1,6 +1,8 @@
 <!-- Template: screen.inc.html -->
 <!DOCTYPE html>
-<html lang="en" xml:lang="en">
+<html lang="en"
+      xml:lang="en"
+>
 <head>
     <title>{pageTitle}</title>
     <meta http-equiv="Content-Type"
@@ -29,6 +31,7 @@
     <script type="text/javascript"
             src="https://svc.webspellchecker.net/spellcheck31/wscbundle/wscbundle.js"
     ></script>
+    <script src="/components/node_modules/browser-image-compression/dist/browser-image-compression.js"></script>
     <script>
         window.WEBSPELLCHECKER_CONFIG = {
             autoSearch: true,
@@ -42,7 +45,7 @@
             ignoreDomainNames: true,
             ignoreWordsWithMixedCases: true,
             ignoreWordsWithNumbers: true,
-            disabledRules: ['DASH_RULE', 'EN_QUOTES']
+            disabledRules: ['DASH_RULE', 'EN_QUOTES', 'LICENCE_LICENSE_NOUN_SINGULAR', 'OXFORD_SPELLING_Z_NOT_S']
         };
     </script>
     <script src="/components/dist/SpinnerHolderComponent.js"></script>
@@ -186,7 +189,6 @@
             src=".javascript/modernizr.js"
             defer
     >
-
     </script>
     <script src=".javascript/datetime-local-polyfill/datetime-local-polyfill.min.js"
             defer

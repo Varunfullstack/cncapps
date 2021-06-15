@@ -2,7 +2,7 @@
 global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_dbe'] . '/DBEItemBillingCategory.php');
-require_once($cfg['path_bu'] . '/BUActivity.inc.php');
+
 
 class CTItemBillingCategory extends CTCNC
 {

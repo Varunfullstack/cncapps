@@ -8,12 +8,13 @@ require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBEOffice365License extends DBEntity
 {
-    const id = "id";
-    const replacement = "replacement";
-    const license = "license";
-    const mailboxLimit = "mailboxLimit";
+    const id                    = "id";
+    const replacement           = "replacement";
+    const license               = "license";
+    const mailboxLimit          = "mailboxLimit";
     const reportOnSpareLicenses = "reportOnSpareLicenses";
     const includesDefender      = 'includesATP';
+    const includesOffice        = 'includesOffice';
 
     /**
      * calls constructor()
@@ -56,7 +57,11 @@ class DBEOffice365License extends DBEntity
             DA_BOOLEAN,
             DA_NOT_NULL
         );
-
+        $this->addColumn(
+            self::includesOffice,
+            DA_BOOLEAN,
+            DA_NOT_NULL
+        );
         $this->setAddColumnsOff();
         $this->setPK(0);
     }
@@ -67,11 +72,8 @@ class DBEOffice365License extends DBEntity
             return;
         }
         $licenseWhere = $this->getDBColumnName(self::license) . " =  '$matches[1]' ";
-
         $this->setQueryString(
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " WHERE " . $licenseWhere
+            "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName() . " WHERE " . $licenseWhere
         );
         $this->getRows();
         $this->fetchFirst();

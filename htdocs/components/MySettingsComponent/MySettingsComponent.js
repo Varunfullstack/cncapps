@@ -97,7 +97,7 @@ class MySettingsComponent extends MainComponent {
         this.setState({activeTab},()=>this.loadActiveTabData());        
     };
     getElement(key, label, value) {
-        return <tr key>
+        return <tr key={key}>
             <td>{label}</td>
             <td>{value}</td>
         </tr>        

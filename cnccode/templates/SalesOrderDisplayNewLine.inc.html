@@ -1,9 +1,12 @@
 <!-- Template: SalesOrderDisplayNewLine.inc.html -->
 <script>
+    const customerId = {customerId};
+
     document.addEventListener('DOMContentLoaded', () => {
         const itemIdInput = document.getElementById("itemID");
         const addLineButton = document.querySelector('button[name="addLine"]');
         const addToRecurringButton = document.querySelector('button[name="ordline[1][isRecurring]"]');
+        const additionalChargesButton = document.querySelector('button[name="additionalChargeRate"]');
         const typeSelector = document.getElementById("lineType");
 
         const itemDescriptionInput = document.getElementById("itemDescription");
@@ -13,6 +16,45 @@
         const curUnitCostInput = document.querySelector("input[name='ordline[1][curUnitCost]']")
         const curUnitSaleInput = document.querySelector("input[name='ordline[1][curUnitSale]']")
         const autocompleteItemContainer = document.getElementById('autocompleteItem');
+        const reactSupplierSearchContainer = document.getElementById("reactSupplierSearchContainer");
+
+        const testModal = document.getElementById('modal');
+
+        additionalChargesButton.addEventListener('click', () => {
+            document.AdditionalChargeRatesSelectorRenderer(
+                    testModal,
+                    customerId,
+                    (selectedCharge) => {
+                        console.log(selectedCharge);
+                        document.unmountComponentAtNode(testModal);
+                        // ITEM ID 18613
+                        itemIdInput.value = 18613;
+                        itemDescriptionInput.value = selectedCharge.description;
+                        curUnitSaleInput.value = selectedCharge.salePrice;
+                        curUnitCostInput.value = 0;
+                        const element = document.querySelector('input.typeahead-input');
+                        element.value = selectedCharge.description;
+                        updateSupplier(53);
+                    },
+                    () => {
+                        console.log('on close is called');
+                        document.unmountComponentAtNode(testModal);
+                    }
+            );
+        })
+
+        function updateSupplier(supplierId) {
+            supplierIdInput.value = supplierId;
+            document.renderSupplierSearchComponent(
+                    reactSupplierSearchContainer, {
+                        onChange: (id) => {
+                            supplierIdInput.value = id;
+                            updateButtons();
+                        },
+                        supplierId: supplierId
+                    }
+            );
+        }
 
         let props = {
             autocompleteSelectedCallBack: (selectedItem) => {
@@ -21,34 +63,39 @@
                 curUnitCostInput.value = selectedItem.curUnitCost;
                 curUnitSaleInput.value = selectedItem.curUnitSale;
                 itemDescriptionInput.value = selectedItem.label;
+                if (selectedItem.supplierId) {
+                    updateSupplier(selectedItem.supplierId);
+                }
                 updateButtons();
                 document.renderTypeAheadComponent(props, autocompleteItemContainer)
             },
             searchRequest: (term, itemsToShow, responseCB) => {
                 fetch(
-                    '/Item.php?action=SEARCH_ITEMS_JSON',
-                    {
-                        method: 'POST',
-                        body: JSON.stringify({term: props.value, limit: itemsToShow + 1})
-                    }
-                )
-                    .then(x => x.json())
-                    .then(response => {
-                        if (response.status !== 'ok') {
-                            throw new Error(response.message);
+                        '/Item.php?action=SEARCH_ITEMS_JSON',
+                        {
+                            method: 'POST',
+                            body: JSON.stringify({term: props.value, limit: itemsToShow + 1})
                         }
+                )
+                        .then(x => x.json())
+                        .then(response => {
+                            if (response.status !== 'ok') {
+                                throw new Error(response.message);
+                            }
 
-                        responseCB(response.data.map(x => ({
-                            label: x.description,
-                            value: x.itemID,
-                            curUnitCost: x.curUnitCost,
-                            curUnitSale: x.curUnitSale,
-                        })))
-                    })
+                            responseCB(response.data.map(x => ({
+                                label: x.description,
+                                value: x.itemID,
+                                curUnitCost: x.curUnitCost,
+                                curUnitSale: x.curUnitSale,
+                                supplierId: x.supplierId
+                            })))
+                        })
             },
             value: '',
             onInputChange: (value) => {
                 props.value = value;
+
                 document.renderTypeAheadComponent(props, autocompleteItemContainer)
             },
             readOnly: false,
@@ -68,6 +115,13 @@
         addToRecurringButton.disabled = true;
         let typeSelected = typeSelector.value;
         updateButtons();
+        document.renderSupplierSearchComponent(reactSupplierSearchContainer, {
+
+            onChange: (id) => {
+                supplierIdInput.value = id;
+                updateButtons();
+            }
+        });
 
         function checkLineValid(typeSelected) {
             if (typeSelected === 'C') {
@@ -87,13 +141,23 @@
             }
         }
 
+        function showAdditionalCharge() {
+            additionalChargesButton.style.display = 'inline-block';
+        }
+
+        function hideAdditionalCharge() {
+            additionalChargesButton.style.display = 'none';
+        }
+
         function updateButtons() {
             if (typeSelected === 'I') {
                 hideItemDescription();
                 showItemSearch();
+                showAdditionalCharge()
             } else {
                 hideItemSearch();
                 showItemDescription();
+                hideAdditionalCharge();
             }
             if (typeSelected === 'I' || typeSelected === 'T' || typeSelected === 'O') {
                 showAddLineButton();
@@ -134,23 +198,17 @@
         }
 
         function disableAllExceptDescription() {
-            supplierNameInput.disabled = true;
+            reactSupplierSearchContainer.style.display = 'none';
             qtyOrderedInput.disabled = true;
             curUnitCostInput.disabled = true;
             curUnitSaleInput.disabled = true;
         }
 
         function enableAllExceptDescription() {
-            supplierNameInput.disabled = false;
+            reactSupplierSearchContainer.style.display = 'block';
             qtyOrderedInput.disabled = false;
             curUnitCostInput.disabled = false;
             curUnitSaleInput.disabled = false;
-        }
-
-        function renderReactElement(component, props, targetNode, callback) {
-            const reactElement = React.createElement(TypeAheadSearch, props, null);
-            ReactDOM.render(reactElement, targetNode, callback);
-            return reactElement;
         }
 
         typeSelector.addEventListener('change', ($event) => {
@@ -161,7 +219,10 @@
 
         function clearInputs() {
             itemDescriptionInput.value = "";
-            supplierNameInput.value = "";
+            document.renderSupplierSearchComponent(reactSupplierSearchContainer, {
+                inputId: 'supplierID',
+                defaultText: ''
+            });
             qtyOrderedInput.value = "";
             curUnitCostInput.value = "";
             curUnitSaleInput.value = "";
@@ -198,6 +259,7 @@
         }
     })
 </script>
+<div id="modal"></div>
 <form name="ordline"
       method="post"
       action="{urlSubmit}"
@@ -291,19 +353,13 @@
                 >
                 <font class="formErrorMessage">{descriptionMessage}</font>
             </td>
-            <td class="field">
-                <input
-                        type="text"
-                        name="ordline[1][supplierName]"
-                        id="supplierName"
-                        value="{supplierName}"
-                        onChange="javascript:validateSupplierName()"
-                        onKeydown="javascript:checkFunctionKey(supplierName)"
-                        size="35"
-                        maxlength="50"
-                        style="width: 100px"
-                >
-                <font class="formErrorMessage">{supplierNameMessage}</font>
+            <td class="field"
+                style="padding-right: 20px"
+            >
+                <div id="reactSupplierSearchContainer"
+                     style="width: 150px;"
+                     data-input-id="supplierID"
+                ></div>
             </td>
             <td class="fieldRight"
                 align="right"
@@ -351,6 +407,7 @@
                 >
                     <i class="fal fa-plus fa-2x"></i>
                 </button>
+
                 <button name="ordline[1][isRecurring]"
                         style="display: none"
                         value="1"
@@ -359,6 +416,13 @@
 
                 >
                     <i class="fal fa-repeat fa-2x"></i>
+                </button>
+                <button name="additionalChargeRate"
+                        class="salesOrderButton not-so-faint"
+                        title="Additional Charges"
+                        type="button"
+                >
+                    <i class="fal fa-search-dollar fa-2x"></i>
                 </button>
             </td>
             <td width="62">&nbsp;</td>

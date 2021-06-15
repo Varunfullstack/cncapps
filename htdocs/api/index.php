@@ -1,32 +1,67 @@
 <?php
 
+use CNCLTD\AdditionalChargesRates\Application\GetRatesForCustomer\GetRatesForCustomerQuery;
+use CNCLTD\AdditionalChargesRates\Application\GetRatesForCustomer\GetRatesForCustomerResponse;
+use CNCLTD\AdditionalChargesRates\Domain\CustomerId;
+use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestTokenId;
+use CNCLTD\ChargeableWorkCustomerRequest\infra\ChargeableWorkCustomerRequestMySQLRepository;
+use CNCLTD\ChargeableWorkCustomerRequest\usecases\AcceptPendingChargeableWorkCustomerRequest;
+use CNCLTD\ChargeableWorkCustomerRequest\usecases\GetPendingToProcessChargeableRequestInfo;
+use CNCLTD\ChargeableWorkCustomerRequest\usecases\RejectPendingChargeableWorkCustomerRequest;
+use CNCLTD\CustomerFeedback;
+use CNCLTD\CustomerFeedbackRepository;
+use CNCLTD\Data\DBConnect;
+use CNCLTD\Exceptions\ChargeableWorkCustomerRequestNotFoundException;
+use CNCLTD\Exceptions\ContactNotFoundException;
+use CNCLTD\FeedbackTokenGenerator;
+use CNCLTD\JsonBodyParserMiddleware;
+use CNCLTD\Shared\Domain\Bus\QueryBus;
+use CNCLTD\SignableProcess;
+use DI\Container;
+use Monolog\Handler\RotatingFileHandler;
 use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 use Signable\ApiClient;
 use Signable\DocumentWithoutTemplate;
 use Signable\Envelopes;
 use Signable\Party;
+use Slim\Exception\HttpNotFoundException;
+use Slim\Factory\AppFactory;
 use Slim\Psr7\Request;
 use Slim\Psr7\Response;
+use Slim\Routing\RouteCollectorProxy;
 use Twig\Environment;
+use Twig\Loader\FilesystemLoader;
 
+const STAT_TYPE_ALL             = 'all';
+const STAT_TYPE_CUSTOMER_FACING = 'customerFacing';
+const STAT_TYPE_PROACTIVE       = 'proactive';
+const statsTypes                = [STAT_TYPE_ALL, STAT_TYPE_CUSTOMER_FACING, STAT_TYPE_PROACTIVE];
 require_once __DIR__ . '/../config.inc.php';
 global $cfg;
 require_once($cfg["path_dbe"] . "/DBEQuotation.inc.php");
 require_once($cfg["path_dbe"] . "/DBESignableEnvelope.inc.php");
 require_once($cfg["path_bu"] . "/BUSalesOrder.inc.php");
 require_once($cfg["path_bu"] . "/BURenewal.inc.php");
-$container = new \DI\Container();
-\Slim\Factory\AppFactory::setContainer($container);
-$app   = \Slim\Factory\AppFactory::create();
+$container = new Container();
+AppFactory::setContainer($container);
+$app   = AppFactory::create();
 $thing = null;
-$app->add(new \CNCLTD\JsonBodyParserMiddleware());
+$app->add(new JsonBodyParserMiddleware());
 $app->addErrorMiddleware(true, true, true);
 $container->set(
     'twig',
     function () {
-        $loader = new \Twig\Loader\FilesystemLoader('', __DIR__ . '/../../twig');
+        $loader = new FilesystemLoader('', __DIR__ . '/../../twig');
         $loader->addPath('api', 'api');
         return new Environment($loader, ["cache" => __DIR__ . '/../../cache']);
+    }
+);
+$container->set(
+    'queryBus',
+    function () {
+        global $inMemorySymfonyBus;
+        return $inMemorySymfonyBus;
     }
 );
 $container->set(
@@ -35,23 +70,23 @@ $container->set(
         $logger      = new Logger('api-log');
         $logFileName = 'api.log';
         $logPath     = APPLICATION_LOGS . '/' . $logFileName;
-        $logger->pushHandler(new \Monolog\Handler\RotatingFileHandler($logPath, 14, Logger::INFO));
+        $logger->pushHandler(new RotatingFileHandler($logPath, 14, Logger::INFO));
         return $logger;
     }
 );
 $app->group(
     '/internal-api',
-    function (\Slim\Routing\RouteCollectorProxy $group) {
+    function (RouteCollectorProxy $group) {
         $group->get(
             '/',
-            function (\Slim\Psr7\Request $request, \Slim\Psr7\Response $response) {
+            function (Request $request, Response $response) {
                 $response->getBody()->write('CNC Internal API');
                 return $response;
             }
         );
         $group->get(
             '/customerStats/{customerId}',
-            function (\Slim\Psr7\Request $request, \Slim\Psr7\Response $response, $args) {
+            function (Request $request, Response $response, $args) {
                 $queryParams = $request->getQueryParams();
                 $endDate     = new DateTime();
                 $startDate   = (clone $endDate)->sub(new DateInterval('P365D'));
@@ -75,15 +110,28 @@ $app->group(
                         return $response->withStatus(400);
                     }
                 }
-                $params      = [
+                $params    = [
                     ["type" => "i", "value" => $args['customerId']],
                     ["type" => "s", "value" => $startDate->format(DATE_MYSQL_DATE)],
                     ["type" => "s", "value" => $endDate->format(DATE_MYSQL_DATE)],
                 ];
-                $isBreakDown = isset($queryParams['breakDown']);
+                $typeWhere = '';
+                $typeParam = [];
+                if (isset($queryParams['type'])) {
+                    $type = $queryParams['type'];
+                    if (!in_array($type, statsTypes)) {
+                        $typesString = implode(',', statsTypes);
+                        $response->getBody()->write(
+                            json_encode(["error" => "The type must be one of {$typesString}"])
+                        );
+                        return $response->withStatus(400);
+                    }
+                    $typeWhere   = " and pro_hide_from_customer_flag = ?";
+                    $typeParam[] = ["type" => "s", "value" => $type == STAT_TYPE_CUSTOMER_FACING ? 'N' : 'Y'];
+                }
                 $query       = "select SUM(1) AS raised,
     SUM(pro_status IN ('F' , 'C')) AS `fixed`,
-    AVG(problem.`pro_responded_hours`) AS responseTime,
+    AVG(if(pro_status IN ('F', 'C'),problem.`pro_responded_hours`,null)) AS responseTime,
        null as sla,
     AVG(IF(pro_status IN ('F' , 'C'),
         problem.`pro_responded_hours` < CASE problem.`pro_priority`
@@ -161,115 +209,255 @@ FROM
         JOIN
     customer ON problem.`pro_custno` = customer.`cus_custno`
 WHERE
-
+       
         problem.pro_custno = ?
   and initial.caa_date between ? and ?
-        AND pro_priority < 5";
+  {$typeWhere}
+        AND pro_priority <= 4";
+                $isBreakDown = isset($queryParams['breakDown']);
                 if ($isBreakDown) {
-                    $query = "SELECT 
-    pro_priority as priority,
-    SUM(1) AS raised,
-    SUM(pro_status IN ('F' , 'C')) AS `fixed`,
-    AVG(problem.`pro_responded_hours`) AS responseTime,
-       CASE problem.`pro_priority`
-            WHEN 1 THEN customer.`cus_sla_p1`
-            WHEN 2 THEN customer.`cus_sla_p2`
-            WHEN 3 THEN customer.`cus_sla_p3`
-            WHEN 4 THEN customer.`cus_sla_p4`
-            ELSE 0 end as sla,
-       CASE problem.`pro_priority`
-            WHEN 1 THEN customer.slaFixHoursP1
-            WHEN 2 THEN customer.slaFixHoursP2
-            WHEN 3 THEN customer.slaFixHoursP3
-            WHEN 4 THEN customer.slaFixHoursP4
-                else 0 end as fixSLA,
-       AVG(IF(pro_status IN ('F' , 'C'),
-        problem.`pro_responded_hours` < CASE problem.`pro_priority`
-            WHEN 1 THEN customer.`cus_sla_p1`
-            WHEN 2 THEN customer.`cus_sla_p2`
-            WHEN 3 THEN customer.`cus_sla_p3`
-            WHEN 4 THEN customer.`cus_sla_p4`
-            ELSE 0
-        END,
-        NULL)) AS slaMet,
-       sum(IF(pro_status IN ('F' , 'C'),
-        problem.`pro_responded_hours` < CASE problem.`pro_priority`
-            WHEN 1 THEN customer.`cus_sla_p1`
-            WHEN 2 THEN customer.`cus_sla_p2`
-            WHEN 3 THEN customer.`cus_sla_p3`
-            WHEN 4 THEN customer.`cus_sla_p4`
-            ELSE 0
-        END,
-        NULL)) AS slaMetRaw,
-       AVG(IF(pro_status IN ('F' , 'C'),
-        problem.`pro_working_hours` > CASE problem.`pro_priority`
-            WHEN 1 THEN customer.`slaFixHoursP1`
-            WHEN 2 THEN customer.`slaFixHoursP2`
-            WHEN 3 THEN customer.`slaFixHoursP3`
-            WHEN 4 THEN customer.`slaFixHoursP4`
-        END,
-        NULL)) AS fixSLAFailedPct,
-       sum(IF(pro_status IN ('F' , 'C'),
-        problem.`pro_working_hours` > CASE problem.`pro_priority`
-            WHEN 1 THEN customer.slaFixHoursP1
-            WHEN 2 THEN customer.slaFixHoursP2
-            WHEN 3 THEN customer.slaFixHoursP3
-            WHEN 4 THEN customer.slaFixHoursP4
-            ELSE 0
-        END,
-        NULL)) AS fixSLAFailedCount,
-       sum(
-               if(
-                       pro_status in ('F', 'C'),
-                       timestampdiff(HOUR, concat(initial.caa_date, ' ', initial.caa_endtime, ':00'),
-                                     concat(fixed.caa_date, ' ', fixed.caa_starttime, ':00')) >
-                       CASE problem.`pro_priority`
-                           WHEN 1 THEN customer.slaFixHoursP1
-                           WHEN 2 THEN customer.slaFixHoursP2
-                           WHEN 3 THEN customer.slaFixHoursP3
-                           WHEN 4 THEN customer.slaFixHoursP4
-                           END,
-                       null
-                   )
-           )                              as overFixSLAWorkingHours,
-    AVG(IF(pro_status IN ('F' , 'C'),
-        openHours < 8,
-        NULL)) AS closedWithin8Hours,
-    AVG(IF(pro_status = 'C',
-        problem.`pro_reopened_date` IS NOT NULL,
-        NULL)) AS reopened,
-       sum(IF(pro_status = 'C',
-        problem.`pro_reopened_date` IS NOT NULL,
-        NULL)) AS reopenedCount,
-    AVG(IF(pro_status IN ('F' , 'C'),
-        problem.`pro_chargeable_activity_duration_hours`, 
-        NULL)) AS avgChargeableTime,
-    AVG(IF(pro_status IN ('F' , 'C'),
-        problem.pro_working_hours,
-        NULL)) AS avgTimeAwaitingCNC,
-    AVG(IF(pro_status IN ('F' , 'C'),
-        openHours,
-        NULL)) AS avgTimeFromRaiseToFixHours
-FROM
-    problem
-        LEFT JOIN
-    callactivity initial ON initial.`caa_problemno` = problem.`pro_problemno`
-        AND initial.`caa_callacttypeno` = 51
-        left join callactivity fixed on fixed.caa_problemno = problem.pro_problemno and fixed.caa_callacttypeno = 57
-        JOIN
-    customer ON problem.`pro_custno` = customer.`cus_custno`
-WHERE
 
-        problem.pro_custno = ?
-  and initial.caa_date between ? and ?
-        AND pro_priority < 5
-        group by pro_priority
-        order by pro_priority ";
+                    $params = [
+                        ["type" => "i", "value" => $args['customerId']],
+                        ["type" => "i", "value" => $args['customerId']],
+                        ["type" => "i", "value" => $args['customerId']],
+                        ["type" => "i", "value" => $args['customerId']],
+                        ["type" => "i", "value" => $args['customerId']],
+                        ["type" => "s", "value" => $startDate->format(DATE_MYSQL_DATE)],
+                        ["type" => "s", "value" => $endDate->format(DATE_MYSQL_DATE)],
+                    ];
+                    $query  = "
+
+SELECT
+  priorities.*,
+  raised,
+  fixed,
+  responseTime,
+  slaMet,
+  slaMetRaw,
+  fixSLAFailedPct,
+  fixSLAFailedCount,
+  overFixSLAWorkingHours,
+  closedWithin8Hours,
+  reopened,
+  reopenedCount,
+  avgChargeableTime,
+  avgTimeAwaitingCNC,
+  avgTimeFromRaiseToFixHours
+FROM
+  (SELECT
+    1 AS priority,
+    customer.`cus_sla_p1` AS sla,
+    customer.`slaFixHoursP1` AS fixSLA
+  FROM
+    customer
+  WHERE customer.`cus_custno` = ?
+  UNION
+  ALL
+  SELECT
+    2 AS priority,
+    customer.`cus_sla_p2` AS sla,
+    customer.`slaFixHoursP2` AS fixSLA
+  FROM
+    customer
+  WHERE customer.`cus_custno` = ?
+  UNION
+  ALL
+  SELECT
+    3 AS priority,
+    customer.`cus_sla_p3` AS sla,
+    customer.`slaFixHoursP3` AS fixSLA
+  FROM
+    customer
+  WHERE customer.`cus_custno` = ?
+  UNION
+  ALL
+  SELECT
+    4 AS priority,
+    customer.`cus_sla_p4` AS sla,
+    customer.`slaFixHoursP4` AS fixSLA
+  FROM
+    customer
+  WHERE customer.`cus_custno` = ?
+      
+      ) priorities
+  LEFT JOIN
+    (SELECT
+      pro_priority AS priority,
+      SUM(1) AS raised,
+      SUM(pro_status IN ('F', 'C')) AS `fixed`,
+      AVG(if(pro_status IN ('F', 'C'),problem.`pro_responded_hours`, null)) AS responseTime,
+      AVG(
+        IF(
+          pro_status IN ('F', 'C'),
+          problem.`pro_responded_hours` <
+          CASE
+            problem.`pro_priority`
+            WHEN 1
+            THEN customer.`cus_sla_p1`
+            WHEN 2
+            THEN customer.`cus_sla_p2`
+            WHEN 3
+            THEN customer.`cus_sla_p3`
+            WHEN 4
+            THEN customer.`cus_sla_p4`
+            ELSE 0
+          END,
+          NULL
+        )
+      ) AS slaMet,
+      SUM(
+        IF(
+          pro_status IN ('F', 'C'),
+          problem.`pro_responded_hours` <
+          CASE
+            problem.`pro_priority`
+            WHEN 1
+            THEN customer.`cus_sla_p1`
+            WHEN 2
+            THEN customer.`cus_sla_p2`
+            WHEN 3
+            THEN customer.`cus_sla_p3`
+            WHEN 4
+            THEN customer.`cus_sla_p4`
+            ELSE 0
+          END,
+          NULL
+        )
+      ) AS slaMetRaw,
+      AVG(
+        IF(
+          pro_status IN ('F', 'C'),
+          problem.`pro_working_hours` >
+          CASE
+            problem.`pro_priority`
+            WHEN 1
+            THEN customer.`slaFixHoursP1`
+            WHEN 2
+            THEN customer.`slaFixHoursP2`
+            WHEN 3
+            THEN customer.`slaFixHoursP3`
+            WHEN 4
+            THEN customer.`slaFixHoursP4`
+          END,
+          NULL
+        )
+      ) AS fixSLAFailedPct,
+      SUM(
+        IF(
+          pro_status IN ('F', 'C'),
+          problem.`pro_working_hours` >
+          CASE
+            problem.`pro_priority`
+            WHEN 1
+            THEN customer.slaFixHoursP1
+            WHEN 2
+            THEN customer.slaFixHoursP2
+            WHEN 3
+            THEN customer.slaFixHoursP3
+            WHEN 4
+            THEN customer.slaFixHoursP4
+            ELSE 0
+          END,
+          NULL
+        )
+      ) AS fixSLAFailedCount,
+      SUM(
+        IF(
+          pro_status IN ('F', 'C'),
+          TIMESTAMPDIFF(
+            HOUR,
+            CONCAT(
+              initial.caa_date,
+              ' ',
+              initial.caa_endtime,
+              ':00'
+            ),
+            CONCAT(
+              fixed.caa_date,
+              ' ',
+              fixed.caa_starttime,
+              ':00'
+            )
+          ) >
+          CASE
+            problem.`pro_priority`
+            WHEN 1
+            THEN customer.slaFixHoursP1
+            WHEN 2
+            THEN customer.slaFixHoursP2
+            WHEN 3
+            THEN customer.slaFixHoursP3
+            WHEN 4
+            THEN customer.slaFixHoursP4
+          END,
+          NULL
+        )
+      ) AS overFixSLAWorkingHours,
+      AVG(
+        IF(
+          pro_status IN ('F', 'C'),
+          openHours < 8,
+          NULL
+        )
+      ) AS closedWithin8Hours,
+      AVG(
+        IF(
+          pro_status = 'C',
+          problem.`pro_reopened_date` IS NOT NULL,
+          NULL
+        )
+      ) AS reopened,
+      SUM(
+        IF(
+          pro_status = 'C',
+          problem.`pro_reopened_date` IS NOT NULL,
+          NULL
+        )
+      ) AS reopenedCount,
+      AVG(
+        IF(
+          pro_status IN ('F', 'C'),
+          problem.`pro_chargeable_activity_duration_hours`,
+          NULL
+        )
+      ) AS avgChargeableTime,
+      AVG(
+        IF(
+          pro_status IN ('F', 'C'),
+          problem.pro_working_hours,
+          NULL
+        )
+      ) AS avgTimeAwaitingCNC,
+      AVG(
+        IF(
+          pro_status IN ('F', 'C'),
+          openHours,
+          NULL
+        )
+      ) AS avgTimeFromRaiseToFixHours
+    FROM
+      problem
+      LEFT JOIN callactivity initial
+        ON initial.`caa_problemno` = problem.`pro_problemno`
+        AND initial.`caa_callacttypeno` = 51
+      LEFT JOIN callactivity fixed
+        ON fixed.caa_problemno = problem.pro_problemno
+        AND fixed.caa_callacttypeno = 57
+      JOIN customer
+        ON problem.`pro_custno` = customer.`cus_custno`
+    WHERE problem.pro_custno = ?
+      AND initial.caa_date BETWEEN ?
+      AND ?
+      AND pro_priority <= 4
+      {$typeWhere}
+    GROUP BY pro_priority) stats
+    ON stats.priority = priorities.priority";
                 }
+                $params = array_merge($params, $typeParam);
                 /** @var $db dbSweetcode */ global $db;
                 $statement = $db->preparedQuery($query, $params);
                 if ($isBreakDown) {
-
                     $data = $statement->fetch_all(MYSQLI_ASSOC);
                 } else {
                     $data = $statement->fetch_assoc();
@@ -280,7 +468,7 @@ WHERE
         );
         $group->get(
             '/SRCount/{customerId}',
-            function (Request $request, Response  $response, $args) {
+            function (Request $request, Response $response, $args) {
                 $queryParams = $request->getQueryParams();
                 $endDate     = new DateTime();
                 $startDate   = (clone $endDate)->sub(new DateInterval('P365D'));
@@ -309,7 +497,7 @@ WHERE
                     ["type" => "s", "value" => $startDate->format(DATE_MYSQL_DATE)],
                     ["type" => "s", "value" => $endDate->format(DATE_MYSQL_DATE)],
                 ];
-                $query = "SELECT
+                $query  = "SELECT
  
   SUM(
     problem.pro_hide_from_customer_flag <> 'Y'
@@ -333,7 +521,7 @@ ORDER BY raisedManually DESC";
         );
         $group->get(
             '/SRCountByPerson/{customerId}',
-            function (\Slim\Psr7\Request $request, \Slim\Psr7\Response $response, $args) {
+            function (Request $request, Response $response, $args) {
                 $queryParams = $request->getQueryParams();
                 $endDate     = new DateTime();
                 $startDate   = (clone $endDate)->sub(new DateInterval('P365D'));
@@ -362,7 +550,7 @@ ORDER BY raisedManually DESC";
                     ["type" => "s", "value" => $startDate->format(DATE_MYSQL_DATE)],
                     ["type" => "s", "value" => $endDate->format(DATE_MYSQL_DATE)],
                 ];
-                $query = "SELECT
+                $query  = "SELECT
           CONCAT(con_first_name, ' ' , con_last_name) AS name,
              SUM(
     problem.pro_hide_from_customer_flag <> 'Y'
@@ -385,7 +573,7 @@ ORDER BY raisedManually DESC";
         );
         $group->get(
             '/SRCountByRootCause/{customerId}',
-            function (\Slim\Psr7\Request $request, \Slim\Psr7\Response $response, $args) {
+            function (Request $request, Response $response, $args) {
                 $queryParams = $request->getQueryParams();
                 $endDate     = new DateTime();
                 $startDate   = (clone $endDate)->sub(new DateInterval('P365D'));
@@ -414,7 +602,7 @@ ORDER BY raisedManually DESC";
                     ["type" => "s", "value" => $startDate->format(DATE_MYSQL_DATE)],
                     ["type" => "s", "value" => $endDate->format(DATE_MYSQL_DATE)],
                 ];
-                $query = "SELECT
+                $query  = "SELECT
           rtc_desc AS rootCauseDescription,
           COUNT(*) AS count
         FROM
@@ -432,8 +620,144 @@ ORDER BY raisedManually DESC";
             }
         );
         $group->get(
+            '/customerAdditionalChargeRates/{customerId}',
+            function (Request $request, Response $response, $args) {
+                $customerId = @$args['customerId'];
+                if (!$customerId) {
+                    $response->getBody()->write(
+                        json_encode(["error" => "Customer ID required"])
+                    );
+                    return $response->withStatus(400);
+                }
+                /** @var QueryBus $queryBus */
+                $queryBus = $this->get('queryBus');
+                /** @var GetRatesForCustomerResponse $res */
+                $res = $queryBus->ask(new GetRatesForCustomerQuery(new CustomerId($customerId)));
+                $response->getBody()->write(
+                    json_encode($res, JSON_NUMERIC_CHECK)
+                );
+                return $response;
+            }
+        );
+        $group->get(
+            '/customerSatisfactionScore/{customerId}',
+            function (Request $request, Response $response, $args) {
+                $db          = DBConnect::instance()->getDB();
+                $statement   = $db->prepare(
+                    "SELECT
+  SUM(cf.value = 1) / COUNT(*) AS good,
+  SUM(cf.value = 2) / COUNT(*) AS meh,
+  SUM(cf.value = 3) / COUNT(*) AS bad,
+  COUNT(*) AS total
+FROM
+  customerFeedback cf
+  JOIN contact
+    ON contact.`con_contno` = cf.contactId
+   WHERE contact.`con_custno` = ? 
+and date(createdAt) >= ? and date(createdAt) <= ?
+GROUP BY contact.`con_custno`"
+                );
+                $queryParams = $request->getQueryParams();
+                $endDate     = new DateTime();
+                $startDate   = (clone $endDate)->sub(new DateInterval('P365D'));
+                if (isset($queryParams['startDate'])) {
+                    $startDateString = $queryParams['startDate'];
+                    $startDate       = DateTime::createFromFormat(DATE_MYSQL_DATE, $startDateString);
+                    if (!$startDate) {
+                        $response->getBody()->write(
+                            json_encode(["error" => "The start date parameter format is not valid: YYYY-MM-DD"])
+                        );
+                        return $response->withStatus(400);
+                    }
+                }
+                if (isset($queryParams['endDate'])) {
+                    $endDateString = $queryParams['endDate'];
+                    $endDate       = DateTime::createFromFormat(DATE_MYSQL_DATE, $endDateString);
+                    if (!$endDate) {
+                        $response->getBody()->write(
+                            json_encode(["error" => "The end date parameter format is not valid: YYYY-MM-DD"])
+                        );
+                        return $response->withStatus(400);
+                    }
+                }
+                $statement->execute(
+                    [
+                        $args['customerId'],
+                        $startDate->format(DATE_MYSQL_DATE),
+                        $endDate->format(DATE_MYSQL_DATE)
+                    ]
+                );
+                $response->getBody()->write(
+                    json_encode($statement->fetch(), JSON_NUMERIC_CHECK)
+                );
+                return $response;
+            }
+        );
+        $group->get(
+            '/customerFeedback/{customerId}',
+            function (Request $request, Response $response, $args) {
+                $db          = DBConnect::instance()->getDB();
+                $queryParams = $request->getQueryParams();
+                $endDate     = new DateTime();
+                $startDate   = (clone $endDate)->sub(new DateInterval('P365D'));
+                if (isset($queryParams['startDate'])) {
+                    $startDateString = $queryParams['startDate'];
+                    $startDate       = DateTime::createFromFormat(DATE_MYSQL_DATE, $startDateString);
+                    if (!$startDate) {
+                        $response->getBody()->write(
+                            json_encode(["error" => "The start date parameter format is not valid: YYYY-MM-DD"])
+                        );
+                        return $response->withStatus(400);
+                    }
+                }
+                if (isset($queryParams['endDate'])) {
+                    $endDateString = $queryParams['endDate'];
+                    $endDate       = DateTime::createFromFormat(DATE_MYSQL_DATE, $endDateString);
+                    if (!$endDate) {
+                        $response->getBody()->write(
+                            json_encode(["error" => "The end date parameter format is not valid: YYYY-MM-DD"])
+                        );
+                        return $response->withStatus(400);
+                    }
+                }
+                $statement = $db->prepare(
+                    "SELECT       
+                    f.id,
+                    f.value,     
+                    customer.`cus_name`,
+                    f.`comments`,
+                    createdAt  ,
+                    serviceRequestId problemID    ,
+                    problem.emailSubjectSummary as emailSubjectSummary,       
+                    cons.cns_name engineer,
+                    concat(contact.con_first_name, ' ', contact.con_last_name) as contactName
+                FROM `customerfeedback` f 
+                    JOIN problem ON problem.`pro_problemno`=f.serviceRequestId
+                    JOIN callactivity cal ON cal.caa_problemno=f.serviceRequestId     
+                    JOIN consultant cons on cons.cns_consno=cal.caa_consno
+                    JOIN customer ON customer.`cus_custno`=problem.`pro_custno`
+                    join contact on  contact.con_contno = cal.caa_contno
+                WHERE cal.caa_callacttypeno=57                    
+                    AND (:from  is null or date(f.`createdAt`) >= :from )
+                    AND (:to    is null or date(f.`createdAt`) <= :to)
+                    AND problem.`pro_custno`= :customerId"
+                );
+                $statement->execute(
+                    [
+                        "from"       => $startDate->format(DATE_MYSQL_DATE),
+                        "to"         => $endDate->format(DATE_MYSQL_DATE),
+                        "customerId" => $args['customerId']
+                    ]
+                );
+                $response->getBody()->write(
+                    json_encode($statement->fetchAll(), JSON_NUMERIC_CHECK)
+                );
+                return $response;
+            }
+        );
+        $group->get(
             '/SRCountByLocation/{customerId}',
-            function (\Slim\Psr7\Request $request, \Slim\Psr7\Response $response, $args) {
+            function (Request $request, Response $response, $args) {
                 $queryParams = $request->getQueryParams();
                 $endDate     = new DateTime();
                 $startDate   = (clone $endDate)->sub(new DateInterval('P365D'));
@@ -462,7 +786,7 @@ ORDER BY raisedManually DESC";
                     ["type" => "s", "value" => $startDate->format(DATE_MYSQL_DATE)],
                     ["type" => "s", "value" => $endDate->format(DATE_MYSQL_DATE)],
                 ];
-                $query = "SELECT
+                $query  = "SELECT
   address.`add_postcode`,
   address.`add_town`,
   COUNT(*) AS COUNT
@@ -493,7 +817,7 @@ ORDER BY COUNT DESC";
         );
         $group->get(
             '/stats',
-            function (\Slim\Psr7\Request $request, \Slim\Psr7\Response $response) {
+            function (Request $request, Response $response) {
                 global $db;
                 $queryParams = $request->getQueryParams();
                 $endDate     = new DateTime();
@@ -518,17 +842,31 @@ ORDER BY COUNT DESC";
                         return $response->withStatus(400);
                     }
                 }
-                $params      = [
+                $params    = [
                     ["type" => "s", "value" => $startDate->format(DATE_MYSQL_DATE)],
                     ["type" => "s", "value" => $endDate->format(DATE_MYSQL_DATE)],
                 ];
+                $typeWhere = '';
+                $typeParam = [];
+                if (isset($queryParams['type'])) {
+                    $type = $queryParams['type'];
+                    if (!in_array($type, statsTypes)) {
+                        $typesString = implode(',', statsTypes);
+                        $response->getBody()->write(
+                            json_encode(["error" => "The type must be one of {$typesString}"])
+                        );
+                        return $response->withStatus(400);
+                    }
+                    $typeWhere   = " and pro_hide_from_customer_flag = ?";
+                    $typeParam[] = ["type" => "s", "value" => $type == STAT_TYPE_CUSTOMER_FACING ? 'N' : 'Y'];
+                }
                 $isBreakDown = isset($queryParams['breakDown']);
-                $query       = 'SELECT
-  SUM(1) AS raised,
-    SUM(pro_status IN("F","C")) AS `fixed`,
-  AVG(if(problem.pro_priority = 1,problem.`pro_responded_hours`, null)) AS responseTime,
+                $query       = "SELECT
+    SUM(1) AS raised,
+    SUM(pro_status IN(\"F\",\"C\")) AS `fixed`,
+  AVG(if(pro_status IN (\"F\",\"C\") ,problem.`pro_responded_hours`, null)) AS responseTime,
   AVG(
-   IF(pro_status IN ("F","C"),   
+   IF(pro_status IN (\"F\",\"C\"),   
    problem.`pro_responded_hours` < 
     CASE
       problem.`pro_priority`
@@ -544,11 +882,11 @@ ORDER BY COUNT DESC";
     END,
     NULL) 
   ) AS slaMet,
-    AVG(IF(pro_status IN ("F","C"), openHours < 8, NULL)) AS closedWithin8Hours,
-    AVG(IF(pro_status ="C" and pro_hide_from_customer_flag <> "Y",problem.`pro_reopened_date` IS NOT NULL, NULL)) AS reopened,
-    AVG(IF(pro_status IN ("F","C"), problem.`pro_chargeable_activity_duration_hours`,NULL)) AS avgChargeableTime,
-    AVG(IF(pro_status IN ("F","C"), problem.pro_working_hours,NULL)) AS avgTimeAwaitingCNC,
-    AVG(IF(pro_status IN ("F","C"), openHours,NULL)) AS avgTimeFromRaiseToFixHours
+    AVG(IF(pro_status IN (\"F\",\"C\"), openHours < 8, NULL)) AS closedWithin8Hours,
+    AVG(IF(pro_status =\"C\" and pro_hide_from_customer_flag <> \"Y\",problem.`pro_reopened_date` IS NOT NULL, NULL)) AS reopened,
+    AVG(IF(pro_status IN (\"F\",\"C\"), problem.`pro_chargeable_activity_duration_hours`,NULL)) AS avgChargeableTime,
+    AVG(IF(pro_status IN (\"F\",\"C\"), problem.pro_working_hours,NULL)) AS avgTimeAwaitingCNC,
+    AVG(IF(pro_status IN (\"F\",\"C\"), openHours,NULL)) AS avgTimeFromRaiseToFixHours
 FROM
   problem
   LEFT JOIN callactivity initial
@@ -557,49 +895,111 @@ FROM
   JOIN customer
     ON problem.`pro_custno` = customer.`cus_custno`
 WHERE  caa_date between ? and ?
-  AND pro_priority < 5';
+ {$typeWhere}
+  AND pro_priority < 4";
                 if ($isBreakDown) {
-                    $query = 'SELECT
-       pro_priority as priority,
-  SUM(1) AS raised,
-    SUM(pro_status IN("F","C")) AS `fixed`,
-  AVG(if(problem.pro_priority = 1,problem.`pro_responded_hours`, null)) AS responseTime,
-  AVG(
-   IF(pro_status IN ("F","C"),   
-   problem.`pro_responded_hours` < 
-    CASE
-      problem.`pro_priority`
-      WHEN 1
-      THEN customer.`cus_sla_p1`
-      WHEN 2
-      THEN customer.`cus_sla_p2`
-      WHEN 3
-      THEN customer.`cus_sla_p3`
-      WHEN 4
-      THEN customer.`cus_sla_p4`
-      ELSE 0
-    END,
-    NULL) 
-  ) AS slaMet,
-    AVG(IF(pro_status IN ("F","C"), openHours < 8, NULL)) AS closedWithin8Hours,
-    AVG(IF(pro_status ="C" and pro_hide_from_customer_flag <> "Y",problem.`pro_reopened_date` IS NOT NULL, NULL)) AS reopened,
-    AVG(IF(pro_status IN ("F","C"), problem.`pro_chargeable_activity_duration_hours`,NULL)) AS avgChargeableTime,
-    AVG(IF(pro_status IN ("F","C"), problem.pro_working_hours,NULL)) AS avgTimeAwaitingCNC,
-    AVG(IF(pro_status IN ("F","C"), openHours,NULL)) AS avgTimeFromRaiseToFixHours
+                    $query = "SELECT
+  p.priority, data.avgChargeableTime, raised, fixed, responseTime, slaMet, closedWithin8Hours, reopened, avgChargeableTime, avgTimeAwaitingCNC, avgTimeFromRaiseToFixHours
 FROM
-  problem
-  LEFT JOIN callactivity initial
-    ON initial.`caa_problemno` = problem.`pro_problemno`
-    AND initial.`caa_callacttypeno` = 51
-  JOIN customer
-    ON problem.`pro_custno` = customer.`cus_custno`
-WHERE 
- caa_date between ? and ?
-  AND pro_priority < 5 
-  group by pro_priority
-        order by pro_priority';
+  (SELECT
+    1 AS priority
+  UNION
+  ALL
+  SELECT
+    2 AS priority
+  UNION
+  ALL
+  SELECT
+    3 AS priority
+  UNION
+  ALL
+  SELECT
+    4 AS priority) p
+  LEFT JOIN
+    (SELECT
+      pro_priority AS priority,
+      SUM(1) AS raised,
+      SUM(pro_status IN (\"F\", \"C\")) AS `fixed`,
+      AVG(
+        IF(
+          pro_status IN (\"F\", \"C\"),
+          problem.`pro_responded_hours`,
+          NULL
+        )
+      ) AS responseTime,
+      AVG(
+        IF(
+          pro_status IN (\"F\", \"C\"),
+          problem.`pro_responded_hours` <
+          CASE
+            problem.`pro_priority`
+            WHEN 1
+            THEN customer.`cus_sla_p1`
+            WHEN 2
+            THEN customer.`cus_sla_p2`
+            WHEN 3
+            THEN customer.`cus_sla_p3`
+            WHEN 4
+            THEN customer.`cus_sla_p4`
+            ELSE 0
+          END,
+          NULL
+        )
+      ) AS slaMet,
+      AVG(
+        IF(
+          pro_status IN (\"F\", \"C\"),
+          openHours < 8,
+          NULL
+        )
+      ) AS closedWithin8Hours,
+      AVG(
+        IF(
+          pro_status = \"C\"
+          AND pro_hide_from_customer_flag <> \"Y\",
+          problem.`pro_reopened_date` IS NOT NULL,
+          NULL
+        )
+      ) AS reopened,
+      AVG(
+        IF(
+          pro_status IN (\"F\", \"C\"),
+          problem.`pro_chargeable_activity_duration_hours`,
+          NULL
+        )
+      ) AS avgChargeableTime,
+      AVG(
+        IF(
+          pro_status IN (\"F\", \"C\"),
+          problem.pro_working_hours,
+          NULL
+        )
+      ) AS avgTimeAwaitingCNC,
+      AVG(
+        IF(
+          pro_status IN (\"F\", \"C\"),
+          openHours,
+          NULL
+        )
+      ) AS avgTimeFromRaiseToFixHours
+    FROM
+      problem
+      LEFT JOIN callactivity initial
+        ON initial.`caa_problemno` = problem.`pro_problemno`
+        AND initial.`caa_callacttypeno` = 51
+      JOIN customer
+        ON problem.`pro_custno` = customer.`cus_custno`
+    WHERE caa_date BETWEEN ?
+      AND ?
+      AND pro_priority < 5
+      {$typeWhere}
+    GROUP BY pro_priority
+    ORDER BY pro_priority) data
+    ON data.priority = p.priority";
                 }
                 try {
+
+                    $params = array_merge($params, $typeParam);
                     $statement = $db->preparedQuery($query, $params);
                     if (!$isBreakDown) {
                         $data = $statement->fetch_assoc();
@@ -608,14 +1008,14 @@ WHERE
                     }
                     $response->getBody()->write(json_encode($data, JSON_NUMERIC_CHECK));
                     return $response;
-                } catch (\Exception $exception) {
+                } catch (Exception $exception) {
                     throw new Exception('Failed operation');
                 }
             }
         );
         $group->post(
             '/termsAndConditionsRequest',
-            function (\Slim\Psr7\Request $request, \Slim\Psr7\Response $response) {
+            function (Request $request, Response $response) {
                 $requestBody = $request->getParsedBody();
                 if (!isset($requestBody['contactId'])) {
                     $response->getBody()->write(
@@ -628,7 +1028,7 @@ WHERE
                     $buRenewal->sendTermsAndConditionsEmailToContact($requestBody['contactId']);
                     $response->getBody()->write(json_encode(["status" => "ok"]));
                     return $response;
-                } catch (\CNCLTD\Exceptions\ContactNotFoundException $exception) {
+                } catch (ContactNotFoundException $exception) {
                     $response->getBody()->write(
                         json_encode(["status" => "error", "error" => "Contact not found!"])
                     );
@@ -638,7 +1038,7 @@ WHERE
         );
         $group->post(
             '/renewalsRequest',
-            function (\Slim\Psr7\Request $request, \Slim\Psr7\Response $response) {
+            function (Request $request, Response $response) {
                 $requestBody = $request->getParsedBody();
                 if (!isset($requestBody['contactId'])) {
                     $response->getBody()->write(
@@ -651,7 +1051,7 @@ WHERE
                     $buRenewal->sendRenewalEmailToContact($requestBody['contactId']);
                     $response->getBody()->write(json_encode(["status" => "ok"]));
                     return $response;
-                } catch (\CNCLTD\Exceptions\ContactNotFoundException $exception) {
+                } catch (ContactNotFoundException $exception) {
                     $response->getBody()->write(
                         json_encode(["status" => "error", "error" => "Contact not found!"])
                     );
@@ -661,7 +1061,7 @@ WHERE
         );
         $group->get(
             '/tokenData',
-            function (\Slim\Psr7\Request $request, \Slim\Psr7\Response $response) {
+            function (Request $request, Response $response) {
                 $queryParams = $request->getQueryParams();
                 if (empty($queryParams['token'])) {
 
@@ -669,7 +1069,7 @@ WHERE
                     return $response->withStatus(400);
                 }
                 global $db;
-                $feedbackTokenGenerator = new \CNCLTD\FeedbackTokenGenerator($db);
+                $feedbackTokenGenerator = new FeedbackTokenGenerator($db);
                 $data                   = $feedbackTokenGenerator->getTokenData($queryParams['token']);
                 if (!$data) {
                     $response->getBody()->write(json_encode(["error" => "Token not found!"]));
@@ -681,7 +1081,7 @@ WHERE
         );
         $group->post(
             '/feedback',
-            function (\Slim\Psr7\Request $request, \Slim\Psr7\Response $response) {
+            function (Request $request, Response $response) {
                 $data = $request->getParsedBody();
                 if (!$data) {
                     $response->getBody()->write(json_encode(["error" => "Data is missing"]));
@@ -692,7 +1092,7 @@ WHERE
                     return $response->withStatus(400);
                 }
                 global $db;
-                $feedbackTokenGenerator = new \CNCLTD\FeedbackTokenGenerator($db);
+                $feedbackTokenGenerator = new FeedbackTokenGenerator($db);
                 $tokenData              = $feedbackTokenGenerator->getTokenData($data['token']);
                 if (!$tokenData) {
                     $response->getBody()->write(json_encode(["status" => "error", "message" => "Token not found!"]));
@@ -712,9 +1112,9 @@ WHERE
                     );
                     return $response->withStatus(400);
                 }
-                $contactId = $dbeProblem->getValue(DBEProblem::contactID);
-                $customerFeedbackRepo               = new \CNCLTD\CustomerFeedbackRepository($db);
-                $customerFeedback                   = new \CNCLTD\CustomerFeedback();
+                $contactId                          = $dbeProblem->getValue(DBEProblem::contactID);
+                $customerFeedbackRepo               = new CustomerFeedbackRepository($db);
+                $customerFeedback                   = new CustomerFeedback();
                 $customerFeedback->serviceRequestId = $tokenData->serviceRequestId;
                 $customerFeedback->contactId        = $contactId;
                 $customerFeedback->value            = $data['value'];
@@ -725,21 +1125,109 @@ WHERE
                 return $response;
             }
         );
+        $group->get(
+            '/pendingChargeableWorkCustomerRequest/{tokenId}',
+            function (Request $request, Response $response, $args) {
+                $tokenId = $args['tokenId'];
+                if (!$tokenId) {
+                    $response->getBody()->write(
+                        json_encode(["status" => "error", "message" => "Token id required!", "code" => 1264])
+                    );
+                    return $response->withStatus(400);
+                }
+                $chargeableRequestRepo = new ChargeableWorkCustomerRequestMySQLRepository();
+                $usecase               = new GetPendingToProcessChargeableRequestInfo($chargeableRequestRepo);
+                try {
+                    $info = $usecase(new ChargeableWorkCustomerRequestTokenId($tokenId));
+                    $response->getBody()->write(
+                        json_encode(["status" => "ok", "data" => $info])
+                    );
+                    return $response->withStatus(200);
+
+                } catch (ChargeableWorkCustomerRequestNotFoundException $exception) {
+
+                    $response->getBody()->write(
+                        json_encode(["status" => "error", "message" => "Request not found!", "code" => 1265])
+                    );
+                    return $response->withStatus(404);
+
+                }
+            }
+        );
+        $group->post(
+            '/pendingChargeableWorkCustomerRequest/{tokenId}/accept',
+            function (Request $request, Response $response, $args) {
+                $tokenId = $args['tokenId'];
+                if (!$tokenId) {
+                    $response->getBody()->write(
+                        json_encode(["status" => "error", "message" => "Token id required!", "code" => 1264])
+                    );
+                    return $response->withStatus(400);
+                }
+                $chargeableRequestRepo = new ChargeableWorkCustomerRequestMySQLRepository();
+                $usecase               = new AcceptPendingChargeableWorkCustomerRequest($chargeableRequestRepo);
+                $requestData           = $request->getParsedBody();
+                $comments              = @$requestData['comments'];
+                try {
+                    $usecase(new ChargeableWorkCustomerRequestTokenId($tokenId), $comments);
+                    $response->getBody()->write(
+                        json_encode(["status" => "ok"])
+                    );
+                    return $response->withStatus(200);
+
+                } catch (ChargeableWorkCustomerRequestNotFoundException $exception) {
+                    $response->getBody()->write(
+                        json_encode(["status" => "error", "message" => "Request not found!", "code" => 1265])
+                    );
+                    return $response->withStatus(404);
+
+                }
+            }
+        );
+        $group->post(
+            '/pendingChargeableWorkCustomerRequest/{tokenId}/reject',
+            function (Request $request, Response $response, $args) {
+                $tokenId = $args['tokenId'];
+                if (!$tokenId) {
+                    $response->getBody()->write(
+                        json_encode(["status" => "error", "message" => "Token id required!", "code" => 1264])
+                    );
+                    return $response->withStatus(400);
+                }
+                $chargeableRequestRepo = new ChargeableWorkCustomerRequestMySQLRepository();
+                $usecase               = new RejectPendingChargeableWorkCustomerRequest($chargeableRequestRepo);
+                $requestData           = $request->getParsedBody();
+                $comments              = $requestData['comments'];
+                try {
+                    $usecase(new ChargeableWorkCustomerRequestTokenId($tokenId), $comments);
+                    $response->getBody()->write(
+                        json_encode(["status" => "ok"])
+                    );
+                    return $response->withStatus(200);
+
+                } catch (ChargeableWorkCustomerRequestNotFoundException $exception) {
+                    $response->getBody()->write(
+                        json_encode(["status" => "error", "message" => "Request not found!", "code" => 1265])
+                    );
+                    return $response->withStatus(404);
+                }
+            }
+        );
     }
 );
 $app->group(
     '/api',
-    function (\Slim\Routing\RouteCollectorProxy $group) {
+    function (RouteCollectorProxy $group) {
         $group->get(
             '/',
-            function (\Slim\Psr7\Request $request, \Slim\Psr7\Response $response) {
+            function (Request $request, Response $response) {
                 $response->getBody()->write('<h1>CNC API v1</h1>');
                 return $response;
             }
         );
         $group->get(
             '/signedConfirmation',
-            function (\Slim\Psr7\Request $request, \Slim\Psr7\Response $response) {
+            function (Request $request, Response $response) {
                 /** @var Environment $twig */
                 $twig = $this->get('twig');
                 $response->getBody()->write(
@@ -750,7 +1238,7 @@ $app->group(
         );
         $group->get(
             '/acceptQuotation',
-            function (\Slim\Psr7\Request $request, \Slim\Psr7\Response $response) {
+            function (Request $request, Response $response) {
                 /** @var Environment $twig */
                 $twig        = $this->get('twig');
                 $queryParams = $request->getQueryParams();
@@ -787,7 +1275,7 @@ $app->group(
                 try {
                     $pdfData = $BUPdfSalesQuote->createSignableOrderForm($dbeQuotation);
                     ApiClient::setApiKey("fc2d9ba05f3f3d9f2e9de4d831e8fed9");
-                    $envDocs = [];
+                    $envDocs           = [];
                     $dsDeliveryContact = new DBEContact($this);
                     $dsDeliveryContact->getRow($dbeQuotation->getValue(DBEQuotation::deliveryContactID));
                     $firstName = $dsDeliveryContact->getValue(DBEContact::firstName);
@@ -797,20 +1285,20 @@ $app->group(
                     if ($server_type !== MAIN_CONFIG_SERVER_TYPE_LIVE) {
                         $email = "sales@" . CONFIG_PUBLIC_DOMAIN;
                     }
-                    $ordHeadID        = $dbeQuotation->getValue(DBEQuotation::ordheadID);
-                    $versionNo        = $dbeQuotation->getValue(DBEQuotation::versionNo);
-                    $orderFile        = $ordHeadID . '_' . $versionNo . '.pdf';
-                    $envelopeDocument = new DocumentWithoutTemplate(
+                    $ordHeadID         = $dbeQuotation->getValue(DBEQuotation::ordheadID);
+                    $versionNo         = $dbeQuotation->getValue(DBEQuotation::versionNo);
+                    $orderFile         = $ordHeadID . '_' . $versionNo . '.pdf';
+                    $envelopeDocument  = new DocumentWithoutTemplate(
                         'Customer Form', null, base64_encode($pdfData), $orderFile
                     );
-                    $envDocs[] = $envelopeDocument;
-                    $envelopeParties = [];
+                    $envDocs[]         = $envelopeDocument;
+                    $envelopeParties   = [];
                     $envelopeParty     = new Party(
                         $firstName . ' ' . $lastName, $email, 'signer1', 'Please sign here', 'no', false
                     );
                     $envelopeParties[] = $envelopeParty;
                     $expiration        = 7 * 24;
-                    $signableResponse = Envelopes::createNewWithoutTemplate(
+                    $signableResponse  = Envelopes::createNewWithoutTemplate(
                         "Document #" . $ordHeadID . "_" . $versionNo . "_" . uniqid(),
                         $envDocs,
                         $envelopeParties,
@@ -863,11 +1351,11 @@ $app->group(
         );
         $group->group(
             '/signable-hooks',
-            function (\Slim\Routing\RouteCollectorProxy $signableHooksGroup) {
+            function (RouteCollectorProxy $signableHooksGroup) {
                 $signableHooksGroup->post(
                     '/',
-                    function (\Slim\Psr7\Request $request, \Slim\Psr7\Response $response) {
-                        /** @var \Psr\Log\LoggerInterface $logger */
+                    function (Request $request, Response $response) {
+                        /** @var LoggerInterface $logger */
                         $logger      = $this->get('logger');
                         $requestType = [
                             "envelope_fingerprint" => "the envelope ID basically",
@@ -944,7 +1432,7 @@ $app->group(
                         if ($associativeArguments) {
                             $arguments = array_values($associativeArguments);
                         }
-                        /** @var \CNCLTD\SignableProcess $objectInstance */
+                        /** @var SignableProcess $objectInstance */
                         $objectInstance = $r->newInstanceArgs($arguments);
                         try {
                             $objectInstance->process($signableRequest, $logger);
@@ -958,7 +1446,7 @@ $app->group(
                 );
                 $signableHooksGroup->get(
                     '/',
-                    function (\Slim\Psr7\Request $request, \Slim\Psr7\Response $response) {
+                    function (Request $request, Response $response) {
                         // we are receiving information about a signed document
                         $response->getBody()->write(json_encode(["message" => "this is the signed hook"]));
                         return $response->withHeader('Content-Type', 'application/json');
@@ -976,7 +1464,7 @@ $app->any(
 );
 try {
     $app->run();
-} catch (\Slim\Exception\HttpNotFoundException $exception) {
+} catch (HttpNotFoundException $exception) {
     http_response_code(404);
     echo json_encode(["Error" => "Resource not found"]);
 }

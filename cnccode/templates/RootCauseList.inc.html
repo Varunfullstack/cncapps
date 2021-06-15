@@ -1,18 +1,1 @@
-<!-- Template: RootCauseList.inc.html -->
-<A href="{urlCreate}">[create new root cause]</A> 
-<table class="singleBorder" width="417" border="0" cellspacing="1" cellpadding="2">
-	<tr> 
-		<td width="265" class="listHeadText">Description</td>
-		<td width="141" class="listHeadText">&nbsp;</td>
-	</tr>
-	<!-- BEGIN RootCauseBlock -->
-	<tr valign="top" onMouseOver="this.bgColor='#ffffcc';" onMouseOut="this.bgColor='';"> 
-		<td class="orderLineItem"><DIV align="left">{description}</div></td>
-		<td class="orderLineItem"><DIV align="left"></div>
-			<DIV align="left"> <A href="{urlEdit}" title="Edit details">{txtEdit}</a> 
-				<A href="{urlDelete}"  title="Delete this type" onClick="if(!confirm('Are you sure you want to remove this root cause?')) return(false)">{txtDelete}</A> 
-			</DIV></td>
-	</tr>
-	<!-- END RootCauseBlock -->
-</table>
-<!-- End Template: RootCauseList.inc.html -->
+<div id="reactRootCauseComponent" name="reactRootCauseComponent"></div>

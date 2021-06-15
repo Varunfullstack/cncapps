@@ -102,7 +102,7 @@ class InboxToBeLoggedComponent extends React.Component {
             },
             {
                 hide: false,
-                order: 6,
+                order: 7,
                 path: "cpTruncatedReason",
                 key: "description",
                 label: "",
@@ -118,6 +118,17 @@ class InboxToBeLoggedComponent extends React.Component {
                         onClick: () => srCustomerDescription(problem)
                     }, problem.cpTruncatedReason)
 
+            },
+            {
+                hide: false,
+                order:6,
+                path: "emailSubject",
+                key: "emailSubject",
+                label: "",
+                sortable: false,
+                icon: "fal fa-envelope fa-2x  color-gray2",
+                hdToolTip: "Email subject",
+                hdClassName: "text-center",
             },
             {
                 hide: false,
@@ -154,7 +165,7 @@ class InboxToBeLoggedComponent extends React.Component {
             },
             {
                 hide: false,
-                order: 7,
+                order: 8,
                 path: "cpPriority",
                 key: "priority",
                 label: "",

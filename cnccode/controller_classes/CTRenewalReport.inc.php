@@ -7,6 +7,8 @@
  * @authors Karim Ahmed - Sweet Code Limited
  */
 
+use CNCLTD\Business\BUActivity;
+use CNCLTD\Data\DBEItem;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use setasign\Fpdi\Fpdi;
@@ -42,6 +44,7 @@ class CTRenewalReport extends CTCNC
 {
 
     const searchFormCustomerID = 'customerID';
+    const SHOW_PDF_FILE        = 'showPDFFile';
     public $dsActivityEngineer;
     public $dsSearchForm;
     public $page;
@@ -60,7 +63,7 @@ class CTRenewalReport extends CTCNC
             $cookieVars,
             $cfg
         );
-        $this->setMenuId(306);
+        $this->setMenuId(307);
         $this->dsSearchForm = new DSForm ($this);
         $this->dsSearchForm->addColumn(
             self::searchFormCustomerID,
@@ -110,7 +113,6 @@ class CTRenewalReport extends CTCNC
                     false
                 );
                 break;
-
             case 'producePdfReport':
                 $roles = [
                     SALES_PERMISSION
@@ -125,7 +127,6 @@ class CTRenewalReport extends CTCNC
                 );
                 break;
             case 'previewPDF':
-
                 $roles = [
                     SALES_PERMISSION
                 ];
@@ -133,14 +134,26 @@ class CTRenewalReport extends CTCNC
                     Header("Location: /NotAllowed.php");
                     exit;
                 }
+                $fileName = $this->generatePDFContract(
+                    $this->getParam('customerID'),
+                    $this->getParam('contractsIDs')
+                );
                 echo json_encode(
                     [
-                        'PDFPath' => $this->generatePDFContract(
-                            $this->getParam('customerID'),
-                            $this->getParam('contractsIDs')
-                        )
+                        "status"   => "ok",
+                        'URL'      => "/RenewalReport.php?action=showPDFFile&fileName=$fileName",
+                        'fileName' => $fileName
                     ]
                 );
+                break;
+            case self::SHOW_PDF_FILE:
+                $pdfFile = @$_REQUEST['fileName'];
+                if (!$pdfFile) {
+                    http_response_code(404);
+                }
+                header("Content-type:application/pdf");
+                header("Content-Disposition:attachment;filename={$pdfFile}");
+                echo file_get_contents(PDF_TEMP_DIR . $pdfFile);
                 break;
             case 'sendPDF':
                 $roles = [
@@ -153,7 +166,7 @@ class CTRenewalReport extends CTCNC
                 echo json_encode(
                     [
                         'status' => $this->sendPDFContract(
-                            $this->getParam('PDFPath'),
+                            $this->getParam('fileName'),
                             $this->getParam('contactID'),
                             $this->getParam('signableTemplateID'),
                             $this->getParam('customerID')
@@ -188,44 +201,33 @@ class CTRenewalReport extends CTCNC
     )
     {
         $this->setMethodName('produceReport');
-
         if ($createPdf) {
             $this->setHTMLFmt(CT_HTML_FMT_PDF);
         }
-
         $this->setTemplateFiles(
             'RenewalReport',
             'RenewalReport.inc'
         );
-
-
-
         if ($customerID) {
             $calledFromSearch = true;
         } else {
             $calledFromSearch = false;
-            $customerID = $this->getParam('customerID');
+            $customerID       = $this->getParam('customerID');
             $this->setPageTitle("Renewal Report");
         }
-
         $displayAccountsInfo = $this->hasPermissions(SALES_PERMISSION);
-
-        $dbeCustomer = new DBECustomer($this);
+        $dbeCustomer         = new DBECustomer($this);
         $dbeCustomer->getRow($customerID);
-
         $this->template->set_var(
             'customerName',
             $dbeCustomer->getValue(DBECustomer::name)
         );
-
         $buRenewal = new BURenewal($this);
-
-        $items = $buRenewal->getRenewalsAndExternalItemsByCustomer(
+        $items     = $buRenewal->getRenewalsAndExternalItemsByCustomer(
             $customerID,
             $this,
             $displayAccountsInfo
         );
-
         usort(
             $items,
             function ($a,
@@ -234,22 +236,17 @@ class CTRenewalReport extends CTCNC
                 return $a['itemTypeDescription'] <=> $b['itemTypeDescription'];
             }
         );
-
         $lastItemTypeDescription = false;
-
         $this->template->set_block(
             'RenewalReport',
             'itemBlock',
             'items'
         );
-
-        $totalCostPrice = 0;
-        $totalSalePrice = 0;
+        $totalCostPrice        = 0;
+        $totalSalePrice        = 0;
         $addOfficeReportButton = false;
-
         foreach ($items as $item) {
             $coveredItemsString = null;
-
             if (count($item['coveredItems']) > 0) {
                 foreach ($item['coveredItems'] as $coveredItem) {
                     $coveredItemsString .= '<br/>' . $coveredItem;
@@ -263,11 +260,10 @@ class CTRenewalReport extends CTCNC
             $itemClass = 'externalItem';
             $salePrice = null;
             $costPrice = null;
-
             if (!is_null($item['customerItemID'])) {
-                $itemClass = null;
-                $salePrice = Controller::formatNumber($item['salePrice']);
-                $costPrice = Controller::formatNumber($item['costPrice']);
+                $itemClass      = null;
+                $salePrice      = Controller::formatNumber($item['salePrice']);
+                $costPrice      = Controller::formatNumber($item['costPrice']);
                 $totalCostPrice += $item['costPrice'];
                 $totalSalePrice += $item['salePrice'];
                 if ($item['itemTypeId'] == 29) {
@@ -278,7 +274,6 @@ class CTRenewalReport extends CTCNC
                     }
                 }
             }
-
             $itemTypeHeader = null;
             if ($item['itemTypeDescription'] != $lastItemTypeDescription) {
                 $itemTypeHeader = "<tr><td colspan=\"7\"><h3>{$item['itemTypeDescription']}</h3></td></tr>";
@@ -286,26 +281,19 @@ class CTRenewalReport extends CTCNC
                     $itemTypeHeader .= '<tr class="officeReport hidden" ><td colspan="7"><button  type="button" onclick="runOfficeReport(' . $customerID . ')">Run O365 Mailbox Report</button></td></tr>';
                 }
             }
-
-
             $this->template->set_var(
                 array(
                     'itemTypeHeader' => $itemTypeHeader
                 )
             );
-
             $lastItemTypeDescription = $item['itemTypeDescription'];
-
-            $buCustomer = new BUCustomer($this);
-
-            $mainContacts = $buCustomer->getMainSupportContacts($customerID);
-
+            $buCustomer              = new BUCustomer($this);
+            $mainContacts            = $buCustomer->getMainSupportContacts($customerID);
             $this->template->set_block(
                 'RenewalReport',
                 'toSignContactsBlock',
                 'toSignContacts'
             );
-
             foreach ($mainContacts as $contact) {
                 $this->template->set_var(
                     array(
@@ -319,9 +307,8 @@ class CTRenewalReport extends CTCNC
                     true
                 );
             }
-
             $BUStandardText = new BUStandardText($this);
-            $standardText = new DataSet($this);
+            $standardText   = new DataSet($this);
             $BUStandardText->getStandardTextByTypeID(
                 BUStandardText::SignableContractsEmailType,
                 $standardText
@@ -331,7 +318,6 @@ class CTRenewalReport extends CTCNC
                 'templateBlock',
                 'templates'
             );
-
             while ($standardText->fetchNext()) {
                 $this->template->set_var(
                     array(
@@ -345,14 +331,10 @@ class CTRenewalReport extends CTCNC
                     true
                 );
             }
-
             $checkbox = null;
-
             if ($item['renewalTypeID'] != 3) {
                 $checkbox = '<input type="checkbox" id="' . $item['customerItemID'] . '">';
             }
-
-
             $this->template->set_var(
                 array(
                     'linkURL'              => $item['linkURL'],
@@ -377,40 +359,32 @@ class CTRenewalReport extends CTCNC
                     "disabled"             => $displayAccountsInfo ? null : "disabled"
                 )
             );
-
             $this->template->parse(
                 'items',
                 'itemBlock',
                 true
             );
         }
-
         /*
         External Items
         */
-        $addExternalItemURL =
-            Controller::buildLink(
-                'ExternalItem.php',
-                array(
-                    'action'     => 'add',
-                    'customerID' => $customerID
-                )
-            );
-
-
+        $addExternalItemURL = Controller::buildLink(
+            'ExternalItem.php',
+            array(
+                'action'     => 'add',
+                'customerID' => $customerID
+            )
+        );
         $this->template->set_var(
             array(
                 'addExternalItemURL' => $addExternalItemURL
             )
         );
-
         if ($displayAccountsInfo) {
             $urlCreateQuote = Controller::buildLink(
                 $_SERVER ['PHP_SELF'],
                 array('action' => 'createQuote')
             );
-
-
             $this->template->set_var(
                 array(
                     'totalSalePrice'    => Controller::formatNumber($totalSalePrice),
@@ -426,16 +400,12 @@ class CTRenewalReport extends CTCNC
                 'RenewalReport',
                 true
             );
-
             $this->template->parse(
                 "CONTENTS",
                 "page"
             );
-
             $output = $this->template->get("CONTENTS");
-
             require_once BASE_DRIVE . '/vendor/autoload.php';
-
             $options = new Options();
             $options->set(
                 'isRemoteEnabled',
@@ -443,33 +413,25 @@ class CTRenewalReport extends CTCNC
             );
             $dompdf = new Dompdf($options);
             $dompdf->setBasePath(BASE_DRIVE . '/htdocs');   // so we can get the images and css
-
             $dompdf->loadHtml($output);
-
             set_time_limit(120);                           // it may take some time!
-
             $dompdf->setPaper(
                 'a4',
                 'landscape'
             );
-
             $dompdf->render();
-
             $dompdf->add_info(
                 'Title',
                 'Renewal Report - ' . $dbeCustomer->getValue(DBECustomer::name)
             );
-
             $dompdf->add_info(
                 'Author',
                 'CNC Ltd'
             );
-
             $dompdf->add_info(
                 'Subject',
                 'Renewal Report'
             );
-
             header("Content-type:application/pdf");
             header("Content-Disposition:attachment;filename='downloaded.pdf'");
             echo $dompdf->output();
@@ -480,7 +442,6 @@ class CTRenewalReport extends CTCNC
                 'RenewalReport',
                 true
             );
-
             return $this->template->get_var('output');
 
         } else {
@@ -489,10 +450,8 @@ class CTRenewalReport extends CTCNC
                 'RenewalReport',
                 true
             );
-
             $this->parsePage();
         }
-
         return true;
     }
 
@@ -515,45 +474,35 @@ class CTRenewalReport extends CTCNC
             $mainPDF,
             $contractsIDs
         );
-
         $pageCount = $mainPDF->setSourceFile(
             PDF_RESOURCE_DIR . '/Terms & Conditions.pdf'
         );
         for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
             $pageId = $mainPDF->importPage($pageNo);
-            $s = $mainPDF->getTemplatesize($pageId);
+            $s      = $mainPDF->getTemplatesize($pageId);
             $mainPDF->AddPage(
                 $s['orientation'],
                 $s
             );
             $mainPDF->useImportedPage($pageId);
         }
-
         $pageCount = $mainPDF->setSourceFile(PDF_RESOURCE_DIR . '/lastPage.pdf');
         for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
             $pageId = $mainPDF->importPage($pageNo);
-            $s = $mainPDF->getTemplatesize($pageId);
+            $s      = $mainPDF->getTemplatesize($pageId);
             $mainPDF->AddPage(
                 $s['orientation'],
                 $s
             );
             $mainPDF->useImportedPage($pageId);
         }
-
-        $fileName = PDF_TEMP_DIR . '/' . $customerID . '-Contracts.pdf';
-
+        $fileName = $customerID . '-Contracts.pdf';
+        $filePath = PDF_TEMP_DIR . $fileName;
         $mainPDF->Output(
             'F',
-            $fileName,
+            $filePath,
             true
         );
-
-        $fileName = str_replace(
-            BASE_DRIVE . '/htdocs',
-            "",
-            $fileName
-        );
-
         return $fileName;
     }
 
@@ -573,9 +522,8 @@ class CTRenewalReport extends CTCNC
 
         foreach ($contractsIDs as $contractID) {
             // Validation and setting of variables
-
             $buCustomerItem = new BUCustomerItem($this);
-            $dsContract = new DataSet($this);
+            $dsContract     = new DataSet($this);
             $buCustomerItem->getCustomerItemByID(
                 $contractID,
                 $dsContract
@@ -584,8 +532,7 @@ class CTRenewalReport extends CTCNC
                 $contractID,
                 $dsCustomerItem
             );
-
-            $buSite = new BUSite($this);
+            $buSite     = new BUSite($this);
             $buActivity = new BUActivity($this);
             $buCustomer = new BUCustomer($this);
             $buCustomer->getCustomerByID(
@@ -600,24 +547,14 @@ class CTRenewalReport extends CTCNC
             $customerHasServiceDeskContract = $buCustomerItem->customerHasServiceDeskContract(
                 $dsContract->getValue(DBEJCustomerItem::customerID)
             );
-
-            $buPDFSupportContract =
-                new BUPDFSupportContract(
-                    $this,
-                    $dsContract,
-                    $dsCustomerItem,
-                    $dsSite,
-                    $dsCustomer,
-                    $buActivity,
-                    $customerHasServiceDeskContract
-                );
-
-            $pdfFile = $buPDFSupportContract->generateFile(false);
-
-            $pageCount = $mainPDF->setSourceFile($pdfFile);
+            $buPDFSupportContract           = new BUPDFSupportContract(
+                $this, $dsContract, $dsCustomerItem, $dsSite, $dsCustomer, $buActivity, $customerHasServiceDeskContract
+            );
+            $pdfFile                        = $buPDFSupportContract->generateFile(false);
+            $pageCount                      = $mainPDF->setSourceFile($pdfFile);
             for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
                 $pageId = $mainPDF->importPage($pageNo);
-                $s = $mainPDF->getTemplatesize($pageId);
+                $s      = $mainPDF->getTemplatesize($pageId);
                 $mainPDF->AddPage(
                     $s['orientation'],
                     $s
@@ -628,55 +565,37 @@ class CTRenewalReport extends CTCNC
 
     }
 
-    private function sendPDFContract($PDFPath,
+    private function sendPDFContract($fileName,
                                      $contactID,
                                      $templateID,
                                      $customerID
     )
     {
         ApiClient::setApiKey("fc2d9ba05f3f3d9f2e9de4d831e8fed9");
-
-        $envDocs = [];
-
-        $file = basename($PDFPath);
-
-        $fileName = PDF_TEMP_DIR . '/' . $file;
-
+        $envDocs    = [];
+        $filePath   = PDF_TEMP_DIR . $fileName;
         $dbeContact = new DBEContact($this);
-
         $dbeContact->getRow($contactID);
-
         $firstName = $dbeContact->getValue(DBEContact::firstName);
-        $lastName = $dbeContact->getValue(DBEContact::lastName);
-        $email = $dbeContact->getValue(DBEContact::email);
+        $lastName  = $dbeContact->getValue(DBEContact::lastName);
+        $email     = $dbeContact->getValue(DBEContact::email);
         global $server_type;
         if ($server_type !== MAIN_CONFIG_SERVER_TYPE_LIVE) {
             $email = "sales@" . CONFIG_PUBLIC_DOMAIN;
         }
-
-        $envelopeDocument = new DocumentWithoutTemplate(
+        $envelopeDocument  = new DocumentWithoutTemplate(
             'CNC Contracts with Terms & Conditions',
             null,
-            base64_encode(file_get_contents($fileName)),
+            base64_encode(file_get_contents($filePath)),
             "CNCContractsTCs.pdf"
         );
-
-        $envDocs[] = $envelopeDocument;
-
-        $envelopeParties = [];
-
-        $envelopeParty = new Party(
-            $firstName . ' ' . $lastName,
-            $email,
-            'signer1',
-            'Please sign here',
-            'no',
-            false
+        $envDocs[]         = $envelopeDocument;
+        $envelopeParties   = [];
+        $envelopeParty     = new Party(
+            $firstName . ' ' . $lastName, $email, 'signer1', 'Please sign here', 'no', false
         );
         $envelopeParties[] = $envelopeParty;
-
-
-        $response = Envelopes::createNewWithoutTemplate(
+        $response          = Envelopes::createNewWithoutTemplate(
             "Document #" . $customerID . "_" . uniqid(),
             $envDocs,
             $envelopeParties,
@@ -686,33 +605,27 @@ class CTRenewalReport extends CTCNC
             0,
             0
         );
-
-
         if ($response && $response->http == 202) {
 
             global $twig;
             $subject = "CNC Contracts and Terms & Conditions to be signed";
-            $body = $twig->render(
+            $body    = $twig->render(
                 '@customerFacing/RenewalContractsToBeSigned/RenewalContractsToBeSigned.html.twig',
                 ["contactFirstName" => $firstName]
             );
-
-            $buMail = new BUMail($this);
+            $buMail  = new BUMail($this);
             $buMail->sendSimpleEmail($body, $subject, $email);
-
             $dbeCustomer = new DBECustomer($this);
             $dbeCustomer->getRow($customerID);
             $dbeCustomer->setValue(
                 DBECustomer::lastContractSent,
-                "Documents last sent to " . $firstName . ' ' . $lastName . " on " .
-                (new DateTime())->format('d/m/Y h:i') .
-                " by " .
-                $this->dbeUser->getValue(DBEUser::firstName) .
-                " " .
-                $this->dbeUser->getValue(DBEUser::lastName)
+                "Documents last sent to " . $firstName . ' ' . $lastName . " on " . (new DateTime())->format(
+                    'd/m/Y h:i'
+                ) . " by " . $this->dbeUser->getValue(DBEUser::firstName) . " " . $this->dbeUser->getValue(
+                    DBEUser::lastName
+                )
             );
             $dbeCustomer->updateRow();
-
             return true;
         }
         return false;
@@ -732,26 +645,21 @@ class CTRenewalReport extends CTCNC
                     $this->setFormErrorOn();
                 } else {
                     $customerID = $this->dsSearchForm->getValue(self::searchFormCustomerID);
-                    $report = $this->produceReport($customerID);
+                    $report     = $this->produceReport($customerID);
                 }
 
             }
         }
-
         $this->setMethodName('displaySearchForm');
-
         $this->setTemplateFiles(
             array(
                 'RenewalReportSearch' => 'RenewalReportSearch.inc'
             )
         );
-
         $urlSubmit = Controller::buildLink(
             $_SERVER ['PHP_SELF'],
             array('action' => CTCNC_ACT_SEARCH)
         );
-
-
         $this->setPageTitle('Renewal Report');
         $customerString = null;
         if ($this->dsSearchForm->getValue(self::searchFormCustomerID) != 0) {
@@ -770,7 +678,6 @@ class CTRenewalReport extends CTCNC
                 'htmlFmt' => CT_HTML_FMT_POPUP
             )
         );
-
         $this->template->set_var(
             array(
                 'formError'         => $this->formError,
@@ -782,13 +689,11 @@ class CTRenewalReport extends CTCNC
                 'report'            => $report
             )
         );
-
         $this->template->parse(
             'CONTENTS',
             'RenewalReportSearch',
             true
         );
-
         $this->parsePage();
 
     } // end function displaySearchForm

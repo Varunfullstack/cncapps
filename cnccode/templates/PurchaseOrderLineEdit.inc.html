@@ -3,19 +3,59 @@
         src="CommonJS.js"
 ></script>
 {purchaseOrderLineEditJS}
-<script language='JavaScript'>
-    function checkFunctionKey(field) {
-        if (event.keyCode == 120) {			// F9 - edit
-            switch (field.id) {
-                case "itemDescription":
-                    if (document.getElementById("itemID").value != "0") {
-                        window.open('{urlItemEdit}&itemID=' + escape(document.getElementById("itemID").value), 'items', 'scrollbars=yes,resizable=no,width=610,height=560,copyhistory=no, menubar=0');
-                    }
-                    break;
-            }
-        }
-        return;
+<style>
+    .typeahead-input {
+        width: 350px;
     }
+</style>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const itemIdInput = document.getElementById("itemID");
+        const itemDescriptionInput = document.getElementById("itemDescription");
+        const curUnitCostInput = document.getElementById("curUnitCost")
+        const autocompleteItemContainer = document.getElementById('itemSearch');
+        let props = {
+            autocompleteSelectedCallBack: (selectedItem) => {
+                props.value = selectedItem.label;
+                itemIdInput.value = selectedItem.value;
+                curUnitCostInput.value = selectedItem.curUnitCost;
+                itemDescriptionInput.value = selectedItem.label;
+                document.renderTypeAheadComponent(props, autocompleteItemContainer)
+            },
+            searchRequest: (term, itemsToShow, responseCB) => {
+                fetch(
+                        '/Item.php?action=SEARCH_ITEMS_JSON',
+                        {
+                            method: 'POST',
+                            body: JSON.stringify({term: props.value, limit: itemsToShow + 1})
+                        }
+                )
+                        .then(x => x.json())
+                        .then(response => {
+                            if (response.status !== 'ok') {
+                                throw new Error(response.message);
+                            }
+
+                            responseCB(response.data.map(x => ({
+                                label: x.description,
+                                value: x.itemID,
+                                curUnitCost: x.curUnitCost,
+                                curUnitSale: x.curUnitSale,
+                                supplierId: x.supplierId
+                            })))
+                        })
+            },
+            value: itemDescriptionInput.value,
+            onInputChange: (value) => {
+                props.value = value;
+                document.renderTypeAheadComponent(props, autocompleteItemContainer)
+            },
+            readOnly: false,
+            showClear: false,
+        }
+
+        document.renderTypeAheadComponent(props, autocompleteItemContainer);
+    });
 </SCRIPT>
 <table width="300px"
        border="0"
@@ -42,9 +82,11 @@
         >
             <div align="center">Order
                 Line
+            </div>
         </td>
     </tr>
 </table>
+
 <form name="porline"
       method="post"
       action="{urlSubmit}"
@@ -97,16 +139,16 @@
             <td class="promptText">Item</td>
             <td class="field">
                 <input
-                        type="text"
+                        type="hidden"
                         name="porline[1][itemDescription]"
                         id="itemDescription"
                         value="{itemDescription}"
-                        onChange="javascript:validateItemDescription()"
-                        onKeydown="javascript:checkFunctionKey(itemDescription)"
                         size="50"
                         maxlength="50"
                         {disableOnPartReceive}
                 >
+                <div id="itemSearch"></div>
+
                 <font class="formErrorMessage">{itemDescriptionMessage}</font>
             </td>
         </tr>

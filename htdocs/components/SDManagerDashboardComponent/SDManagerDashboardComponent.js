@@ -16,6 +16,9 @@ import moment from "moment";
 import Spinner from "../shared/Spinner/Spinner";
 import {ColumnRenderer} from "../CurrentActivityReportComponent/subComponents/ColumnRenderer";
 import MissedCallBackComponent from "./subComponents/MissedCallBackComponent";
+import PendingChargeableRequestsComponent from "./subComponents/PendingChargeableRequestsComponent";
+import MassAssignmentComponent from "./subComponents/MassAssignmentComponent";
+import MassDeletionComponent from "./subComponents/MassDeletionComponent";
 
 const CUSTOMER_TAB = 9;
 
@@ -28,7 +31,9 @@ const SHORTEST_SLA_FIX_REMAINING = 3;
 const AUTO_RELOAD_TIME = 60 * 1000;
 
 const CRITICAL_SERVICE_REQUESTS = 4;
-const TAB_MISSED_CALL_BACKS=12;
+const TAB_MISSED_CALL_BACKS = 12;
+const PENDING_CHARGEABLE_WORK_REQUESTS_TAB = 13;
+const MASS_DELETION_TAB = "massDeletionTab";
 
 class SDManagerDashboardComponent extends MainComponent {
     el = React.createElement;
@@ -36,6 +41,7 @@ class SDManagerDashboardComponent extends MainComponent {
     api = new APISDManagerDashboard();
     apiCurrentActivityService = new CurrentActivityService();
     intervalRef;
+    TAB_MASS_ASSIGNMENT = 14;
 
     constructor(props) {
         super(props);
@@ -52,7 +58,8 @@ class SDManagerDashboardComponent extends MainComponent {
                 limit: 10
             },
             queueData: [],
-            allocatedUsers: []
+            allocatedUsers: [],
+            currentUser: null,
         };
         this.tabs = [
             {id: 1, title: "Shortest SLA Remaining", icon: null},
@@ -67,10 +74,22 @@ class SDManagerDashboardComponent extends MainComponent {
             {id: HELD_FOR_QA_TAB, title: "Held for QA", icon: null},
             {id: DAILY_STATS_TAB, title: "Daily Stats", icon: null},
             {id: TAB_MISSED_CALL_BACKS, title: "Call Backs", icon: null},
+            {id: PENDING_CHARGEABLE_WORK_REQUESTS_TAB, title: 'Pending Chargeable Work', icon: null},
+            {id: this.TAB_MASS_ASSIGNMENT, title: 'Mass Assignment', icon: null},
+            {
+                id: MASS_DELETION_TAB,
+                title: 'Mass Deletion',
+                icon: null,
+                requiredPermission: 'massDeletionOnUnstartedServiceRequestPermission'
+            }
+
         ];
     }
 
     componentDidMount() {
+        this.api.getCurrentUser().then(currentUser => {
+            this.setState({currentUser});
+        })
         this.loadFilterFromStorage();
         setTimeout(() => {
             this.loadAllocatedUsers()
@@ -109,37 +128,40 @@ class SDManagerDashboardComponent extends MainComponent {
 
     getTabsElement = () => {
         const {el, tabs} = this;
+        const {currentUser} = this.state;
         return el(
             "div",
             {
                 key: "tab",
                 className: "tab-container",
-                style: {flexWrap: "wrap", justifyContent: "flex-start", maxWidth: 1300}
+                style: {flexWrap: "wrap", justifyContent: "flex-start", maxWidth: 1500}
             },
-            tabs.map((t) => {
-                return el(
-                    "i",
-                    {
-                        key: t.id,
-                        className: this.isActive(t.id) + " nowrap",
-                        onClick: () => this.setActiveTab(t.id),
-                        style: {width: 200}
-                    },
-                    t.title,
-                    t.icon
-                        ? el("span", {
-                            className: t.icon,
-                            style: {
-                                fontSize: "12px",
-                                marginTop: "-12px",
-                                marginLeft: "-5px",
-                                position: "absolute",
-                                color: "#000",
-                            },
-                        })
-                        : null
-                );
-            })
+            tabs
+                .filter(tab => !tab.requiredPermission || (currentUser && currentUser[tab.requiredPermission]))
+                .map((t) => {
+                    return el(
+                        "i",
+                        {
+                            key: t.id,
+                            className: this.isActive(t.id) + " nowrap",
+                            onClick: () => this.setActiveTab(t.id),
+                            style: {width: 200}
+                        },
+                        t.title,
+                        t.icon
+                            ? el("span", {
+                                className: t.icon,
+                                style: {
+                                    fontSize: "12px",
+                                    marginTop: "-12px",
+                                    marginLeft: "-5px",
+                                    position: "absolute",
+                                    color: "#000",
+                                },
+                            })
+                            : null
+                    );
+                })
         );
     };
     loadFilterFromStorage = () => {
@@ -260,9 +282,9 @@ class SDManagerDashboardComponent extends MainComponent {
     ;
 
     getQueueElement = () => {
-        const { queueData} = this.state;        
+        const {queueData} = this.state;
         const {el} = this;
-        const filter = {...this.state.filter};        
+        const filter = {...this.state.filter};
 
         if ([1, 2, 3, CRITICAL_SERVICE_REQUESTS, SHORTEST_SLA_FIX_REMAINING, 5, 6, 7, 8, HELD_FOR_QA_TAB].indexOf(filter.activeTab) >= 0) {
             let columns = [
@@ -602,9 +624,15 @@ class SDManagerDashboardComponent extends MainComponent {
             );
         } else if (filter.activeTab == 10) {
             return el(DailyStatsComponent);
+        } else if (filter.activeTab == TAB_MISSED_CALL_BACKS) {
+            return <MissedCallBackComponent filter={filter}/>
+        } else if (filter.activeTab == PENDING_CHARGEABLE_WORK_REQUESTS_TAB) {
+            return <PendingChargeableRequestsComponent filter={filter}/>
+        } else if (filter.activeTab == this.TAB_MASS_ASSIGNMENT) {
+            return <MassAssignmentComponent filter={filter}/>
+        } else if (filter.activeTab == MASS_DELETION_TAB) {
+            return <MassDeletionComponent/>
         }
-        else if(filter.activeTab==TAB_MISSED_CALL_BACKS)
-        return <MissedCallBackComponent filter={filter}></MissedCallBackComponent>
     }
     srDescription = (problem) => {
         window.open(

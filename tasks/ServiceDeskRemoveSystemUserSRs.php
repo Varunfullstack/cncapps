@@ -1,4 +1,6 @@
 <?php
+
+use CNCLTD\Business\BUActivity;
 use CNCLTD\LoggerCLI;
 require_once(__DIR__ . "/../htdocs/config.inc.php");
 global $cfg;
@@ -21,9 +23,9 @@ $debugMode = false;
 if (isset($options['d'])) {
     $debugMode = true;
 }
-require_once($cfg['path_bu'] . '/BUActivity.inc.php');
+
 $thing = null;
-$buActivity = new buActivity($thing);
+$buActivity = new BUActivity($thing);
 $buActivity->clearSystemSrQueue();
 echo "System User SRs removed";
 ?>

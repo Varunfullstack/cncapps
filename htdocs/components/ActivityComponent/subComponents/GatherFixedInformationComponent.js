@@ -11,6 +11,7 @@ import React from 'react';
 import CustomerDocumentUploader from "./CustomerDocumentUploader";
 import EditorFieldComponent from "../../shared/EditorField/EditorFieldComponent";
 import {RESOLUTION_SUMMARY_MIN_CHARS} from "../../CONFIG_CONSTANTS";
+import AssetListSelectorComponent from "../../shared/AssetListSelectorComponent/AssetListSelectorComponent";
 
 class GatherFixedInformationComponent extends MainComponent {
     el = React.createElement;
@@ -33,7 +34,10 @@ class GatherFixedInformationComponent extends MainComponent {
                 problemID: null,
                 contractCustomerItemID: null,
                 rootCauseID: null,
-                resolutionSummary: null
+                resolutionSummary: null,
+                assetName: null,
+                assetTitle: null,
+                emptyAssetReason: null,
             },
             showModal: false,
             modalType: null,
@@ -46,31 +50,32 @@ class GatherFixedInformationComponent extends MainComponent {
         const activity = await this.apiActivity.getCallActivityBasicInfo(
             params.get("callActivityID")
         );
-        const [rootCauses, customerContracts, documents, initialActivity] = await Promise.all([
+        const [rootCauses, customerContracts, initialActivity] = await Promise.all([
             this.apiActivity.getRootCauses(),
             this.apiCustomer.getCustomerContracts(
                 activity.customerID,
                 activity.contractCustomerItemID,
                 activity.linkedSalesOrderID > 0
             ),
-            this.apiActivity.getDocuments(activity.callActivityID, activity.problemID),
             this.apiActivity.getInitialActivity(activity.problemID)
         ]);
 
         const {data} = this.state;
         data.rootCauseID = activity.rootCauseID;
-        data.contractCustomerItemID = activity.contractCustomerItemID || "99";
+        data.contractCustomerItemID = "99";
         if (!params.get("resolutionSummary")) {
             data.resolutionSummaryDefault = initialActivity?.reason;
             data.resolutionSummary = data.resolutionSummaryDefault;
         }
+        data.assetName = activity.assetName;
+        data.assetTitle = activity.assetTitle;
+        data.emptyAssetReason = activity.emptyAssetReason;
         this.setState({
             data,
             activity,
             rootCauses: rootCauses,
             contracts: customerContracts,
             groupedContracts: groupBy(customerContracts, "renewalType"),
-            documents: documents,
             initialActivity: initialActivity,
         })
     }
@@ -131,7 +136,17 @@ class GatherFixedInformationComponent extends MainComponent {
                         el("td", {className: "display-label"}, "Root Cause"),
                         el("td", null, this.getRootCause())
                     ),
-
+                    <tr>
+                        <td className="display-label">
+                            Asset
+                        </td>
+                        <td>
+                            <AssetListSelectorComponent assetName={data.assetName} assetTitle={data.assetTitle}
+                                                        emptyAssetReason={data.emptyAssetReason}
+                                                        customerId={activity.customerID}
+                                                        onChange={this.handleAssetSelect}/>
+                        </td>
+                    </tr>,
                     el(
                         "tr",
                         null,
@@ -151,13 +166,29 @@ class GatherFixedInformationComponent extends MainComponent {
                                                   value={initialActivity?.reason}
                                                   onChange={(value) => this.setValue("resolutionSummary", value)}
                                                   minCharCount={activity.problemHideFromCustomerFlag == 'N' ? RESOLUTION_SUMMARY_MIN_CHARS : -1}
-                                                  disableClipboard={true}
+                                                  disableClipboard={activity.problemHideFromCustomerFlag == 'N'}
                             />
                         )
-                    ),
+                    )
                 )
             )
         );
+    }
+
+    handleAssetSelect = (value) => {
+        const {data} = this.state;
+        data.assetName = "";
+        data.assetTitle = "";
+        data.emptyAssetReason = "";
+        if (value) {
+            if (value.isAsset) {
+                data.assetName = value.name;
+                data.assetTitle = value.name + " " + value.LastUsername + " " + value.BiosVer;
+            } else {
+                data.emptyAssetReason = value.template;
+            }
+        }
+        this.setState({data});
     };
 
     async updateContract(contractCustomerItemID) {
@@ -181,6 +212,7 @@ class GatherFixedInformationComponent extends MainComponent {
         const {el} = this;
         const {groupedContracts, data, activity} = this.state;
 
+
         return el(
             "select",
             {
@@ -194,8 +226,9 @@ class GatherFixedInformationComponent extends MainComponent {
             el("option", {key: "empty", value: 99}, "Please select"),
             el("option", {
                 key: "tandm",
-                value: ""
-            }, "T&M" + (activity.linkedSalesOrderID ? " - Must be selected because this is linked to a Sales Order" : '')),
+                value: "",
+                disabled: activity.prePayChargeApproved
+            }, "T&M" + (activity.linkedSalesOrderID ? " - Must be selected because this is linked to a Sales Order" : (activity.hasCallOutExpense ? ' - This Service Request has a Call Out Expense and must be closed as T&M' : ''))),
             groupedContracts?.map((t, index) =>
                 el(
                     "optgroup",
@@ -205,7 +238,7 @@ class GatherFixedInformationComponent extends MainComponent {
                             "option",
                             {
                                 key: i.contractCustomerItemID,
-                                disabled: i.isDisabled,
+                                disabled: i.isDisabled || (activity.prePayChargeApproved && i.contractCustomerItemID !== activity?.contractCustomerItemID) || activity.hasCallOutExpense,
                                 value: i.contractCustomerItemID,
                             },
                             i.contractDescription
@@ -254,29 +287,10 @@ class GatherFixedInformationComponent extends MainComponent {
         );
     };
 
-    async deleteDocument(id) {
-        const {documents, activity} = this.state;
-        if (await this.confirm('Are you sure you want to remove this document?')) {
-            await this.apiActivity.deleteDocument(activity.callActivityID, id);
-            this.setState({documents: documents.filter(d => d.id !== id)});
-        }
-    }
-
     getDocuments = () => {
-        const {documents, activity} = this.state;
-        return <CustomerDocumentUploader
-            onDeleteDocument={(id) => this.deleteDocument(id)}
-            onFilesUploaded={() => this.handleDocumentsUploads()}
-            serviceRequestId={activity.problemID}
-            activityId={activity.callActivityID}
-            documents={documents}
-        />
-    };
-    handleDocumentsUploads = async () => {
         const {activity} = this.state;
-        const documents = await this.apiActivity.getDocuments(activity.callActivityID, activity.problemID);
-        this.setState({documents});
-    }
+        return <CustomerDocumentUploader serviceRequestId={activity.problemID}/>
+    };
     getActions = () => {
         const {el} = this;
         return el('div', {className: "flex-row"},
@@ -374,6 +388,12 @@ class GatherFixedInformationComponent extends MainComponent {
             this.alert(`The resolution summary must have at least ${RESOLUTION_SUMMARY_MIN_CHARS} characters`);
             return;
         }
+
+        if (!data.emptyAssetReason && !data.assetName) {
+            this.alert(`Assset, or empty reason is required`);
+            return;
+        }
+
         data.problemID = activity.problemID;
         this.apiActivity.saveFixedInformation(data).then(result => {
             if (result.status) {

@@ -7,7 +7,10 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
-require_once($cfg['path_bu'] . '/BUActivity.inc.php');
+
+use CNCLTD\Business\BUActivity;
+
+global $cfg;
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 
@@ -29,7 +32,7 @@ class CTPrepayAdjustment extends CTCNC
             exit;
         }
         $this->setMenuId(707);
-        $this->buActivity = new BUActivity($this);
+        $this->buActivity     = new BUActivity($this);
         $this->dsCallActivity = new DSForm($this);
         $this->dsCallActivity->copyColumnsFrom($this->buActivity->dbeJCallActivity);
         $this->dsCallActivity->setNull(DBEJCallActivity::customerID, DA_NOT_NULL);
@@ -53,9 +56,7 @@ class CTPrepayAdjustment extends CTCNC
     function edit()
     {
         $this->setMethodName('edit');
-
         $this->setTemplateFiles('PrepayAdjustment', 'PrepayAdjustment.inc');
-
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $formError = (!$this->dsCallActivity->populateFromArray($this->getParam('callActivity')));
             if (!$this->dsCallActivity->getValue(DBEJCallActivity::customerID)) {
@@ -68,14 +69,12 @@ class CTPrepayAdjustment extends CTCNC
                     $formError = true;
                 }
             }
-
             if (!$formError) {
                 $this->buActivity->createPrepayAdjustment(
                     $this->dsCallActivity->getValue(DBEJCallActivity::customerID),
                     $this->dsCallActivity->getValue(DBEJCallActivity::curValue),
                     $this->dsCallActivity->getValue(DBEJCallActivity::date)
                 );
-
                 $urlNext = Controller::buildLink(
                     '/',
                     array()
@@ -84,12 +83,10 @@ class CTPrepayAdjustment extends CTCNC
                 exit;
             }
         }
-
         $urlSubmit = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             []
         );
-
         $urlCustomerPopup = Controller::buildLink(
             CTCNC_PAGE_CUSTOMER,
             array(
@@ -97,9 +94,7 @@ class CTPrepayAdjustment extends CTCNC
                 'htmlFmt' => CT_HTML_FMT_POPUP
             )
         );
-
         $this->setPageTitle('Create Prepay Adjustment');
-
         $this->template->set_var(
             array(
                 'formError'         => $this->formError,
@@ -115,9 +110,7 @@ class CTPrepayAdjustment extends CTCNC
                 'urlSubmit'         => $urlSubmit
             )
         );
-
         $this->template->parse('CONTENTS', 'PrepayAdjustment', true);
-
         $this->parsePage();
     }
 }

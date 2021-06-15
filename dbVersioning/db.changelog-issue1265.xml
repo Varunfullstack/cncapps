@@ -1,0 +1,35 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="xavi" id="issue1265-0">
+        <tagDatabase tag="issue1265"/>
+    </changeSet>
+    <changeSet id="issue1265-1" author="xavi">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="OBRSServerStorage"/>
+            </not>
+        </preConditions>
+        <createTable tableName="OBRSServerStorage">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="checkedAt" type="datetime">
+                <constraints nullable="false"/>
+
+            </column>
+            <column name="serverCustomerItemId" type="int(11) unsigned">
+                <constraints
+                        nullable="false"
+                        foreignKeyName="serverCustomerItemId_fk"
+                        referencedTableName="custitem"
+                        referencedColumnNames="cui_cuino"/>
+            </column>
+            <column name="sizeInGB" type="int(11)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

@@ -1,6 +1,19 @@
 <?php
 
+use CNCLTD\AdditionalChargesRates\Application\GetAll\GetAllAdditionalChargeRatesQueryHandler;
+use CNCLTD\AdditionalChargesRates\Application\GetOne\GetOneAdditionalChargeRatesQueryHandler;
+use CNCLTD\AdditionalChargesRates\Application\GetOneSpecificRateForCustomer\GetOneSpecificRateForCustomerQueryHandler;
+use CNCLTD\AdditionalChargesRates\Application\GetRatesForCustomer\GetRatesForCustomerQueryHandler;
+use CNCLTD\AdditionalChargesRates\Application\GetSpecificRatesForCustomer\GetSpecificRatesForCustomerQueryHandler;
+use CNCLTD\AdditionalChargesRates\Infra\Persistence\AdditionalChargeRatePDORepository;
+use CNCLTD\AdditionalChargesRates\Infra\Persistence\PDOCustomerPricesGetter;
+use CNCLTD\AdditionalChargesRates\Infra\Persistence\PDOCustomerSpecificPriceGetter;
+use CNCLTD\AdditionalChargesRates\Infra\Persistence\PDOCustomerSpecificPricesGetter;
+use CNCLTD\Shared\Infrastructure\Bus\Query\InMemorySymfonyQueryBus;
 use Twig\Environment;
+use Twig\Extension\DebugExtension;
+use Twig\Extra\Intl\IntlExtension;
+use Twig\Loader\FilesystemLoader;
 use Twig\TwigFilter;
 
 const DEV_PORTAL_URL = "https://www.cnc-ltd.co.uk:4481";
@@ -119,7 +132,7 @@ function noshell_exec(string $command): string
 {
     static $descriptors = [['pipe', 'r'], ['pipe', 'w'], ['pipe', 'w']], $options = ['bypass_shell' => true];
     if (!$proc = proc_open($command, $descriptors, $pipes, null, null, $options)) {
-        throw new \Error('Creating child process failed');
+        throw new Error('Creating child process failed');
     }
     fclose($pipes[0]);
     $result = stream_get_contents($pipes[1]);
@@ -497,6 +510,7 @@ switch ($server_type) {
             'display_errors',
             'on'
         );
+        ini_set("error_log", "E:\Sites\dev-error.log");
         $GLOBALS['mail_options'] = array(
             'driver' => 'smtp',
             'host'   => 'cncltd-co-uk0i.mail.protection.outlook.com',
@@ -616,6 +630,7 @@ switch ($server_type) {
             'display_errors',
             'off'
         );
+        ini_set("error_log", "E:\Sites\live-error.log");
         define('PORTAL_URL', "https://www.cnc-ltd.co.uk");
         $GLOBALS['mail_options'] = array(
             'driver' => 'smtp',
@@ -659,6 +674,7 @@ switch ($server_type) {
             'display_errors',
             'on'
         );
+        ini_set("error_log", "E:\\Sites\\test-error.log");
         $GLOBALS['mail_options'] = array(
             'driver' => 'smtp',
             'host'   => 'cncltd-co-uk0i.mail.protection.outlook.com',
@@ -737,6 +753,7 @@ switch ($server_type) {
             'display_errors',
             'on'
         );
+        ini_set("error_log", "E:\\Sites\\web-error.log");
         $GLOBALS['mail_options'] = array(
             'driver' => 'smtp',
             'host'   => 'cncltd-co-uk0i.mail.protection.outlook.com',
@@ -815,6 +832,7 @@ switch ($server_type) {
             'display_errors',
             'on'
         );
+        ini_set("error_log", "E:\\Sites\\design-error.log");
         $GLOBALS['mail_options'] = array(
             'driver' => 'smtp',
             'host'   => 'cncltd-co-uk0i.mail.protection.outlook.com',
@@ -899,6 +917,7 @@ switch ($server_type) {
             'display_errors',
             'on'
         );
+        ini_set("error_log", "E:\Sites\dev2-error.log");
         $GLOBALS['mail_options'] = array(
             'driver' => 'smtp',
             'host'   => 'cncltd-co-uk0i.mail.protection.outlook.com',
@@ -967,7 +986,7 @@ define(
 );
 define(
     'PDF_TEMP_DIR',
-    BASE_DRIVE . "/htdocs/pdfTemp"
+    BASE_DRIVE . "/files/pdfTemp/"
 );
 define(
     'PDF_RESOURCE_DIR',
@@ -975,7 +994,7 @@ define(
 );
 define(
     'INTERNAL_DOCUMENTS_FOLDER',
-    BASE_DRIVE . '/serviceRequestsDocuments'
+    BASE_DRIVE . '/files/serviceRequestsDocuments'
 );
 define(
     "APPLICATION_DIR",
@@ -999,11 +1018,11 @@ define(
 );
 define(
     "QUOTES_DIR",
-    BASE_DRIVE . "/htdocs/quotes"
+    BASE_DRIVE . "/files/quotes/"
 );
 define(
     "DELIVERY_NOTES_DIR",
-    BASE_DRIVE . "/htdocs/delivery_notes"
+    BASE_DRIVE . "/files/deliveryNotes/"
 );
 define(
     "LETTER_TEMPLATE_DIR",
@@ -1031,9 +1050,8 @@ define(
 );
 define(
     'RECEIPT_PATH',
-    BASE_DRIVE . '/receipts/'
+    BASE_DRIVE . '/files/receipts/'
 );
-$cfg['quote_path'] = BASE_DRIVE . "/htdocs/quotes";
 define(
     "PHPLIB_SESSIONS_DIR",
     BASE_DRIVE . "/sessions/"
@@ -1044,7 +1062,7 @@ $GLOBALS['db_options'] = array(
     'mail_table' => 'mail_queue'
 );
 require BASE_DRIVE . '/vendor/autoload.php';
-$loader = new \Twig\Loader\FilesystemLoader('', __DIR__ . '/../twig');
+$loader = new FilesystemLoader('', __DIR__ . '/../twig');
 $loader->addPath('internal', 'internal');
 $loader->addPath('customerFacing', 'customerFacing');
 $twig = new Environment(
@@ -1063,8 +1081,8 @@ $twig->addFilter(
     }
     )
 );
-$twig->addExtension(new \Twig\Extra\Intl\IntlExtension());
-$twig->addExtension(new \Twig\Extension\DebugExtension());
+$twig->addExtension(new IntlExtension());
+$twig->addExtension(new DebugExtension());
 define(
     'DOMPDF_ENABLE_AUTOLOAD',
     false
@@ -1224,6 +1242,10 @@ define(
 define(
     'CONFIG_CONSULTANCY_HOURLY_LABOUR_ITEMID',
     2237
+);
+define(
+    'CONFIG_ADDITIONAL_CHARGE_ITEMID',
+    18613,
 );
 define(
     'CONFIG_SALES_STOCK_CUSTOMERID',
@@ -1484,6 +1506,10 @@ define(
     'DATE_CNC_DATE_TIME_FORMAT',
     DATE_CNC_DATE_FORMAT . " H:i:s"
 );
+define(
+    'CONFIG_STARTER_PC_INSTALLATION_ROOT_CAUSE',
+    92
+);
 $cfg["postToSco"]   = FALSE;
 $cfg["txt_chevron"] = "&gt;";
 // System paths and URLs
@@ -1517,4 +1543,17 @@ $db = new dbSweetcode;
 //$db->query("SET sql_mode = ''");    // strict mode off
 //$pkdb= new dbSweetcode;
 //$db->Debug = DEBUG;        // Turn this on if database debug output needed
-?>
+$pdoConnection                  = new PDO(
+    'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8', DB_USER, DB_PASSWORD
+);
+$additionalChargeRateRepository = new AdditionalChargeRatePDORepository($pdoConnection);
+$inMemorySymfonyBus             = new InMemorySymfonyQueryBus(
+    [
+        new GetAllAdditionalChargeRatesQueryHandler($additionalChargeRateRepository),
+        new GetOneAdditionalChargeRatesQueryHandler($additionalChargeRateRepository),
+        new GetRatesForCustomerQueryHandler(new PDOCustomerPricesGetter($pdoConnection)),
+        new GetSpecificRatesForCustomerQueryHandler(new PDOCustomerSpecificPricesGetter($pdoConnection)),
+        new GetOneSpecificRateForCustomerQueryHandler(new PDOCustomerSpecificPriceGetter($pdoConnection))
+    ]
+);
+

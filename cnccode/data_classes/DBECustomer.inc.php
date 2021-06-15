@@ -4,6 +4,9 @@
 * @access public
 */
 global $cfg;
+
+use CNCLTD\Data\DBConnect;
+
 require_once($cfg["path_dbe"] . "/DBCNCEntity.inc.php");
 
 class DBECustomer extends DBCNCEntity
@@ -76,6 +79,7 @@ class DBECustomer extends DBCNCEntity
     const lastUpdatedDateTime          = "lastUpdatedDateTime";
     const inclusiveOOHCallOuts         = "inclusiveOOHCallOuts";
     const eligiblePatchManagement      = "eligiblePatchManagement";
+    const excludeFromWebrootChecks     = "excludeFromWebrootChecks";
 
     const statementContactId = "statementContactId";
 
@@ -275,10 +279,10 @@ class DBECustomer extends DBCNCEntity
             DA_NOT_NULL,
             "cus_sla_p5"
         );
-        $this->addColumn(self::slaFixHoursP1, DA_FLOAT, DA_NOT_NULL);
-        $this->addColumn(self::slaFixHoursP2, DA_FLOAT, DA_NOT_NULL);
-        $this->addColumn(self::slaFixHoursP3, DA_FLOAT, DA_NOT_NULL);
-        $this->addColumn(self::slaFixHoursP4, DA_FLOAT, DA_NOT_NULL);
+        $this->addColumn(self::slaFixHoursP1, DA_FLOAT, DA_ALLOW_NULL);
+        $this->addColumn(self::slaFixHoursP2, DA_FLOAT, DA_ALLOW_NULL);
+        $this->addColumn(self::slaFixHoursP3, DA_FLOAT, DA_ALLOW_NULL);
+        $this->addColumn(self::slaFixHoursP4, DA_FLOAT, DA_ALLOW_NULL);
         $this->addColumn(
             self::sendContractEmail,
             DA_STRING,
@@ -472,6 +476,13 @@ class DBECustomer extends DBCNCEntity
         $this->addColumn(
             self::eligiblePatchManagement,
             DA_INTEGER,
+            DA_NOT_NULL,
+            null,
+            0
+        );
+        $this->addColumn(
+            self::excludeFromWebrootChecks,
+            DA_BOOLEAN,
             DA_NOT_NULL,
             null,
             0
@@ -771,6 +782,13 @@ class DBECustomer extends DBCNCEntity
         $this->setQueryString($queryString);
         $ret = (self::getRows());
         return $ret;
+    }
+
+    public function getCustomerSiteAddress($customerID, $siteID)
+    {
+        $query   = "select * from address where add_custno=:custID and (:siteID is null or add_siteno=:siteID)";
+        $address = DBConnect::fetchOne($query, ["siteID" => $siteID, "custID" => $customerID]);
+        return $address;
     }
 }
 

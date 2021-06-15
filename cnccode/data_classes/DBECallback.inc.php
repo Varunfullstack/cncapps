@@ -1,27 +1,23 @@
-<?php /*
-* Project table
-* @authors Karim Ahmed
-* @access public
-*/
+<?php
+global $cfg;
+
+use CNCLTD\Data\CallBackStatus;
+
 require_once($cfg["path_gc"] . "/DBEntity.inc.php");
-class CallBackStatus
-{
-    const AWAITING='awaiting';
-    const CONTACTED='contacted';
-    const CANCELED='canceled';
-}
+
+
 class DBECallback extends DBEntity
 {
     const id                = "id";
-    const consID            = "consID";     
-    const problemID         ="problemID";
-    const callActivityID    ='callActivityID';
-    const contactID         ='contactID';    
-    const description       ='description';
-    const callback_datetime ='callback_datetime';
-    const status       ='status';
-    const createAt          ='createAt';
-    const notifyTeamLead          ='notifyTeamLead';
+    const consID            = "consID";
+    const problemID         = "problemID";
+    const contactID         = 'contactID';
+    const description       = 'description';
+    const callback_datetime = 'callback_datetime';
+    const status            = 'status';
+    const createAt          = 'createAt';
+    const notifyTeamLead    = 'notifyTeamLead';
+
     /**
      * calls constructor()
      * @access public
@@ -49,12 +45,6 @@ class DBECallback extends DBEntity
             DA_NOT_NULL
         );
         $this->addColumn(
-            self::callActivityID,
-            DA_INTEGER,
-            DA_NOT_NULL
-        );
-         
-        $this->addColumn(
             self::contactID,
             DA_INTEGER,
             DA_NOT_NULL
@@ -68,7 +58,7 @@ class DBECallback extends DBEntity
             self::callback_datetime,
             DA_DATETIME,
             DA_NOT_NULL
-        );        
+        );
         $this->addColumn(
             self::status,
             DA_STRING,
@@ -88,8 +78,33 @@ class DBECallback extends DBEntity
         $this->setAddColumnsOff();
         $this->db->connect();
     }
- 
-  
+
+    public function pendingCallbackCountForServiceRequest($problemID)
+    {
+        $problemIdFiltered = mysqli_real_escape_string($this->db->link_id(), $problemID);
+        $this->setQueryString(
+            "select {$this->getColumnNamesAsString()} from {$this->getTableName(
+            )} where {$this->getDBColumnName(
+                self::problemID
+            )} =  {$problemIdFiltered} and {$this->getDBColumnName(self::status)} = '" . CallBackStatus::AWAITING . "'"
+        );
+        $this->getRows();
+        return $this->rowCount();
+    }
+
+    public function getAwaitingForServiceRequest(?int $serviceRequestId)
+    {
+        $serviceRequestId = mysqli_real_escape_string($this->db->link_id(), $serviceRequestId);
+        $this->setQueryString(
+            "select {$this->getColumnNamesAsString()} from {$this->getTableName(
+            )} where {$this->getDBColumnName(
+                self::problemID
+            )} =  {$serviceRequestId} and {$this->getDBColumnName(self::status)} = '" . CallBackStatus::AWAITING . "'"
+        );
+        $this->getRows();
+    }
+
+
 }
 
 ?>

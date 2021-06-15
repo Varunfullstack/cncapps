@@ -49,24 +49,106 @@ class DailyStatsComponent extends MainComponent {
         const {summary} = this.state;
         if (this.loading)
             return null;
-        const evenBackgroundColor    ="#00628B";
-        const eventTextColor         ="#E6E6E6";
+        const evenBackgroundColor = "#00628B";
+        const eventTextColor = "#E6E6E6";
+
         return <table>
             <tbody>
             <tr>
                 <td>{this.getOpenSrCard(summary.prioritySummary)}</td>
                 <td>{this.getTeamSrCard(summary.openSrTeamSummary, evenBackgroundColor, eventTextColor)}</td>
                 <td>{this.getDailySourceCard(summary.dailySourceSummary)}</td>
-                <td>{this.getTotalCardWithBiggerNumber("Unique Customers", summary.uniqueCustomerTodaySummary.total, evenBackgroundColor, eventTextColor)}</td>
-                <td>{this.getTotalCardWithBiggerNumber("Near SLA", summary.nearSLASummary.total)}</td>
-                <td>{this.getTotalCardWithBiggerNumber("Near Fix SLA Breach", summary.nearFixSLABreach, evenBackgroundColor, eventTextColor)}</td>
+                <td>{this.getDailyInboundOutBoundCard(summary.inboundOutbound, evenBackgroundColor, eventTextColor)}</td>
+                <td>{
+                    this.getTotalCardWithBiggerNumber({
+                            label: "Unique Customers",
+                            total: summary.uniqueCustomerTodaySummary.total
+                        },
+                    )
+                }</td>
+                <td>
+                    {
+                        this.getTotalCardWithBiggerNumber(
+                            {label: "Near SLA", total: summary.nearSLASummary.total},
+                            evenBackgroundColor,
+                            eventTextColor,
+                        '/DailyStatsDashboard.php?tab=NEAR_SLA'
+                        )
+                    }
+                </td>
             </tr>
             <tr>
-                <td>{this.getTotalCardWithBiggerNumber("Raised Today", summary.raisedTodaySummary.total, evenBackgroundColor, eventTextColor)}</td>
-                <td>{this.getTotalCardWithBiggerNumber("Today's Started", summary.raisedStartTodaySummary.total)}</td>
-                <td>{this.getTotalCardWithBiggerNumber("Fixed Today", summary.fixedTodaySummary.total, evenBackgroundColor, eventTextColor)}</td>
-                <td>{this.getTotalCardWithBiggerNumber("Reopened Today", summary.reopenTodaySummary.total)}</td>
-                <td>{this.getTotalCardWithBiggerNumber("Breached SLA", summary.breachedSLATodaySummary.total, evenBackgroundColor, eventTextColor)}</td>
+                <td>
+                    {
+                        this.getTotalCardWithBiggerNumber({
+                                label: "Near Fix SLA Breach",
+                                total: summary.nearFixSLABreach
+                            },
+                            evenBackgroundColor,
+                            eventTextColor,
+                            '/DailyStatsDashboard.php?tab=NEAR_FIX_SLA_BREACH'
+                        )
+                    }
+                </td>
+                <td>
+                    {this.getTotalCardWithBiggerNumber({
+                            label: "Raised Today",
+                            total: summary.raisedTodaySummary.total
+                        },
+                        "#C6C6C6",
+                        "#3C3C3C",
+                        '/DailyStatsDashboard.php?tab=RAISED_ON'
+                    )
+                    }
+                </td>
+                <td>
+                    {
+                        this.getTotalCardWithBiggerNumber({
+                                label: "Today's Started",
+                                total: summary.raisedStartTodaySummary.total,
+                            },
+                            evenBackgroundColor,
+                            eventTextColor,
+                            '/DailyStatsDashboard.php?tab=STARTED_ON'
+                        )
+                    }
+                </td>
+                <td>
+                    {
+                        this.getTotalCardWithBiggerNumber({
+                                label: "Fixed Today",
+                                total: summary.fixedTodaySummary.total
+                            },
+                            "#C6C6C6",
+                            "#3C3C3C",
+                            '/DailyStatsDashboard.php?tab=FIXED_ON'
+                        )
+                    }
+                </td>
+                <td>
+                    {
+                        this.getTotalCardWithBiggerNumber({
+                                label: "Reopened Today",
+                                total: summary.reopenTodaySummary.total
+                            },
+                            evenBackgroundColor,
+                            eventTextColor,
+                            '/DailyStatsDashboard.php?tab=REOPENED_ON'
+                        )
+                    }
+                </td>
+                <td>
+                    {
+                        this.getTotalCardWithBiggerNumber({
+                                label: "Breached SLA",
+                                total: summary.breachedSLATodaySummary.total
+                            },
+                            "#C6C6C6",
+                            "#3C3C3C",
+                            '/DailyStatsDashboard.php?tab=BREACHED_ON'
+                        )
+                    }
+                </td>
             </tr>
             </tbody>
         </table>
@@ -240,16 +322,24 @@ class DailyStatsComponent extends MainComponent {
             );
         } else return null;
     };
-    getTotalCardWithBiggerNumber = (label, total, backgroundColor = "#C6C6C6", textColor = "#3C3C3C") => {
-        return this.getTotalCard(label, total, backgroundColor, textColor, 'total-big');
+
+
+    getTotalCardWithBiggerNumber = (cardInfo, backgroundColor = "#C6C6C6", textColor = "#3C3C3C", linkOpen = null) => {
+        return this.getTotalCard(cardInfo.label, cardInfo.total, backgroundColor, textColor, 'total-big', linkOpen);
     }
-    getTotalCard = (label, total, backgroundColor = "#C6C6C6", textColor = "#3C3C3C", totalClass = 'total') => {
-        const {el} = this;
-        return el(
-            "div",
-            {className: "sd-card ", style: {backgroundColor: backgroundColor, color: textColor}},
-            el("label", {className: "sd-card-title"}, label),
-            el("label", {className: totalClass}, total)
+
+    getTotalCard = (label, total, backgroundColor = "#C6C6C6", textColor = "#3C3C3C", totalClass = 'total', linkOpen = null) => {
+        return (
+            <div className="sd-card " style={{backgroundColor: backgroundColor, color: textColor}}
+                 onClick={() => {
+                     if (linkOpen) {
+                         window.open(linkOpen, '_blank');
+                     }
+                 }}
+            >
+                <label className="sd-card-title">{label}</label>
+                <label className={totalClass}>{total}</label>
+            </div>
         );
     };
 
@@ -260,6 +350,26 @@ class DailyStatsComponent extends MainComponent {
             onClick: () => window.open('popup.php?action=dailyStats', 'popup', 'width=1250,height=600')
         })
     }
+    getDailyInboundOutBoundCard = (data,
+                                   backgroundColor = "#C6C6C6",
+                                   textColor) => {
+        return <div className="sd-card" style={{backgroundColor: backgroundColor, color: textColor}}>
+            <label className="sd-card-title">Daily Contact</label>
+            <table style={{color: textColor}}>
+                <tbody>
+                <tr>
+                    <td>Inbound</td>
+                    <td>{data.inbound}</td>
+                </tr>
+                <tr>
+                    <td>Outbound</td>
+                    <td>{data.outbound}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+    };
 
     render() {
         return (

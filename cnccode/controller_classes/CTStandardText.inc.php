@@ -291,7 +291,13 @@ class CTStandardText extends CTCNC
     function update()
     {
         $this->setMethodName('update');
-        $this->formError = (!$this->dsStandardText->populateFromArray($this->getParam('standardText')));
+        $standardTextArray                = $this->getParam('standardText');
+        $standardTextArray[1]['stt_text'] = preg_replace(
+            '/(<[^>]+) style=".*?"/i',
+            '$1',
+            $standardTextArray[1]['stt_text']
+        );
+        $this->formError                  = (!$this->dsStandardText->populateFromArray($standardTextArray));
         if ($this->formError) {
             if (!$this->dsStandardText->getValue(
                 DBEStandardText::stt_standardtextno

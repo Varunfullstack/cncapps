@@ -8,10 +8,13 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+
+use CNCLTD\Business\BURenContract;
+
 require_once("config.inc.php");
 global $cfg;
 require_once($cfg['path_bu'] . '/BURenBroadband.inc.php');
-require_once($cfg['path_bu'] . '/BURenContract.inc.php');
+require_once($cfg['path_bu'] . '/Burencontract.php');
 require_once($cfg['path_bu'] . '/BURenQuotation.inc.php');
 require_once($cfg['path_bu'] . '/BURenDomain.inc.php');
 $thing = null;

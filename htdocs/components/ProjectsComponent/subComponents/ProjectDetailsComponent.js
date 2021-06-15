@@ -55,7 +55,9 @@ export default class ProjectDetailsComponent extends MainComponent {
                 projectManager: '',
                 projectPlanningDate: '',
                 expectedHandoverQADate: '',
-                originalQuoteDocumentFinalAgreed: ''
+                originalQuoteDocumentFinalAgreed: '',
+                projectStageID:1,
+                projectTypeID:''
             },
             budgetData: null,
             users: [],
@@ -246,7 +248,6 @@ export default class ProjectDetailsComponent extends MainComponent {
                     <tr>
                         <td>Project Summary</td>
                         <td>
-                            {" "}
                             <CNCCKEditor
                                 readOnly={disabled == "disabled"}
                                 value={data.notes || ""}
@@ -827,8 +828,14 @@ export default class ProjectDetailsComponent extends MainComponent {
     };
     isDataValid = () => {
         const {data} = this.state;
+        
+       
         if (!data.customerID) {
             this.alert("Please select Customer");
+            return false;
+        }
+        if (!data.projectTypeID) {
+            this.alert("Please select project type");
             return false;
         }
 
@@ -845,6 +852,11 @@ export default class ProjectDetailsComponent extends MainComponent {
             this.alert("Please select project engineer");
             return false;
         }
+        if (!data.projectStageID) {
+            this.alert("Please select project stage");
+            return false;
+        }
+         
         return true;
     };
     handleUpdate = async () => {
@@ -1052,7 +1064,6 @@ export default class ProjectDetailsComponent extends MainComponent {
         this.apiSalesOrder
             .getCustomerInitialSalesOrders(data.customerID)
             .then((salesOrders) => {
-                console.log("salesOrders", salesOrders);
                 this.setState({
                     showSalesOrder: true,
                     originalOrder,
@@ -1153,7 +1164,6 @@ export default class ProjectDetailsComponent extends MainComponent {
                 }
             })
             .catch((ex) => {
-                console.log(ex);
                 this.alert("Failed to save order");
             });
     };

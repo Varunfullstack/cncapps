@@ -42,22 +42,25 @@ class Table extends React.Component {
         }
     }
 
-    componentDidMount() {
+    componentDidMount() {        
+    }
+    componentDidUpdate(prevProps, prevState) {
         if (this.props.allowRowOrder) {
             setTimeout(() => {
                 $("#table" + this.props.id + " tbody").sortable({
+                    cursor: "move",
                     helper: this.fixHelperModified,
                     stop: this.updateIndex
                 }).disableSelection()
-            }, 2000);
+            }, 1000);
         }
     }
-
     fixHelperModified = (e, tr) => {
         var $originals = tr.children();
         var $helper = tr.clone();
         $helper.children().each(function (index) {
-            $(this).width($originals.eq(index).width())
+            $(this).width($originals.eq(index).width());
+            $(this).css('background-color', '#00b9f1');
         });
         return $helper;
     }
@@ -88,6 +91,7 @@ class Table extends React.Component {
     }
 
     handleSort = (path) => {
+
         let {sortColumn} = this.state;
         const {columns} = this.props;
 
@@ -102,6 +106,9 @@ class Table extends React.Component {
             this.disableSortable();
         } else {
             this.enableSortable();
+        }
+        if (this.props.onSort) {
+            this.props.onSort(sortColumn);
         }
         this.setState({sortColumn});
     };
@@ -124,6 +131,7 @@ class Table extends React.Component {
         });
     };
     handleSearch = (event) => {
+
         if (event.target.value) {
             this.disableSortable();
         } else {
@@ -132,8 +140,10 @@ class Table extends React.Component {
         clearTimeout(this.delayTimer);
         event.persist();
         this.delayTimer = setTimeout(() => {
-
-            this.setState({searchFilter: event.target.value});
+            if (this.props.onSearch)            // custome search
+                this.props.onSearch(event.target.value);
+            else
+                this.setState({searchFilter: event.target.value});
         }, 1000); // Will do the ajax stuff after 1000 ms, or 1 s
     };
 
@@ -171,7 +181,8 @@ class Table extends React.Component {
             selectedKey,
             search,
             searchLabelStyle,
-            hasFooter
+            hasFooter,
+            style
         } = props;
         const {sortColumn} = this.state;
         const {handleSearch} = this;
@@ -180,14 +191,14 @@ class Table extends React.Component {
         let striped = "table-striped";
         if (this.props.striped === false)
             striped = "";
-        if (this.state.sortColumn.path != null && data.length > 0) {
+        if (this.state.sortColumn.path != null && data.length > 0 && !this.props.onSort) {
             if (this.state.sortColumn.sortFn) {
                 filterData.sort(this.state.sortColumn.sortFn(this.state.sortColumn.order));
             } else {
                 this.sort(filterData, this.state.sortColumn.path, this.state.sortColumn.order);
             }
         }
-        return [
+        return el("div", {style: style},
             el("div", {className: "flex-row", key: "tableSearch"},
                 search
                     ? el("div", {key: "tableSearch", style: {marginBottom: 5}, className: "flex-row"}, [
@@ -211,7 +222,8 @@ class Table extends React.Component {
             el("table", {
                 key: "table" + this.props.id,
                 id: "table" + this.props.id,
-                className: "table " + striped
+                className: "table " + striped,
+
             }, [
                 el(TableHeader, {
                     key: "tableHeader",
@@ -232,7 +244,7 @@ class Table extends React.Component {
                     : null,
                 hasFooter ? el(TableFooter, {key: "tableFooter", id: "tableFooter", columns}) : null
             ]),
-        ];
+        );
     }
 }
 

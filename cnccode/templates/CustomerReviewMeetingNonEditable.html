@@ -1,7 +1,31 @@
 <script type="text/javascript"
-<script type="text/javascript"
         src="https://www.gstatic.com/charts/loader.js"
 ></script>
+<style>
+    .text-center {
+        text-align: center !important;
+    }
+
+    .sla-table {
+        margin-top: 20px;
+        border: none;
+        border-collapse: collapse;
+
+    }
+
+    .sla-table table,
+    .sla-table tr,
+    .sla-table td,
+    .sla-table th {
+        border: none !important;
+    }
+
+    .sla-table td,
+    .sla-table th {
+        padding: 0.2rem 0.5rem;
+
+    }
+</style>
 <script type="text/javascript">
     if (!window.googleChartsLoaded) {
         google.charts.load('current', {'packages': ['corechart']});
@@ -10,14 +34,16 @@
     }
 
     function drawCharts() {
-        graphData['renderServerCare'] ? drawChart('serverCareIncidents') : '';
-        drawChart('serviceDesk');
-        drawChart('otherContracts');
-        drawChart('totalSR');
-        drawChart('historicTotalSR');
+        const hasServiceDesk = document.getElementById("hasServiceDesk").value;
+        drawChart('totalSR', 'line', 400);
+        drawChart('historicTotalSR', 'line', 400);
+        drawChart('sourceOfRequests', 'pie', 400, 400);
+        if (hasServiceDesk == "1") {
+            drawChart('firstTimeFixRequests', 'pie', 400, 400);
+        }
     }
 
-    function drawChart(chartName) {
+    function drawChart(chartName, type = 'line', height = 500, width = 1000) {
 
         var data = new google.visualization.DataTable();
         graphData[chartName]['columns'].forEach(function (columnName, id) {
@@ -30,21 +56,43 @@
 
         data.addRows(graphData[chartName]['data']);
 
-
         var options = {
             title: graphData[chartName]['title'],
             legend: {position: 'bottom'},
-            height: 500,
-            width: 1000
+            height: height,
+            width: width,
+            titleTextStyle: {
+                bold: true,    // true or false
+                italic: false  // true of false
+            }
         };
+        var chart = null;
+        switch (type) {
+            case 'line':
+                chart = new google.visualization.LineChart(document.getElementById(chartName));
+                //options["legend"] = { position: 'none' };
 
-        var chart = new google.visualization.LineChart(document.getElementById(chartName));
+                break;
+            case 'pie':
+                chart = new google.visualization.PieChart(document.getElementById(chartName));
+                options["is3D"] = true;
+                options["legend"] = {position: 'right', maxLines: 4};
+                options['chartArea'] = {width: '100%', height: '80%'};
+                break;
 
+        }
+        const my_div = document.getElementById(chartName);
+        google.visualization.events.addListener(chart, 'ready', function () {
+            //my_div.innerHTML = '<img src="' + chart.getImageURI() + '">';
+        });
         chart.draw(data, options);
 
     }
 </script>
-
+<input type="hidden"
+       id="hasServiceDesk"
+       value="{hasServiceDesk}"
+>
 <!--<div style="position: relative">-->
 <!--<img src="{waterMark}"-->
 <!--style="position: absolute;left: 0px;top: 0px;z-index: 99; opacity: 0.5"-->
@@ -56,7 +104,8 @@
            style="width: 100%;"
     >
         <tr>
-            <td style="width: 90%">&nbsp;<h1>{customerName} - Review Meeting {meetingDate}</h1></td>
+            <td style="width: 90%">&nbsp;<h1>{customerName} - Review Meeting {meetingDate}</h1>
+            </td>
             <td><img src="{siteURL}/images/cnclogo.jpg"
                      style="width:100px"
             ></td>
@@ -130,11 +179,11 @@
         <thead>
         <tr>
             <th colspan="2">&nbsp;</th>
-            <th>
+            <th class="text-center">
                 Quantity
             </th>
-            <th>Direct Debit</th>
-            <th>Annual Fee(&pound;)</th>
+            <th class="text-center">Direct Debit</th>
+            <th class="text-center">Annual Fee(&pound;)</th>
         </tr>
 
         </thead>
@@ -146,9 +195,9 @@
                 {description}
             </td>
             <td class="content">{notes}{coveredItemsString}</td>
-            <td class="content">{quantity}</td>
-            <td class="content">{directDebit}</td>
-            <td class="contentRightAlign"
+            <td class="content text-center">{quantity}</td>
+            <td class="content text-center">{directDebit}</td>
+            <td class="text-center"
                 align="right"
             >{salePrice}
             </td>
@@ -160,27 +209,39 @@
 <div class="reportSection"
      style="margin-bottom:30px"
 >
-    <h2>Support</h2>
+    <h2>
+        Support Analyses
+    </h2>
 
-    <table class="collapse">
+    <table class="sla-table"
+           style="width: 100%;"
+    >
+        <thead>
+        <tr>
+            <th></th>
+            <th>P1</th>
+            <th>P2</th>
+            <th>P3</th>
+            <th>P4</th>
+            <th>All</th>
+        </tr>
+        </thead>
         <tbody>
+        <!-- BEGIN customerSLABlock -->
         <tr>
-            <th style="text-align: left;">SR Priority</th>
-            <td style="text-align: center;">1</td>
-            <td style="text-align: center;">2</td>
-            <td style="text-align: center;">3</td>
-            <td style="text-align: center;">4</td>
-            <td style="text-align: center;">5</td>
+            <td style="text-align: right; width:150px">{description}
+            </td>
+            <td class="text-center">{p1Value}</td>
+            <td class="text-center">{p2Value}</td>
+            <td class="text-center">{p3Value}</td>
+            <td class="text-center">{p4Value}</td>
+            <td class="text-center">{allValue}</td>
         </tr>
+        <tr style="display:{newLine}">
+            <td><br></td>
+        </tr>
+        <!-- END customerSLABlock -->
 
-        <tr>
-            <th style="text-align: left;">Response Hours</th>
-            <td style="text-align: center;">{slaP1}</td>
-            <td style="text-align: center;">{slaP2}</td>
-            <td style="text-align: center;">{slaP3}</td>
-            <td style="text-align: center;">{slaP4}</td>
-            <td style="text-align: center;">{slaP5}</td>
-        </tr>
         </tbody>
     </table>
 </div>
@@ -197,70 +258,99 @@
     <div id="otherContracts"></div>
 </div>
 
+
 <div class="reportSection">
-    <div id="totalSR"></div>
+    <div class="subSection">
+        <div id="totalSR"></div>
+    </div>
+    <div class="subSection">
+        <div id="historicTotalSR"></div>
+    </div>
+    <div class="subSection"
+         style="display: flex; flex-direction: row;"
+    >
+        <table class="sla-table">
+            <tr>
+                <td>
+                    <div id="firstTimeFixRequests"></div>
+                </td>
+                <td>
+                    <div id="sourceOfRequests"></div>
+                </td>
+            </tr>
+        </table>
+
+
+    </div>
 </div>
 
 <div class="reportSection">
-    <div id="historicTotalSR"></div>
+
+    <div class="subSection">
+        <h3>Service Request Count By User - {reportDate}</h3>
+        <table class="collapse requestCount">
+            <colgroup>
+                <col span="1"
+                     style="width: 40%;"
+                >
+                <col span="1"
+                     style="width: 30%;"
+                >
+                <col span="1"
+                     style="width: 30%;"
+                >
+            </colgroup>
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Raised Manually</th>
+                <th>Proactive Work</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- BEGIN userBlock -->
+            <tr>
+                <td>{srUserName}</td>
+                <td class="text-center">{srCount}</td>
+                <td class="text-center">{srHiddenCount}</td>
+            </tr>
+            <!-- END userBlock -->
+            </tbody>
+        </table>
+        <p>
+            * Indicates no longer at the company.
+        </p>
+    </div>
+    <div class="subSection">
+        <h3>Root Cause - {reportDate}</h3>
+        <table class="collapse rootCause ">
+            <tbody>
+            <!-- BEGIN rootCauseBlock -->
+            <tr>
+
+                <td style="padding: 0.4rem 0.5rem ">{srRootCauseDescription}</td>
+                <td style="padding: 0.4rem 1.8rem "
+                    class="text-center"
+                >{srCount}
+                </td>
+
+                <!-- END rootCauseBlock -->
+            </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
+
 
 <div class="reportSection">
     <h2>Supported Users - ({supportUsersCount} Total Named Contacts)</h2>
     {supportContactInfo}
 </div>
 
-<div class="reportSection newPage">
-    <h2>Root Cause - {reportDate}</h2>
-    <table class="collapse rootCause">
-        <tbody>
-        <!-- BEGIN rootCauseBlock -->
-        <tr>
+<!-- <div class="reportSection newPage">
+    
+</div> -->
 
-            <td>{srRootCauseDescription}</td>
-            <td>{srCount}</td>
-
-            <!-- END rootCauseBlock -->
-        </tr>
-        </tbody>
-    </table>
-</div>
-
-<div class="reportSection">
-    <h2>Service Request Count - {reportDate}</h2>
-    <table class="collapse requestCount">
-        <colgroup>
-            <col span="1"
-                 style="width: 40%;"
-            >
-            <col span="1"
-                 style="width: 30%;"
-            >
-            <col span="1"
-                 style="width: 30%;"
-            >
-        </colgroup>
-        <thead>
-        <tr>
-            <th>Name</th>
-            <th>Raised Manually</th>
-            <th>Proactive Work</th>
-        </tr>
-        </thead>
-        <tbody>
-        <!-- BEGIN userBlock -->
-        <tr>
-            <td>{srUserName}</td>
-            <td>{srCount}</td>
-            <td>{srHiddenCount}</td>
-        </tr>
-        <!-- END userBlock -->
-        </tbody>
-    </table>
-    <p>
-        * Indicates no longer at the company.
-    </p>
-</div>
 
 <div class="reportSection diskSpaceReportSection">
     {diskSpaceSection}

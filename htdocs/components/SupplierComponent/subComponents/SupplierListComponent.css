@@ -1,0 +1,8 @@
+.supplierCreateModal input, .supplierCreateModal select {
+    width: 100%;
+    padding: 5px;
+}
+
+.supplierCreateModal label {
+    margin: 5px;
+}

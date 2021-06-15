@@ -7,25 +7,27 @@
  * @authors Karim Ahmed - Sweet Code Limited
  */
 global $cfg;
+
+use CNCLTD\Business\BURenContract;
+use CNCLTD\Data\DBEItem;
+
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
-require_once($cfg['path_bu'] . '/BURenContract.inc.php');
-require_once($cfg['path_bu'] . '/BUActivity.inc.php');
+require_once($cfg['path_bu'] . '/Burencontract.php');
 require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
-require_once($cfg['path_dbe'] . '/DBEItem.inc.php');
 require_once($cfg['path_bu'] . '/BUCustomerItem.inc.php');
 require_once($cfg['path_bu'] . '/BUPDFSupportContract.inc.php');
 
 class CTRenContract extends CTCNC
 {
-    const customerName = 'customerName';
-    const invoiceFromDate = 'invoiceFromDate';
-    const invoiceToDate = 'invoiceToDate';
-    const itemID = 'itemID';
-    const itemDescription = 'itemDescription';
-    const siteDesc = 'siteDesc';
-    const costPrice = 'costPrice';
-    const salePrice = 'salePrice';
+    const customerName                = 'customerName';
+    const invoiceFromDate             = 'invoiceFromDate';
+    const invoiceToDate               = 'invoiceToDate';
+    const itemID                      = 'itemID';
+    const itemDescription             = 'itemDescription';
+    const siteDesc                    = 'siteDesc';
+    const costPrice                   = 'costPrice';
+    const salePrice                   = 'salePrice';
     const InitialContractLengthValues = [
         12,
         24,
@@ -61,9 +63,9 @@ class CTRenContract extends CTCNC
             exit;
         }
         $this->setMenuId(602);
-        $this->buRenContract = new BURenContract($this);
+        $this->buRenContract  = new BURenContract($this);
         $this->buCustomerItem = new BUCustomerItem($this);
-        $this->dsRenContract = new DSForm($this);
+        $this->dsRenContract  = new DSForm($this);
         $this->dsRenContract->copyColumnsFrom($this->buRenContract->dbeRenContract);
         $this->dsRenContract->addColumn(
             self::customerName,
@@ -129,11 +131,11 @@ class CTRenContract extends CTCNC
                 break;
             case 'addItemToContract':
                 $contractCustomerItemId = $this->getParam('contractCustomerItemId');
-                $itemToAddId = $this->getParam('itemToAddId');
+                $itemToAddId            = $this->getParam('itemToAddId');
                 try {
                     $this->addItemToContract($contractCustomerItemId, $itemToAddId);
                     $data = ["status" => "ok"];
-                } catch (\Exception $exception) {
+                } catch (Exception $exception) {
                     $data = ["status" => "error", "message" => $exception->getMessage()];
                 }
                 echo json_encode($data);
@@ -143,20 +145,17 @@ class CTRenContract extends CTCNC
                 break;
             case 'searchDesc':
                 $itemsPerPage = 20;
-                $page = 1;
-                $term = '';
+                $page         = 1;
+                $term         = '';
                 if (isset($_REQUEST['term'])) {
                     $term = $_REQUEST['term'];
                 }
-
                 if (isset($_REQUEST['itemsPerPage'])) {
                     $itemsPerPage = $_REQUEST['itemsPerPage'];
                 }
-
                 if (isset($_REQUEST['page'])) {
                     $page = $_REQUEST['page'];
                 }
-
                 global $db;
                 $result = $db->preparedQuery(
                     "SELECT itm_desc AS `name`, itm_itemno AS id  FROM custitem LEFT JOIN item ON itm_itemno = cui_itemno WHERE declinedFlag = 'N' AND directDebitFlag <> 'Y'
@@ -172,7 +171,6 @@ class CTRenContract extends CTCNC
                     echo json_encode(["error" => $db->errorInfo()]);
                     http_response_code(400);
                 }
-
                 $data = $result->fetch_all(MYSQLI_ASSOC);
                 echo json_encode($data);
                 break;
@@ -192,8 +190,6 @@ class CTRenContract extends CTCNC
     {
         $this->setMethodName('edit');
         $dsRenContract = &$this->dsRenContract; // ref to class var
-
-
         if (!$this->getFormError()) {
             if ($this->getAction() == 'edit') {
                 $this->buRenContract->getRenContractByID(
@@ -214,24 +210,20 @@ class CTRenContract extends CTCNC
             $dsRenContract->fetchNext();
             $customerItemID = $dsRenContract->getValue(DBEJRenContract::customerItemID);
         }
-
-        $urlUpdate =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action'         => 'update',
-                    'ordheadID'      => $this->getParam('ordheadID'),
-                    'customerItemID' => $customerItemID
-                )
-            );
-
-        $urlDisplayList =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action' => 'list'
-                )
-            );
+        $urlUpdate      = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action'         => 'update',
+                'ordheadID'      => $this->getParam('ordheadID'),
+                'customerItemID' => $customerItemID
+            )
+        );
+        $urlDisplayList = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action' => 'list'
+            )
+        );
         $this->setPageTitle('Edit Contract');
         $this->setTemplateFiles(
             array(
@@ -239,32 +231,29 @@ class CTRenContract extends CTCNC
                 'RenContractPrepayFields' => 'RenContractPrepayFields.inc'
             )
         );
-
+        $this->loadReactScript('ItemSelectorWrapperComponent.js');
+        $this->loadReactCSS('ItemSelectorWrapperComponent.css');
         $disabled = 'DISABLED';
         $readonly = 'READONLY';
         if ($this->hasPermissions(RENEWALS_PERMISSION)) {
             $readonly = null;
             $disabled = null;
         }
-
-        $urlPrintContract =
-            Controller::buildLink(
-                'CustomerItem.php',
-                array(
-                    'action'         => 'printContract',
-                    'customerItemID' => $customerItemID
-                )
-            );
+        $urlPrintContract = Controller::buildLink(
+            'CustomerItem.php',
+            array(
+                'action'         => 'printContract',
+                'customerItemID' => $customerItemID
+            )
+        );
         $this->template->set_var(
             array(
                 'txtPrintContract' => 'Print Contract',
                 'urlPrintContract' => $urlPrintContract
             )
         );
-
         if (!$disabled) {
-            $prices =
-                '<tr>
+            $prices   = '<tr>
             <td class="promptText">Sale Price/Annum </td>
             <td class="fieldText">
             <input name="renContract[1][curUnitSale]"
@@ -290,9 +279,7 @@ class CTRenContract extends CTCNC
                     $dsRenContract->getMessage(DBEJRenContract::curUnitCost)
                 ) . '</span> </td>
         </tr>';
-
-            $declined =
-                '<tr>
+            $declined = '<tr>
             <td class="promptText">Declined</td>
             <td class="fieldText">
             <input
@@ -303,7 +290,6 @@ class CTRenContract extends CTCNC
               ' . Controller::htmlChecked($dsRenContract->getValue(DBEJRenContract::declinedFlag)) . '
             /></td>
         </tr>';
-
             $this->template->set_var(
                 array(
                     'prices'   => $prices,
@@ -311,49 +297,43 @@ class CTRenContract extends CTCNC
                 )
             );
         }
-        $urlItemPopup =
-            Controller::buildLink(
-                CTCNC_PAGE_ITEM,
-                array(
-                    'action'        => CTCNC_ACT_DISP_ITEM_POPUP,
-                    'renewalTypeID' => CONFIG_CONTRACT_RENEWAL_TYPE_ID,
-                    'htmlFmt'       => CT_HTML_FMT_POPUP
-                )
-            );
-        $urlItemEdit =
-            Controller::buildLink(
-                CTCNC_PAGE_ITEM,
-                array(
-                    'action'  => CTCNC_ACT_ITEM_EDIT,
-                    'htmlFmt' => CT_HTML_FMT_POPUP
-                )
-            );
-        $urlSiteEdit =
-            Controller::buildLink(
-                CTCNC_PAGE_SITE,
-                array(
-                    'action'  => CTCNC_ACT_SITE_EDIT,
-                    'htmlFmt' => CT_HTML_FMT_POPUP
-                )
-            );
-        $urlSitePopup =
-            Controller::buildLink(
-                CTCNC_PAGE_SITE,
-                array(
-                    'action'  => CTCNC_ACT_SITE_POPUP,
-                    'htmlFmt' => CT_HTML_FMT_POPUP
-                )
-            );
-        $dbeItem = new DBEItem($this);
+        $urlItemPopup = Controller::buildLink(
+            CTCNC_PAGE_ITEM,
+            array(
+                'action'        => CTCNC_ACT_DISP_ITEM_POPUP,
+                'renewalTypeID' => CONFIG_CONTRACT_RENEWAL_TYPE_ID,
+                'htmlFmt'       => CT_HTML_FMT_POPUP
+            )
+        );
+        $urlItemEdit  = Controller::buildLink(
+            CTCNC_PAGE_ITEM,
+            array(
+                'action'  => CTCNC_ACT_ITEM_EDIT,
+                'htmlFmt' => CT_HTML_FMT_POPUP
+            )
+        );
+        $urlSiteEdit  = Controller::buildLink(
+            CTCNC_PAGE_SITE,
+            array(
+                'action'  => CTCNC_ACT_SITE_EDIT,
+                'htmlFmt' => CT_HTML_FMT_POPUP
+            )
+        );
+        $urlSitePopup = Controller::buildLink(
+            CTCNC_PAGE_SITE,
+            array(
+                'action'  => CTCNC_ACT_SITE_POPUP,
+                'htmlFmt' => CT_HTML_FMT_POPUP
+            )
+        );
+        $dbeItem      = new DBEItem($this);
         $dbeItem->getRow($dsRenContract->getValue(DBECustomerItem::itemID));
         $dsCustomer = new DBECustomer($this);
         $dsCustomer->getRow($dsRenContract->getValue(DBECustomerItem::customerID));
-
         $isDirectDebitAllowed = $dsCustomer->getValue(DBECustomer::sortCode) && $dsCustomer->getValue(
                 DBECustomer::accountName
             ) && $dsCustomer->getValue(DBECustomer::accountNumber);
-
-        $expiryDate = null;
+        $expiryDate           = null;
         if ($installationDate = DateTime::createFromFormat(
             'Y-m-d',
             $dsRenContract->getValue(DBECustomerItem::installationDate)
@@ -363,17 +343,14 @@ class CTRenContract extends CTCNC
                 $dsRenContract->getValue(DBECustomerItem::initialContractLength)
             )->format('d/m/Y');
         }
-
         $officeItems = new DBEItem($this);
         $officeItems->getRowsByDescriptionMatch("+CNC +Office +365 +Backup");
         $isOfficeItem = false;
         while (!$isOfficeItem && $officeItems->fetchNext()) {
             $isOfficeItem = $officeItems->getValue(DBEItem::itemID) == $dbeItem->getValue(DBEItem::itemID);
         }
-
         $isWebroot = $dbeItem->getValue(DBEItem::itemID) == CONFIG_WEBROOT_ITEMTYPEID;
-        $isDUO = $dbeItem->getValue(DBEItem::itemID) == CONFIG_DUO_ITEMID;
-
+        $isDUO     = $dbeItem->getValue(DBEItem::itemID) == CONFIG_DUO_ITEMID;
         $this->template->set_var(
             array(
                 'customerItemID'                     => $dsRenContract->getValue(DBEJRenContract::customerItemID),
@@ -411,11 +388,9 @@ class CTRenContract extends CTCNC
                 ),
                 'invoicePeriodMonthsMessage'         => Controller::htmlDisplayText(
                     $dsRenContract->getMessage(DBEJRenContract::invoicePeriodMonths)
-
                 ),
                 'totalInvoiceMonths'                 => Controller::htmlInputText(
                     $dsRenContract->getValue(DBEJRenContract::totalInvoiceMonths)
-
                 ),
                 'curUnitCost'                        => $dsRenContract->getValue(DBEJRenContract::curUnitCost),
                 'curUnitSale'                        => $dsRenContract->getValue(DBEJRenContract::curUnitSale),
@@ -454,7 +429,6 @@ class CTRenContract extends CTCNC
                 ),
                 'controlPanelUrlMessage'             => Controller::htmlDisplayText(
                     $dsRenContract->getMessage(DBEJRenContract::controlPanelUrl)
-
                 ),
                 'ftpAddress'                         => Controller::htmlInputText(
                     $dsRenContract->getValue(DBEJRenContract::ftpAddress)
@@ -518,7 +492,6 @@ class CTRenContract extends CTCNC
                 'clientCheckDirectDebit'             => $isDirectDebitAllowed ? 'true' : 'false'
             )
         );
-
         // prepay fields
         if ($this->dsRenContract->getValue(DBEJRenContract::itemID) == CONFIG_DEF_PREPAY_ITEMID) {
             $this->template->set_var(
@@ -532,30 +505,24 @@ class CTRenContract extends CTCNC
                 )
             );
         }
-
         $this->template->set_block(
             'RenContractEdit',
             'renewalStatusBlock',
             'renewalStatus'
         );
         $this->parseRenewalSelector($dsRenContract->getValue(DBEJRenContract::renewalStatus));
-
-
         $this->template->setBlock(
             'RenContractEdit',
             'initialContractLengthBlock',
             'initialContractLengths'
         );
-
         $this->parseInitialContractLength($dsRenContract->getValue(DBECustomerItem::initialContractLength));
-
         $buCustomerItem = new BUCustomerItem($this);
         $dsCustomerItem = new DataSet($this);
         $buCustomerItem->getCustomerItemsByContractID(
             $dsRenContract->getValue(DBEJRenContract::customerItemID),
             $dsCustomerItem
         );
-
         $this->template->set_block(
             'RenContractEdit',
             'TransactionTypesBlock',
@@ -587,19 +554,16 @@ class CTRenContract extends CTCNC
         );
         while ($dsCustomerItem->fetchNext()) {
             $description = $dsCustomerItem->getValue(DBEJCustomerItem::itemDescription);
-
             if ($dsCustomerItem->getValue(DBEJCustomerItem::serverName)) {
                 $description .= '(' . $dsCustomerItem->getValue(DBEJCustomerItem::serverName) . ')';
             }
-
-            $url =
-                Controller::buildLink(
-                    'CustomerItem.php',
-                    array(
-                        'action'         => 'displayCI',
-                        'customerItemID' => $dsCustomerItem->getValue(DBEJCustomerItem::customerItemID)
-                    )
-                );
+            $url = Controller::buildLink(
+                'CustomerItem.php',
+                array(
+                    'action'         => 'displayCI',
+                    'customerItemID' => $dsCustomerItem->getValue(DBEJCustomerItem::customerItemID)
+                )
+            );
             $this->template->set_var(
                 array(
                     'coveredItemDescription' => $description,
@@ -613,7 +577,6 @@ class CTRenContract extends CTCNC
                 true
             );
         }
-
         if ($this->dsRenContract->getValue(DBEJRenContract::itemID) == CONFIG_DEF_PREPAY_ITEMID) {
             $this->template->parse(
                 'renContractPrePayFields',
@@ -621,13 +584,11 @@ class CTRenContract extends CTCNC
                 true
             );
         }
-
         $this->template->parse(
             'CONTENTS',
             'RenContractEdit',
             true
         );
-
         $this->parsePage();
 
     }
@@ -689,7 +650,7 @@ class CTRenContract extends CTCNC
     function editFromSalesOrder()
     {
         $buSalesOrder = new BUSalesOrder($this);
-        $DBEJOrdline = new DBEJOrdline($this);
+        $DBEJOrdline  = new DBEJOrdline($this);
         $DBEJOrdline->getRow($this->getParam('lineId'));
         $renewalCustomerItemID = $DBEJOrdline->getValue(DBEJOrdline::renewalCustomerItemID);
         // has the order line get a renewal already?
@@ -701,15 +662,12 @@ class CTRenContract extends CTCNC
                 $dsOrdhead,
                 $dsDontNeedOrdline
             );
-
             $this->buRenContract->createNewRenewal(
                 $dsOrdhead->getValue(DBEJOrdhead::customerID),
                 $DBEJOrdline,
                 $renewalCustomerItemID,
                 $dsOrdhead->getValue(DBEJOrdhead::delSiteNo)                // returned by function
             );
-
-
             // For despatch, prevents the renewal appearing again today during despatch process.
             $dbeOrdline = new DBEOrdline($this);
             $dbeOrdline->getRow($DBEJOrdline->getValue(DBEJOrdline::id));
@@ -717,20 +675,16 @@ class CTRenContract extends CTCNC
                 DBEJOrdline::renewalCustomerItemID,
                 $renewalCustomerItemID
             );
-
             $dbeOrdline->updateRow();
 
         }
-
-        $urlNext =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action' => 'edit',
-                    'ID'     => $renewalCustomerItemID
-                )
-            );
-
+        $urlNext = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action' => 'edit',
+                'ID'     => $renewalCustomerItemID
+            )
+        );
         header('Location: ' . $urlNext);
         exit;
     }
@@ -753,32 +707,27 @@ class CTRenContract extends CTCNC
             $this->edit();
             exit;
         }
-
         $this->buRenContract->updateRenContract($this->dsRenContract);
-
         if ($this->getParam('ordheadID') == 1) {        // see whether more renewals need to be edited for this
             // despatch
-            $urlNext =
-                Controller::buildLink(
-                    'Despatch',
-                    array(
-                        'action' => 'inputRenewals',
-                        'ID'     => $this->getParam('ordheadID')
-                    )
-                );
+            $urlNext = Controller::buildLink(
+                'Despatch',
+                array(
+                    'action' => 'inputRenewals',
+                    'ID'     => $this->getParam('ordheadID')
+                )
+            );
 
         } else {
-            $urlNext =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action' => 'edit',
-                        'ID'     => $this->dsRenContract->getValue(DBEJRenContract::customerItemID)
-                    )
-                );
+            $urlNext = Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action' => 'edit',
+                    'ID'     => $this->dsRenContract->getValue(DBEJRenContract::customerItemID)
+                )
+            );
 
         }
-
         header('Location: ' . $urlNext);
     }
 
@@ -792,16 +741,14 @@ class CTRenContract extends CTCNC
             $contractCustomerItemId,
             $dsRenContract
         );
-        $customerId = $dsRenContract->getValue(DBEJRenContract::customerID);
+        $customerId      = $dsRenContract->getValue(DBEJRenContract::customerID);
         $dbeCustomerItem = new DBECustomerItem($this);
         if (!$dbeCustomerItem->getRow($itemToAddId)) {
             throw new Exception('Item not found');
         }
-
         if ($customerId !== $dbeCustomerItem->getValue(DBECustomerItem::customerID)) {
             throw new Exception('The item does not belong to the same customer');
         }
-
         $dbeCustomerItem->addContract($itemToAddId, $contractCustomerItemId);
     }
 
@@ -835,7 +782,6 @@ class CTRenContract extends CTCNC
             $dsRenContract,
             $this->getParam('orderBy')
         );
-
         if ($dsRenContract->rowCount() > 0) {
             $this->template->set_block(
                 'RenContractList',
@@ -845,25 +791,20 @@ class CTRenContract extends CTCNC
             while ($dsRenContract->fetchNext()) {
 
                 $customerItemID = $dsRenContract->getValue(DBEJRenContract::customerItemID);
-
-                $urlEdit =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action' => 'edit',
-                            'ID'     => $customerItemID
-                        )
-                    );
-                $txtEdit = '[edit]';
-
-                $urlList =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action' => 'list'
-                        )
-                    );
-
+                $urlEdit        = Controller::buildLink(
+                    $_SERVER['PHP_SELF'],
+                    array(
+                        'action' => 'edit',
+                        'ID'     => $customerItemID
+                    )
+                );
+                $txtEdit        = '[edit]';
+                $urlList        = Controller::buildLink(
+                    $_SERVER['PHP_SELF'],
+                    array(
+                        'action' => 'list'
+                    )
+                );
                 $this->template->set_var(
                     array(
                         'customerName'    => $dsRenContract->getValue(DBEJRenContract::customerName),

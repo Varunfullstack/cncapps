@@ -124,7 +124,7 @@ class CTContact extends CTCNC
                     throw new Exception('Customer ID is required');
                 }
                 $customerId = $_REQUEST['customerId'];
-                $dsResult = new DataSet($this);
+                $dsResult   = new DataSet($this);
                 $this->buContact->getCustomerContactsByNameMatch($customerId, $term, $dsResult);
                 $sites = [];
                 while ($dsResult->fetchNext()) {
@@ -197,7 +197,6 @@ class CTContact extends CTCNC
             $_SERVER['PHP_SELF'],
             array(
                 'action'      => CTCNC_ACT_DISP_CONTACT_POPUP,
-                'supplierID'  => $this->dsContact->getValue(DBEContact::supplierID),
                 'customerID'  => $this->dsContact->getValue(DBEContact::customerID),
                 'siteNo'      => $this->dsContact->getValue(DBEContact::siteNo),
                 'contactName' => $this->dsContact->getPKValue(),
@@ -232,20 +231,12 @@ class CTContact extends CTCNC
             header('Location: ' . $urlCreate);
             exit;
         }
-        if ($this->getParam('supplierID')) {
-            $this->buContact->getSupplierContactsByNameMatch(
-                $this->getParam('supplierID'),
-                $this->getParam('contactName'),
-                $this->dsContact
-            );
-        } else {
-            $this->buContact->getCustomerContactsByNameMatch(
-                $this->getParam('customerID'),
-                $this->getParam('contactName'),
-                $this->dsContact,
-                $this->getParam('siteNo')
-            );
-        }
+        $this->buContact->getCustomerContactsByNameMatch(
+            $this->getParam('customerID'),
+            $this->getParam('contactName'),
+            $this->dsContact,
+            $this->getParam('siteNo')
+        );
         if ($this->dsContact->rowCount() == 1) {
             $this->setTemplateFiles(
                 'ContactSelect',

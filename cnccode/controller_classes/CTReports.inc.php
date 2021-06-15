@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Further Action controller class
  * CNC Ltd
@@ -8,28 +7,28 @@
  * @authors Karim Ahmed - Sweet Code Limited
  */
 
- 
+use CNCLTD\Data\DBConnect;
 
 global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_dbe'] . '/DBEProject.inc.php');
 require_once($cfg['path_dbe'] . '/DBEProjectIssues.inc.php');
 require_once($cfg['path_bu'] . '/BUExpense.inc.php');
- 
+
 
 class CTReports extends CTCNC
 {
-    const CONST_REPORT_CATEGORIES='reportCategories';
-    const CONST_CATEGORY_REPORTS='categoryReports';
-    const CONST_REPORT_PARAMTERS='reportParamters';
+    const CONST_REPORT_CATEGORIES = 'reportCategories';
+    const CONST_CATEGORY_REPORTS  = 'categoryReports';
+    const CONST_REPORT_PARAMTERS  = 'reportParamters';
 
-    function __construct(
-        $requestMethod,
-        $postVars,
-        $getVars,
-        $cookieVars,
-        $cfg
-    ) {
+    function __construct($requestMethod,
+                         $postVars,
+                         $getVars,
+                         $cookieVars,
+                         $cfg
+    )
+    {
         parent::__construct(
             $requestMethod,
             $postVars,
@@ -40,12 +39,10 @@ class CTReports extends CTCNC
         // $roles = [
         //     "technical"
         // ];
-
         // if (!self::hasPermissions($roles)) {
         //     Header("Location: /NotAllowed.php");
         //     exit;
         // }
-
         //$this->setMenuId(107);
     }
 
@@ -55,20 +52,20 @@ class CTReports extends CTCNC
      */
     function defaultAction()
     {
-        $method=$_SERVER['REQUEST_METHOD'] ;
+        $method = $_SERVER['REQUEST_METHOD'];
         switch ($this->getAction()) {
             case self::CONST_REPORT_CATEGORIES:
                 switch ($method) {
                     case 'GET':
-                        echo json_encode($this->getReportsCategories(),JSON_NUMERIC_CHECK);
+                        echo json_encode($this->getReportsCategories(), JSON_NUMERIC_CHECK);
                         break;
                 }
                 break;
             case self::CONST_CATEGORY_REPORTS:
-                echo json_encode($this->getCategoryReports(),JSON_NUMERIC_CHECK);
+                echo json_encode($this->getCategoryReports(), JSON_NUMERIC_CHECK);
                 break;
             case self::CONST_REPORT_PARAMTERS:
-                echo json_encode($this->getReportParamters(),JSON_NUMERIC_CHECK);
+                echo json_encode($this->getReportParamters(), JSON_NUMERIC_CHECK);
                 break;
             default:
                 $this->setTemplate();
@@ -77,10 +74,8 @@ class CTReports extends CTCNC
 
     function setTemplate()
     {
-        if(isset($_REQUEST["hideMenu"]))
-            $this->hideMenu();
-        else
-        $this->setPageTitle('Reports');
+        if (isset($_REQUEST["hideMenu"])) $this->hideMenu(); else
+            $this->setPageTitle('Reports');
         $this->setTemplateFiles(
             array('Reports' => 'Reports.rct')
         );
@@ -93,18 +88,20 @@ class CTReports extends CTCNC
         );
         $this->parsePage();
     }
-    function getReportsCategories(){
-        $active=@$_REQUEST['active']??1;
-        $query="select id,title,active from reports_categories";
-        if($active)
-            $query .=" where active=1";
+
+    function getReportsCategories()
+    {
+        $active = @$_REQUEST['active'] ?? 1;
+        $query  = "select id,title,active from reports_categories";
+        if ($active) $query .= " where active=1";
         return DBConnect::fetchAll($query);
     }
-    function getCategoryReports(){
-        $categoryID=@$_REQUEST['categoryID'];
-        if(!$categoryID)
-            throw new Exception("category id is missing",400);
-        $query="
+
+    function getCategoryReports()
+    {
+        $categoryID = @$_REQUEST['categoryID'];
+        if (!$categoryID) throw new Exception("category id is missing", 400);
+        $query = "
         SELECT 
         r.id,
         r.title,
@@ -113,13 +110,14 @@ class CTReports extends CTCNC
         from report_categories rc join reports r on rc.reportID=r.id
         where rc.categoryID=:categoryID
         ";
-        return DBConnect::fetchAll($query,["categoryID"=>$categoryID]);
+        return DBConnect::fetchAll($query, ["categoryID" => $categoryID]);
     }
-    function getReportParamters(){
-        $reportID=@$_REQUEST["reportID"];
-        if(!$reportID)
-            throw new Exception("report id is missing",400);
-        $query="select rp.id,
+
+    function getReportParamters()
+    {
+        $reportID = @$_REQUEST["reportID"];
+        if (!$reportID) throw new Exception("report id is missing", 400);
+        $query  = "select rp.id,
                 rp.reportID,
                 rp.paramterID,
                 rp.title,
@@ -130,8 +128,8 @@ class CTReports extends CTCNC
                 from report_paramters rp 
                 join reports_paramters p
                     on rp.paramterID=p.id
-                where reportID=:reportID ";            
-        $params=DBConnect::fetchAll($query,["reportID"=>$reportID]);
+                where reportID=:reportID ";
+        $params = DBConnect::fetchAll($query, ["reportID" => $reportID]);
         return $params;
     }
 }

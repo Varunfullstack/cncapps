@@ -1,11 +1,8 @@
-<?php /**
- * Contact controller class
- * CNC Ltd
- *
- * @access public
- * @authors Karim Ahmed - Sweet Code Limited
- */
+<?php
 global $cfg;
+
+use CNCLTD\Data\DBEItem;
+
 require_once($cfg['path_bu'] . '/BUContactExport.inc.php');
 require_once($cfg['path_bu'] . '/BUContact.inc.php');
 require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
@@ -13,7 +10,6 @@ require_once($cfg['path_bu'] . '/BUHeader.inc.php');
 require_once($cfg['path_bu'] . '/BUSector.inc.php');
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
-require_once($cfg['path_dbe'] . '/DBEItem.inc.php');
 require_once($cfg['path_dbe'] . '/DBEStandardText.inc.php');
 
 class CTContactExport extends CTCNC

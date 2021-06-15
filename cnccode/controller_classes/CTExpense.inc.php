@@ -6,11 +6,13 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+
+use CNCLTD\Business\BUActivity;
+
 global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BUExpense.inc.php');
 require_once($cfg['path_bu'] . '/BUExpenseType.inc.php');
-require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
 require_once($cfg['path_dbe'] . '/DBEReceipt.php');
 // Actions
@@ -84,10 +86,10 @@ class CTExpense extends CTCNC
             exit;
         }
         $this->setMenuId(708);
-        $this->buExpense = new BUExpense($this);
-        $this->dsSearchForm = new DSForm($this);
+        $this->buExpense       = new BUExpense($this);
+        $this->dsSearchForm    = new DSForm($this);
         $this->dsSearchResults = new DSForm($this);
-        $this->dsExpense = new DSForm($this);
+        $this->dsExpense       = new DSForm($this);
         $this->dsExpense->copyColumnsFrom($this->buExpense->dbeJExpense);
     }
 
@@ -141,38 +143,30 @@ class CTExpense extends CTCNC
             $this->displayFatalError('no callActivityID passed');
             exit;
         }
-
         $this->setPageTitle('Expenses');
         $this->setTemplateFiles(
             array('ExpenseList' => 'ExpenseList.inc')
         );
-
-        $buActivity = new BUActivity($this);
+        $buActivity     = new BUActivity($this);
         $dsCallActivity = new DataSet($this);
         $buActivity->getActivityByID(
             $this->getParam('callActivityID'),
             $dsCallActivity
         );
-
-        $urlCreate =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action'         => CTEXPENSE_ACT_CREATE_EXPENSE,
-                    'callActivityID' => $this->getParam('callActivityID')
-                )
-            );
-
-        $urlCallActivity =
-            Controller::buildLink(
-                'SRActivity.php',
-                array(
-                    'action'         => 'displayActivity',
-                    'callActivityID' => $dsCallActivity->getValue(DBEJCallActivity::callActivityID)
-                )
-            );
-
-
+        $urlCreate = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action'         => CTEXPENSE_ACT_CREATE_EXPENSE,
+                'callActivityID' => $this->getParam('callActivityID')
+            )
+        );
+        $urlCallActivity = Controller::buildLink(
+            'SRActivity.php',
+            array(
+                'action'         => 'displayActivity',
+                'callActivityID' => $dsCallActivity->getValue(DBEJCallActivity::callActivityID)
+            )
+        );
         $this->template->set_var(
             array(
                 'callActivityID'      => $dsCallActivity->getValue(DBEJCallActivity::callActivityID),
@@ -209,15 +203,14 @@ class CTExpense extends CTCNC
                 'expenses'
             );
             while ($dsExpense->fetchNext()) {
-                $expenseID = $dsExpense->getValue(DBEJExpense::expenseID);
-                $expenseTypeID = $dsExpense->getValue(DBEJExpense::expenseTypeID);
+                $expenseID      = $dsExpense->getValue(DBEJExpense::expenseID);
+                $expenseTypeID  = $dsExpense->getValue(DBEJExpense::expenseTypeID);
                 $dbeExpenseType = new DBEExpenseType($this);
                 $dbeExpenseType->getRow($expenseTypeID);
                 $uploadReceipt = null;
                 if ($dbeExpenseType->getValue(DBEExpenseType::receiptRequired)) {
                     $dbeReceipt = new DBEReceipt($this);
                     $dbeReceipt->getReceiptByExpenseId($expenseID);
-
                     if ($dbeReceipt->rowCount()) {
                         $uploadReceipt = "<a href='/Receipt.php?action=show&receiptID=" . $dbeReceipt->getValue(
                                 DBEReceipt::id
@@ -229,31 +222,26 @@ class CTExpense extends CTCNC
 
                 }
                 $urlEdit = $urlDelete = $txtEdit = $txtDelete = null;
-
                 if ($dsExpense->getValue(DBEExpense::exportedFlag) != 'Y' && !$dsExpense->getValue(
                         DBEExpense::deniedReason
                     ) && !$dsExpense->getValue(DBEExpense::approvedBy)) {
-                    $urlEdit =
-                        Controller::buildLink(
-                            $_SERVER['PHP_SELF'],
-                            array(
-                                'action'    => CTEXPENSE_ACT_EDIT_EXPENSE,
-                                'expenseID' => $expenseID
-                            )
-                        );
-                    $txtEdit = '[edit]';
-                    $urlDelete =
-                        Controller::buildLink(
-                            $_SERVER['PHP_SELF'],
-                            array(
-                                'action'    => CTEXPENSE_ACT_DELETE_EXPENSE,
-                                'expenseID' => $expenseID
-                            )
-                        );
+                    $urlEdit   = Controller::buildLink(
+                        $_SERVER['PHP_SELF'],
+                        array(
+                            'action'    => CTEXPENSE_ACT_EDIT_EXPENSE,
+                            'expenseID' => $expenseID
+                        )
+                    );
+                    $txtEdit   = '[edit]';
+                    $urlDelete = Controller::buildLink(
+                        $_SERVER['PHP_SELF'],
+                        array(
+                            'action'    => CTEXPENSE_ACT_DELETE_EXPENSE,
+                            'expenseID' => $expenseID
+                        )
+                    );
                     $txtDelete = '[delete]';
                 }
-
-
                 $this->template->set_var(
                     array(
                         'expenseID'      => $expenseID,
@@ -272,9 +260,7 @@ class CTExpense extends CTCNC
                         ) ? 'Approved' : ($dsExpense->getValue(DBEExpense::deniedReason) ? 'Denied' : 'Pending')
                     )
                 );
-
                 $totalValue += $dsExpense->getValue(DBEJExpense::value);
-
                 $this->template->parse(
                     'expenses',
                     'expenseBlock',
@@ -314,28 +300,26 @@ class CTExpense extends CTCNC
         }
         // get the activity and call records
         $callActivityID = $dsExpense->getValue(DBEJExpense::callActivityID);
-        $buActivity = new BUActivity($this);
+        $buActivity     = new BUActivity($this);
         $dsCallActivity = new DataSet($this);
         $buActivity->getActivityByID(
             $callActivityID,
             $dsCallActivity
         );
-        $urlUpdateExpense =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action'    => CTEXPENSE_ACT_UPDATE_EXPENSE,
-                    'expenseID' => $expenseID
-                )
-            );
-        $urlDisplayExpenses =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action'         => CTCNC_ACT_VIEW,
-                    'callActivityID' => $callActivityID
-                )
-            );
+        $urlUpdateExpense   = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action'    => CTEXPENSE_ACT_UPDATE_EXPENSE,
+                'expenseID' => $expenseID
+            )
+        );
+        $urlDisplayExpenses = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action'         => CTCNC_ACT_VIEW,
+                'callActivityID' => $callActivityID
+            )
+        );
         $this->setPageTitle('Expense');
         $this->setTemplateFiles(
             array('ExpenseEdit' => 'ExpenseEdit.inc')
@@ -343,7 +327,6 @@ class CTExpense extends CTCNC
         $dbeUser = new DBEUser($this);
         $dbeUser->getRow($dsExpense->getValue(DBEJExpense::userID));
         $userMileageRate = $dbeUser->getValue(DBEUser::petrolRate);
-
         $this->template->set_var(
             array(
                 'expenseID'           => $this->getParam('expenseID'),
@@ -385,7 +368,7 @@ class CTExpense extends CTCNC
             'expenseTypeBlock',
             'expenseTypes'
         );
-        $buExpenseType = new BUExpenseType($this);
+        $buExpenseType   = new BUExpenseType($this);
         $allowedExpenses = $buExpenseType->getExpenseTypesAllowedForActivityTypeID(
             $dsCallActivity->getValue(DBECallActivity::callActTypeID)
         );
@@ -407,7 +390,6 @@ class CTExpense extends CTCNC
                     "allowsTax"           => $dbeExpenseType->getValue(
                         DBEExpenseType::vatFlag
                     ) == 'Y' ? 'data-allows-tax="1"' : '',
-
                 )
             );
             $this->template->parse(
@@ -443,15 +425,13 @@ class CTExpense extends CTCNC
             exit;
         }
         $callActivityID = $this->buExpense->deleteExpense($this->getParam('expenseID'));
-
-        $urlNext =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action'         => CTCNC_ACT_VIEW,
-                    'callActivityID' => $callActivityID
-                )
-            );
+        $urlNext = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action'         => CTCNC_ACT_VIEW,
+                'callActivityID' => $callActivityID
+            )
+        );
         header('Location: ' . $urlNext);
     }// end function editExpense()
 
@@ -464,31 +444,27 @@ class CTExpense extends CTCNC
     {
         $this->setMethodName('updateExpense');
         $expenseToUpdate = $this->getParam('expense')[1];
-        $expenseID = $expenseToUpdate['expenseID'];
-        $dbeExpense = new DBEExpense($this);
+        $expenseID       = $expenseToUpdate['expenseID'];
+        $dbeExpense      = new DBEExpense($this);
         $dbeExpense->getRow($expenseID);
         $expenseToUpdate[DBEExpense::deniedReason] = $dbeExpense->getValue(DBEExpense::deniedReason);
-        $this->formError = (!$this->dsExpense->populateFromArray([$expenseToUpdate]));
+        $this->formError                           = (!$this->dsExpense->populateFromArray([$expenseToUpdate]));
         if ($this->formError) {
             $this->editExpense();
             exit;
         }
-
         if ($this->getParam('submit') === 'Delete') {
             $this->buExpense->deleteExpense($this->dsExpense->getValue(DBEExpense::expenseID));
         } else {
             $this->buExpense->updateExpense($this->dsExpense);
         }
-
-
-        $urlNext =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'callActivityID' => $this->dsExpense->getValue(DBEJExpense::callActivityID),
-                    'action'         => CTCNC_ACT_VIEW
-                )
-            );
+        $urlNext = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'callActivityID' => $this->dsExpense->getValue(DBEJExpense::callActivityID),
+                'action'         => CTCNC_ACT_VIEW
+            )
+        );
         header('Location: ' . $urlNext);
     }
 
@@ -505,15 +481,13 @@ class CTExpense extends CTCNC
             throw new Exception('Call activity ID not provided');
         }
         $expenseID = $this->buExpense->createExpenseFromCallActivityID($this->getParam('callActivityID'));
-
-        $urlNext =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'expenseID' => $expenseID,
-                    'action'    => CTEXPENSE_ACT_EDIT_EXPENSE
-                )
-            );
+        $urlNext = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'expenseID' => $expenseID,
+                'action'    => CTEXPENSE_ACT_EDIT_EXPENSE
+            )
+        );
         header('Location: ' . $urlNext);
     }
 
@@ -570,7 +544,6 @@ class CTExpense extends CTCNC
                 $this->getParam('exportType'),
                 $this->dbeUser
             );
-
             if ($this->getParam('exportType') == 'Export') {
                 $dbeHeader = new DBEHeader($this);
                 $dbeHeader->getRow(1);
@@ -585,7 +558,6 @@ class CTExpense extends CTCNC
                     $this->setFormErrorMessage('No data to export for this date');
                 }
             } else { // trial
-
                 if ($expensesExported) {
                     $this->setFormErrorMessage('Trial data sent to CNC Payroll');
                 } else {
@@ -593,7 +565,6 @@ class CTExpense extends CTCNC
                 }
 
             }
-
             $this->exportExpenseForm();
         }
         // to display

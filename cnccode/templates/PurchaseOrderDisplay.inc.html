@@ -10,41 +10,48 @@
 </style>
 {PurchaseOrderLineEditJS}
 <script language='JavaScript'>
+
+    const isPartReceived = {isPartReceived};
+    const canChangeStatus = {canChangeStatus};
+    const type = '{type}';
+    let typeInput;
+
+
     function checkFunctionKey(field) {
         if (event.keyCode == 120) {			// F9 - edit
             switch (field.id) {
                 case "itemDescription":
                     if (document.getElementById("itemID").value != "0") {
                         window.open(
-                            '{urlItemEdit}&itemID=' +
-                            escape(document.getElementById("itemID").value) +
-                            '&parentIDField=itemID' +
-                            '&parentDescField=itemName',
-                            'item',
-                            'scrollbars=yes,resizable=yes,width=500,height=550,copyhistory=no, menubar=0'
+                                '{urlItemEdit}&itemID=' +
+                                escape(document.getElementById("itemID").value) +
+                                '&parentIDField=itemID' +
+                                '&parentDescField=itemName',
+                                'item',
+                                'scrollbars=yes,resizable=yes,width=500,height=550,copyhistory=no, menubar=0'
                         );
                     }
                     break;
                 case "supplierName":
                     if (document.getElementById("supplierID").value != "0") {
                         window.open(
-                            '{urlSupplierEdit}&supplierID=' +
-                            escape(document.getElementById("supplierID").value) +
-                            '&parentIDField=supplierID' +
-                            '&parentDescField=supplierName',
-                            'supplier',
-                            'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0'
+                                '{urlSupplierEdit}&supplierID=' +
+                                escape(document.getElementById("supplierID").value) +
+                                '&parentIDField=supplierID' +
+                                '&parentDescField=supplierName',
+                                'supplier',
+                                'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0'
                         );
                     }
                     break;
                 case "contactName":
                     if (document.getElementById("contactID").value != "") {
                         window.open(
-                            '{urlContactEdit}' +
-                            '&contactID=' + escape(document.getElementById("contactID").value) +
-                            '&parentIDField=contactID' +
-                            '&parentDescField=contactName',
-                            'address', 'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0');
+                                '{urlContactEdit}' +
+                                '&contactID=' + escape(document.getElementById("contactID").value) +
+                                '&parentIDField=contactID' +
+                                '&parentDescField=contactName',
+                                'address', 'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0');
                     }
                     break;
             }
@@ -212,54 +219,131 @@
         }
     }
 
+    let addNewButton = null;
     document.addEventListener("DOMContentLoaded", function () {
         checkValidity();
 
-        document.getElementById('addNewRowButton').addEventListener('click', $event => {
-            open('/PurchaseOrder.php?action=addOrdline&porheadID=' + getPurchaseOrderId(), '_blank');
-        })
+        typeInput = document.querySelector('input[type="hidden"][name="porhead[1][type]"]');
 
+        addNewButton = document.getElementById('addNewRowButton');
         const deleteLineButtons = document.querySelectorAll('button.deleteLineButton');
 
 
-        deleteLineButtons.forEach(el => el.addEventListener('click', ($event) => {
-
-                if (!confirm('Are you sure you want to delete this row?')) {
-                    return;
-                }
-
-                const target = $event.target;
-                const row = target.closest('tr');
-
-                const currentSequenceNo = row.dataset.seqNo;
-
-                fetch('?action=delOrdline', {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        purchaseOrderHeadId: getPurchaseOrderId(),
-                        sequenceNumber: row.dataset.seqNo
-                    })
-                })
-                    .then(x => x.json())
-                    .then(res => {
-                        if (res.status !== 'ok') {
-                            throw new Error('Failed to delete row: ' + res.message);
-                        }
-                        const tbody = row.closest('tbody');
-                        row.remove();
-                        updateSequenceNumbers(tbody.children, currentSequenceNo, tbody.childElementCount);
-
-                    })
-                    .catch(error => {
-                        alert(error);
-                        console.error(error)
-                    })
-
-
+        if (isPartReceived) {
+            addNewButton.style.display = 'none';
+            deleteLineButtons.forEach(deleteButton => {
+                deleteButton.style.display = 'none'
+            });
+        } else {
+            addNewButton.addEventListener('click', $event => {
+                open('/PurchaseOrder.php?action=addOrdline&porheadID=' + getPurchaseOrderId(), '_blank');
             })
-        );
+            deleteLineButtons.forEach(el => el.addEventListener('click', ($event) => {
+
+                        if (!confirm('Are you sure you want to delete this row?')) {
+                            return;
+                        }
+
+                        const target = $event.target;
+                        const row = target.closest('tr');
+
+                        const currentSequenceNo = row.dataset.seqNo;
+
+                        fetch('?action=delOrdline', {
+                            method: 'POST',
+                            body: JSON.stringify({
+                                purchaseOrderHeadId: getPurchaseOrderId(),
+                                sequenceNumber: row.dataset.seqNo
+                            })
+                        })
+                                .then(x => x.json())
+                                .then(res => {
+                                    if (res.status !== 'ok') {
+                                        throw new Error('Failed to delete row: ' + res.message);
+                                    }
+                                    const tbody = row.closest('tbody');
+                                    row.remove();
+                                    updateSequenceNumbers(tbody.children, currentSequenceNo, tbody.childElementCount);
+
+                                })
+                                .catch(error => {
+                                    alert(error);
+                                    console.error(error)
+                                })
+
+
+                    })
+            );
+
+        }
+
+        if (canChangeStatus) {
+
+            const updateButtonRow = document.querySelector('.updateButtonRow');
+            const newRow = getStatusRow(type)
+            updateButtonRow.parentNode.insertBefore(newRow, updateButtonRow);
+        }
 
     });
+
+    function getStatusRow(currentSelectedValue) {
+        const newRow = document.createElement('tr');
+        const promptText = document.createElement('td');
+        promptText.className = "promptText";
+        promptText.textContent = "Status";
+        newRow.appendChild(promptText);
+        const selector = document.createElement('td');
+        selector.className = "mainHeadText";
+        const statusSelector = getStatusSelector(currentSelectedValue)
+        selector.appendChild(statusSelector);
+        const button = document.createElement('button');
+        button.textContent = "Update Status";
+        button.addEventListener('click', () => {
+            if (selector.value == typeInput.value) {
+                return;
+            }
+            const purchaseOrderId = getPurchaseOrderId();
+            const newStatus = statusSelector.value;
+
+            fetch('?action=UPDATE_STATUS&purchaseOrderId=' + purchaseOrderId + '&newStatus=' + newStatus)
+                    .then(response => response.json())
+                    .then(response => {
+                        console.log(response);
+                        if (response.status == 'error') {
+                            throw new Error(response.message);
+                        }
+                        document.location.reload();
+                    })
+                    .catch(error => {
+                        console.log(error);
+                        alert(error.message);
+                    })
+
+        })
+        selector.appendChild(button);
+        newRow.appendChild(selector);
+        return newRow;
+    }
+
+    function getStatusSelector(currentSelectedValue) {
+        const options = [
+            {value: "I", label: "Initial",},
+            {value: "P", label: "Part Received",},
+            {value: "C", label: "Completed",},
+            {value: "A", label: "Authorised"},
+        ]
+        const selector = document.createElement('select');
+        selector.value = currentSelectedValue;
+        options.forEach(optionData => {
+            const option = document.createElement('option');
+            option.label = optionData.label;
+            option.value = optionData.value;
+            option.selected = currentSelectedValue === optionData.value;
+            selector.options.add(option);
+        })
+        return selector;
+    }
+
 </SCRIPT>
 
 <TABLE width="400px"

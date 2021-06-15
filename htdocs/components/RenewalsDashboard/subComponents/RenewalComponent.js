@@ -1,7 +1,7 @@
 import MainComponent from "../../shared/MainComponent";
 import React from 'react';
 import Table from "../../shared/table/table";
-import {dateFormatExcludeNull, exportCSV, sort} from "../../utils/utils";
+import {dateFormatExcludeNull, exportCSV, poundFormat, sort} from "../../utils/utils";
 
 export class RenewalComponent extends MainComponent {
     constructor(props) {
@@ -36,7 +36,6 @@ export class RenewalComponent extends MainComponent {
                 hdClassName: "text-center",
                 icon: "fal fa-2x fa-shopping-cart color-gray2 pointer",
                 sortable: true,
-                // className: "text-center",
                 backgroundColorColumn: "sentQuotationColor",
             },
             {
@@ -101,6 +100,28 @@ export class RenewalComponent extends MainComponent {
                 content: order => dateFormatExcludeNull(order.latestQuoteSent, 'YYYY-MM-DD HH:mm:ss', 'DD/MM/YYYY HH:mm:ss')
             },
             {
+                path: "costAnnum",
+                label: "",
+                hdToolTip: "Cost Price/Annum",
+                hdClassName: "text-center",
+                icon: "fal fa-2x fa-coin color-gray2 pointer",
+                sortable: true,
+                className: "text-right",
+                backgroundColorColumn: "sentQuotationColor",
+                content: order => poundFormat(order.costAnnum)
+            },
+            {
+                path: "saleAnnum",
+                label: "",
+                hdToolTip: "Sale Price/Annum",
+                hdClassName: "text-center",
+                icon: "fal fa-2x fa-coins color-gray2 pointer",
+                sortable: true,
+                className: "text-right",
+                backgroundColorColumn: "sentQuotationColor",
+                content: order => poundFormat(order.saleAnnum)
+            },
+            {
                 path: "customerItemID",
                 label: "",
                 hdToolTip: "Edit",
@@ -137,7 +158,9 @@ export class RenewalComponent extends MainComponent {
                 'Invoice From': d.startDate,
                 'Expire Date': d.nextPeriodStartDate,
                 'Comments': d.comments,
-                'Latest Quote Sent': d.latestQuoteSent
+                'Latest Quote Sent': d.latestQuoteSent,
+                "Cost Price/Annum": d.costAnnum,
+                "Sale Price/Annum": d.saleAnnum,
             }
         })
         exportCSV(exportData, 'Renewals.csv');

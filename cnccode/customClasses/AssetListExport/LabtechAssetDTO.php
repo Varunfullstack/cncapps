@@ -1,6 +1,10 @@
 <?php
 
 namespace CNCLTD\AssetListExport;
+
+use DateTime;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
+
 class LabtechAssetDTO
 {
     private $isHostServer;
@@ -38,7 +42,7 @@ class LabtechAssetDTO
         $this->model         = preg_replace('/\s+/', ' ', $this->model);
         $this->officeVersion = ucwords($this->officeVersion);
         if ($this->isHostServer) {
-            $re  = '/Service tag=(.*?);/m';
+            $re  = '/.*Service tag=(.*?)(;|$)/m';
             $str = $this->serialNumber;
             if (preg_match_all($re, $str, $matches, PREG_SET_ORDER, 0)) {
                 $this->serialNumber = $matches[0][1];
@@ -58,12 +62,20 @@ class LabtechAssetDTO
             $this->computerName = substr($this->computerName, 0, $firstStopPosition);
         }
         if ($this->antivirusDefinition) {
-            $testDate = \DateTime::createFromFormat(DATE_CNC_DATE_FORMAT, $this->antivirusDefinition);
-            if (!$testDate || $testDate->format(DATE_CNC_DATE_FORMAT) !== $this->antivirusDefinition) {
+            $testDate = DateTime::createFromFormat(DATE_MYSQL_DATETIME, $this->antivirusDefinition);
+            if (!$testDate || $testDate->format(DATE_MYSQL_DATETIME) !== $this->antivirusDefinition) {
                 $this->antivirusDefinition = null;
             }
         }
 
+    }
+
+    public function is3CX(): bool
+    {
+        if (!$this->computerName || !preg_match('/.*3CX.*/', $this->computerName)) {
+            return false;
+        }
+        return true;
     }
 
     private function getUnrepeatedUsername($str)
@@ -142,6 +154,16 @@ class LabtechAssetDTO
         return $this->warrantyStartDate;
     }
 
+    public function getWarrantyStartDateAsOfficeDate()
+    {
+        return $this->getDateAsExcelDate($this->warrantyStartDate);
+    }
+
+    public function getWarrantyEndDateAsOfficeDate()
+    {
+        return $this->getDateAsExcelDate($this->warrantyExpiryDate);
+    }
+
     /**
      * @return mixed
      */
@@ -163,7 +185,7 @@ class LabtechAssetDTO
      */
     public function getSerialNumber()
     {
-        return $this->serialNumber;
+        return trim($this->serialNumber);
     }
 
     /**
@@ -238,6 +260,11 @@ class LabtechAssetDTO
         return $this->antivirusDefinition;
     }
 
+    public function antivirusDefinitionAsExcelDate()
+    {
+        return $this->getDateAsExcelDate($this->antivirusDefinition);
+    }
+
     /**
      * @return mixed
      */
@@ -268,6 +295,25 @@ class LabtechAssetDTO
     public function getLastContact()
     {
         return $this->lastContact;
+    }
+
+    public function lastContactAsExcelDate()
+    {
+        return $this->getDateAsExcelDate($this->lastContact);
+    }
+
+    /**
+     * @param $data
+     * @return bool|float|int
+     */
+    private function getDateAsExcelDate($data)
+    {
+        $dateTime = DateTime::createFromFormat('Y-m-d H:i:s', $data);
+        if (!$dateTime) {
+            return $data;
+        }
+
+        return Date::PHPToExcel($dateTime->getTimestamp());
     }
 
 }

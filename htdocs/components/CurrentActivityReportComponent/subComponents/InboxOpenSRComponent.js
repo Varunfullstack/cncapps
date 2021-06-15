@@ -64,9 +64,9 @@ class InboxOpenSRComponent extends React.Component {
                 className: "text-center",
                 content: (problem) =>
                     <ToolTip title="Call back">
-                        <i className="fal fa-2x fa-phone icon pointer color-gray"
+                        <i className={`fal fa-2x icon pointer color-gray fa-phone${problem.hasCallback ? '-plus' : ''}`}
                            onClick={() => this.props.onCallBack(problem)}
-                        ></i>
+                        />
                     </ToolTip>
 
             },

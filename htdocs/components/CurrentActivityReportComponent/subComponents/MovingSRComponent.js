@@ -16,6 +16,7 @@ class MovingSRComponent extends MainComponent {
         this.state = {
             ...this.state,
             show: false,
+            isPriorityOnly: false,
             changeQueuData: {
                 priorityTemplateText: "",
                 priorities: [],
@@ -49,6 +50,7 @@ class MovingSRComponent extends MainComponent {
             current_state.changeQueuData.priorityTemplate = "";
             current_state.changeQueuData.priorityId = props.problem.priority;
             current_state.changeQueuData.movingSrReason = "";
+            current_state.isPriorityOnly = props.newTeam === 'PRI';
         }
         return current_state;
     }
@@ -59,35 +61,38 @@ class MovingSRComponent extends MainComponent {
         this.setState({changeQueuData});
     }
     getAssignTeamModal = () => {
-        const {changeQueuData, show} = this.state;
+        const {changeQueuData, show, isPriorityOnly} = this.state;
         if (!show)
             return null;
         return <Modal key="modal"
                       onClose={this.handleCancel}
                       width={650}
                       show={show}
-                      title="Change queue / priority"
+                      title={`Change ${isPriorityOnly ? '' : 'queue / '}priority`}
                       content={
                           <div key="content">
-                              <div className="form-group">
-                                  <label>Reason for moving this SR to another queue</label>
-                                  <textarea style={{
-                                      border: "1px solid white",
-                                      minHeight: 50,
-                                      backgroundColor: "transparent",
-                                      color: "white",
-                                      fontSize: 15
-                                  }}
-                                            onChange={(event) => this.setChangeQueueData("movingSrReason", event.target.value)}
-                                  ></textarea>
-                              </div>
+                              {
+                                  isPriorityOnly ? '' :
+                                      <div className="form-group">
+                                          <label>Reason for moving this SR to another queue</label>
+                                          <textarea style={{
+                                              border: "1px solid white",
+                                              minHeight: 50,
+                                              backgroundColor: "transparent",
+                                              color: "white",
+                                              fontSize: 15
+                                          }}
+                                                    onChange={(event) => this.setChangeQueueData("movingSrReason", event.target.value)}
+                                          />
+                                      </div>
+                              }
                               <div className="form-group">
                                   <label>Priority</label>
                                   <select style={{width: 360}}
                                           value={changeQueuData.priorityId}
                                           onChange={(event) => this.setChangeQueueData("priorityId", event.target.value)}
                                   >
-                                      <option></option>
+                                      <option/>
                                       {changeQueuData.priorities.map(r => <option key={r.id}
                                                                                   value={r.id}
                                       >{r.name}</option>)}
@@ -99,20 +104,21 @@ class MovingSRComponent extends MainComponent {
                                           value={changeQueuData.priorityTemplate?.id}
                                           onChange={(event) => this.handleTemplateChange(event.target.value)}
                                   >
-                                      <option></option>
+                                      <option/>
                                       {changeQueuData.priorityReasons.map(r => <option key={r.id}
                                                                                        value={r.id}
                                       >{r.name}</option>)}
                                   </select>
                               </div>
                               <div className="form-group">
-                                  <label>Reason for changing this SR priority (this will be sent to the
-                                      customer)"</label>
+                                  <label>
+                                      Reason for changing this SR priority (this will be sent to the customer)
+                                  </label>
                                   <CNCCKEditor value={changeQueuData.priorityTemplateText}
                                                type="inline"
                                                style={{border: "1px solid white", minHeight: 50}}
                                                onChange={(text) => this.setChangeQueueData("priorityTemplateText", text)}
-                                  ></CNCCKEditor>
+                                  />
                               </div>
                           </div>
                       }
@@ -125,14 +131,16 @@ class MovingSRComponent extends MainComponent {
         </Modal>
     }
     handleSaveMovingSR = () => {
-        const {changeQueuData} = this.state;
+        const {changeQueuData, isPriorityOnly} = this.state;
         let queueChanged = false, priorityChange = false;
         const callApis = [];
-        if (changeQueuData.problem.status == "P" && changeQueuData.movingSrReason == "") {
-            this.alert("A reason for moving queues is required because this request has been started");
-            return;
-        } else if (changeQueuData.problem.status == "I" || changeQueuData.movingSrReason != "") {
-            queueChanged = true;
+        if (!isPriorityOnly) {
+            if (changeQueuData.problem.status == "P" && changeQueuData.movingSrReason == "") {
+                this.alert("A reason for moving queues is required because this request has been started");
+                return;
+            } else if (changeQueuData.problem.status == "I" || changeQueuData.movingSrReason != "") {
+                queueChanged = true;
+            }
         }
 
         if (changeQueuData.priorityId != changeQueuData.problem.priority && changeQueuData.priorityTemplateText == "") {

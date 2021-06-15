@@ -4,20 +4,27 @@
 
 <script type="text/javascript">
 
+    const SALES_ORDER_TYPES = {
+        QUOTATION: 'Q',
+        INITIAL: 'I'
+    }
+
+    const salesOrderType = "{salesOrderType}";
+
     function customerNotePopup() {
         window.open(
-            '{urlCustomerNote}',
-            'item',
-            'scrollbars=yes,resizable=yes,width=660,height=560,copyhistory=no, menubar=0'
+                '{urlCustomerNote}',
+                'item',
+                'scrollbars=yes,resizable=yes,width=660,height=560,copyhistory=no, menubar=0'
         );
 
     }
 
     function serviceRequestPopup() {
         window.open(
-            '{urlServiceRequest}',
-            'item',
-            'scrollbars=yes,resizable=yes,width=900,height=800,copyhistory=no, menubar=0'
+                '{urlServiceRequest}',
+                'item',
+                'scrollbars=yes,resizable=yes,width=900,height=800,copyhistory=no, menubar=0'
         );
 
     }
@@ -29,79 +36,54 @@
                 case "itemDescription":
                     if (document.getElementById("itemID").value != "0") {
                         window.open(
-                            '{urlItemEdit}&itemID=' +
-                            escape(document.getElementById("itemID").value) +
-                            '&parentIDField=itemID' +
-                            '&parentDescField=itemDescription',
-                            'item',
-                            'scrollbars=yes,resizable=yes,width=610,height=560,copyhistory=no, menubar=0'
-                        );
-                    }
-                    break;
-                case "supplierName":
-                    if (document.getElementById("supplierID").value != "0") {
-                        window.open(
-                            '{urlSupplierEdit}&supplierID=' +
-                            escape(document.getElementById("supplierID").value) +
-                            '&parentIDField=supplierID' +
-                            '&parentDescField=supplierName',
-                            'supplier',
-                            'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0'
-                        );
-                    }
-                    break;
-
-                case "updateSupplierName":
-                    if (document.getElementById("updateSupplierID").value != "0") {
-                        window.open(
-                            '{urlSupplierEdit}&supplierID=' +
-                            escape(document.getElementById("updateSupplierID").value) +
-                            '&parentIDField=updateSupplierID' +
-                            '&parentDescField=updateSupplierName',
-                            'supplier',
-                            'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0'
+                                '{urlItemEdit}&itemID=' +
+                                escape(document.getElementById("itemID").value) +
+                                '&parentIDField=itemID' +
+                                '&parentDescField=itemDescription',
+                                'item',
+                                'scrollbars=yes,resizable=yes,width=610,height=560,copyhistory=no, menubar=0'
                         );
                     }
                     break;
                 case "invSiteDesc":
                     if (document.getElementById("invSiteNo").value != "") {
                         window.open(
-                            '{urlSiteEdit}&customerID={customerID}' +
-                            '&siteNo=' + escape(document.getElementById("invSiteNo").value) +
-                            '&parentIDField=invSiteNo' +
-                            '&parentDescField=invSiteDesc',
-                            'address', 'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0'
+                                '{urlSiteEdit}&customerID={customerID}' +
+                                '&siteNo=' + escape(document.getElementById("invSiteNo").value) +
+                                '&parentIDField=invSiteNo' +
+                                '&parentDescField=invSiteDesc',
+                                'address', 'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0'
                         );
                     }
                     break;
                 case "delSiteDesc":
                     if (document.getElementById("delSiteNo").value != "") {
                         window.open(
-                            '{urlSiteEdit}&customerID={customerID}' +
-                            '&siteNo=' + escape(document.getElementById("delSiteNo").value) +
-                            '&parentIDField=delSiteNo' +
-                            '&parentDescField=delSiteDesc',
-                            'address', 'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0');
+                                '{urlSiteEdit}&customerID={customerID}' +
+                                '&siteNo=' + escape(document.getElementById("delSiteNo").value) +
+                                '&parentIDField=delSiteNo' +
+                                '&parentDescField=delSiteDesc',
+                                'address', 'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0');
                     }
                     break;
                 case "invContactName":
                     if (document.getElementById("invContactID").value != "") {
                         window.open(
-                            '{urlContactEdit}' +
-                            '&contactID=' + escape(document.getElementById("invContactID").value) +
-                            '&parentIDField=invContactID' +
-                            '&parentDescField=invContactName',
-                            'address', 'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0');
+                                '{urlContactEdit}' +
+                                '&contactID=' + escape(document.getElementById("invContactID").value) +
+                                '&parentIDField=invContactID' +
+                                '&parentDescField=invContactName',
+                                'address', 'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0');
                     }
                     break;
                 case "delContactName":
                     if (document.getElementById("delContactID").value != "") {
                         window.open(
-                            '{urlContactEdit}' +
-                            '&contactID=' + escape(document.getElementById("delContactID").value) +
-                            '&parentIDField=delContactID' +
-                            '&parentDescField=delContactName',
-                            'address', 'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0');
+                                '{urlContactEdit}' +
+                                '&contactID=' + escape(document.getElementById("delContactID").value) +
+                                '&parentIDField=delContactID' +
+                                '&parentDescField=delContactName',
+                                'address', 'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0');
                     }
                     break;
             }
@@ -138,9 +120,28 @@
     let newLineRecurringSequenceNumberInput;
     let oneOffTable;
     let recurringTable;
+    let performActionButton;
 
     let requiredByDateInput;
     let tbcInput;
+
+    function onActionSelectorValueChanged(value) {
+        let updateSupplierDisplayValue = "inline-block";
+        let purchaseOrderDisplayValue = 'inline-block';
+        if (value !== 'CHANGE_SUPPLIER_FOR_LINES') {
+            updateSupplierDisplayValue = 'none'
+        }
+
+        if (value !== 'CREATE_PURCHASE_ORDERS') {
+            purchaseOrderDisplayValue = 'none';
+        }
+
+        performActionButton.disabled = !value;
+
+        requiredByDateInput.style.display = purchaseOrderDisplayValue;
+        tbcInput.style.display = purchaseOrderDisplayValue;
+        updateSupplierName.style.display = updateSupplierDisplayValue;
+    }
 
     document.addEventListener('DOMContentLoaded', () => {
         window.fromDate = $('#fromDate').get(0);
@@ -189,30 +190,31 @@
                 fetch('?action=MOVE_LINE_TO_POSITION', {
                     method: 'POST',
                     body: JSON.stringify(
-                        {
-                            lineId: movingLineId,
-                            replacedLineId,
-                            updatedTime
-                        }
+                            {
+                                lineId: movingLineId,
+                                replacedLineId,
+                                updatedTime
+                            }
                     )
                 })
-                    .then(x => x.json())
-                    .then(response => {
-                        if (response.status !== 'ok') {
-                            throw new Error(response.message);
-                        }
-                        updateUpdatedTimeInput(response.updatedTime);
-                        updateSequenceNumbers(ui.item.parent().children(), fromSequenceNo, toSequenceNo);
-                    })
-                    .catch(errorResponse => {
-                        alert(errorResponse);
-                        oneOffSortableJQuery.sortable('cancel');
-                    })
+                        .then(x => x.json())
+                        .then(response => {
+                            if (response.status !== 'ok') {
+                                throw new Error(response.message);
+                            }
+                            updateUpdatedTimeInput(response.updatedTime);
+                            updateSequenceNumbers(ui.item.parent().children(), fromSequenceNo, toSequenceNo);
+                        })
+                        .catch(errorResponse => {
+                            alert(errorResponse);
+                            oneOffSortableJQuery.sortable('cancel');
+                        })
 
             }
         });
 
         actionSelector = document.querySelector('#actionSelector');
+        performActionButton = document.querySelector('#performActionButton');
         supplierToChangeId = document.querySelector('#updateSupplierID');
         salutationInput = document.querySelector('#salutation');
         introductionTextArea = document.querySelector('#introduction');
@@ -220,6 +222,8 @@
         orderHeadIdInput = document.querySelector('[name="form[ordheadID]"]');
         toggleCheckBoxes = document.querySelectorAll('[name="Toggle"]');
         updateSupplierName = document.querySelector('#updateSupplierName');
+        updateSupplierName.style.display = 'none';
+        document.renderSupplierSearchComponent(updateSupplierName, {inputId: 'updateSupplierID', defaultText: ''})
         requiredByDateInput = document.querySelector('#requiredByDate');
         tbcInput = document.querySelector('#tbc');
         lineSelectors = document.querySelectorAll('input[type="checkbox"][name="selectedOrderLine[]"]');
@@ -230,13 +234,21 @@
         newLineOneOffSequenceNumberInput = document.querySelector('input[name="oneOffSequenceNumber"]')
         newLineRecurringSequenceNumberInput = document.querySelector('input[name="recurringSequenceNumber"]')
 
+        onActionSelectorValueChanged(actionSelector.value);
+
+
         function handleNewLineClick() {
             newLineOneOffSequenceNumberInput.value = getOneOffLastSelectedLineCheckboxSequenceNumber();
             newLineRecurringSequenceNumberInput.value = getRecurringLastSelectedLineCheckboxSequenceNumber();
         }
 
-        newLineSubmitButton.addEventListener('click', handleNewLineClick);
-        newLineSubmitRecurringButton.addEventListener('click', handleNewLineClick);
+        if (newLineSubmitButton) {
+
+            newLineSubmitButton.addEventListener('click', handleNewLineClick);
+        }
+        if (newLineSubmitRecurringButton) {
+            newLineSubmitRecurringButton.addEventListener('click', handleNewLineClick);
+        }
 
 
         toggleCheckBoxes.forEach(el => {
@@ -272,6 +284,94 @@
             el.addEventListener('click', handleDeleteLine)
         })
 
+        function updateStockLevel(rowElement) {
+            const quantity = rowElement.querySelector('input.lineItemQuantityOrdered').value;
+            const stockLevelContainer = rowElement.querySelector('td.stock-level-container');
+
+            let htmlContent = '';
+            if (rowElement.dataset.showStock && rowElement.dataset.amountInStock >= quantity) {
+                htmlContent = '<i class="fal fa-2x fa-boxes color-gray icon"></i>'
+            }
+            stockLevelContainer.innerHTML = htmlContent;
+        }
+
+        if (salesOrderType !== 'C') {
+
+
+            document.querySelectorAll('tr[data-line-type="I"]')
+                    .forEach(itemRow => {
+                                const buttonContainer = itemRow.querySelector('td:last-child > div');
+                                const description = itemRow.querySelector('a').text;
+                                const supplierName = itemRow.querySelector('.supplier-name').textContent;
+
+                                updateStockLevel(itemRow);
+
+                                if (salesOrderType === SALES_ORDER_TYPES.QUOTATION) {
+                                    const button = document.createElement('button');
+                                    button.type = "button";
+                                    button.className = "salesOrderButton";
+                                    let title = "Update master item price";
+                                    if (itemRow.dataset.itemUpdatedAt) {
+                                        title = "Price updated by " + itemRow.dataset.itemUpdatedBy + " at " + (moment(itemRow.dataset.itemUpdatedAt).format('DD/MM/YYYY HH:mm'))
+                                    }
+                                    button.title = title;
+                                    button.addEventListener('click', async () => {
+                                        const newCost = itemRow.querySelector('input.lineItemUnitCost').value;
+                                        const newSale = itemRow.querySelector('input.lineItemUnitSale').value;
+
+                                        if (!confirm(
+                                                "Please confirm you want to change the master item cost price for " +
+                                                description +
+                                                " from " +
+                                                toPounds(itemRow.dataset.itemCost) + " to " +
+                                                toPounds(newCost) + " and the sale price from " + toPounds(itemRow.dataset.itemSale) +
+                                                " to " + toPounds(newSale) + ". The default supplier will also be updated to " + supplierName
+                                        )) {
+                                            return;
+                                        }
+
+                                        try {
+
+                                            const response = await fetch(
+                                                    '/Item.php?action=updateItemFromSalesOrder',
+                                                    {
+                                                        method: 'POST',
+                                                        body: JSON.stringify({
+                                                            itemId: itemRow.dataset.itemId,
+                                                            cost: newCost,
+                                                            sale: newSale,
+                                                            supplierId: itemRow.dataset.supplierId
+                                                        })
+                                                    }
+                                            )
+                                            const res = await response.json();
+                                            if (res.status !== 'ok') {
+                                                throw new Error('Failed to save prices');
+                                            }
+                                            alert('Prices saved, reloading page...');
+                                            window.location.reload();
+                                        } catch (error) {
+                                            alert("Failed to save new prices");
+                                        }
+
+
+                                    })
+                                    const icon = document.createElement('i');
+                                    icon.className = "fal fa-money-check-edit-alt";
+                                    button.appendChild(icon);
+                                    buttonContainer.appendChild(button);
+                                }
+                            }
+                    )
+        }
+
+        function toPounds(number) {
+            if (typeof number !== 'number') {
+                number = parseFloat(number);
+            }
+            return '£' + number.toFixed(2);
+        }
+
         function getLastSelectedLineCheckboxSequenceNumber(table) {
             const selected = table.querySelectorAll('[name="selectedOrderLine[]"]:checked');
             if (!selected.length) {
@@ -302,24 +402,14 @@
             return selectedLines;
         }
 
+
         actionSelector.addEventListener('change', $event => {
-            let updateSupplierDisplayValue = "inline-block";
-            let purchaseOrderDisplayValue = 'inline-block';
-            if (actionSelector.value !== 'CHANGE_SUPPLIER_FOR_LINES') {
-                updateSupplierDisplayValue = 'none'
-            }
 
-            if (actionSelector.value !== 'CREATE_PURCHASE_ORDERS') {
-                purchaseOrderDisplayValue = 'none';
-            }
 
-            requiredByDateInput.style.display = purchaseOrderDisplayValue;
-            tbcInput.style.display = purchaseOrderDisplayValue;
-            updateSupplierName.style.display = updateSupplierDisplayValue;
+            onActionSelectorValueChanged($event.target.value);
         })
 
-        document.querySelector('#performActionButton').addEventListener('click', $event => {
-            console.log('perform action');
+        performActionButton.addEventListener('click', $event => {
             if (!actionSelector.selectedOptions.length) {
                 return;
             }
@@ -337,31 +427,31 @@
                     }
 
                     fetch('?action=' + selectedOptionText,
-                        {
-                            method: 'POST',
-                            body: JSON.stringify(
-                                {
-                                    orderHeadId,
-                                    selectedLines
-                                }
-                            )
-                        }
+                            {
+                                method: 'POST',
+                                body: JSON.stringify(
+                                        {
+                                            orderHeadId,
+                                            selectedLines
+                                        }
+                                )
+                            }
                     )
-                        .then(x => x.json())
-                        .then(res => {
-                            if (res.status !== 'ok') {
-                                throw new Error(res.message);
-                            }
+                            .then(x => x.json())
+                            .then(res => {
+                                if (res.status !== 'ok') {
+                                    throw new Error(res.message);
+                                }
 
-                            if (res.orderHeadId !== orderHeadId) {
-                                open('SalesOrder.php?action=displaySalesOrder&ordheadID=' + res.orderHeadId)
-                            } else {
-                                window.location.reload();
-                            }
-                        })
-                        .catch(error => {
-                            alert(error.message);
-                        })
+                                if (res.orderHeadId !== orderHeadId) {
+                                    open('SalesOrder.php?action=displaySalesOrder&ordheadID=' + res.orderHeadId)
+                                } else {
+                                    window.location.reload();
+                                }
+                            })
+                            .catch(error => {
+                                alert(error.message);
+                            })
 
                     break;
                 }
@@ -413,29 +503,29 @@
                     const updatedTime = getUpdatedTimeCurrentValue();
 
                     fetch('?action=DELETE_LINES',
-                        {
-                            method: 'POST',
-                            body: JSON.stringify({
-                                selectedLines,
-                                updatedTime,
-                            })
-                        }
-                    )
-                        .then(response => response.json())
-                        .then(response => {
-                            if (response.status !== 'ok') {
-                                throw new Error(response.message);
+                            {
+                                method: 'POST',
+                                body: JSON.stringify({
+                                    selectedLines,
+                                    updatedTime,
+                                })
                             }
+                    )
+                            .then(response => response.json())
+                            .then(response => {
+                                if (response.status !== 'ok') {
+                                    throw new Error(response.message);
+                                }
 
-                            updateUpdatedTimeInput(response.updatedTime);
-                            getSelectedHTMLRows().forEach(row => {
-                                deleteRowAndUpdate(row);
+                                updateUpdatedTimeInput(response.updatedTime);
+                                getSelectedHTMLRows().forEach(row => {
+                                    deleteRowAndUpdate(row);
+                                })
+
                             })
-
-                        })
-                        .catch(error => {
-                            alert(error.message);
-                        })
+                            .catch(error => {
+                                alert(error.message);
+                            })
                     break
                 }
 
@@ -455,24 +545,24 @@
                     }
 
                     fetch('?action=CHANGE_SUPPLIER_FOR_LINES',
-                        {
-                            method: 'POST',
-                            body: JSON.stringify({
-                                selectedLines,
-                                supplierId
-                            })
-                        }
-                    )
-                        .then(response => response.json())
-                        .then(response => {
-                            if (response.status == 'error') {
-                                throw new Error(response.message);
+                            {
+                                method: 'POST',
+                                body: JSON.stringify({
+                                    selectedLines,
+                                    supplierId
+                                })
                             }
-                            document.location.reload();
-                        })
-                        .catch(error => {
-                            alert(error.message);
-                        })
+                    )
+                            .then(response => response.json())
+                            .then(response => {
+                                if (response.status == 'error') {
+                                    throw new Error(response.message);
+                                }
+                                document.location.reload();
+                            })
+                            .catch(error => {
+                                alert(error.message);
+                            })
                     break;
                 }
                 case 'CREATE_MANUAL_ORDER_FORM': {
@@ -485,24 +575,24 @@
                     }
 
                     fetch('?action=CREATE_MANUAL_ORDER_FORM',
-                        {
-                            method: 'POST',
-                            body: JSON.stringify({
-                                selectedLines,
-                                orderHeadId
-                            })
-                        }
-                    )
-                        .then(response => response.json())
-                        .then(response => {
-                            if (response.status == 'error') {
-                                throw new Error(response.message);
+                            {
+                                method: 'POST',
+                                body: JSON.stringify({
+                                    selectedLines,
+                                    orderHeadId
+                                })
                             }
-                            document.location.reload();
-                        })
-                        .catch(error => {
-                            alert(error.message);
-                        })
+                    )
+                            .then(response => response.json())
+                            .then(response => {
+                                if (response.status == 'error') {
+                                    throw new Error(response.message);
+                                }
+                                document.location.reload();
+                            })
+                            .catch(error => {
+                                alert(error.message);
+                            })
                     break;
                 }
                 case 'CREATE_SIGNABLE_QUOTE': {
@@ -524,27 +614,73 @@
                     }
 
                     fetch('?action=CREATE_SIGNABLE_QUOTE',
-                        {
-                            method: 'POST',
-                            body: JSON.stringify({
-                                selectedLines,
-                                salutation,
-                                introduction,
-                                emailSubject,
-                                orderHeadId
-                            })
-                        }
-                    )
-                        .then(response => response.json())
-                        .then(response => {
-                            if (response.status == 'error') {
-                                throw new Error(response.message);
+                            {
+                                method: 'POST',
+                                body: JSON.stringify({
+                                    selectedLines,
+                                    salutation,
+                                    introduction,
+                                    emailSubject,
+                                    orderHeadId
+                                })
                             }
-                            document.location.reload();
-                        })
-                        .catch(error => {
-                            alert(error.message);
-                        })
+                    )
+                            .then(response => response.json())
+                            .then(response => {
+                                console.log(response);
+                                if (response.status == 'error') {
+                                    throw new Error(response.message);
+                                }
+                                document.location.reload();
+                            })
+                            .catch(error => {
+                                console.log(error);
+                                alert(error.message);
+                            })
+
+                    break;
+                }
+                case 'INITIAL_TO_QUOTATION': {
+                    const salesOrderId = orderHeadIdInput.value;
+                    fetch("?action=INITIAL_TO_QUOTATION&salesOrderId=" + salesOrderId,
+                            {
+                                method: 'POST',
+                            }
+                    )
+                            .then(response => response.json())
+                            .then(response => {
+                                console.log(response);
+                                if (response.status == 'error') {
+                                    throw new Error(response.message);
+                                }
+                                document.location.reload();
+                            })
+                            .catch(error => {
+                                console.log(error);
+                                alert(error.message);
+                            })
+
+                    break;
+                }
+                case 'COMPLETED_TO_INITIAL': {
+                    const salesOrderId = orderHeadIdInput.value;
+                    fetch("?action=COMPLETED_TO_INITIAL&salesOrderId=" + salesOrderId,
+                            {
+                                method: 'POST',
+                            }
+                    )
+                            .then(response => response.json())
+                            .then(response => {
+                                console.log(response);
+                                if (response.status == 'error') {
+                                    throw new Error(response.message);
+                                }
+                                document.location.reload();
+                            })
+                            .catch(error => {
+                                console.log(error);
+                                alert(error.message);
+                            })
 
                     break;
                 }
@@ -571,25 +707,25 @@
             const updatedTime = getUpdatedTimeCurrentValue();
 
             fetch('?action=DELETE_LINE',
-                {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        lineId,
-                        updatedTime
-                    })
-                }
-            )
-                .then(r => r.json())
-                .then(response => {
-                    if (response.status !== 'ok') {
-                        throw new Error(response.message);
+                    {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            lineId,
+                            updatedTime
+                        })
                     }
-                    updateUpdatedTimeInput(response.updatedTime);
-                    deleteRowAndUpdate(parentRow);
-                })
-                .catch(error => {
-                    alert(error);
-                })
+            )
+                    .then(r => r.json())
+                    .then(response => {
+                        if (response.status !== 'ok') {
+                            throw new Error(response.message);
+                        }
+                        updateUpdatedTimeInput(response.updatedTime);
+                        deleteRowAndUpdate(parentRow);
+                    })
+                    .catch(error => {
+                        alert(error);
+                    })
         }
 
         function updateUpdatedTimeInput(newValue) {
@@ -624,12 +760,12 @@
                     unitCost
                 })
             })
-                .then(() => {
-                    alert('Price updated');
-                })
-                .catch(() => {
-                    alert('Failed to update price');
-                })
+                    .then(() => {
+                        alert('Price updated');
+                    })
+                    .catch(() => {
+                        alert('Failed to update price');
+                    })
         }
 
         function handleUpdateLine($event) {
@@ -666,12 +802,12 @@
                     unitCost,
                 })
             })
-                .catch(() => {
-                    alert('Failed trying to save');
-                })
-                .then(() => {
-                    rowOverlay.parentNode.removeChild(rowOverlay);
-                })
+                    .catch(() => {
+                        alert('Failed trying to save');
+                    })
+                    .then(() => {
+                        rowOverlay.parentNode.removeChild(rowOverlay);
+                    })
 
         }
 
@@ -746,6 +882,7 @@
             const target = $event.target;
             const quantityValue = target.value;
             const parentRow = target.closest('tr');
+            updateStockLevel(parentRow);
             const unitCost = parentRow.querySelector('.lineItemUnitCost').value;
             const unitSale = parentRow.querySelector('.lineItemUnitSale').value;
             updateRowCalculatedValues(parentRow, quantityValue, unitCost, unitSale);
@@ -845,7 +982,7 @@
                         value="{updateSupplierID}"
                 >
 
-                <select {readOnly}
+                <select {actionSelectorReadOnly}
                         id="actionSelector"
                 >
                     <!-- BEGIN actionBlock -->
@@ -876,20 +1013,11 @@
                        title="Date TBC"
                        style="display: none"
                 >
-                <input {updateSupplierNameStyle}
-                       type="text"
-                       name="form[updateSupplierName]"
-                       id="updateSupplierName"
-                       value="{updateSupplierName}"
-                       onChange="javascript:validateUpdateSupplierName()"
-                       onKeydown="javascript:checkFunctionKey(updateSupplierName)"
-                       size="35"
-                       maxlength="50"
-                       placeholder="Supplier Name or ID"
+                <div id="updateSupplierName"
+                     style="padding-right: 30px"
                 >
-                <font class="formErrorMessage">{updateSupplierNameMessage}</font>
+                </div>
                 <button id="performActionButton"
-                        {readOnly}
                         type="button"
                         class="salesOrderButton not-so-faint"
                         title="Complete selected action"
@@ -927,6 +1055,9 @@
         </td>
         <td class="listHeadText renewalsColumn">
             <div> &nbsp;</div>
+        </td>
+        <td class="listHeadText showStockLevels">
+            <div> In Stock</div>
         </td>
         <td class="listHeadText descriptionColumn">
             <div> Description</div>
@@ -974,6 +1105,7 @@
         >
             <div>{salesOrderDisplayCreatePO}</div>
         </td>
+
     </tr>
     </thead>
     <tbody class="sortableLines"
@@ -985,6 +1117,7 @@
     </tbody>
     <tfoot>
     <tr>
+        <td>&nbsp;</td>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
         <td class="orderTotalItem">&nbsp;</td>
@@ -1030,6 +1163,7 @@
         <td class="listHeadText renewalsColumn">
             <div> &nbsp;</div>
         </td>
+        <td class="listHeadText showStockLevelsColumn"></td>
         <td class="listHeadText descriptionColumn">
             <div> Description</div>
         </td>
@@ -1089,6 +1223,7 @@
         <td>&nbsp;</td>
         <td>&nbsp;</td>
         <td class="orderTotalItem">&nbsp;</td>
+        <td class="orderTotalItem">&nbsp;</td>
         <td class="orderTotalItem">
             <DIV align="left"> Totals</DIV>
         </td>
@@ -1113,14 +1248,6 @@
     <input type="hidden"
            name="form[ordheadID]"
            value="{ordheadID}"
-    >
-    <input type="hidden"
-           name="form[serviceRequestCustomerItemID]"
-           value="{serviceRequestCustomerItemID}"
-    >
-    <input type="hidden"
-           name="form[serviceRequestText]"
-           value="{serviceRequestText}"
     >
     <input type="hidden"
            name="form[ordheadID]"
@@ -1157,8 +1284,8 @@
                         <td valign="top"
                             class="listHeadText"
                         >
-                            <div align="center">Invoice
-                                Address
+                            <div align="center">
+                                Invoice Address
                             </div>
                         </td>
                     </tr>

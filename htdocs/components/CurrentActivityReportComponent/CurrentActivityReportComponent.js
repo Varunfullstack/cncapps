@@ -15,7 +15,7 @@ import {getServiceRequestWorkTitle, sort} from '../utils/utils';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import APIStandardText from '../services/APIStandardText';
-import CallBackModal from './subComponents/CallBackModal';
+import CallBackModal from '../shared/CallbackModal/CallBackModal';
 
 import '../style.css';
 import './CurrentActivityReportComponent.css';
@@ -24,6 +24,7 @@ import APIActivity from '../services/APIActivity';
 import MovingSRComponent from './subComponents/MovingSRComponent';
 
 import CallBackComponent from './subComponents/CallBackComponent';
+import AllocateMoreTimeComponent from '../shared/AllocateMoreTimeComponent/AllocateMoreTimeComponent';
 
 const AUTORELOAD_INTERVAL_TIME = 2 * 60 * 1000;
 
@@ -72,7 +73,8 @@ class CurrentActivityReportComponent extends MainComponent {
                 problem: null
             },
             showCallBackModal: false,
-            currentProblem: null
+            currentProblem: null,
+            showAllocateMoreTime: false
         };
         this.apiCurrentActivityService = new CurrentActivityService();
         this.teams = [
@@ -353,7 +355,7 @@ class CurrentActivityReportComponent extends MainComponent {
                 show={changeQueuData.show}
                 newTeam={changeQueuData.newTeam}
                 onClose={this.handleMovingModalClose}
-            ></MovingSRComponent>
+            />
     }
     handleMovingModalClose = (reload = true) => {
         const {changeQueuData} = this.state;
@@ -394,6 +396,7 @@ class CurrentActivityReportComponent extends MainComponent {
             [
                 el("option", {value: "", key: "null"}),
                 options.map((e) => el("option", {value: e.id, key: e.id}, e.title)),
+                (<option key="priorityChange" >PRI</option>)
             ]
         );
     };
@@ -412,7 +415,8 @@ class CurrentActivityReportComponent extends MainComponent {
         );
     }
     allocateAdditionalTime = (problem) => {
-        window.location = `Activity.php?action=allocateAdditionalTime&problemID=${problem.problemID}`;
+        this.setState({"showAllocateMoreTime": true, currentProblem: problem});
+        //window.location = `Activity.php?action=allocateAdditionalTime&problemID=${problem.problemID}`;
     };
     requestAdditionalTime = async (problem) => {
         var reason = await this.prompt(
@@ -578,7 +582,13 @@ class CurrentActivityReportComponent extends MainComponent {
         })
     }
     createNewSR = (problem, code) => {
-        window.location = `LogServiceRequest.php?customerproblemno=${problem.cpCustomerProblemID}`
+        const {filter} = this.state;
+        let append = "";
+        switch (filter.activeTab) {
+            case "TBL":
+                append += `&emailSubject=${problem.emailSubject}`;
+        }
+        window.location = `LogServiceRequest.php?customerproblemno=${problem.cpCustomerProblemID}${append}`
 
     }
     getFollowOnElement = () => {
@@ -615,12 +625,20 @@ class CurrentActivityReportComponent extends MainComponent {
         return <CallBackModal key="modal"
                               show={showCallBackModal}
                               onClose={this.handleCallBackClose}
-                              problem={currentProblem}
+                              contactID={currentProblem.contactID}
+                              customerID={currentProblem.customerID}
+                              problemID={currentProblem.problemID}
+                              contactName={currentProblem.contactName}
         >
         </CallBackModal>
     }
-    handleCallBackClose = (callActivityID) => {
+    handleCallBackClose = () => {
         this.setState({showCallBackModal: false});
+    }
+    handleAllocateMoreTimeClose = () => {
+        this.setState({"showAllocateMoreTime": false});
+        const {filter} = this.state;
+        this.loadQueue(filter.activeTab);
     }
 
     render() {
@@ -664,7 +682,12 @@ class CurrentActivityReportComponent extends MainComponent {
             <CallBackComponent key='callback'
                                team={filter.activeTab}
                                customerID={this.state.openSrCustomerID}
-            ></CallBackComponent>,
+            />,
+            <AllocateMoreTimeComponent onClose={this.handleAllocateMoreTimeClose}
+                                       key="showAllocateMoreTime"
+                                       show={this.state.showAllocateMoreTime}
+                                       problem={this.state.currentProblem}
+            />,
             this.getCallBackModal(),
             this.getConfirm(),
             this.getAlert(),

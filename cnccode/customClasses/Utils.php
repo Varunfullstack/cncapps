@@ -35,7 +35,6 @@ class Utils
         if (is_array($mixed)) {
             foreach ($mixed as $key => $value) {
                 if (is_string($value) && $value) {
-                    var_dump('here');
                     $test = json_encode($value);
                     if (!$test) {
                         var_dump($key, $value);

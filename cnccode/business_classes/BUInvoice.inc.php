@@ -1164,33 +1164,34 @@ class BUInvoice extends Business
         ));
     }
 
-    function printDirectDebitInvoices(?string $dateToUse,
+    function printDirectDebitInvoices(string $dateToUse,
+                                      DateTimeImmutable $collectionDate,
                                       $privateKey
     )
     {
         if (!$dateToUse) {
             $dateToUse = date('Y-m-d');    // use today if blank
         }
-        $dbeInvhead = new DBEInvhead($this);
+        $dbeInvhead                                   = new DBEInvhead($this);
         $buCustomer                                   = new BUCustomer($this);
         $invoiceWithAllDirectDebitServicesPerCustomer = new DataSet($this);
         $this->getUnprintedInvoices(
             $invoiceWithAllDirectDebitServicesPerCustomer,
             true
         );
-        $subject = 'Sales Invoice(s)';
+        $subject        = 'CNC Direct Debit Billing Notice And Invoice Attached';
         $invoiceNumbers = array();
         $buMail         = new BUMail($this);
-        $bankData = [];
+        $bankData       = [];
         while ($invoiceWithAllDirectDebitServicesPerCustomer->fetchNext()) {
-            $invoiceNumbers[] = $invoiceWithAllDirectDebitServicesPerCustomer->getValue(DBEInvhead::invheadID);
+            $invoiceNumbers[]         = $invoiceWithAllDirectDebitServicesPerCustomer->getValue(DBEInvhead::invheadID);
             $generatedInvoiceFilePath = $this->generateAndStorePDFForInvoice(
                 $dbeInvhead,
                 $invoiceWithAllDirectDebitServicesPerCustomer,
                 $dateToUse
             );
-            $fileName = "{$invoiceWithAllDirectDebitServicesPerCustomer->getValue(DBEInvhead::invheadID)}.pdf";
-            $attachments = new \CNCLTD\Email\AttachmentCollection();
+            $fileName                 = "{$invoiceWithAllDirectDebitServicesPerCustomer->getValue(DBEInvhead::invheadID)}.pdf";
+            $attachments              = new \CNCLTD\Email\AttachmentCollection();
             $attachments->add(
                 $generatedInvoiceFilePath,
                 'Application/pdf',
@@ -1208,12 +1209,6 @@ class BUInvoice extends Business
                 $dsCustomer->getValue(DBECustomer::invoiceSiteNo),
                 $dsSite
             );
-            $paymentDate         = $this->calculateDirectDebitPaymentDate(
-                DateTime::createFromFormat(
-                    'Y-m-d',
-                    $dateToUse
-                )
-            )->format('d M Y');
             $invoiceTotal        = $this->getInvoiceTotal(
                 $invoiceWithAllDirectDebitServicesPerCustomer->getValue(DBEInvhead::invheadID)
             );
@@ -1237,7 +1232,7 @@ class BUInvoice extends Business
             }
             $vatValue    = $invoiceTotal * ($dbeInvhead->getValue(DBEInvhead::vatRate) / 100);
             $totalAmount = $invoiceTotal + $vatValue;
-            $bankRow = [
+            $bankRow     = [
                 $unEncryptedSortCode,
                 $dsCustomer->getValue(DBECustomer::accountName),
                 $unEncryptedAccountNumber,
@@ -1248,8 +1243,8 @@ class BUInvoice extends Business
                 $invoiceWithAllDirectDebitServicesPerCustomer->getValue(DBEInvhead::invheadID),
                 $invoiceWithAllDirectDebitServicesPerCustomer->getValue(DBEInvhead::transactionType)
             ];
-            $bankData[] = $bankRow;
-            $dsContact  = new DataSet($this);
+            $bankData[]  = $bankRow;
+            $dsContact   = new DataSet($this);
             $buCustomer->getInvoiceContactsByCustomerID(
                 $invoiceWithAllDirectDebitServicesPerCustomer->getValue(DBEInvhead::customerID),
                 $dsContact
@@ -1268,16 +1263,16 @@ class BUInvoice extends Business
                     $dsSite->getValue(DBESite::postcode),
                     (new DateTime())->format('d M Y'),
                     $invoiceWithAllDirectDebitServicesPerCustomer->getValue(DBEInvhead::invheadID),
-                    $paymentDate,
+                    $collectionDate->format('d M Y'),
                     $totalAmount
                 );
                 global $twig;
-                $body = $twig->render(
+                $body    = $twig->render(
                     '@customerFacing/DirectDebitInvoice/DirectDebitInvoice.html.twig',
                     ["data" => $directDebitInvoiceEmailDTO]
                 );
                 $toEmail = $dsContact->getValue(DBEContact::email);
-                $buMail->sendEmailWithAttachments($body, $subject, $toEmail, $attachments, CONFIG_SALES_EMAIL);
+                $buMail->sendEmailWithAttachments($body, $subject, $toEmail, $attachments, 'accounts@cnc-ltd.co.uk');
             }
         }
         $this->sendDirectDebitSageSalesEmail($invoiceNumbers, $bankData);
@@ -1322,9 +1317,9 @@ class BUInvoice extends Business
 
     public function calculateDirectDebitPaymentDate(DateTime $date)
     {
-        $lastYearBh = common_getUKBankHolidays($date->format('Y') - 1);
-        $thisYearBh = common_getUKBankHolidays($date->format('Y'));
-        $nextYearBh = common_getUKBankHolidays((int)$date->format('Y') + 1);
+        $lastYearBh   = common_getUKBankHolidays($date->format('Y') - 1);
+        $thisYearBh   = common_getUKBankHolidays($date->format('Y'));
+        $nextYearBh   = common_getUKBankHolidays((int)$date->format('Y') + 1);
         $bankHolidays = array_merge(
             $lastYearBh,
             $thisYearBh,
@@ -1373,8 +1368,8 @@ class BUInvoice extends Business
         $toEmail     = CONFIG_SALES_EMAIL;
         $senderName  = 'CNC Sales';
         $subject     = 'Sage Import Files';
-        $buMail = new BUMail($this);
-        $hdrs   = array(
+        $buMail      = new BUMail($this);
+        $hdrs        = array(
             'From'    => $senderName . " <" . $senderEmail . ">",
             'To'      => $toEmail,
             'Subject' => $subject
@@ -1473,7 +1468,7 @@ class BUInvoice extends Business
             $customerId = $dsInvhead->getValue(DBEInvhead::customerID);
             if (!key_exists($customerId, $invoiceEmails)) {
                 $invoiceEmails[$customerId] = new SalesInvoiceEmailDTO();
-                $dsContact = new DataSet($this);
+                $dsContact                  = new DataSet($this);
                 $buCustomer->getInvoiceContactsByCustomerID(
                     $customerId,
                     $dsContact
@@ -1542,13 +1537,13 @@ class BUInvoice extends Business
     /**
      * @param array $invoiceNumbers
      */
-    private function sendSageSalesEmail(array $invoiceNumbers): void
+    public function sendSageSalesEmail(array $invoiceNumbers): void
     {
         $buMail = new BUMail($this);
         $this->buSageExport->generateSageSalesDataByInvoiceNumbers($invoiceNumbers);
         $subject     = 'Sage Import Files';
         $attachments = new \CNCLTD\Email\AttachmentCollection();
-        $fileName = SAGE_EXPORT_DIR . '/sales.csv';
+        $fileName    = SAGE_EXPORT_DIR . '/sales.csv';
         $attachments->add(
             $fileName,
             'Text/csv',
@@ -1604,7 +1599,7 @@ class BUInvoice extends Business
             $dsInvhead,
             $directDebit
         );
-        $buPdfInvoice = new BUPDFInvoice(
+        $buPdfInvoice             = new BUPDFInvoice(
             $this, $this
         );
         $buPdfInvoice->_dateToUse = $dateToUse;
@@ -1625,9 +1620,9 @@ class BUInvoice extends Business
             $this, $this
         );
         $buPdfInvoice->_dateToUse = $dbeInvhead->getValue(DBEInvhead::datePrinted);
-        $pdfFileName = $buPdfInvoice->generateFile($this->dbeJInvhead);
-        $fileSize    = filesize($pdfFileName);
-        $fileString = fread(
+        $pdfFileName              = $buPdfInvoice->generateFile($this->dbeJInvhead);
+        $fileSize                 = filesize($pdfFileName);
+        $fileString               = fread(
             fopen(
                 $pdfFileName,
                 'rb'

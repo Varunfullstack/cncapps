@@ -1,10 +1,15 @@
 <?php
 global $cfg;
+
+use CNCLTD\Business\BUActivity;
+use CNCLTD\Data\DBEJProblem;
+use CNCLTD\Exceptions\JsonHttpException;
+
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
-require_once($cfg["path_dbe"] . "/DBConnect.php");
-require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 require_once($cfg ["path_dbe"] . "/DBEJCallActivity.php");
 require_once($cfg['path_bu'] . '/BUHeader.inc.php');
+require_once($cfg['path_dbe'] . '/DBECallDocumentWithoutFile.php');
+require_once($cfg["path_dbe"] . "/DBEProblem.inc.php");
 
 class CTRequestDashboard extends CTCNC
 {
@@ -34,7 +39,6 @@ class CTRequestDashboard extends CTCNC
             $getVars,
             $cookieVars,
             $cfg,
-            false
         );
         if (!self::isSdManager()) {
             Header("Location: /NotAllowed.php");
@@ -86,6 +90,11 @@ class CTRequestDashboard extends CTCNC
         $this->setTemplateFiles(
             array('RequestDashboard' => 'RequestDashboard.rct')
         );
+        $isAdditionalTimeApprover = $this->dbeUser->getValue(DBEUser::additionalTimeLevelApprover);
+        $this->template->setVar(
+            'additionalTimeLimitApprover',
+            $isAdditionalTimeApprover ? 'true' : 'false',
+        );
         $this->loadReactScript('RequestDashboardComponent.js');
         $this->loadReactCSS('RequestDashboardComponent.css');
         $this->template->parse(
@@ -127,32 +136,34 @@ class CTRequestDashboard extends CTCNC
             $assignedMinutes = 0;
             $dbeProblem      = new DBEJProblem($this);
             $dbeProblem->getRow($problemID);
-            $teamName    = '';
-            $isOverLimit = false;
+            $teamName                          = '';
+            $teamManagementTimeApprovalMinutes = null;
             switch ($teamID) {
                 case 1:
-                    $usedMinutes     = $buActivity->getHDTeamUsedTime($problemID);
-                    $assignedMinutes = $dbeProblem->getValue(DBEProblem::hdLimitMinutes);
-                    $isOverLimit     = $assignedMinutes >= $dsHeader->getValue(
-                            DBEHeader::hdTeamManagementTimeApprovalMinutes
-                        );
-                    $teamName        = 'Helpdesk';
+                    $usedMinutes                       = $buActivity->getHDTeamUsedTime($problemID);
+                    $assignedMinutes                   = $dbeProblem->getValue(DBEProblem::hdLimitMinutes);
+                    $teamManagementTimeApprovalMinutes = $dsHeader->getValue(
+                        DBEHeader::hdTeamManagementTimeApprovalMinutes
+                    );
+                    $teamName                          = 'Helpdesk';
                     break;
                 case 2:
-                    $usedMinutes     = $buActivity->getESTeamUsedTime($problemID);
-                    $assignedMinutes = $dbeProblem->getValue(DBEProblem::esLimitMinutes);
-                    $isOverLimit     = $assignedMinutes >= $dsHeader->getValue(
-                            DBEHeader::esTeamManagementTimeApprovalMinutes
-                        );
-                    $teamName        = 'Escalation';
+                    $usedMinutes                       = $buActivity->getESTeamUsedTime($problemID);
+                    $assignedMinutes                   = $dbeProblem->getValue(DBEProblem::esLimitMinutes);
+                    $teamManagementTimeApprovalMinutes = $dsHeader->getValue(
+                        DBEHeader::esTeamManagementTimeApprovalMinutes
+                    );
+                    $teamName                          = 'Escalation';
                     break;
                 case 4:
-                    $usedMinutes     = $buActivity->getSPTeamUsedTime($problemID);
-                    $assignedMinutes = $dbeProblem->getValue(DBEProblem::smallProjectsTeamLimitMinutes);
-                    $isOverLimit     = $assignedMinutes >= $dsHeader->getValue(
-                            DBEHeader::smallProjectsTeamManagementTimeApprovalMinutes
-                        );
-                    $teamName        = 'Small Projects';
+                    $usedMinutes                       = $buActivity->getSPTeamUsedTime($problemID);
+                    $assignedMinutes                   = $dbeProblem->getValue(
+                        DBEProblem::smallProjectsTeamLimitMinutes
+                    );
+                    $teamManagementTimeApprovalMinutes = $dsHeader->getValue(
+                        DBEHeader::smallProjectsTeamManagementTimeApprovalMinutes
+                    );
+                    $teamName                          = 'Small Projects';
                     break;
                 case 5:
                     $usedMinutes     = $buActivity->getUsedTimeForProblemAndTeam($problemID, 5);
@@ -170,18 +181,23 @@ class CTRequestDashboard extends CTCNC
             array_push(
                 $result,
                 [
-                    'customerName'      => $dbejCallActivity->getValue(DBEJCallActivity::customerName),
-                    'notes'             => $dbejCallActivity->getValue(DBEJCallActivity::reason),
-                    'requestedBy'       => $dbejCallActivity->getValue(DBEJCallActivity::userName),
-                    'requestedDateTime' => $requestedDateTimeString,
-                    'chargeableHours'   => $dbeProblem->getValue(DBEJProblem::chargeableActivityDurationHours),
-                    'timeSpentSoFar'    => round($usedMinutes),
-                    'timeLeftOnBudget'  => $leftOnBudget,
-                    'requesterTeam'     => $teamName,
-                    'alertRow'          => $requestedDateTime < $alertTime ? 'warning' : null,
-                    'approvalLevel'     => $isOverLimit ? 'Mgmt' : 'Team Lead',
-                    "callActivityID"    => $dbejCallActivity->getValue(DBEJCallActivity::callActivityID),
-                    'problemID'         => $dbejCallActivity->getValue(DBEJCallActivity::problemID),
+                    'customerName'                  => $dbejCallActivity->getValue(DBEJCallActivity::customerName),
+                    'notes'                         => $dbejCallActivity->getValue(DBEJCallActivity::reason),
+                    'requestedBy'                   => $dbejCallActivity->getValue(DBEJCallActivity::userName),
+                    'requestedDateTime'             => $requestedDateTimeString,
+                    'chargeableHours'               => $dbeProblem->getValue(
+                        DBEJProblem::chargeableActivityDurationHours
+                    ),
+                    'timeSpentSoFar'                => round($usedMinutes),
+                    'timeLeftOnBudget'              => $leftOnBudget,
+                    'requesterTeam'                 => $teamName,
+                    'alertRow'                      => $requestedDateTime < $alertTime ? 'warning' : null,
+                    'teamManagementApprovalMinutes' => $teamManagementTimeApprovalMinutes,
+                    "callActivityID"                => $dbejCallActivity->getValue(DBEJCallActivity::callActivityID),
+                    'problemID'                     => $dbejCallActivity->getValue(DBEJCallActivity::problemID),
+                    "linkedSalesOrderID"            => $dbejCallActivity->getValue(
+                        DBEJCallActivity::linkedSalesOrderID
+                    ),
                 ]
             );
 
@@ -263,14 +279,15 @@ class CTRequestDashboard extends CTCNC
         $result = [];
         while ($dbejCallActivity->fetchNext()) {
             $result[] = [
-                'customerName'      => $dbejCallActivity->getValue(DBEJCallActivity::customerName),
-                'problemID'         => $dbejCallActivity->getValue(DBEJCallActivity::problemID),
-                'requestBody'       => $dbejCallActivity->getValue(DBEJCallActivity::reason),
-                'requestedBy'       => $dbejCallActivity->getValue(DBEJCallActivity::userAccount),
-                'requestedDateTime' => $dbejCallActivity->getValue(
+                'customerName'       => $dbejCallActivity->getValue(DBEJCallActivity::customerName),
+                'problemID'          => $dbejCallActivity->getValue(DBEJCallActivity::problemID),
+                'requestBody'        => $dbejCallActivity->getValue(DBEJCallActivity::reason),
+                'requestedBy'        => $dbejCallActivity->getValue(DBEJCallActivity::userAccount),
+                'requestedDateTime'  => $dbejCallActivity->getValue(
                         DBEJCallActivity::date
                     ) . ' ' . $dbejCallActivity->getValue(DBEJCallActivity::startTime) . ':00',
-                'callActivityID'    => $dbejCallActivity->getValue(DBEJCallActivity::callActivityID)
+                'callActivityID'     => $dbejCallActivity->getValue(DBEJCallActivity::callActivityID),
+                "linkedSalesOrderID" => $dbejCallActivity->getValue(DBEJCallActivity::linkedSalesOrderID),
             ];
         }
         return $result;
@@ -367,7 +384,7 @@ class CTRequestDashboard extends CTCNC
             $dsCallActivity
         );
         if ($dsCallActivity->getValue(DBECallActivity::salesRequestStatus) !== 'O') {
-            throw new \CNCLTD\Exceptions\JsonHttpException(2005, "This sales request has already been processed");
+            throw new JsonHttpException(400, "This sales request has already been processed");
         }
         {
             $notify = true;
@@ -381,7 +398,7 @@ class CTRequestDashboard extends CTCNC
                     $option = 'D';
                     break;
                 default:
-                    throw new \CNCLTD\Exceptions\JsonHttpException(2006, 'Action not valid');
+                    throw new JsonHttpException(400, 'Action not valid');
             }
             try {
                 $buActivity->salesRequestProcess(
@@ -391,8 +408,8 @@ class CTRequestDashboard extends CTCNC
                     $body['comments'],
                     $notify
                 );
-            } catch (\Exception $exception) {
-                throw new \CNCLTD\Exceptions\JsonHttpException(2007, $exception->getMessage());
+            } catch (Exception $exception) {
+                throw new JsonHttpException(400, $exception->getMessage());
             }
         }
         return ["status" => true];

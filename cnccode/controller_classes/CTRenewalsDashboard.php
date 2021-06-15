@@ -1,9 +1,11 @@
 <?php
 global $cfg;
-require_once($cfg["path_dbe"] . "/DBConnect.php");
+
+use CNCLTD\Business\BURenContract;
+
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BURenQuotation.inc.php');
-require_once($cfg['path_bu'] . '/BURenContract.inc.php');
+require_once($cfg['path_bu'] . '/Burencontract.php');
 require_once($cfg['path_bu'] . '/BURenBroadband.inc.php');
 require_once($cfg['path_bu'] . '/BURenDomain.inc.php');
 require_once($cfg['path_bu'] . '/BURenHosting.inc.php');
@@ -121,6 +123,8 @@ class CTRenewalsDashboard extends CTCNC
                     0,
                     30
                 ),
+                'costAnnum'           => $dsRenQuotation->getValue(DBEJRenQuotation::costPrice),
+                'saleAnnum'           => $dsRenQuotation->getValue(DBEJRenQuotation::salePrice),
             ];
         }
         return $data;
@@ -198,7 +202,6 @@ class CTRenewalsDashboard extends CTCNC
         $this->setMethodName('getRenDomainData');
         $dsRenDomain = new DataSet($this);
         $buRenDomain = new BURenDomain($this);
-
         $buRenDomain->getAll(
             $dsRenDomain,
             $this->getParam('orderBy')
@@ -213,6 +216,8 @@ class CTRenewalsDashboard extends CTCNC
                     'domain'          => $dsRenDomain->getValue(DBEJCustomerItem::notes),
                     'invoiceFromDate' => $dsRenDomain->getValue(DBEJCustomerItem::invoiceFromDateYMD),
                     'invoiceToDate'   => $dsRenDomain->getValue(DBEJCustomerItem::invoiceToDateYMD),
+                    'costAnnum'       => $dsRenDomain->getValue(DBEJCustomerItem::costPrice),
+                    'saleAnnum'       => $dsRenDomain->getValue(DBEJCustomerItem::salePrice),
                 );
             }
         }
@@ -244,7 +249,9 @@ class CTRenewalsDashboard extends CTCNC
                     'invoiceToDate'   => $dsRenHosting->getValue(DBEJRenHosting::invoiceToDateYMD),
                     'notes'           => Controller::htmlTextArea(
                         $dsRenHosting->getValue(DBEJRenHosting::internalNotes)
-                    )
+                    ),
+                    'costAnnum'       => $dsRenHosting->getValue(DBEJRenHosting::curUnitCost),
+                    'saleAnnum'       => $dsRenHosting->getValue(DBEJRenHosting::curUnitSale),
                 );
             }
         }

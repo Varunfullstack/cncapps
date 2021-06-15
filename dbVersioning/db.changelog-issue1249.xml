@@ -1,0 +1,20 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdevMt" id="issue1249-0">
+        <tagDatabase tag="issue1249"/>
+    </changeSet>
+    <changeSet id="issue1249-1" author="pavwebdevmt">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="customer" columnName="excludeFromWebrootChecks"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="customer">
+            <column name="excludeFromWebrootChecks" defaultValue="0" type="tinyint(1)">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

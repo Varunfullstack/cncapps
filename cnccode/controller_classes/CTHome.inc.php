@@ -8,6 +8,8 @@
  */
 global $cfg;
 
+use CNCLTD\Data\DBConnect;
+use CNCLTD\Exceptions\JsonHttpException;
 use CNCLTD\Utils;
 
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
@@ -16,7 +18,6 @@ require_once($cfg['path_dbe'] . '/DBEInvoiceTotals.inc.php');
 require_once($cfg['path_bu'] . '/BUUser.inc.php');
 require_once($cfg['path_bu'] . '/BUHeader.inc.php');
 require_once($cfg['path_bu'] . '/BUProject.inc.php');
-require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 require_once($cfg['path_bu'] . '/BUTeamPerformance.inc.php');
 require_once($cfg['path_ct'] . '/CTProject.inc.php');
 
@@ -114,8 +115,8 @@ class CTHome extends CTCNC
                 if ($this->getParam('date')) {
                     $dateTime = DateTime::createFromFormat(DATE_MYSQL_DATE, $this->getParam('date'));
                     if (!$dateTime) {
-                        throw new \CNCLTD\Exceptions\JsonHttpException(
-                            2231, "Please provide date a valid date in YYYY-MM-DD format"
+                        throw new JsonHttpException(
+                            400, "Please provide date a valid date in YYYY-MM-DD format"
                         );
                     }
                 }
@@ -130,8 +131,8 @@ class CTHome extends CTCNC
                     echo json_encode(
                         ["status" => "ok", "data" => $this->getUserPerformanceBetweenDatesController()]
                     );
-                } catch (\Exception $exception) {
-                    throw new \CNCLTD\Exceptions\JsonHttpException(123, $exception->getMessage());
+                } catch (Exception $exception) {
+                    throw new JsonHttpException(400, $exception->getMessage());
                 }
                 break;
             case self::GET_SALES_FIGURES:
@@ -1242,17 +1243,17 @@ ORDER BY caa_date ASC,
     {
         $data = $this->getJSONData();
         if (!@$data['startDate'] || !@$data['endDate'] || !@$data['userId']) {
-            throw new \CNCLTD\Exceptions\JsonHttpException(2332, "Start date, end date and user Id are required");
+            throw new JsonHttpException(400, "Start date, end date and user Id are required");
         }
         $startDateString = $data['startDate'];
         $startDate       = DateTime::createFromFormat(DATE_MYSQL_DATE, $startDateString);
         if (!$startDate) {
-            throw new \CNCLTD\Exceptions\JsonHttpException(531, "Start date must have YYYY-MM-DD format");
+            throw new JsonHttpException(400, "Start date must have YYYY-MM-DD format");
         }
         $endDateString = $data['endDate'];
         $endDate       = DateTime::createFromFormat(DATE_MYSQL_DATE, $endDateString);
         if (!$endDate) {
-            throw new \CNCLTD\Exceptions\JsonHttpException(531, "End date must have YYYY-MM-DD format");
+            throw new JsonHttpException(400, "End date must have YYYY-MM-DD format");
         }
         return $this->buUser->getUserPerformanceByUserBetweenDates($data['userId'], $startDate, $endDate);
     }
@@ -1261,8 +1262,8 @@ ORDER BY caa_date ASC,
     function getSalesFigures()
     {
         if (!$this->hasPermissions(ACCOUNTS_PERMISSION)) {
-            http_response_code(400);
-            return ["status" => false];
+            http_response_code(403);
+            return ["status" => 'error', "message" => "You are not allowed to access this resource"];
         }
         $result              = [];
         $dbeSalesOrderTotals = new DBESalesOrderTotals($this);
@@ -1306,7 +1307,7 @@ ORDER BY caa_date ASC,
         $result['saleTotal']          = $saleTotal;
         $result['costTotal']          = $costTotal;
         $result['profitTotal']        = $profitTotal;
-        return ["status" => true, 'data' => $result];
+        return ["status" => 'ok', 'data' => $result];
     }
 
     function getTeamPerformance()
@@ -1372,7 +1373,7 @@ ORDER BY caa_date ASC,
             if ($result['projectTeamActualFixHours'] <= $result['projectTeamTargetFixHours']) {
                 $projectTeamFixHoursClass = 'performance-green';
             }
-            $data = (object)array_merge(
+            $data = array_merge(
                 $data,
                 array(
                     'esTeamActualSlaPercentage' . $result['quarter']                      => number_format(
@@ -1421,7 +1422,6 @@ ORDER BY caa_date ASC,
                     'projectTeamActualFixHours' . $result['quarter'] . 'Class'            => $projectTeamFixHoursClass,
                 )
             );
-
         }
         return $data;
     }

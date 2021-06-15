@@ -17,7 +17,8 @@ class DBEJOrdline extends DBEOrdline
     const itemDescription = "itemDescription";
     const renewalTypeID = "renewalTypeID";
     const partNo = "partNo";
-
+    const showStockLevels = "showStockLevels";
+    const qtyInStock="qtyInStock";
     /**
      * calls constructor()
      * @access public
@@ -58,6 +59,18 @@ class DBEJOrdline extends DBEOrdline
             DA_ALLOW_NULL,
             "itm_unit_of_sale"
         );
+        $this->addColumn(
+            self::qtyInStock,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            "itm_sstk_qty"
+        );
+        $this->addColumn(
+            self::showStockLevels,
+            DA_BOOLEAN,
+            DA_ALLOW_NULL,
+            "(SELECT showStockLevels from itemtype where ity_itemtypeno=item.itm_itemtypeno)"
+        );
         $this->setPK(0);
         $this->setAddColumnsOff();
     }
@@ -85,7 +98,8 @@ class DBEJOrdline extends DBEOrdline
                 self::supplierID
             ) . "=sup_suppno" . " LEFT JOIN item ON " . $this->getDBColumnName(
                 self::itemID
-            ) . "=itm_itemno" . " WHERE " . $this->getDBColumnName($ixColumn) . "=" . $this->getFormattedValue(
+            )
+             . "=itm_itemno" . " WHERE " . $this->getDBColumnName($ixColumn) . "=" . $this->getFormattedValue(
                 $ixColumn
             );
         if ($sortColumn) {

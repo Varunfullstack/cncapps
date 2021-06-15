@@ -1,18 +1,2 @@
-<!-- Template: CustomerTypeList.inc.html -->
-<A href="{urlCreate}">[create new]</A> 
-<table class="singleBorder" width="417" border="0" cellspacing="1" cellpadding="2">
-	<tr> 
-		<td width="265" class="listHeadText">Referal Type</td>
-		<td width="141" class="listHeadText">&nbsp;</td>
-	</tr>
-	<!-- BEGIN CustomerTypeBlock -->
-	<tr valign="top" onMouseOver="this.bgColor='#ffffcc';" onMouseOut="this.bgColor='';"> 
-		<td class="orderLineItem"><DIV align="left">{description}</div></td>
-		<td class="orderLineItem"><DIV align="left"></div>
-			<DIV align="left"> <A href="{urlEdit}" title="Edit details">{txtEdit}</a> 
-				<A href="{urlDelete}"  title="Delete" onClick="if(!confirm('Are you sure you want to remove this referal type?')) return(false)">{txtDelete}</A> 
-			</DIV></td>
-	</tr>
-	<!-- END CustomerTypeBlock -->
-</table>
-<!-- End Template: CustomerTypeList.inc.html -->
+<div id="reactCustomerType" name="reactCustomerType"></div>
+ 

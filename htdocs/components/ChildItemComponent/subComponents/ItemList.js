@@ -61,7 +61,7 @@ class ItemList extends React.Component {
                                         onClick: ($event) => onDeleteItem(childItem.childItemId),
                                         type: 'button'
                                     },
-                                    this.el('i', {className: 'fas fa-trash'})
+                                    this.el('i', {className: 'fas fa-trash-alt'})
                                 )
                             ) : ''
                     ]

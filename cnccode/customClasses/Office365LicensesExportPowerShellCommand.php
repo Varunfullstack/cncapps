@@ -11,18 +11,18 @@ require_once($cfg["path_dbe"] . "/DBEPasswordService.inc.php");
 require_once($cfg["path_dbe"] . "/DBEProblem.inc.php");
 require_once($cfg["path_dbe"] . "/DBEJCallActivity.php");
 require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
-require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 require_once($cfg['path_bu'] . '/BUHeader.inc.php');
 require_once($cfg['path_bu'] . '/BUPassword.inc.php');
 require_once($cfg['path_bu'] . '/BUMail.inc.php');
 require_once($cfg["path_bu"] . "/BUProblemRaiseType.inc.php");
 
-use BUActivity;
 use BUCustomer;
 use BUHeader;
 use BUMail;
 use BUPassword;
 use BUProblemRaiseType;
+use CNCLTD\Business\BUActivity;
+use CNCLTD\Data\DBEJProblem;
 use DataSet;
 use DateInterval;
 use DateTime;
@@ -31,7 +31,6 @@ use DBEContact;
 use DBECustomer;
 use DBEHeader;
 use DBEJCallActivity;
-use DBEJProblem;
 use DBEOffice365License;
 use DBEPassword;
 use DBEPasswordService;
@@ -117,7 +116,7 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
         $this->commandName    = "365OfficeLicensesExport";
         try {
             $data = $this->run();
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             $this->createFailedSR(
                 $dbeCustomer,
                 $exception->getMessage(),
@@ -130,6 +129,7 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
         $licenses        = $data['licenses'];
         $devices         = $data['devices'];
         $sharePointSites = $data['sharePointAndTeams'];
+        $permissions     = $data['permissions'];
         $BUHeader        = new BUHeader($thing);
         $this->dbeHeader = new DataSet($thing);
         $BUHeader->getHeader($this->dbeHeader);
@@ -214,8 +214,16 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
                 $logger->error('Failed to process sharepoint sites for customer: ' . $exception->getMessage());
             }
         }
-        if (!count($mailboxes) && !count($licenses) && !count($devices) && !count($sharePointSites)) {
-            $message = 'This customer does not have a licences nor mailboxes nor devices nor sharePointSites';
+        if (count($permissions)) {
+            $this->processPermissions(
+                $spreadsheet,
+                $permissions,
+            );
+        }
+        if (!count($mailboxes) && !count($licenses) && !count($devices) && !count($sharePointSites) && !count(
+                $permissions
+            )) {
+            $message = 'This customer does not have a licences nor mailboxes nor devices nor sharePointSites nor permissions';
             $logger->warning($message);
             throw new UnexpectedValueException($message);
         }
@@ -553,6 +561,7 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
                     $this->raiseCustomerLeaverWithLicenseSR($dbeCustomer, $datum['DisplayName']);
                 }
                 $licensesWithDefender = 0;
+                $licensesWithOffice   = 0;
                 foreach ($datum['Licenses'] as $license) {
                     $dbeOffice365Licenses->getRowForLicense($license);
                     if ($dbeOffice365Licenses->rowCount()) {
@@ -564,17 +573,26 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
                         if ($dbeOffice365Licenses->getValue(DBEOffice365License::includesDefender)) {
                             $licensesWithDefender++;
                         }
+                        if ($dbeOffice365Licenses->getValue(DBEOffice365License::includesOffice)) {
+                            $licensesWithOffice++;
+                        }
                         $currentMailboxLimit = $dbeOffice365Licenses->getValue(DBEOffice365License::mailboxLimit);
                         if ($currentMailboxLimit && (!$mailboxLimit || $currentMailboxLimit > $mailboxLimit)) {
                             $mailboxLimit = $currentMailboxLimit;
                         }
                     } else {
                         $this->logger->warning('Raising a License not found SR while processing Mailboxes:' . $license);
-                        $this->raiseCNCRequest($license, $dbeCustomer, $datum['DisplayName']);
+                        $this->raiseCustomerServiceRequest(
+                            $dbeCustomer,
+                            "License not found {$license} while processing mailbox {$datum['DisplayName']} "
+                        );
                     }
                 }
                 if ($licensesWithDefender > 1) {
                     $this->raiseMultipleDefenderLicensesSR($dbeCustomer, $datum['DisplayName']);
+                }
+                if ($licensesWithOffice > 1) {
+                    $this->raiseMultipleDefenderLicensesSR($dbeCustomer, $datum['DisplayName'], "Office");
                 }
             }
             $licensesArray = explode(", ", $licenseValue);
@@ -933,7 +951,6 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
             DBEJProblem::userID,
             null
         );
-
         $dbeProblem->setValue(DBEProblem::emailSubjectSummary, "M365 Export Report Error");
         $dbeProblem->setValue(
             DBEProblem::raiseTypeId,
@@ -997,9 +1014,9 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
         $dbeCallActivity->insertRow();
     }
 
-    function raiseMultipleDefenderLicensesSR(DBECustomer $dbeCustomer, $userName)
+    function raiseMultipleDefenderLicensesSR(DBECustomer $dbeCustomer, $userName, $included = "Defender")
     {
-        $details = "<p>The username $userName has multiple M365 licenses that include Defender, please review and correct.</p>";
+        $details = "<p>The username $userName has multiple M365 licenses that include $included, please review and correct.</p>";
         $this->raiseCustomerServiceRequest($dbeCustomer, $details);
     }
 
@@ -1264,5 +1281,40 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
                 strtolower($datum),
                 'leaver'
             ) !== false;
+    }
+
+    private function processPermissions(Spreadsheet $spreadsheet, $permissions)
+    {
+        $permissionsSheet = $spreadsheet->createSheet();
+        $permissionsSheet->setTitle('Mailbox Permissions');
+        $permissionsSheet->fromArray(
+            [
+                "Mailbox Name",
+                "Email Address",
+                "Mailbox Type",
+                "Permission",
+                "Assigned To",
+            ],
+            null,
+            'A1'
+        );
+        $permissionsSheet->fromArray($permissions, null, 'A2');
+        $highestRow    = $permissionsSheet->getHighestRow();
+        $highestColumn = $permissionsSheet->getHighestColumn();
+        $permissionsSheet->getStyle("A1:{$highestColumn}1")->getFont()->setBold(true);
+        $permissionsSheet->getStyle("A1:{$highestColumn}{$highestRow}")->getAlignment()->setHorizontal(
+            Alignment::HORIZONTAL_CENTER
+        );
+        foreach (range('A', $highestColumn) as $col) {
+            $permissionsSheet->getColumnDimension($col)->setAutoSize(true);
+        }
+        $dateTime = new DateTime();
+        $permissionsSheet->getStyle("A{$highestRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+        $legendRowStart = $highestRow + 2;
+        $permissionsSheet->fromArray(
+            ["Report generated at " . $dateTime->format("d-m-Y H:i:s")],
+            null,
+            'A' . $legendRowStart
+        );
     }
 }

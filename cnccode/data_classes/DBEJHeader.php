@@ -26,14 +26,13 @@ class DBEJHeader extends DBEHeader
         $this->setAddColumnsOff();
     }
 
-    function getRow()
+    function getRow($pkValue = null)
     {
         $this->setMethodName("getRow");
         $ret = FALSE;
         $this->setQueryString(
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " JOIN item ON hed_gensup_itemno = itm_itemno"
+            "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName(
+            ) . " JOIN item ON hed_gensup_itemno = itm_itemno"
         );
         return (parent::getRow());
     }

@@ -6,6 +6,9 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+
+use CNCLTD\Exceptions\APIException;
+
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BUExpenseType.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
@@ -19,6 +22,8 @@ define('CTEXPENSETYPE_ACT_UPDATE', 'updateExpenseType');
 
 class CTExpenseType extends CTCNC
 {
+    const CONST_TYPES='types';
+    const CONST_EXPENSE_ACTIVITY_TYPES='expenseActivityTypes';
     /** @var DSForm */
     public $dsExpenseType;
     /** @var BUExpenseType */
@@ -46,132 +51,52 @@ class CTExpenseType extends CTCNC
     {
         $this->checkPermissions(MAINTENANCE_PERMISSION);
         switch ($this->getAction()) {
-            case CTEXPENSETYPE_ACT_EDIT:
-            case CTEXPENSETYPE_ACT_CREATE:
-                $this->edit();
-                break;
-            case CTEXPENSETYPE_ACT_DELETE:
-                $this->delete();
-                break;
-            case CTEXPENSETYPE_ACT_UPDATE:
-                $this->update();
-                break;
+            case self::CONST_TYPES:
+                switch ($this->requestMethod) {
+                    case 'GET':
+                        echo  json_encode($this->getTypes(),JSON_NUMERIC_CHECK);
+                        break;
+                    case 'POST':
+                        echo  json_encode($this->addType(),JSON_NUMERIC_CHECK);
+                        break;
+                    case 'PUT':
+                        echo  json_encode($this->updateType(),JSON_NUMERIC_CHECK);
+                        break;
+                    case 'DELETE':
+                        echo  json_encode($this->deleteType(),JSON_NUMERIC_CHECK);
+                        break;
+                    default:
+                        # code...
+                        break;
+                }
+                exit;                 
+            case self::CONST_EXPENSE_ACTIVITY_TYPES:
+                echo  json_encode($this->getActivitiesForExpenseType(@$_REQUEST['id']),JSON_NUMERIC_CHECK);
+                break;           
             case CTEXPENSETYPE_ACT_DISPLAY_LIST:
+                echo  json_encode($this->getTypes(),JSON_NUMERIC_CHECK);
+                break;
             default:
-                $this->displayList();
+                $this->setTemplate();
                 break;
         }
     }
 
     /**
-     * Edit/Add Expense Type
+     * Display list of types
      * @access private
      * @throws Exception
      */
-    function edit()
+    function setTemplate()
     {
-        $this->setMethodName('edit');
-        $dsExpenseType = &$this->dsExpenseType; // ref to class var
-
-        if (!$this->getFormError()) {
-            if ($this->getAction() == CTEXPENSETYPE_ACT_EDIT) {
-                $this->buExpenseType->getExpenseTypeByID($this->getParam('expenseTypeID'), $dsExpenseType);
-                $expenseTypeID = $this->getParam('expenseTypeID');
-            } else {                                                                    // creating new
-                $dsExpenseType->initialise();
-                $dsExpenseType->setValue(DBEExpenseType::expenseTypeID, null);
-                $expenseTypeID = null;
-            }
-        } else {                                                                        // form validation error
-            $dsExpenseType->initialise();
-            $dsExpenseType->fetchNext();
-            $expenseTypeID = $dsExpenseType->getValue(DBEExpenseType::expenseTypeID);
-        }
-        $urlDelete = null;
-        $txtDelete = null;
-        if ($this->getAction() == CTEXPENSETYPE_ACT_EDIT && $this->buExpenseType->canDeleteExpenseType(
-                $this->getParam('expenseTypeID')
-            )) {
-            $urlDelete = Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action'        => CTEXPENSETYPE_ACT_DELETE,
-                    'expenseTypeID' => $expenseTypeID
-                )
-            );
-            $txtDelete = 'Delete';
-        }
-        $urlUpdate =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action'        => CTEXPENSETYPE_ACT_UPDATE,
-                    'expenseTypeID' => $expenseTypeID
-                )
-            );
-        $urlDisplayList =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action' => CTEXPENSETYPE_ACT_DISPLAY_LIST
-                )
-            );
-        $this->setPageTitle('Edit Expense Type');
+        $this->setMethodName('displayList');
+        $this->setPageTitle('Expense Types');
         $this->setTemplateFiles(
-            array('ExpenseTypeEdit' => 'ExpenseTypeEdit.inc')
+            array('ExpenseTypeList' => 'ExpenseTypeList.inc')
         );
-
-
-        $this->template->setBlock('ExpenseTypeEdit', 'activityBlock', 'activities');
-
-        $selectedActivities = $this->getActivitiesForExpenseType($expenseTypeID);
-        $dbeActivityType = new DBECallActType($this);
-        $dbeActivityType->getRows();
-        while ($dbeActivityType->fetchNext()) {
-            $this->template->setVar(
-                [
-                    "activitySelected" => in_array(
-                        $dbeActivityType->getValue(DBECallActType::callActTypeID),
-                        $selectedActivities
-                    ) ? 'selected' : null,
-                    "activityID"       => $dbeActivityType->getValue(DBECallActType::callActTypeID),
-                    "activityName"     => $dbeActivityType->getValue(DBECallActType::description)
-                ]
-            );
-            $this->template->parse('activities', 'activityBlock', true);
-        }
-
-
-        $this->template->set_var(
-            array(
-                'expenseTypeID'             => $dsExpenseType->getValue(DBEExpenseType::expenseTypeID),
-                'description'               => Controller::htmlInputText(
-                    $dsExpenseType->getValue(DBEExpenseType::description)
-                ),
-                'descriptionMessage'        => Controller::htmlDisplayText(
-                    $dsExpenseType->getMessage(DBEExpenseType::description)
-                ),
-                'taxableChecked'            => $dsExpenseType->getValue(DBEExpenseType::taxable) ? 'checked' : null,
-                'approvalRequiredChecked'   => $dsExpenseType->getValue(
-                    DBEExpenseType::approvalRequired
-                ) ? 'checked' : null,
-                'receiptRequiredChecked'    => $dsExpenseType->getValue(
-                    DBEExpenseType::receiptRequired
-                ) ? 'checked' : null,
-                'mileageFlagChecked'        => Controller::htmlChecked(
-                    $dsExpenseType->getValue(DBEExpenseType::mileageFlag)
-                ),
-                'vatFlagChecked'            => Controller::htmlChecked(
-                    $dsExpenseType->getValue(DBEExpenseType::vatFlag)
-                ),
-                'maximumAutoApprovalAmount' => $dsExpenseType->getValue(DBEExpenseType::maximumAutoApprovalAmount),
-                'urlUpdate'                 => $urlUpdate,
-                'urlDelete'                 => $urlDelete,
-                'txtDelete'                 => $txtDelete,
-                'urlDisplayList'            => $urlDisplayList
-            )
-        );
-        $this->template->parse('CONTENTS', 'ExpenseTypeEdit', true);
+        $this->loadReactScript('ExpenseTypeComponent.js');
+        $this->loadReactCSS('ExpenseTypeComponent.css');      
+        $this->template->parse('CONTENTS', 'ExpenseTypeList', true);
         $this->parsePage();
     }
 
@@ -190,68 +115,8 @@ class CTExpenseType extends CTCNC
         );
     }
 
-    /**
-     * Delete Expense Type
-     *
-     * @access private
-     * @authors Karim Ahmed - Sweet Code Limited
-     * @throws Exception
-     */
-    function delete()
-    {
-        $this->setMethodName('delete');
-        if (!$this->buExpenseType->deleteExpenseType($this->getParam('expenseTypeID'))) {
-            $this->displayFatalError('Cannot delete this expense type');
-            exit;
-        } else {
-            $urlNext = Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action' => CTEXPENSETYPE_ACT_DISPLAY_LIST
-                )
-            );
-            header('Location: ' . $urlNext);
-            exit;
-        }
-    }// end function editExpense Type()
-
-    /**
-     * Update call expense type details
-     * @access private
-     * @throws Exception
-     */
-    function update()
-    {
-        $this->setMethodName('update');
-
-        $this->formError = (!$this->dsExpenseType->populateFromArray($this->getParam('expenseType')));
-        if ($this->formError) {
-            if (!$this->dsExpenseType->getValue(DBEExpenseType::expenseTypeID)) {
-                $this->setAction(CTEXPENSETYPE_ACT_EDIT);
-            } else {
-                $this->setAction(CTEXPENSETYPE_ACT_CREATE);
-            }
-            $this->edit();
-            exit;
-        }
-
-        $this->buExpenseType->updateExpenseType($this->dsExpenseType);
-        $newActivities = $this->getParam('expenseTypeActivities');
-        $this->updateActivitiesForExpenseType(
-            $newActivities,
-            $this->dsExpenseType->getValue(DBEExpenseType::expenseTypeID)
-        );
-
-        $urlNext =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'expenseTypeID' => $this->dsExpenseType->getValue(DBEExpenseType::expenseTypeID),
-                    'action'        => CTCNC_ACT_VIEW
-                )
-            );
-        header('Location: ' . $urlNext);
-    }
+   
+    
 
     private function updateActivitiesForExpenseType($newActivities, $expenseTypeID)
     {
@@ -314,61 +179,94 @@ class CTExpenseType extends CTCNC
         return true;
     }
 
-    /**
-     * Display list of types
-     * @access private
-     * @throws Exception
-     */
-    function displayList()
-    {
-        $this->setMethodName('displayList');
-        $this->setPageTitle('Expense Types');
-        $this->setTemplateFiles(
-            array('ExpenseTypeList' => 'ExpenseTypeList.inc')
-        );
+    
+    //---------------new
+    function getTypes(){
         $dsExpenseType = new DataSet($this);
-
-        $this->buExpenseType->getAllTypes($dsExpenseType);
-
-        $urlCreate = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            array(
-                'action' => CTEXPENSETYPE_ACT_CREATE
-            )
-        );
-
-        $this->template->set_var(
-            array('urlCreate' => $urlCreate)
-        );
-
-        if ($dsExpenseType->rowCount() > 0) {
-            $this->template->set_block('ExpenseTypeList', 'typeBlock', 'types');
+        $this->buExpenseType->getAllTypes($dsExpenseType);        
+        $data=[];
+        if ($dsExpenseType->rowCount() > 0) {            
             while ($dsExpenseType->fetchNext()) {
-                $expenseTypeID = $dsExpenseType->getValue(DBEExpenseType::expenseTypeID);
-                $urlEdit =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action'        => CTEXPENSETYPE_ACT_EDIT,
-                            'expenseTypeID' => $expenseTypeID
-                        )
-                    );
-                $txtEdit = '[edit]';
-
-                $this->template->set_var(
+                $expenseTypeID = $dsExpenseType->getValue(DBEExpenseType::expenseTypeID); 
+                $canDelete=false;
+                if ( $this->buExpenseType->canDeleteExpenseType( $expenseTypeID)) {
+                    $canDelete=true;
+                }                              
+                $data []=
                     array(
                         'expenseTypeID' => $expenseTypeID,
                         'description'   => Controller::htmlDisplayText(
                             $dsExpenseType->getValue(DBEExpenseType::description)
                         ),
-                        'urlEdit'       => $urlEdit,
-                        'txtEdit'       => $txtEdit
-                    )
-                );
-                $this->template->parse('types', 'typeBlock', true);
+                        'canDelete'     =>$canDelete,
+                        'taxable'            => $dsExpenseType->getValue(DBEExpenseType::taxable) ,
+                        'approvalRequired'   => $dsExpenseType->getValue(DBEExpenseType::approvalRequired) ,
+                        'receiptRequired'    => $dsExpenseType->getValue(DBEExpenseType::receiptRequired),
+                        'mileageFlag'        => $dsExpenseType->getValue(DBEExpenseType::mileageFlag)=='Y'?1:0,
+                        'vatFlag'            => $dsExpenseType->getValue(DBEExpenseType::vatFlag)=='Y'?1:0,
+                        'maximumAutoApprovalAmount' => $dsExpenseType->getValue(DBEExpenseType::maximumAutoApprovalAmount),
+                        //"activityTypes"  => $this->getActivitiesForExpenseType($expenseTypeID)
+
+                    ); 
             }
         }
-        $this->template->parse('CONTENTS', 'ExpenseTypeList', true);
-        $this->parsePage();
+        return  $this->success($data);
+    }
+    function addType(){
+
+        $this->setMethodName('addType'); 
+
+        $body=$this->getBody();
+        $dbeExpenseType= new DBEExpenseType($this);
+        $dbeExpenseType->setValue(DBEExpenseType::description, $body->description);
+        $dbeExpenseType->getRowByColumn(DBEExpenseType::description);
+        if($dbeExpenseType->rowCount>0)
+            return $this->fail(APIException::conflict,"Conflicted name");
+        $dbeExpenseType= new DBEExpenseType($this);  
+        $dbeExpenseType->setValue(DBEExpenseType::description, $body->description);
+        $dbeExpenseType->setValue(DBEExpenseType::taxable, $body->taxable);
+        $dbeExpenseType->setValue(DBEExpenseType::approvalRequired, $body->approvalRequired);
+        $dbeExpenseType->setValue(DBEExpenseType::receiptRequired, $body->receiptRequired);
+        $dbeExpenseType->setValue(DBEExpenseType::mileageFlag, $body->mileageFlag);
+        $dbeExpenseType->setValue(DBEExpenseType::vatFlag, $body->vatFlag);
+        $dbeExpenseType->setValue(DBEExpenseType::maximumAutoApprovalAmount, $body->maximumAutoApprovalAmount);
+        $dbeExpenseType->insertRow(); 
+        if(isset($body->activityTypes))     
+        $this->updateActivitiesForExpenseType(
+            $body->activityTypes,
+            $dbeExpenseType->getValue(DBEExpenseType::expenseTypeID)
+        );
+        return $this->success();
+ 
+    }
+    function updateType(){
+        $this->setMethodName('updateType'); 
+        $body=$this->getBody();
+        $dbeExpenseType= new DBEExpenseType($this);
+        $dbeExpenseType->setValue(DBEExpenseType::description, $body->description);
+        $dbeExpenseType->getRow($body->expenseTypeID);                
+        $dbeExpenseType->setValue(DBEExpenseType::description, $body->description);
+        $dbeExpenseType->setValue(DBEExpenseType::taxable, $body->taxable);
+        $dbeExpenseType->setValue(DBEExpenseType::approvalRequired, $body->approvalRequired);
+        $dbeExpenseType->setValue(DBEExpenseType::receiptRequired, $body->receiptRequired);
+        $dbeExpenseType->setValue(DBEExpenseType::mileageFlag, $body->mileageFlag);
+        $dbeExpenseType->setValue(DBEExpenseType::vatFlag, $body->vatFlag);
+        $dbeExpenseType->setValue(DBEExpenseType::maximumAutoApprovalAmount, $body->maximumAutoApprovalAmount);
+        //return;
+        $dbeExpenseType->updateRow(); 
+        if(isset($body->activityTypes))     
+        $this->updateActivitiesForExpenseType(
+            $body->activityTypes,
+            $dbeExpenseType->getValue(DBEExpenseType::expenseTypeID)
+        );
+        return $this->success();
+    }
+    function deleteType(){
+        $this->setMethodName('updateType');
+        $id=@$_REQUEST["id"];
+        if($this->buExpenseType->deleteExpenseType($id))                       
+            return $this->success();
+        else
+            return $this->fail(APIException::conflict,"Item can't delete");
     }
 }
