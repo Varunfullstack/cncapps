@@ -3,6 +3,7 @@ This project changes will be shown here.
 ## [Unreleased]
 ### Changed
 - Issue 1366 - rewrite GoodsIn.php,QuoteTemplates.php, ContractAndNumbersReport.php,  PurchaseInv.php, PaymentTerms.php, ItemBillingCategory.php.
+- update table default align 
 
 ## [v5.12.3] - 2021-06-08
 ### Fixed

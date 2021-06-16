@@ -22,23 +22,23 @@
 <h1>FOC activities logged yesterday</h1>
 <table>
     <tr>
-        <th>Customer</th>
-        <th>Activity No</th>
-        <th>SR No</th>
-        <th>Technician</th>
-        <th>Contract</th>
-        <th>Category</th>
-        <th>Hours</th>
+        <th style="text-align: left;">Customer</th>
+        <th style="text-align: right;">Activity No</th>
+        <th style="text-align: right;">SR No</th>
+        <th style="text-align: left;">Technician</th>
+        <th style="text-align: left;">Contract</th>
+        <th style="text-align: left;">Category</th>
+        <th style="text-align: right;">Hours</th>
     </tr>
     <!-- BEGIN activityBlock -->
     <tr>
         <td>{customer}</td>
-        <td><a href="{urlActivity}">{activityID}</a></td>
-        <td><a href="{urlRequest}">{serviceRequestID}</a></td>
+        <td style="text-align: right;"><a href="{urlActivity}">{activityID}</a></td>
+        <td style="text-align: right;"><a href="{urlRequest}">{serviceRequestID}</a></td>
         <td>{technician}</td>
         <td>{contract}</td>
         <td>{category}</td>
-        <td>{hours}</td>
+        <td style="text-align: right;">{hours}</td>
     </tr>
     <!-- END activityBlock -->
 </table>

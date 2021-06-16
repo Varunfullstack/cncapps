@@ -2,8 +2,8 @@
 <!-- FOC activities logged the previous day -->
   <head>
   <style type="text/css">
-  <!--
-  BODY, P, TD, TH {
+  
+  /* BODY, P, TD, TH {
     font-family: Arial, Helvetica, sans-serif;
     font-size: 9pt;
   }
@@ -16,26 +16,26 @@
   TABLE {
     border-spacing: 1px;
   }
-  -->
+   */
   </style>
   </head>
   <body>
     <h1>Pre-pay activities logged yesterday over £100 in value</h1>
     <table>
       <tr>
-        <th>Customer</th>
-        <th>Activity No</th>
-        <th>SR No</th>
-        <th>Technician</th>
-        <th>Value</th>
+        <th style="text-align: left;">Customer</th>
+        <th style="text-align: right;">Activity No</th>
+        <th style="text-align: right;">SR No</th>
+        <th style="text-align: left;">Technician</th>
+        <th style="text-align: right;">Value</th>
       </tr>
 <!-- BEGIN activityBlock -->
       <tr>
-        <td>{customer}</td>
-        <td><a href="{urlActivity}">{activityID}</a></td>
-        <td><a href="{urlRequest}">{serviceRequestID}</a></td>
-        <td>{technician}</td>
-        <td>{value}</td>
+        <td style="text-align: left;">{customer}</td>
+        <td style="text-align: right;"><a href="{urlActivity}">{activityID}</a></td>
+        <td style="text-align: right;"><a href="{urlRequest}">{serviceRequestID}</a></td>
+        <td style="text-align: left;">{technician}</td>
+        <td style="text-align: right;">{value}</td>
       </tr>
 <!-- END activityBlock -->
     </table>

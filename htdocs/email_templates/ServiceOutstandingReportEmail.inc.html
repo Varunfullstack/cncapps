@@ -2,7 +2,7 @@
 <!-- Service requests fixed the previous day -->
 <head>
     <style type="text/css">
-        <!--
+      
         BODY, P, TD, TH {
             font-family: Arial, Helvetica, sans-serif;
             font-size: 9pt;
@@ -33,7 +33,7 @@
             color: red;
         }
 
-        -->
+      
     </style>
     <script type="text/javascript"
             src=".javascript/handlebars-v4.0.11.js"
@@ -50,7 +50,7 @@
         <table>
             <thead>
             <tr>
-                <th>&nbsp;</th>
+                <th style="text-align: left;">&nbsp;</th>
                 <th>Jan</th>
                 <th>Feb</th>
                 <th>Mar</th>
@@ -67,13 +67,13 @@
             </thead>
             <tbody>
             <tr>
-                <th>Average Number of 7 Dayers</th>
+                <th  style="text-align: left;">Average Number of 7 Dayers</th>
                 {% #values %}
                 <td class="{% class %}">{% value %}</td>
                 {% /values %}
             </tr>
             <tr>
-                <th>Target</th>
+                <th style="text-align: left;">Target</th>
                 {% #values %}
                 <td class="{% class %}">{% target %}</td>
                 {% /values %}
