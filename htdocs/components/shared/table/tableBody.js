@@ -19,7 +19,7 @@ class TableBody extends React.Component {
     }
 
     addToolTip = (element, title,cell) => {
-        return <div style={{display:"flex",justifyContent:this.getCellAlign(cell)}}>
+        return <div style={{display:"flex",justifyContent:this.getCellAlign(cell)}}>          
          {title ? this.el('div', {className: 'tooltip'}, element, this.el('div', {className: "tooltiptext tooltip-bottom"}, title)) : element}
          </div>
     }
@@ -27,7 +27,7 @@ class TableBody extends React.Component {
         if (c && c.cellType) {
           switch (c.cellType) {
             case CellType.Text:
-              return "flext-start";
+              return "flex-start";
             case CellType.Number:
               return "flex-end";
             case CellType.Money:

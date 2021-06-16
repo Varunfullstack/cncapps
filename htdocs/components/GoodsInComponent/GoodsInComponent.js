@@ -52,7 +52,7 @@ class GoodsInComponent extends MainComponent {
         hdToolTip: "Supplier",        
         icon: "fal fa-2x fa-warehouse-alt color-gray2 pointer",
         sortable: true,
-        cellType:CellType.Text
+        //cellType:CellType.Text
       },
       {
         path: "porheadID",
@@ -60,7 +60,7 @@ class GoodsInComponent extends MainComponent {
         hdToolTip: "Order No",        
         icon: "fal fa-2x fa-hashtag color-gray2 pointer",
         sortable: true,
-        cellType:CellType.Number
+        //cellType:CellType.Number
 
       },
       {
@@ -68,7 +68,7 @@ class GoodsInComponent extends MainComponent {
         label: "",
         icon: "fal fa-2x fa-tag color-gray2 pointer",
         sortable: true,
-        cellType:CellType.Text,
+        //cellType:CellType.Text,
         content:(order)=><label>{order.customerID}/{order.ordheadID}</label> ,
       },
       {
@@ -77,7 +77,7 @@ class GoodsInComponent extends MainComponent {
         hdToolTip: "Status",        
         icon: "fal fa-2x fa-text color-gray2 pointer",
         sortable: true,
-        cellType:CellType.Text,
+        //cellType:CellType.Text,
       },
       {
         path: "supplierRef",
@@ -85,7 +85,7 @@ class GoodsInComponent extends MainComponent {
         hdToolTip: "Supplier Ref",        
         icon: "fal fa-2x fa-user-tag color-gray2 pointer",
         sortable: true,
-        cellType:CellType.Text,
+        //cellType:CellType.Text,
       },
       {
         path: "customerName",
@@ -93,7 +93,7 @@ class GoodsInComponent extends MainComponent {
         hdToolTip: "Solid to",        
         icon: "fal fa-2x fa-building color-gray2 pointer",
         sortable: true,
-        cellType:CellType.Text,
+        //cellType:CellType.Text,
       },
       {
         path: "edit",

@@ -1,6 +1,6 @@
-import React from 'react';
-import '../ToolTip.css'
-import { CellType } from './table';
+import React from "react";
+import "../ToolTip.css";
+import { CellType } from "./table";
 import ToolTip from "../ToolTip";
 class TableHeader extends React.Component {
   el = React.createElement;
@@ -32,54 +32,12 @@ class TableHeader extends React.Component {
     if (column.sortable == true) return this.el("i", { key, className, style });
     return null;
   };
-
-  render() {
-    const { columns } = this.props;
-    const { el, raiseSort, renderSortIcon } = this;
-    return el(
-      "thead",
-      null,
-      el(
-        "tr",
-        null,
-        columns.map((c) =>
-          el(
-            "th",
-            {
-              className: (c?.hdClassName || "") + " clickable ",
-              key: c.key || c.path || c.label.replace(" ", ""),
-              onClick: () => raiseSort(c.path),
-              width: c.width ? c.width : "",
-              //title:c.toolTip?c.toolTip:""
-            },
-            el(
-              "div",
-              {
-                style: {
-                  display: "flex",
-                  justifyContent: this.getCellAlign(c),
-                },
-              },
-              <div style={{ ...c.hdStyle, whiteSpace: "nowrap",display: "flex",alignItems: "center",justifyContent: "center" }}>
-                <ToolTip title={c.hdToolTip ? c.hdToolTip : ""} >
-                <span>{c?.label || " "}</span>
-                {c.icon ?<i className={ c.icon} onClick={this.handleExportCsv}></i>:null}
-                </ToolTip>
-                <div style={{marginLeft:3}}>
-                  {renderSortIcon(c)}
-                </div>
-              </div>             
-            )
-          )
-        )
-      )
-    );
-  }
   getCellAlign(c) {
     if (c && c.cellType) {
+      //console.log(c);
       switch (c.cellType) {
         case CellType.Text:
-          return "flext-start";
+          return "flex-start";
         case CellType.Number:
           return "flex-end";
         case CellType.Money:
@@ -89,6 +47,53 @@ class TableHeader extends React.Component {
       }
     }
     return "center";
+  }
+  render() {
+    const { columns } = this.props;
+    console.log("header c", columns);
+    const { el, raiseSort, renderSortIcon } = this;
+    return el(
+      "thead",
+      null,
+      el(
+        "tr",
+        null,
+        columns.map((c) => (
+          <th
+            className={(c?.hdClassName || "") + " clickable "}
+            key={c.key || c.path || c.label.replace(" ", "")}
+            onClick={() => raiseSort(c.path)}
+            width={c.width ? c.width : ""}
+          >
+            <div
+              key={this.getCellAlign(c)}
+              style={{
+                display: "flex",
+                justifyContent: this.getCellAlign(c),
+              }}
+            >
+              <div
+                style={{
+                  ...c.hdStyle,
+                  whiteSpace: "nowrap",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >                
+                <ToolTip title={c.hdToolTip ? c.hdToolTip : ""}>
+                  <span>{c?.label || " "}</span>
+                  {c.icon ? (
+                    <i className={c.icon} onClick={this.handleExportCsv}></i>
+                  ) : null}
+                </ToolTip>
+                <div style={{ marginLeft: 3 }}>{renderSortIcon(c)}</div>
+              </div>
+            </div>
+          </th>
+        ))
+      )
+    );
   }
 }
 

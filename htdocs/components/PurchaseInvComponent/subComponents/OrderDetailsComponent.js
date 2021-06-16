@@ -17,20 +17,35 @@ export default class OrderDetailsComponent extends MainComponent {
       showModal: false,
       lines: [],
       invoiceNo:"",
-      invoiceDate:moment().format("YYYY-MM-DD")
+      invoiceDate:moment().format("YYYY-MM-DD"),
+      recieveAll:false
     };
   }
 
   componentDidMount() {
     this.getData();
-  }
+    document.addEventListener("keydown",this.handleKeyDown)
 
+  }
+  handleKeyDown=(ev)=>{     
+    if(ev.key=="F5")
+    {
+      this.handleInvoiceAll(!this.state.recieveAll);
+      ev.preventDefault();
+      return false;
+    }
+    
+  }
+  componentWillUnmount() {
+    document.removeEventListener("keydown",this.handleKeyDown);
+  }
   getData = () => {
     const { porheadID } = this.props;
     if (porheadID)
       this.api.getOrderLines(porheadID).then(
-        (res) => {
-          //console.log(res);
+        (res) => {          
+          const lines=res.data;
+          lines.map((line,index)=>line.id=index+1);
           this.setState({ lines: res.data });
         },
         (error) => this.alert("Error in loading data")
@@ -153,16 +168,17 @@ export default class OrderDetailsComponent extends MainComponent {
         label: "Serial No",
         hdClassName: "text-center",
         sortable: true,
-        content: (order) => (
+        content: (item) => (
           <div style={{ display: "flex", justifyContent: "center" }}>
             <input
-              disabled={order.lineDisabled || order.disabled}
+              disabled={item.lineDisabled || item.disabled}
               className="form-control"
               style={{ width: 150 }}
-              value={order.serialNo}
-              onChange={(event) =>
-                this.handleOrderChange(order, "serialNo", event.target.value)
-              }
+              defaultValue={item.serialNo}
+              id={`serialNo${item.id}`}
+              // onChange={(event) =>
+              //   this.handleOrderChange(order, "serialNo", event.target.value)
+              // }
             ></input>
           </div>
         ),
@@ -221,6 +237,12 @@ export default class OrderDetailsComponent extends MainComponent {
       ></Table>
     );
   };
+  updateItems=(lines)=>{
+    lines.map(line=>{
+      const serialNo=document.getElementById(`serialNo${line.id}`).value;      
+      line.serialNo=serialNo;       
+    })
+  }
   calcTotal = () => {
     const { lines } = this.state;
     const { vatRate } = this.props;
@@ -240,11 +262,11 @@ export default class OrderDetailsComponent extends MainComponent {
     );
     return <div style={{ textAlign: "center" }}>{total}</div>;
   };
-  handleOrderChange = (order, prop, value) => {
+  handleOrderChange = (item, prop, value) => {
     const { lines } = this.state;
     if (this.tableTimeChange) clearTimeout(this.tableTimeChange);
     this.tableTimeChange = setTimeout(() => {
-      const line = lines.find((o) => o.itemID == order.itemID);
+      const line = lines.find((o) => o.id == item.id);
       line[prop] = value;
       this.calcTotal();
     }, 1000);
@@ -263,6 +285,7 @@ export default class OrderDetailsComponent extends MainComponent {
   handleUpdate = () => {
     const { lines,invoiceDate,invoiceNo } = this.state;
     const { porheadID } = this.props;
+    this.updateItems(lines);
     const linesToReceive = lines.filter((l) => l.qtyToInvoice > 0);
     if (linesToReceive.length == 0) {
       this.alert("Please enter at least one value to invoice");
@@ -293,7 +316,7 @@ export default class OrderDetailsComponent extends MainComponent {
       items:items,
       invoiceNo,
       invoiceDate
-    }
+    }   
     this.api
       .updateInvoice(data)
       .then((res) => {
@@ -313,9 +336,11 @@ export default class OrderDetailsComponent extends MainComponent {
       });
   };
   handleInvoiceAll = (value) => {
-    let { lines } = this.state;
+    let { lines,recieveAll } = this.state;
+    this.updateItems(lines);
+    //console.log("lines", lines);
     lines.map((line) => (line.qtyToInvoice = value ? line.qtyOS : 0));
-    this.setState(lines,()=> this.calcTotal());
+    this.setState({lines,recieveAll:!recieveAll},()=> this.calcTotal());
     //console.log("change", value);
   };
   getHeader = () => {
@@ -330,7 +355,7 @@ export default class OrderDetailsComponent extends MainComponent {
             <td style={{textAlign:"right"}}>Invoice Date	</td>
             <td><input type="date" className="form-control" value={invoiceDate} onChange={(event)=>this.setState({invoiceDate:event.target.value})}></input></td>
             <td  style={{textAlign:"right"}}>Invoice All</td>
-            <td><Toggle width={30} onChange={this.handleInvoiceAll}></Toggle></td>
+            <td><Toggle width={30} onChange={this.handleInvoiceAll} checked={this.state.recieveAll}></Toggle></td>
           </tr>
          
         </tbody>

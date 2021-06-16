@@ -2,7 +2,7 @@ import MainComponent from "../shared/MainComponent.js";
 import React from "react";
 import ReactDOM from "react-dom";
 import Spinner from "../shared/Spinner/Spinner";
-import Table from "../shared/table/table.js";
+import Table, { CellType } from "../shared/table/table.js";
 import APIPurchaseInv from "./services/APIPurchaseInv.js";
 import "../style.css";
 import "./PurchaseInvComponent.css";
@@ -52,6 +52,7 @@ class PurchaseInvComponent extends MainComponent {
         hdClassName: "text-center",
         icon: "fal fa-2x fa-warehouse-alt color-gray2 pointer",
         sortable: true,
+        //cellType:CellType.Text
         //className: "text-center",
       },
       {
@@ -109,7 +110,7 @@ class PurchaseInvComponent extends MainComponent {
         label: "",
         hdToolTip: "Edit",
         hdClassName: "text-center",
-        sortable: true,
+        sortable: false,
         content: (order) =>
           this.getEditElement(order, this.handleEdit, true, "Edit order lines"),
       },
@@ -168,6 +169,7 @@ class PurchaseInvComponent extends MainComponent {
       </Modal>
     );
   };
+
   handleOnClose = () => {
     this.getData();
     this.setState({ showModal: false });

@@ -174,13 +174,16 @@ class Table extends React.Component {
         } else return [...data];
     }
     correctCellType(columns,data){
-        console.log("before",columns);
+        //console.log("before",columns,data);
         if(columns && data)
         {
             for(let i=0;i<columns.length;i++)
             {
-                if(!columns.cellType&&!columns.content){ // if we have the type then don't update it
+               // console.log(columns[i].cellType,columns[i].content);
+
+                if(!columns[i].cellType&&!columns[i].content){ // if we have the type then don't update it
                     let isText=false;
+                    
                     for(let j=0;j<data.length;j++)
                     {
                         //console.log(columns[i].path,data[j][columns[i].path],isNumeric(data[j][columns[i].path]));
@@ -195,10 +198,12 @@ class Table extends React.Component {
                     else 
                         columns[i].cellType=CellType.Number;
                 }
+                else if(!columns[i].cellType&&columns[i].content)
+                    columns[i].cellType=CellType.Text;
             }
             
         }
-        console.log("after",columns);
+        //console.log("after",columns);
         return columns;
     }
      
@@ -219,7 +224,8 @@ class Table extends React.Component {
         const {handleSearch} = this;
         const el = React.createElement;
         const filterData = search ? this.filterData(data, columns) : data;
-        //columns=this.correctCellType(columns,filterData);
+        columns=this.correctCellType(columns,filterData);
+        //console.log("columns",columns)
         let striped = "table-striped";
         if (this.props.striped === false)
             striped = "";

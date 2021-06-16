@@ -50,6 +50,8 @@ export default class OrderDetailsComponent extends MainComponent {
       this.api.getOrderLines(porheadID).then(
         (res) => {
           const lines= res.lines;
+          lines.map((line,index)=>line.id=index+1);
+          //console.log("lines",lines);
           this.setState({ lines });
         },
         (error) => this.alert("Error in loading data")
@@ -105,15 +107,16 @@ export default class OrderDetailsComponent extends MainComponent {
         //icon: "fal fa-2x fa-building color-gray2 pointer",
         sortable: true,
         className: "text-center",
-        content: (order) => (
+        content: (item) => (
           <div style={{ display: "flex", justifyContent: "center" }}>
             <input
-              disabled={order.lineDisabled}
+              disabled={item.lineDisabled}
               type="number"
               className="form-control"
               style={{ width: 100 }}
-              defaultValue={order.qtyToReceive}
-              onChange={(event)=>this.handleOrderChange(order,"qtyToReceive",parseInt(event.target.value))}
+              defaultValue={item.qtyToReceive}
+              id={`qtyToReceive`+item.id}
+              //onChange={(event)=>this.handleOrderChange(order,"qtyToReceive",parseInt(event.target.value))}
             ></input>
           </div>
         ),
@@ -126,14 +129,15 @@ export default class OrderDetailsComponent extends MainComponent {
         //icon: "fal fa-2x fa-building color-gray2 pointer",
         sortable: true,
         //className: "text-center",
-        content: (order) => (
+        content: (item) => (
           <div style={{ display: "flex", justifyContent: "center" }}>
             <input
-            disabled={order.lineDisabled||order.disabled}
+              disabled={item.lineDisabled||item.disabled}
               className="form-control"
               style={{ width: 150 }}
-              value={order.serialNo}
-              onChange={(event)=>this.handleOrderChange(order,"serialNo",event.target.value)}
+              defaultValue={item.serialNo}
+              id={`serialNo`+item.id}
+              // onChange={(event)=>this.handleOrderChange(item,"serialNo",event.target.value)}
             ></input>
           </div>
         ),
@@ -182,13 +186,15 @@ export default class OrderDetailsComponent extends MainComponent {
       ></Table>
     );
   };
-  handleOrderChange=(order,prop,value)=>{
+  handleOrderChange=(item,prop,value)=>{
       const {lines}=this.state;
       if(this.tableTimeChange)
       clearTimeout(this.tableTimeChange);
       this.tableTimeChange=setTimeout(()=>{
-        const temp=lines.find(o=>o.itemID==order.itemID);
-        temp[prop]=value;        
+        const temp=lines.find(o=>o.id==item.id);
+        //console.log(temp);
+        temp[prop]=value;  
+        this.setState(lines);
        },500)
      
   }
@@ -200,15 +206,27 @@ export default class OrderDetailsComponent extends MainComponent {
     const { porheadID } = this.props;
     window.open(`PurchaseOrder.php?action=display&porheadID=${porheadID}`, '_blank');
   }
+  updateItems=(lines)=>{
+    lines.map(line=>{
+      const serialNo=document.getElementById(`serialNo${line.id}`).value;      
+      line.serialNo=serialNo;
+      const qtyToReceive=document.getElementById(`qtyToReceive${line.id}`).value;      
+      line.qtyToReceive=qtyToReceive;
+    })
+  }
   handleReceive=()=>{
     const {lines}=this.state;
     const { porheadID } = this.props;
+    this.updateItems(lines);
     const linesToReceive=lines.filter(l=>l.qtyToReceive>0);
     if(linesToReceive.length==0)
     {
       this.alert("Please enter at least one value to receive");
       return;
-    }
+    }   
+    this.setState({lines});
+    //console.log('lines',lines);
+    
     this.api.receive(porheadID,lines).then(res=>{   
       window.location=`PurchaseOrder.php?action=display&porheadID=${porheadID}`;     
     }).catch(res=>{      
@@ -217,6 +235,7 @@ export default class OrderDetailsComponent extends MainComponent {
   }
   handleRecieveAll=(value)=>{
     let {lines}=this.state;
+    this.updateItems(lines);
     lines.map(line=>line.qtyToReceive=value?line.qtyOS:0);
     this.setState({lines,recieveAll:value});
   }
