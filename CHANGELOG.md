@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.13.3] - 2021-06-17
+### Fixed
+- Fixed issue with call back activities not having proper "status".
+
 ## [v5.13.2] - 2021-06-17
 ### Fixed
 - Fix hardcoded path in ContactImport.php
