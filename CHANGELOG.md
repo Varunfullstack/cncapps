@@ -1,6 +1,11 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.13.2] - 2021-06-17
+### Fixed
+- Fix hardcoded path in ContactImport.php
+- Fix issue with importing
+
 ## [v5.13.1] - 2021-06-11
 ### Fixed
 - Fixed issue with Supplier field outline in supplier selector react component.
