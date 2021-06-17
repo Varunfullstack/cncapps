@@ -1,0 +1,16 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.2.xsd">
+    <changeSet author="pavwebdev" id="hotfix-v5.13.3-0">
+        <tagDatabase tag="hotfix-v5.13.3"/>
+    </changeSet>
+    <changeSet id="hotfix-v5.13.3" author="Xavi">
+        <sql>
+            update callactivity
+            set caa_status = 'C'
+            where caa_status is null;
+        </sql>
+        <rollback/>
+    </changeSet>
+</databaseChangeLog>

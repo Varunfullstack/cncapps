@@ -823,6 +823,7 @@ class CTCurrentActivityReport extends CTCNC
             $dbeCallActivity->setValue(DBECallActivity::startTime, date('H:i'));
             $endTime = new DateTime();
             $dbeCallActivity->setValue(DBECallActivity::endTime, $endTime->format('H:i'));
+            $dbeCallActivity->setValue(DBECallActivity::status, 'C');
             $dbeCallActivity->setValue(
                 DBECallActivity::reason,
                 $staffName . ' cancelled this call back for the following reason: ' . $reason
