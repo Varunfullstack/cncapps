@@ -653,12 +653,7 @@ class CTCustomer extends CTCNC
         switch ($this->getAction()) {
             case 'encrypt':
             {
-                $value     = @$_REQUEST['value'];
-                $encrypted = Encryption::encrypt(
-                    CUSTOMERS_ENCRYPTION_PUBLIC_KEY,
-                    $value
-                );
-                echo json_encode(["status" => "ok", "data" => $encrypted]);
+                $this->getEncrypt();
                 exit;
             }
             case self::GET_CUSTOMER_ORDERS:
@@ -668,258 +663,53 @@ class CTCustomer extends CTCNC
             }
             case self::GET_CUSTOMER_DATA:
             {
-                $customerID = @$_REQUEST['customerID'];
-                if (!$customerID) {
-                    http_response_code(400);
-                    echo json_encode(["status" => "error", "description" => "Customer ID Not provided"]);
-                    exit;
-                }
-                $dbeCustomer = new DBECustomer($this);
-                if (!$dbeCustomer->getRow($customerID)) {
-                    http_response_code(404);
-                    echo json_encode(["status" => "error", "description" => "Customer not found"]);
-                    exit;
-                }
-                echo json_encode(
-                    [
-                        "status" => "ok",
-                        "data"   => [
-                            "accountManagerUserID"         => $dbeCustomer->getValue(DBECustomer::accountManagerUserID),
-                            "accountName"                  => $dbeCustomer->getValue(DBECustomer::accountName),
-                            "accountNumber"                => $dbeCustomer->getValue(DBECustomer::accountNumber),
-                            "activeDirectoryName"          => $dbeCustomer->getValue(DBECustomer::activeDirectoryName),
-                            "becameCustomerDate"           => $dbeCustomer->getValue(DBECustomer::becameCustomerDate),
-                            "customerID"                   => $dbeCustomer->getValue(DBECustomer::customerID),
-                            "customerTypeID"               => $dbeCustomer->getValue(DBECustomer::customerTypeID),
-                            "droppedCustomerDate"          => $dbeCustomer->getValue(DBECustomer::droppedCustomerDate),
-                            "gscTopUpAmount"               => $dbeCustomer->getValue(DBECustomer::gscTopUpAmount),
-                            "lastReviewMeetingDate"        => $dbeCustomer->getValue(
-                                DBECustomer::lastReviewMeetingDate
-                            ),
-                            "leadStatusId"                 => $dbeCustomer->getValue(DBECustomer::leadStatusId),
-                            "mailshotFlag"                 => $dbeCustomer->getValue(DBECustomer::mailshotFlag),
-                            "modifyDate"                   => $dbeCustomer->getValue(DBECustomer::modifyDate),
-                            "name"                         => $dbeCustomer->getValue(DBECustomer::name),
-                            "noOfPCs"                      => $dbeCustomer->getValue(DBECustomer::noOfPCs),
-                            "noOfServers"                  => $dbeCustomer->getValue(DBECustomer::noOfServers),
-                            "primaryMainContactID"         => $dbeCustomer->getValue(DBECustomer::primaryMainContactID),
-                            "referredFlag"                 => $dbeCustomer->getValue(DBECustomer::referredFlag),
-                            "regNo"                        => $dbeCustomer->getValue(DBECustomer::regNo),
-                            "reviewMeetingBooked"          => $dbeCustomer->getValue(DBECustomer::reviewMeetingBooked),
-                            "reviewMeetingFrequencyMonths" => $dbeCustomer->getValue(
-                                DBECustomer::reviewMeetingFrequencyMonths
-                            ),
-                            "sectorID"                     => $dbeCustomer->getValue(DBECustomer::sectorID),
-                            "slaP1"                        => $dbeCustomer->getValue(DBECustomer::slaP1),
-                            "slaP2"                        => $dbeCustomer->getValue(DBECustomer::slaP2),
-                            "slaP3"                        => $dbeCustomer->getValue(DBECustomer::slaP3),
-                            "slaP4"                        => $dbeCustomer->getValue(DBECustomer::slaP4),
-                            "slaP5"                        => $dbeCustomer->getValue(DBECustomer::slaP5),
-                            "slaFixHoursP1"                => $dbeCustomer->getValue(DBECustomer::slaFixHoursP1),
-                            "slaFixHoursP2"                => $dbeCustomer->getValue(DBECustomer::slaFixHoursP2),
-                            "slaFixHoursP3"                => $dbeCustomer->getValue(DBECustomer::slaFixHoursP3),
-                            "slaFixHoursP4"                => $dbeCustomer->getValue(DBECustomer::slaFixHoursP4),
-                            "slaP1PenaltiesAgreed"         => $dbeCustomer->getValue(DBECustomer::slaP1PenaltiesAgreed),
-                            "slaP2PenaltiesAgreed"         => $dbeCustomer->getValue(DBECustomer::slaP2PenaltiesAgreed),
-                            "slaP3PenaltiesAgreed"         => $dbeCustomer->getValue(DBECustomer::slaP3PenaltiesAgreed),
-                            "sortCode"                     => $dbeCustomer->getValue(DBECustomer::sortCode),
-                            "specialAttentionEndDate"      => $dbeCustomer->getValue(
-                                DBECustomer::specialAttentionEndDate
-                            ),
-                            "specialAttentionFlag"         => $dbeCustomer->getValue(DBECustomer::specialAttentionFlag),
-                            "support24HourFlag"            => $dbeCustomer->getValue(DBECustomer::support24HourFlag),
-                            "techNotes"                    => $dbeCustomer->getValue(DBECustomer::techNotes),
-                            "websiteURL"                   => $dbeCustomer->getValue(DBECustomer::websiteURL),
-                            "reviewDate"                   => $dbeCustomer->getValue(DBECustomer::reviewDate),
-                            "reviewTime"                   => $dbeCustomer->getValue(DBECustomer::reviewTime),
-                            "dateMeetingConfirmed"         => $dbeCustomer->getValue(DBECustomer::dateMeetingConfirmed),
-                            "invoiceSiteNo"                => $dbeCustomer->getValue(DBECustomer::invoiceSiteNo),
-                            "deliverSiteNo"                => $dbeCustomer->getValue(DBECustomer::deliverSiteNo),
-                            "lastUpdatedDateTime"          => $dbeCustomer->getValue(DBECustomer::lastUpdatedDateTime),
-                            "opportunityDeal"              => $dbeCustomer->getValue(DBECustomer::opportunityDeal),
-                            "reviewAction"                 => $dbeCustomer->getValue(DBECustomer::reviewAction),
-                            "lastContractSent"             => $dbeCustomer->getValue(DBECustomer::lastContractSent),
-                            "statementContactId"           => $dbeCustomer->getValue(DBECustomer::statementContactId)
-                        ]
-                    ]
-                );
+                $this->getCustomerData();
                 break;
             }
             case 'getMainContacts':
             {
-                $customerID = @$_REQUEST['customerID'];
-                if (!$customerID) {
-                    http_response_code(400);
-                    echo json_encode(["status" => "error", "description" => "Customer ID Not provided"]);
-                    exit;
-                }
-                echo json_encode(["status" => "ok", "data" => $this->getMainContacts($customerID)]);
+                $this->_getMainContacts(@$_REQUEST['customerID']);
                 break;
             }
             case 'getLeadStatuses':
             {
-                $dbeLeadStatus = new DBECustomerLeadStatus($this);
-                $dbeLeadStatus->getRows(DBECustomerLeadStatus::sortOrder);
-                echo json_encode(["status" => "ok", "data" => $dbeLeadStatus->fetchArray()]);
+                $this->getLeadStatuses();
                 break;
             }
             case 'updateCustomer':
             {
-                $json        = file_get_contents('php://input');
-                $data        = json_decode($json, true);
-                $dbeCustomer = new DBECustomer($this);
-                $dbeCustomer->getRow($data['customerID']);
-                if (empty($data['lastUpdatedDateTime']) || $data['lastUpdatedDateTime'] < $dbeCustomer->getValue(
-                        DBECustomer::lastUpdatedDateTime
-                    )) {
-                    throw new \CNCLTD\Exceptions\JsonHttpException(
-                        400, "Updated by another user", [
-                               "errorCode"           => 1002,
-                               "lastUpdatedDateTime" => $dbeCustomer->getValue(DBECustomer::lastUpdatedDateTime)
-                           ]
-                    );
-                }
-                foreach ($data as $key => $value) {
-                    $dbeCustomer->setValue($key, $value);
-                }
-                $dbeCustomer->updateRow();
-                echo json_encode(
-                    [
-                        "status"              => "ok",
-                        "lastUpdatedDateTime" => $dbeCustomer->getValue(DBECustomer::lastUpdatedDateTime)
-                    ]
-                );
+                $this->updateCustomer();
                 break;
             }
             case self::UPDATE_SITE:
             {
-                $data    = $this->getJSONData();
-                $dbeSite = new DBESite($this);
-                if (!isset($data['customerId'])) {
-                    throw new \CNCLTD\Exceptions\JsonHttpException(400, "Customer ID is mandatory");
-                }
-                if (!isset($data['siteNo'])) {
-                    throw new \CNCLTD\Exceptions\JsonHttpException(400, "siteNo is mandatory");
-                }
-                $dbeSite->setValue(DBESite::customerID, $data['customerId']);
-                $dbeSite->setValue(DBESite::siteNo, $data['siteNo']);
-                $dbeSite->getRowByCustomerIDSiteNo();
-                if (empty($data['lastUpdatedDateTime']) || $data['lastUpdatedDateTime'] < $dbeSite->getValue(
-                        DBESite::lastUpdatedDateTime
-                    )) {
-                    throw new \CNCLTD\Exceptions\JsonHttpException(
-                        400, "Updated by another user", [
-                               "errorCode"           => 1002,
-                               "lastUpdatedDateTime" => $dbeSite->getValue(DBESite::lastUpdatedDateTime)
-                           ]
-                    );
-                }
-                if (isset($data['fieldValueMap']['active']) && $data['siteNo'] == 0) {
-                    throw new \CNCLTD\Exceptions\JsonHttpException(400, "Cannot deactivate Site 0");
-                }
-                $dbeSite = \CNCLTD\Data\SiteMapper::fromDTOToDB($data['fieldValueMap'], $dbeSite);
-                $dbeSite->updateRow();
-                echo json_encode(
-                    [
-                        "status"              => "ok",
-                        "lastUpdatedDateTime" => $dbeSite->getValue(DBECustomer::lastUpdatedDateTime)
-                    ]
-                );
+                $this->updateSite($this->getJSONData()); 
                 exit;
             }
             case self::DELETE_PORTAL_DOCUMENT:
             {
-                $data = $this->getJSONData();
-                if (!isset($data['portalDocumentId'])) {
-                    throw new \CNCLTD\Exceptions\JsonHttpException(400, "portal document Id is required");
-                }
-                $dbePortalCustomerDocumentWithoutFile = new DBEPortalCustomerDocumentWithoutFile($this);
-                $dbePortalCustomerDocumentWithoutFile->deleteRow($data['portalDocumentId']);
-                echo json_encode(["status" => "ok"]);
+                $this->deletePortalDocument($this->getJSONData());               
                 exit;
             }
             case self::ADD_PORTAL_CUSTOMER_DOCUMENT:
             {
-                $data = $this->getJSONData();
-                if (!isset($data['customerId'])) {
-                    throw new \CNCLTD\Exceptions\JsonHttpException(400, "customerId is required");
-                }
-                if (!isset($data['description'])) {
-                    throw new \CNCLTD\Exceptions\JsonHttpException(400, "description is required");
-                }
-                if (!isset($data['fileName'])) {
-                    throw new \CNCLTD\Exceptions\JsonHttpException(400, "fileName is required");
-                }
-                if (!isset($data['encodedFile'])) {
-                    throw new \CNCLTD\Exceptions\JsonHttpException(400, "encodedFile is required");
-                }
-                if (!isset($data['customerContract'])) {
-                    throw new \CNCLTD\Exceptions\JsonHttpException(400, "customerContract is required");
-                }
-                if (!isset($data['mainContractOnly'])) {
-                    throw new \CNCLTD\Exceptions\JsonHttpException(400, "mainContractOnly is required");
-                }
-                $fileAndMimeType           = $this->getFileDecodedAndMimeTypeFromBase64EncodedFile(
-                    $data['encodedFile']
-                );
-                $dbePortalCustomerDocument = new DBEPortalCustomerDocument($this);
-                $dbePortalCustomerDocument->setValue(DBEPortalCustomerDocument::customerID, $data['customerId']);
-                $dbePortalCustomerDocument->setValue(DBEPortalCustomerDocument::description, $data['description']);
-                $dbePortalCustomerDocument->setValue(DBEPortalCustomerDocument::file, $fileAndMimeType->file);
-                $dbePortalCustomerDocument->setValue(
-                    DBEPortalCustomerDocument::fileMimeType,
-                    $fileAndMimeType->mimeType
-                );
-                $dbePortalCustomerDocument->setValue(DBEPortalCustomerDocument::filename, $data['fileName']);
-                $dbePortalCustomerDocument->setValue(
-                    DBEPortalCustomerDocument::customerContract,
-                    $data['customerContract']
-                );
-                $dbePortalCustomerDocument->setValue(
-                    DBEPortalCustomerDocument::mainContactOnlyFlag,
-                    $data['mainContractOnly'] ? 'Y' : 'N'
-                );
-                $dbePortalCustomerDocument->insertRow();
-                $document = [
-                    'id'                  => $dbePortalCustomerDocument->getValue(
-                        DBEPortalCustomerDocument::portalCustomerDocumentID
-                    ),
-                    'description'         => $dbePortalCustomerDocument->getValue(
-                        DBEPortalCustomerDocumentWithoutFile::description
-                    ),
-                    'filename'            => $dbePortalCustomerDocument->getValue(
-                        DBEPortalCustomerDocumentWithoutFile::filename
-                    ),
-                    'customerContract'    => $dbePortalCustomerDocument->getValue(
-                        DBEPortalCustomerDocumentWithoutFile::customerContract
-                    ),
-                    'mainContactOnlyFlag' => $dbePortalCustomerDocument->getValue(
-                            DBEPortalCustomerDocument::mainContactOnlyFlag
-                        ) === 'Y',
-                ];
-                echo json_encode(["status" => "ok", "data" => $document]);
+                $this->addPortalCustomerDocument($this->getJSONData());
                 exit;
             }
             case
             'getSectors':
             {
-                $dbeSector = new DBESector($this);
-                $dbeSector->getRows(DBESector::description);
-                echo json_encode(["status" => "ok", "data" => $dbeSector->fetchArray()]);
+                $this->getSectors();
                 break;
             }
             case 'getCustomerTypes':
             {
-                $dbeCustomerTypes = new DBECustomerType($this);
-                $dbeCustomerTypes->getRows(DBECustomerType::description);
-                echo json_encode(["status" => "ok", "data" => $dbeCustomerTypes->fetchArray()]);
+                $this->getCustomerTypes();
                 break;
             }
             case 'getAccountManagers':
             {
-                $dbeUser = new DBEUser($this);
-                $dbeUser->getRows();
-                echo json_encode(["status" => "ok", "data" => $dbeUser->fetchArray()]);
+                $this->getAccountManagers();
                 break;
             }
             case 'getReviewEngineers':
@@ -1128,11 +918,11 @@ class CTCustomer extends CTCNC
                 exit;
                 break;
             case "projects":
-                echo json_encode($this->getCustomerProjects());
+                echo json_encode($this->getCustomerProjects(@$_REQUEST['customerID']));
                 exit;
                 break;
             case "contracts":
-                echo json_encode($this->getCustomerContracts());
+                echo json_encode($this->getCustomerContracts(@$_REQUEST['customerID']));
                 exit;
             case "getCustomersHaveOpenSR":
                 echo json_encode($this->getCustomersHaveOpenSR());
@@ -3222,9 +3012,9 @@ ORDER BY NAME,
         return $contacts;
     }
 
-    function getCustomerContracts()
+    function getCustomerContracts($customerID)
     {
-        $customerID         = $_REQUEST["customerId"];
+        $customerID         = $customerID;
         $linkedToSalesOrder = $_REQUEST["linkedToSalesOrder"];
         $contracts          = array();
         $buCustomerItem     = new BUCustomerItem($this);
@@ -3324,6 +3114,8 @@ ORDER BY NAME,
             $this->displayEditForm();
         }
     }
+    
+    //--------------------------------new
     function displayForm(){
         $this->setPageTitle('Customer');
         $this->setTemplateFiles(
@@ -3338,5 +3130,265 @@ ORDER BY NAME,
             true
         );
         $this->parsePage();
+    }
+    function getEncrypt()
+    {
+        $value     = @$_REQUEST['value'];
+        $encrypted = Encryption::encrypt(
+            CUSTOMERS_ENCRYPTION_PUBLIC_KEY,
+            $value
+        );
+        echo json_encode(["status" => "ok", "data" => $encrypted]);
+    }
+
+    function getCustomerData()
+    {
+        $customerID = @$_REQUEST['customerID'];
+                if (!$customerID) {
+                    http_response_code(400);
+                    echo json_encode(["status" => "error", "description" => "Customer ID Not provided"]);
+                    exit;
+                }
+                $dbeCustomer = new DBECustomer($this);
+                if (!$dbeCustomer->getRow($customerID)) {
+                    http_response_code(404);
+                    echo json_encode(["status" => "error", "description" => "Customer not found"]);
+                    exit;
+                }
+                echo json_encode(
+                    [
+                        "status" => "ok",
+                        "data"   => [
+                            "accountManagerUserID"         => $dbeCustomer->getValue(DBECustomer::accountManagerUserID),
+                            "accountName"                  => $dbeCustomer->getValue(DBECustomer::accountName),
+                            "accountNumber"                => $dbeCustomer->getValue(DBECustomer::accountNumber),
+                            "activeDirectoryName"          => $dbeCustomer->getValue(DBECustomer::activeDirectoryName),
+                            "becameCustomerDate"           => $dbeCustomer->getValue(DBECustomer::becameCustomerDate),
+                            "customerID"                   => $dbeCustomer->getValue(DBECustomer::customerID),
+                            "customerTypeID"               => $dbeCustomer->getValue(DBECustomer::customerTypeID),
+                            "droppedCustomerDate"          => $dbeCustomer->getValue(DBECustomer::droppedCustomerDate),
+                            "gscTopUpAmount"               => $dbeCustomer->getValue(DBECustomer::gscTopUpAmount),
+                            "lastReviewMeetingDate"        => $dbeCustomer->getValue(
+                                DBECustomer::lastReviewMeetingDate
+                            ),
+                            "leadStatusId"                 => $dbeCustomer->getValue(DBECustomer::leadStatusId),
+                            "mailshotFlag"                 => $dbeCustomer->getValue(DBECustomer::mailshotFlag),
+                            "modifyDate"                   => $dbeCustomer->getValue(DBECustomer::modifyDate),
+                            "name"                         => $dbeCustomer->getValue(DBECustomer::name),
+                            "noOfPCs"                      => $dbeCustomer->getValue(DBECustomer::noOfPCs),
+                            "noOfServers"                  => $dbeCustomer->getValue(DBECustomer::noOfServers),
+                            "primaryMainContactID"         => $dbeCustomer->getValue(DBECustomer::primaryMainContactID),
+                            "referredFlag"                 => $dbeCustomer->getValue(DBECustomer::referredFlag),
+                            "regNo"                        => $dbeCustomer->getValue(DBECustomer::regNo),
+                            "reviewMeetingBooked"          => $dbeCustomer->getValue(DBECustomer::reviewMeetingBooked),
+                            "reviewMeetingFrequencyMonths" => $dbeCustomer->getValue(
+                                DBECustomer::reviewMeetingFrequencyMonths
+                            ),
+                            "sectorID"                     => $dbeCustomer->getValue(DBECustomer::sectorID),
+                            "slaP1"                        => $dbeCustomer->getValue(DBECustomer::slaP1),
+                            "slaP2"                        => $dbeCustomer->getValue(DBECustomer::slaP2),
+                            "slaP3"                        => $dbeCustomer->getValue(DBECustomer::slaP3),
+                            "slaP4"                        => $dbeCustomer->getValue(DBECustomer::slaP4),
+                            "slaP5"                        => $dbeCustomer->getValue(DBECustomer::slaP5),
+                            "slaFixHoursP1"                => $dbeCustomer->getValue(DBECustomer::slaFixHoursP1),
+                            "slaFixHoursP2"                => $dbeCustomer->getValue(DBECustomer::slaFixHoursP2),
+                            "slaFixHoursP3"                => $dbeCustomer->getValue(DBECustomer::slaFixHoursP3),
+                            "slaFixHoursP4"                => $dbeCustomer->getValue(DBECustomer::slaFixHoursP4),
+                            "slaP1PenaltiesAgreed"         => $dbeCustomer->getValue(DBECustomer::slaP1PenaltiesAgreed),
+                            "slaP2PenaltiesAgreed"         => $dbeCustomer->getValue(DBECustomer::slaP2PenaltiesAgreed),
+                            "slaP3PenaltiesAgreed"         => $dbeCustomer->getValue(DBECustomer::slaP3PenaltiesAgreed),
+                            "sortCode"                     => $dbeCustomer->getValue(DBECustomer::sortCode),
+                            "specialAttentionEndDate"      => $dbeCustomer->getValue(
+                                DBECustomer::specialAttentionEndDate
+                            ),
+                            "specialAttentionFlag"         => $dbeCustomer->getValue(DBECustomer::specialAttentionFlag),
+                            "support24HourFlag"            => $dbeCustomer->getValue(DBECustomer::support24HourFlag),
+                            "techNotes"                    => $dbeCustomer->getValue(DBECustomer::techNotes),
+                            "websiteURL"                   => $dbeCustomer->getValue(DBECustomer::websiteURL),
+                            "reviewDate"                   => $dbeCustomer->getValue(DBECustomer::reviewDate),
+                            "reviewTime"                   => $dbeCustomer->getValue(DBECustomer::reviewTime),
+                            "dateMeetingConfirmed"         => $dbeCustomer->getValue(DBECustomer::dateMeetingConfirmed),
+                            "invoiceSiteNo"                => $dbeCustomer->getValue(DBECustomer::invoiceSiteNo),
+                            "deliverSiteNo"                => $dbeCustomer->getValue(DBECustomer::deliverSiteNo),
+                            "lastUpdatedDateTime"          => $dbeCustomer->getValue(DBECustomer::lastUpdatedDateTime),
+                            "opportunityDeal"              => $dbeCustomer->getValue(DBECustomer::opportunityDeal),
+                            "reviewAction"                 => $dbeCustomer->getValue(DBECustomer::reviewAction),
+                            "lastContractSent"             => $dbeCustomer->getValue(DBECustomer::lastContractSent),
+                            "statementContactId"           => $dbeCustomer->getValue(DBECustomer::statementContactId)
+                        ]
+                    ]
+                );
+    }
+
+    function _getMainContacts($customerID)
+    {
+        if (!$customerID) {
+            http_response_code(400);
+            echo json_encode(["status" => "error", "description" => "Customer ID Not provided"]);
+            exit;
+        }
+        echo json_encode(["status" => "ok", "data" => $this->getMainContacts($customerID)]);
+    }
+
+    function getLeadStatuses()
+    {
+        $dbeLeadStatus = new DBECustomerLeadStatus($this);
+        $dbeLeadStatus->getRows(DBECustomerLeadStatus::sortOrder);
+        echo json_encode(["status" => "ok", "data" => $dbeLeadStatus->fetchArray()]);
+    }
+
+    function updateCustomer()
+    {
+        $json        = file_get_contents('php://input');
+                $data        = json_decode($json, true);
+                $dbeCustomer = new DBECustomer($this);
+                $dbeCustomer->getRow($data['customerID']);
+                if (empty($data['lastUpdatedDateTime']) || $data['lastUpdatedDateTime'] < $dbeCustomer->getValue(
+                        DBECustomer::lastUpdatedDateTime
+                    )) {
+                    throw new \CNCLTD\Exceptions\JsonHttpException(
+                        400, "Updated by another user", [
+                               "errorCode"           => 1002,
+                               "lastUpdatedDateTime" => $dbeCustomer->getValue(DBECustomer::lastUpdatedDateTime)
+                           ]
+                    );
+                }
+                foreach ($data as $key => $value) {
+                    $dbeCustomer->setValue($key, $value);
+                }
+                $dbeCustomer->updateRow();
+                echo json_encode(
+                    [
+                        "status"              => "ok",
+                        "lastUpdatedDateTime" => $dbeCustomer->getValue(DBECustomer::lastUpdatedDateTime)
+                    ]
+                );
+    }
+
+    function updateSite($data)
+    {
+                $dbeSite = new DBESite($this);
+                if (!isset($data['customerId'])) {
+                    throw new \CNCLTD\Exceptions\JsonHttpException(400, "Customer ID is mandatory");
+                }
+                if (!isset($data['siteNo'])) {
+                    throw new \CNCLTD\Exceptions\JsonHttpException(400, "siteNo is mandatory");
+                }
+                $dbeSite->setValue(DBESite::customerID, $data['customerId']);
+                $dbeSite->setValue(DBESite::siteNo, $data['siteNo']);
+                $dbeSite->getRowByCustomerIDSiteNo();
+                if (empty($data['lastUpdatedDateTime']) || $data['lastUpdatedDateTime'] < $dbeSite->getValue(
+                        DBESite::lastUpdatedDateTime
+                    )) {
+                    throw new \CNCLTD\Exceptions\JsonHttpException(
+                        400, "Updated by another user", [
+                               "errorCode"           => 1002,
+                               "lastUpdatedDateTime" => $dbeSite->getValue(DBESite::lastUpdatedDateTime)
+                           ]
+                    );
+                }
+                if (isset($data['fieldValueMap']['active']) && $data['siteNo'] == 0) {
+                    throw new \CNCLTD\Exceptions\JsonHttpException(400, "Cannot deactivate Site 0");
+                }
+                $dbeSite = \CNCLTD\Data\SiteMapper::fromDTOToDB($data['fieldValueMap'], $dbeSite);
+                $dbeSite->updateRow();
+                echo json_encode(
+                    [
+                        "status"              => "ok",
+                        "lastUpdatedDateTime" => $dbeSite->getValue(DBECustomer::lastUpdatedDateTime)
+                    ]
+                );
+    }
+
+    function deletePortalDocument($data)
+    {
+                if (!isset($data['portalDocumentId'])) {
+                    throw new \CNCLTD\Exceptions\JsonHttpException(400, "portal document Id is required");
+                }
+                $dbePortalCustomerDocumentWithoutFile = new DBEPortalCustomerDocumentWithoutFile($this);
+                $dbePortalCustomerDocumentWithoutFile->deleteRow($data['portalDocumentId']);
+                echo json_encode(["status" => "ok"]);
+    }
+
+    function addPortalCustomerDocument($data)
+    {
+        if (!isset($data['customerId'])) {
+            throw new \CNCLTD\Exceptions\JsonHttpException(400, "customerId is required");
+        }
+        if (!isset($data['description'])) {
+            throw new \CNCLTD\Exceptions\JsonHttpException(400, "description is required");
+        }
+        if (!isset($data['fileName'])) {
+            throw new \CNCLTD\Exceptions\JsonHttpException(400, "fileName is required");
+        }
+        if (!isset($data['encodedFile'])) {
+            throw new \CNCLTD\Exceptions\JsonHttpException(400, "encodedFile is required");
+        }
+        if (!isset($data['customerContract'])) {
+            throw new \CNCLTD\Exceptions\JsonHttpException(400, "customerContract is required");
+        }
+        if (!isset($data['mainContractOnly'])) {
+            throw new \CNCLTD\Exceptions\JsonHttpException(400, "mainContractOnly is required");
+        }
+        $fileAndMimeType           = $this->getFileDecodedAndMimeTypeFromBase64EncodedFile(
+            $data['encodedFile']
+        );
+        $dbePortalCustomerDocument = new DBEPortalCustomerDocument($this);
+        $dbePortalCustomerDocument->setValue(DBEPortalCustomerDocument::customerID, $data['customerId']);
+        $dbePortalCustomerDocument->setValue(DBEPortalCustomerDocument::description, $data['description']);
+        $dbePortalCustomerDocument->setValue(DBEPortalCustomerDocument::file, $fileAndMimeType->file);
+        $dbePortalCustomerDocument->setValue(
+            DBEPortalCustomerDocument::fileMimeType,
+            $fileAndMimeType->mimeType
+        );
+        $dbePortalCustomerDocument->setValue(DBEPortalCustomerDocument::filename, $data['fileName']);
+        $dbePortalCustomerDocument->setValue(
+            DBEPortalCustomerDocument::customerContract,
+            $data['customerContract']
+        );
+        $dbePortalCustomerDocument->setValue(
+            DBEPortalCustomerDocument::mainContactOnlyFlag,
+            $data['mainContractOnly'] ? 'Y' : 'N'
+        );
+        $dbePortalCustomerDocument->insertRow();
+        $document = [
+            'id'                  => $dbePortalCustomerDocument->getValue(
+                DBEPortalCustomerDocument::portalCustomerDocumentID
+            ),
+            'description'         => $dbePortalCustomerDocument->getValue(
+                DBEPortalCustomerDocumentWithoutFile::description
+            ),
+            'filename'            => $dbePortalCustomerDocument->getValue(
+                DBEPortalCustomerDocumentWithoutFile::filename
+            ),
+            'customerContract'    => $dbePortalCustomerDocument->getValue(
+                DBEPortalCustomerDocumentWithoutFile::customerContract
+            ),
+            'mainContactOnlyFlag' => $dbePortalCustomerDocument->getValue(
+                    DBEPortalCustomerDocument::mainContactOnlyFlag
+                ) === 'Y',
+        ];
+        echo json_encode(["status" => "ok", "data" => $document]);
+    }
+
+    function getSectors()
+    {
+        $dbeSector = new DBESector($this);
+                $dbeSector->getRows(DBESector::description);
+                echo json_encode(["status" => "ok", "data" => $dbeSector->fetchArray()]);
+    }
+
+    function getCustomerTypes()
+    {
+        $dbeCustomerTypes = new DBECustomerType($this);
+        $dbeCustomerTypes->getRows(DBECustomerType::description);
+        echo json_encode(["status" => "ok", "data" => $dbeCustomerTypes->fetchArray()]);
+    }
+
+    function getAccountManagers()
+    {
+        $dbeUser = new DBEUser($this);
+        $dbeUser->getRows();
+        echo json_encode(["status" => "ok", "data" => $dbeUser->fetchArray()]);
     }
 }
