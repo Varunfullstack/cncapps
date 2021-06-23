@@ -182,7 +182,7 @@
             </addColumn>
         </rollback>
     </changeSet>
-    <changeSet author="pavwebdev" id="issue916-15">
+    <!-- <changeSet author="pavwebdev" id="issue916-15">
         <comment>
             Get rid of old contacts where the customer doesn't exist anymore.
         </comment>
@@ -196,7 +196,7 @@
             ]]>
         </sql>
         <rollback/>
-    </changeSet>
+    </changeSet> -->
     <changeSet author="pavwebdev" id="issue916-18">
         <preConditions onFail="MARK_RAN">
             <not>

@@ -128,7 +128,7 @@ class DBECustomer extends DBCNCEntity
             self::mailshotFlag,
             DA_YN_FLAG,
             DA_NOT_NULL,
-            "cus_mailshot"
+            "mailshotAllowed"
         );
         $this->addColumn(
             self::createDate,
@@ -140,7 +140,7 @@ class DBECustomer extends DBCNCEntity
             self::referredFlag,
             DA_YN_FLAG,
             DA_ALLOW_NULL,
-            "cus_referred"
+            "isReferred"
         );
         $this->addColumn(
             self::customerTypeID,
@@ -627,12 +627,12 @@ class DBECustomer extends DBCNCEntity
             return $this;
         }
         $this->setMethodName("getCustomerByName");
-        $name        = mysqli_real_escape_string($this->db->link_id(), $name);
+        $name        = mysqli_real_escape_string($this->db->link_id(), $name);        
         $queryString = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName() . " where 
-				cus_name like '{$name}'
-				and {$this->getDBColumnName(DBECustomer::referredFlag)} <> 'Y' 
-				and {$this->getDBColumnName(DBECustomer::becameCustomerDate)} is not null and {$this->getDBColumnName(DBECustomer::droppedCustomerDate)} is null
-				LIMIT 1";
+        cus_name like '{$name}'
+        and {$this->getDBColumnName(DBECustomer::referredFlag)} <> 'Y' 
+        and {$this->getDBColumnName(DBECustomer::becameCustomerDate)} is not null and {$this->getDBColumnName(DBECustomer::droppedCustomerDate)} is null
+        LIMIT 1";
         $this->setQueryString($queryString);
         $ret = (parent::getRows());
         return $ret;
