@@ -3198,7 +3198,10 @@ ORDER BY NAME,
                             "opportunityDeal"              => $dbeCustomer->getValue(DBECustomer::opportunityDeal),
                             "reviewAction"                 => $dbeCustomer->getValue(DBECustomer::reviewAction),
                             "lastContractSent"             => $dbeCustomer->getValue(DBECustomer::lastContractSent),
-                            "statementContactId"           => $dbeCustomer->getValue(DBECustomer::statementContactId)
+                            "statementContactId"           => $dbeCustomer->getValue(DBECustomer::statementContactId),
+                            "inclusiveOOHCallOuts"         => $dbeCustomer->getValue(DBECustomer::inclusiveOOHCallOuts),
+                            "eligiblePatchManagement"     => $dbeCustomer->getValue(DBECustomer::eligiblePatchManagement ),
+                            "excludeFromWebrootChecks"     => $dbeCustomer->getValue(DBECustomer::excludeFromWebrootChecks),  
                         ]
                     ]
                 );
