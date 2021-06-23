@@ -998,7 +998,8 @@ class CTCustomer extends CTCNC
             case CTCUSTOMER_ACT_ADDCONTACT:
             case CTCUSTOMER_ACT_DISP_SUCCESS:
             case CTCNC_ACT_DISP_EDIT:
-                $this->displayEditForm();
+                //$this->displayEditForm();
+                $this->displayForm();
                 break;
             case CTCUSTOMER_ACT_DELETECONTACT:
                 $this->deleteContact();
@@ -3322,5 +3323,20 @@ ORDER BY NAME,
         } else {
             $this->displayEditForm();
         }
+    }
+    function displayForm(){
+        $this->setPageTitle('Customer');
+        $this->setTemplateFiles(
+            'CustomerEdit',
+            'CustomerEditSimple.inc'
+        );
+        $this->loadReactScript('CustomerEditComponent.js');
+        $this->loadReactCSS('CustomerEditComponent.css');
+        $this->template->parse(
+            'CONTENTS',
+            'CustomerEdit',
+            true
+        );
+        $this->parsePage();
     }
 }

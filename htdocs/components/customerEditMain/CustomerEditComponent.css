@@ -1,0 +1,4 @@
+input[type="date"]
+{
+    max-width: 170 !important;
+}

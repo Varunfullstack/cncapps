@@ -30,11 +30,17 @@ class APIMain {
             }).then((res) => this.handleResponse(res));
     }
 
-    post(url, payload) {
+    post(url, payload, handleException = false) {
+        if(handleException)
         return fetch(url, {
             method: "POST",
             body: JSON.stringify(payload)
         });
+        else
+        return fetch(url, {
+            method: "POST",
+            body: JSON.stringify(payload)
+        }).then((res) => this.handleResponse(res));
     }
 
     postJson(url, payload) {
