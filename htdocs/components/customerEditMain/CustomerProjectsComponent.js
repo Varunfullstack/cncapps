@@ -2,18 +2,105 @@ import React, {Fragment} from 'react';
 import * as HTMLReactParser from 'html-react-parser'
 import moment from "moment";
 import {connect} from "react-redux";
-import {entityMapToArray} from "../utils/utils";
+import {entityMapToArray, params} from "../utils/utils";
 import {addNewProject, deleteProject, hideNewProjectModal, newProjectFieldUpdate, showNewProjectModal} from "./actions";
 import AddProjectModalComponent from "./modals/AddProjectModalComponent";
 import {getProjects} from "./selectors/selectors";
-
-class CustomerProjectsComponent extends React.PureComponent {
-    el = React.createElement;
+import APICustomers from '../services/APICustomers';
+import MainComponent from '../shared/MainComponent';
+import Table from '../shared/table/table';
+export default class CustomerProjectsComponent extends MainComponent {
+    api =new APICustomers();
 
     constructor(props) {
         super(props);
+        this.state={
+            ...this.state,
+            customerId:null,
+            projects:[]
+        }
+    }
+    componentDidMount() {
+        const customerId=params.get("customerID");
+        this.api.getCustomerProjects(customerId).then(projects=>{
+            console.log(projects);
+            projects.map(p=>{
+                if( p.notes!=null)
+                p.notes=p.notes.substr(0,150);
+               return p;
+            })
+            this.setState({projects,customerId});
+        })
+    }
+    getTable=()=>{
+        const columns=[
+            {
+               path: "name",
+               label: "name",
+               hdToolTip: "Project Name",               
+               //icon: "fal fa-2x fa-signal color-gray2 pointer",
+               sortable: true,                              
+            },
+            {
+                path: "notes",
+                label: "notes",
+                hdToolTip: "Notes",               
+                //icon: "fal fa-2x fa-signal color-gray2 pointer",
+                sortable: true,      
+                width:500                        
+             },
+             {
+                path: "startDate",
+                label: "Start Date",
+                hdToolTip: "Start Date",               
+                //icon: "fal fa-2x fa-signal color-gray2 pointer",
+                sortable: true,                              
+                content:(project)=>this.getCorrectDate(project.startDate)
+             },
+             {
+                path: "expiryDate",
+                label: "Expiry Date",
+                hdToolTip: "Expiry Date",               
+                //icon: "fal fa-2x fa-signal color-gray2 pointer",
+                sortable: true,          
+                content:(project)=>this.getCorrectDate(project.expiryDate)                    
+             },
+             {
+                path: "edit",
+                label: "",
+                hdToolTip: "Edit Project",               
+                //icon: "fal fa-2x fa-signal color-gray2 pointer",
+                sortable: true,                              
+                content:(project)=>this.getEditElement(project,()=>this.handleEdit(project))
+             },
+             {
+                path: "delete",
+                label: "",
+                hdToolTip: "Delete Project",               
+                //icon: "fal fa-2x fa-signal color-gray2 pointer",
+                sortable: true,                              
+                content:(project)=>this.getEditElement(project,()=>this.handleDelete(project))
+             },
+        ]
+        return <Table           
+                     
+        key="projects"
+        pk="id"
+        columns={columns}
+        data={this.state.projects||[]}
+        search={true}
+        >
+        </Table>
     }
 
+    handleEdit=(project)=>{
+        console.log("Edit project",project);
+    }
+
+    handleDelete=(project)=>{
+        console.log("Delete project",project);
+    }
+/*
     renderHeadingRow() {
         return this.el(
             'tr',
@@ -121,9 +208,12 @@ class CustomerProjectsComponent extends React.PureComponent {
             )
         )
     }
-
+*/
     render() {
-        const {customerId, newProject, newProjectModalShown, onNewProjectFieldUpdate, onHideNewProjectModal, onAddNewProject, isFetching, projects, onShowNewProjectModal} = this.props;
+        return <div>
+            {this.getTable()}
+        </div>
+      /*  const {customerId, newProject, newProjectModalShown, onNewProjectFieldUpdate, onHideNewProjectModal, onAddNewProject, isFetching, projects, onShowNewProjectModal} = this.props;
 
         if (isFetching) {
             return '';
@@ -208,9 +298,10 @@ class CustomerProjectsComponent extends React.PureComponent {
                 </div>
             </Fragment>
         )
+        */
     }
 }
-
+/*
 function mapStateToProps(state) {
     const {projects} = state;
     return {
@@ -240,5 +331,5 @@ function mapDispatchToProps(dispatch) {
         }
     }
 }
-
-export default connect(mapStateToProps, mapDispatchToProps)(CustomerProjectsComponent)
+*/
+ 

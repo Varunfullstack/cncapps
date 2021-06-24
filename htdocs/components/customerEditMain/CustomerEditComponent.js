@@ -3,6 +3,7 @@ import MainComponent from "../shared/MainComponent";
 import React from 'react';
 import ReactDOM from 'react-dom';
 import CustomerEditMain from "./CustomerEditMain";
+import CustomerProjectsComponent from "./CustomerProjectsComponent";
 //import configureStore from "./configureStore";
 /*
 import './wdyr';
@@ -11,7 +12,7 @@ import {clearEditingSiteAction, fetchAllData, setEditSiteAction} from "./actions
 import ErrorHandler from "./helpers/ErrorHandlerComponent";
 import {Tab, Tabs} from "react-bootstrap";
 
-import CustomerProjectsComponent from "./CustomerProjectsComponent";
+
 import PortalCustomerDocumentsComponent from "./PortalCustomerDocumentsComponent";
 import SitesList from "./customerSites/SitesList";
 import CustomerOrders from "./CustomerOrders";
@@ -99,7 +100,7 @@ class CustomerEditComponent extends MainComponent {
           case this.TAB_PORTAL_DOCUMENT:
             return <label>Portal Documents</label>;
           case this.TAB_PROJECTS:
-            return <label>Projects</label>;
+            return <CustomerProjectsComponent customerId={customerId}></CustomerProjectsComponent>;
           case this.TAB_SITES:
             return <label>Sites</label>;
         }
