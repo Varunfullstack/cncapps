@@ -32,23 +32,17 @@ export default class CustomerEditMain extends MainComponent {
     }
 
     componentDidMount() {
-        this.api.getCustomerData(this.props.customerId).then(data=>{
-            console.log("customer",data);
-            this.setState({data})
-        },error=>{
-            this.alert("Error in get customer data");
-            console.log(error);
-        });
+        this.getCustomerData();
         this.api.getCustomerContacts(this.props.customerId).then(contacts=>{
-            console.log("contacts",contacts);
+            //console.log("contacts",contacts);
             this.setState({contacts})
         });
         this.apiUsers.getActiveUsers().then(users=>{
-            console.log('users',users);
+            //console.log('users',users);
             this.setState({users})
         });
         this.api.getCustomerTypes().then(customerTypes=>{
-            console.log(customerTypes);
+            //console.log(customerTypes);
             this.setState({customerTypes})
         })
         this.api.getCustomerSectors().then(sectors=>{
@@ -58,7 +52,15 @@ export default class CustomerEditMain extends MainComponent {
             this.setState({leadStatus})
         })
     }
-
+    getCustomerData=()=>{
+        this.api.getCustomerData(this.props.customerId).then(data=>{
+            console.log("customer",data);
+            this.setState({data})
+        },error=>{
+            this.alert("Error in get customer data");
+            console.log(error);
+        });
+    }
     updateCustomerField = (field, value) => {
         const {customerValueUpdate} = this.props;
         customerValueUpdate(field, value);
@@ -164,11 +166,11 @@ export default class CustomerEditMain extends MainComponent {
                           style={{ justifyContent: "space-between",width:150 }}
                         >
                           <Toggle
-                            checked={data.referredFlag == "Y"}
+                            checked={data.referredFlag }
                             onChange={() =>
                               this.setValue(
                                 "referredFlag",
-                                data.referredFlag == "Y" ? "N" : "Y"
+                                (!data.referredFlag*1) 
                               )
                             }
                           ></Toggle>
@@ -631,7 +633,7 @@ export default class CustomerEditMain extends MainComponent {
                   </tr>
                   <tr>
                     <td align="right">Last Modified:</td>
-                    <td>{data.modifyDate}</td>
+                    <td>{data.lastUpdatedDateTime}</td>
                   </tr>
                 </tbody>
               </table>
@@ -679,7 +681,7 @@ export default class CustomerEditMain extends MainComponent {
             </div>
     }
     getCards=()=>{       
-        console.log("Cards")
+        
         return <div className="row" style={{margin:2}}>
         <div className="col-md-6">
             {this.getKeyDetailsCard()}           
@@ -697,7 +699,13 @@ export default class CustomerEditMain extends MainComponent {
         const {data}=this.state;
         this.api.updateCustomer(data).then(res=>{
             if(res.status)
-            this.alert("Data saved successfully");
+            {
+                this.alert("Data saved successfully");
+                this.getCustomerData();
+            }
+            else
+            this.alert("Data not saved successfully");
+
         },error=>{
             console.log(error);
             this.alert("Data not saved successfully");

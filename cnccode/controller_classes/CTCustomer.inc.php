@@ -678,7 +678,7 @@ class CTCustomer extends CTCNC
             }
             case 'updateCustomer':
             {
-                $this->updateCustomer();
+                echo json_encode($this->updateCustomer(),JSON_NUMERIC_CHECK);
                 break;
             }
             case self::UPDATE_SITE:
@@ -3260,12 +3260,7 @@ ORDER BY NAME,
                     $dbeCustomer->setValue($key, $value);
                 }
                 $dbeCustomer->updateRow();
-                echo json_encode(
-                    [
-                        "status"              => "ok",
-                        "lastUpdatedDateTime" => $dbeCustomer->getValue(DBECustomer::lastUpdatedDateTime)
-                    ]
-                );
+                return $this->success(["lastUpdatedDateTime" => $dbeCustomer->getValue(DBECustomer::lastUpdatedDateTime)]);                
     }
 
     function updateSite($data)

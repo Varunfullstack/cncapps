@@ -126,7 +126,7 @@ class DBECustomer extends DBCNCEntity
         ); // have to be strings so zero sites don't go empty
         $this->addColumn(
             self::mailshotFlag,
-            DA_YN_FLAG,
+            DA_BOOLEAN,
             DA_NOT_NULL,
             "mailshotAllowed"
         );
@@ -138,7 +138,7 @@ class DBECustomer extends DBCNCEntity
         );
         $this->addColumn(
             self::referredFlag,
-            DA_YN_FLAG,
+            DA_BOOLEAN,
             DA_ALLOW_NULL,
             "isReferred"
         );
