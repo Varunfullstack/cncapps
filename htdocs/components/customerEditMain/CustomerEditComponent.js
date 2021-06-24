@@ -4,6 +4,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import CustomerEditMain from "./CustomerEditMain";
 import CustomerProjectsComponent from "./CustomerProjectsComponent";
+import PortalCustomerDocumentsComponent from "./PortalCustomerDocumentsComponent";
+
 //import configureStore from "./configureStore";
 /*
 import './wdyr';
@@ -13,7 +15,6 @@ import ErrorHandler from "./helpers/ErrorHandlerComponent";
 import {Tab, Tabs} from "react-bootstrap";
 
 
-import PortalCustomerDocumentsComponent from "./PortalCustomerDocumentsComponent";
 import SitesList from "./customerSites/SitesList";
 import CustomerOrders from "./CustomerOrders";
 import CustomerCRMComponent from "./CustomerCRMComponent";
@@ -98,7 +99,7 @@ class CustomerEditComponent extends MainComponent {
           case this.TAB_ORDERS:
             return <label>Orders</label>;
           case this.TAB_PORTAL_DOCUMENT:
-            return <label>Portal Documents</label>;
+            return   <PortalCustomerDocumentsComponent customerId={customerId}/>;
           case this.TAB_PROJECTS:
             return <CustomerProjectsComponent customerId={customerId}></CustomerProjectsComponent>;
           case this.TAB_SITES:
