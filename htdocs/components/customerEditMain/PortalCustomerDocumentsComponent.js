@@ -1,27 +1,36 @@
-import React, {Fragment} from 'react';
-import {
-    addNewPortalCustomerDocument,
-    deletePortalCustomerDocument,
-    hideNewPortalCustomerDocumentModal,
-    newPortalDocumentFieldUpdate,
-    showNewPortalCustomerDocumentModal
-} from "./actions";
-import {connect} from "react-redux";
-import {
-    getMappedPortalCustomerDocuments,
-    getPortalCustomerDocumentsIsFetching,
-    getPortalCustomerDocumentsModalShown,
-    getPortalCustomerDocumentsNewPortalDocument
-} from "./selectors/selectors";
-import AddPortalCustomerDocumentComponent from "./modals/AddPortalCustomerDocumentComponent";
+import React from 'react';
+import APIPortalDocuments from '../services/APIPortalDocuments';
+import MainComponent from '../shared/MainComponent';
+// import {
+//     addNewPortalCustomerDocument,
+//     deletePortalCustomerDocument,
+//     hideNewPortalCustomerDocumentModal,
+//     newPortalDocumentFieldUpdate,
+//     showNewPortalCustomerDocumentModal
+// } from "./actions";
+// import {connect} from "react-redux";
+// import {
+//     getMappedPortalCustomerDocuments,
+//     getPortalCustomerDocumentsIsFetching,
+//     getPortalCustomerDocumentsModalShown,
+//     getPortalCustomerDocumentsNewPortalDocument
+// } from "./selectors/selectors";
+// import AddPortalCustomerDocumentComponent from "./modals/AddPortalCustomerDocumentComponent";
 
-class PortalCustomerDocumentsComponent extends React.PureComponent {
-    el = React.createElement;
+export default class PortalCustomerDocumentsComponent extends MainComponent{
+    api=new APIPortalDocuments();
 
     constructor(props) {
         super(props);
+        this.state={
+            ...this.state,
+            documents:[]
+        }
     }
-
+    componentDidMount() {
+        //get data and table
+    }
+/*
     renderPortalDocumentsRows() {
         const {
             portalCustomerDocuments,
@@ -71,11 +80,12 @@ class PortalCustomerDocumentsComponent extends React.PureComponent {
                 );
             }
         )
-    }
+    }*/
 
     render() {
+        return <div>New portal</div>
         // console.warn('portal customer rendered');
-        const {
+       /* const {
             newPortalDocument,
             newPortalDocumentModalShown,
             onNewPortalDocumentFieldUpdate,
@@ -136,11 +146,11 @@ class PortalCustomerDocumentsComponent extends React.PureComponent {
                 </div>
             </Fragment>
 
-        )
+        )*/
     }
 }
 
-
+/*
 function mapStateToProps(state) {
     return {
         portalCustomerDocuments: getMappedPortalCustomerDocuments(state),
@@ -170,4 +180,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(PortalCustomerDocumentsComponent)
+export default connect(mapStateToProps, mapDispatchToProps)(PortalCustomerDocumentsComponent)*/
