@@ -7,6 +7,7 @@
  * @authors Karim Ahmed - Sweet Code Limited
  */
 
+use CNCLTD\AdditionalChargesRates\Domain\CustomerId;
 use CNCLTD\Business\BUActivity;
 use CNCLTD\Data\DBConnect;
 use CNCLTD\Data\DBEJProblem;
@@ -804,96 +805,24 @@ class CTCustomer extends CTCNC
                 $this->displayCustomerSelectPopup();
                 break;
             case 'saveContactPassword':
-                $response = [];
-                try {
-                    $this->saveContactPassword();
-                    $response["status"] = "ok";
-                } catch (Exception $exception) {
-                    http_response_code(400);
-                    $response["status"] = "error";
-                    $response["error"]  = $exception->getMessage();
-                }
-                echo json_encode($response);
+                $this->_saveContactPassword();
                 break;
             case 'archiveContact':
-                $response = [];
-                try {
-                    $this->clearContact();
-                    $response["status"] = "ok";
-                } catch (Exception $exception) {
-                    http_response_code(400);
-                    $response["status"] = "error";
-                    $response["error"]  = $exception->getMessage();
-                }
-                echo json_encode($response);
+                $this->archiveContact();
                 break;
             case self::GET_CUSTOMER_REVIEW_CONTACTS:
-                $response = [];
-                try {
-                    $response['data']   = $this->getCustomerReviewContacts();
-                    $response["status"] = "ok";
-                } catch (Exception $exception) {
-                    http_response_code(400);
-                    $response["status"] = "error";
-                    $response["error"]  = $exception->getMessage();
-                }
-                echo json_encode($response);
+                $this->_getCustomerReviewContacts();
                 break;
             case self::GET_CUSTOMER_PROJECTS:
                 return $this->getCustomerProjectsController();
             case self::DECRYPT:
-                $response = ["status" => "ok"];
-                try {
-                    $response['decryptedData'] = Encryption::decrypt(
-                        CUSTOMERS_ENCRYPTION_PRIVATE_KEY,
-                        @$this->getParam('passphrase'),
-                        @$this->getParam('encryptedData')
-                    );
-                } catch (Exception $exception) {
-                    $response['status'] = "error";
-                    $response['error']  = $exception->getMessage();
-                    http_response_code(400);
-                }
-                echo json_encode($response);
+                $this->decrypt();
                 break;
             case "removeSupportAndRefer":
-                $customerID = @$this->getParam('customerID');
-                $response   = ['status' => 'ok'];
-                try {
-                    $this->removeSupportForAllUsersAndReferCustomer($customerID);
-                } catch (Exception $exception) {
-                    $response['status'] = "error";
-                    $response['error']  = $exception->getMessage();
-                    http_response_code(400);
-                }
-                echo json_encode($response);
+                $this->removeSupportAndRefer(@$this->getParam('customerID'));
                 break;
             case 'searchName':
-                $itemsPerPage = 20;
-                $page         = 1;
-                $term         = '';
-                if (isset($_REQUEST['term'])) {
-                    $term = $_REQUEST['term'];
-                }
-                if (isset($_REQUEST['itemsPerPage'])) {
-                    $itemsPerPage = $_REQUEST['itemsPerPage'];
-                }
-                if (isset($_REQUEST['page'])) {
-                    $page = $_REQUEST['page'];
-                }
-                $dsResult   = new DataSet($this);
-                $buCustomer = new BUCustomer($this);
-                $buCustomer->getActiveCustomers($dsResult);
-                $customers = [];
-                $buCustomer->getCustomersByNameMatch($dsResult, null, null, $term);
-                while ($dsResult->fetchNext()) {
-                    $customers[] = [
-                        "id"             => $dsResult->getValue(DBECustomer::customerID),
-                        "name"           => $dsResult->getValue(DBECustomer::name),
-                        "streamOneEmail" => $dsResult->getValue(DBECustomer::streamOneEmail),
-                    ];
-                }
-                echo json_encode($customers);
+                $this->searchName();
                 break;
             case "getCurrentUser":
                 echo $this->getCurrentUser();
@@ -3388,5 +3317,106 @@ ORDER BY NAME,
         $dbeUser = new DBEUser($this);
         $dbeUser->getRows();
         echo json_encode(["status" => "ok", "data" => $dbeUser->fetchArray()]);
+    }
+
+    function _saveContactPassword()
+    {
+        $response = [];
+        try {
+            $this->saveContactPassword();
+            $response["status"] = "ok";
+        } catch (Exception $exception) {
+            http_response_code(400);
+            $response["status"] = "error";
+            $response["error"]  = $exception->getMessage();
+        }
+        echo json_encode($response);
+    }
+
+    function archiveContact()
+    {
+        $response = [];
+        try {
+            $this->clearContact();
+            $response["status"] = "ok";
+        } catch (Exception $exception) {
+            http_response_code(400);
+            $response["status"] = "error";
+            $response["error"]  = $exception->getMessage();
+        }
+        echo json_encode($response);
+    }
+
+    function _getCustomerReviewContacts()
+    {
+        $response = [];
+                try {
+                    $response['data']   = $this->getCustomerReviewContacts();
+                    $response["status"] = "ok";
+                } catch (Exception $exception) {
+                    http_response_code(400);
+                    $response["status"] = "error";
+                    $response["error"]  = $exception->getMessage();
+                }
+                echo json_encode($response);
+    }
+
+    function decrypt()
+    {
+        $response = ["status" => "ok"];
+        try {
+            $response['decryptedData'] = Encryption::decrypt(
+                CUSTOMERS_ENCRYPTION_PRIVATE_KEY,
+                @$this->getParam('passphrase'),
+                @$this->getParam('encryptedData')
+            );
+        } catch (Exception $exception) {
+            $response['status'] = "error";
+            $response['error']  = $exception->getMessage();
+            http_response_code(400);
+        }
+        echo json_encode($response);
+    }
+
+    function removeSupportAndRefer($customerID)
+    {
+        $response   = ['status' => 'ok'];
+                try {
+                    $this->removeSupportForAllUsersAndReferCustomer($customerID);
+                } catch (Exception $exception) {
+                    $response['status'] = "error";
+                    $response['error']  = $exception->getMessage();
+                    http_response_code(400);
+                }
+                echo json_encode($response);
+    }
+
+    function searchName()
+    {
+        $itemsPerPage = 20;
+        $page         = 1;
+        $term         = '';
+        if (isset($_REQUEST['term'])) {
+            $term = $_REQUEST['term'];
+        }
+        if (isset($_REQUEST['itemsPerPage'])) {
+            $itemsPerPage = $_REQUEST['itemsPerPage'];
+        }
+        if (isset($_REQUEST['page'])) {
+            $page = $_REQUEST['page'];
+        }
+        $dsResult   = new DataSet($this);
+        $buCustomer = new BUCustomer($this);
+        $buCustomer->getActiveCustomers($dsResult);
+        $customers = [];
+        $buCustomer->getCustomersByNameMatch($dsResult, null, null, $term);
+        while ($dsResult->fetchNext()) {
+            $customers[] = [
+                "id"             => $dsResult->getValue(DBECustomer::customerID),
+                "name"           => $dsResult->getValue(DBECustomer::name),
+                "streamOneEmail" => $dsResult->getValue(DBECustomer::streamOneEmail),
+            ];
+        }
+        echo json_encode($customers);
     }
 }
