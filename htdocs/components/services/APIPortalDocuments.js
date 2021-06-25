@@ -6,13 +6,14 @@ import ApiUrls from "./ApiUrls";
 class APIPortalDocuments extends APIMain {
      
     getPortalDocuments(){
-        return this.get(`${ApiUrls.PortalDocument}documents`);
+        return this.get(`${ApiUrls.PortalCustomerDocument}documents`);
     }     
-    updateDocument(body,files){
-        return this.uploadFiles(`${ApiUrls.PortalDocument}documents`,files,"userfile",body,true);
+    updateDocument(document){
+        return this.put(`${ApiUrls.PortalCustomerDocument}documents`, document);
+        //return this.uploadFiles(`${ApiUrls.PortalCustomerDocument}documents`,files,"userfile",body,true);
     }
-    deletePortalDocuments(portalDocumentID){
-        return this.delete(`${ApiUrls.PortalDocument}documents&portalDocumentID=${portalDocumentID}`);
+    deletePortalDocument(portalDocumentID){
+        return this.delete('PortalCustomerDocument.php?action=delete&portalCustomerDocumentID=' + portalDocumentID,true);
     }
 }
 

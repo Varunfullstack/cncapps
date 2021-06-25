@@ -720,7 +720,7 @@ class CTCustomer extends CTCNC
             case 'updateCustomerReview':
                 return $this->updateCustomerReviewController();
             case self::GET_PORTAL_CUSTOMER_DOCUMENTS:
-                return $this->getPortalCustomerDocumentsController();
+                return $this->getPortalCustomerDocumentsController($_REQUEST['customerID']);
             case 'createCustomerFolder':
                 $this->createCustomerFolder();
                 break;
@@ -732,55 +732,7 @@ class CTCustomer extends CTCNC
             case self::GET_CUSTOMER_CONTACTS:
                 return $this->getCustomerContactsController();
             case self::ADD_SITE:
-                $data = $this->getJSONData();
-                if (!isset($data['customerId'])) {
-                    throw new \CNCLTD\Exceptions\JsonHttpException(400, 'customerId is required');
-                }
-                if (!isset($data['addressLine'])) {
-                    throw new \CNCLTD\Exceptions\JsonHttpException(400, 'addressLine is required');
-                }
-                if (!isset($data['town'])) {
-                    throw new \CNCLTD\Exceptions\JsonHttpException(400, 'town is required');
-                }
-                if (!isset($data['postcode'])) {
-                    throw new \CNCLTD\Exceptions\JsonHttpException(400, 'postcode is required');
-                }
-                if (!isset($data['phone'])) {
-                    throw new \CNCLTD\Exceptions\JsonHttpException(400, 'phone is required');
-                }
-                if (!isset($data['maxTravelHours'])) {
-                    throw new \CNCLTD\Exceptions\JsonHttpException(400, 'maxTravelHours is required');
-                }
-                $dbeSite = new DBESite($this);
-                $dbeSite->setValue(DBESite::customerID, $data['customerId']);
-                $dbeSite->setValue(DBESite::add1, $data['addressLine']);
-                $dbeSite->setValue(DBESite::town, $data['town']);
-                $dbeSite->setValue(DBESite::postcode, $data['postcode']);
-                $dbeSite->setValue(DBESite::phone, $data['phone']);
-                $dbeSite->setValue(DBESite::maxTravelHours, $data['maxTravelHours']);
-                $dbeSite->setValue(DBESite::activeFlag, 'Y');
-                $dbeSite->insertRow();
-                $site = [
-                    "customerID"     => $dbeSite->getValue(DBESite::customerID),
-                    "siteNo"         => $dbeSite->getValue(DBESite::siteNo),
-                    "address1"       => $dbeSite->getValue(DBESite::add1),
-                    "address2"       => $dbeSite->getValue(DBESite::add2),
-                    "address3"       => $dbeSite->getValue(DBESite::add3),
-                    "town"           => $dbeSite->getValue(DBESite::town),
-                    "county"         => $dbeSite->getValue(DBESite::county),
-                    "postcode"       => $dbeSite->getValue(DBESite::postcode),
-                    "invoiceContact" => $dbeSite->getValue(DBESite::invoiceContactID),
-                    "deliverContact" => $dbeSite->getValue(DBESite::deliverContactID),
-                    "debtorCode"     => $dbeSite->getValue(DBESite::debtorCode),
-                    "sageRef"        => $dbeSite->getValue(DBESite::sageRef),
-                    "phone"          => $dbeSite->getValue(DBESite::phone),
-                    "maxTravelHours" => $dbeSite->getValue(DBESite::maxTravelHours),
-                    "active"         => $dbeSite->getValue(DBESite::activeFlag) == 'Y',
-                    "nonUKFlag"      => $dbeSite->getValue(DBESite::nonUKFlag) == 'Y',
-                    "what3Words"     => $dbeSite->getValue(DBESite::what3Words),
-                    "canDelete"      => true
-                ];
-                echo json_encode(["status" => "ok", "data" => $site]);
+                $this->addSite($this->getJSONData());
                 exit;
             case CTCUSTOMER_ACT_SEARCH:
                 $this->search();
@@ -995,15 +947,15 @@ class CTCustomer extends CTCNC
         );
     }
 
-    function getPortalCustomerDocumentsController()
+    function getPortalCustomerDocumentsController($customerID)
     {
-        if (!isset($_REQUEST['customerId'])) {
+        if (!isset($customerID)) {
             http_response_code(400);
             echo json_encode(["status" => "error", "message" => "Customer ID is mandatory"]);
             exit;
         }
         echo json_encode(
-            ["status" => "ok", "data" => $this->getPortalDocuments($_REQUEST['customerId'])]
+            ["status" => "ok", "data" => $this->getPortalDocuments($customerID)]
         );
     }
 
@@ -2838,7 +2790,42 @@ class CTCustomer extends CTCNC
                     DBESite::town
                 ) . ' ' . $dbeSite->getValue(DBESite::postcode);
             $siteNo   = $dbeSite->getValue(DBESite::siteNo);
-            array_push($sites, ["id" => $siteNo, "title" => $siteDesc]);
+            $add1     = $dbeSite->getValue(DBESite::add1);
+            $add2     = $dbeSite->getValue(DBESite::add2);
+            $add3     = $dbeSite->getValue(DBESite::add3);
+            $town     = $dbeSite->getValue(DBESite::town);
+            $county   = $dbeSite->getValue(DBESite::county);
+            $postcode = $dbeSite->getValue(DBESite::postcode);
+            $invoiceContactID = $dbeSite->getValue(DBESite::invoiceContactID);
+            $deliverContactID = $dbeSite->getValue(DBESite::deliverContactID);
+            $debtorCode       = $dbeSite->getValue(DBESite::debtorCode);
+            $sageRef          = $dbeSite->getValue(DBESite::sageRef);
+            $phone            = $dbeSite->getValue(DBESite::phone);
+            $maxTravelHours   = $dbeSite->getValue(DBESite::maxTravelHours);
+            $activeFlag       = $dbeSite->getValue(DBESite::activeFlag);
+            $nonUKFlag        = $dbeSite->getValue(DBESite::nonUKFlag);
+            $what3Words       = $dbeSite->getValue(DBESite::what3Words);
+            $lastUpdatedDateTime   = $dbeSite->getValue(DBESite::lastUpdatedDateTime);
+            array_push($sites, [
+                "id"     => $siteNo, 
+                "title"  => $siteDesc,
+                "siteNo" => $siteNo,
+                "add1"   => $add1,
+                "add2"   => $add2,
+                "add3"   => $add3,
+                "town"   => $town,
+                "county" => $county,
+                "postcode" => $postcode,
+                "invoiceContactID" => $invoiceContactID,
+                "deliverContactID" => $deliverContactID,
+                "debtorCode" => $debtorCode,
+                "sageRef"    => $sageRef,
+                "phone"      => $phone,
+                "maxTravelHours"      => $maxTravelHours,
+                "activeFlag"          => $activeFlag,
+                "what3Words"          => $what3Words,
+                "lastUpdatedDateTime" => $lastUpdatedDateTime,
+            ]);
         }
         return $sites;
     }
@@ -2921,17 +2908,47 @@ ORDER BY NAME,
                     'position'     => $dbeContact->getValue(DBEContact::position),
                     'firstName'    => $dbeContact->getValue(DBEContact::firstName),
                     'lastName'     => $dbeContact->getValue(DBEContact::lastName),
+                    "email"        => $dbeContact->getValue(DBEContact::email),
+                    "phone"        => $dbeContact->getValue(DBEContact::phone),
+                    "mobilePhone"  => $dbeContact->getValue(DBEContact::mobilePhone),
+                    "fax"          => $dbeContact->getValue(DBEContact::fax),
+                    "portalPassword"    => $dbeContact->getValue(DBEContact::portalPassword),
+                    "mailshot"          => $dbeContact->getValue(DBEContact::mailshot),
+                    //"discontinuedFlag"  => $dbeContact->getValue(DBEContact::discontinuedFlag),
+                    //"accountsFlag"      => $dbeContact->getValue(DBEContact::accountsFlag),
+                    "mailshot2Flag"     => $dbeContact->getValue(DBEContact::mailshot2Flag),
+                    "mailshot3Flag"     => $dbeContact->getValue(DBEContact::mailshot3Flag),
+                    "mailshot8Flag"     => $dbeContact->getValue(DBEContact::mailshot8Flag),
+                    "mailshot9Flag"     => $dbeContact->getValue(DBEContact::mailshot9Flag),
+                    "mailshot11Flag"    => $dbeContact->getValue(DBEContact::mailshot11Flag),
+                    "notes"             => $dbeContact->getValue(DBEContact::notes),
+                    "failedLoginCount"  => $dbeContact->getValue(DBEContact::failedLoginCount),
+                    "reviewUser"        => $dbeContact->getValue(DBEContact::reviewUser),
+                    "hrUser"            => $dbeContact->getValue(DBEContact::hrUser),
+                    "notes"             => $dbeContact->getValue(DBEContact::notes),
+                    'supportLevel'      => $dbeContact->getValue(DBEContact::supportLevel),
+                    //'main'              => $dbeContact->getValue(DBEContact::supportLevelMain),
+                    //'supervisor'        => $dbeContact->getValue(DBEContact::supportLevelSupervisor),
+                    //'support'           => $dbeContact->getValue(DBEContact::supportLevelSupport),
+                    //'delegate'          => $dbeContact->getValue(DBEContact::supportLevelDelegate),
+                    //'furlough'          => $dbeContact->getValue(DBEContact::supportLevelFurlough),
+                    'initialLoggingEmail' => $dbeContact->getValue(DBEContact::initialLoggingEmail),
+                    'othersInitialLoggingEmailFlag' => $dbeContact->getValue(DBEContact::othersInitialLoggingEmailFlag),
+                    'othersWorkUpdatesEmailFlag'    => $dbeContact->getValue(DBEContact::othersWorkUpdatesEmailFlag),
+                    'othersFixedEmailFlag'          => $dbeContact->getValue(DBEContact::othersFixedEmailFlag),
+                    'pendingLeaverFlag'             => $dbeContact->getValue(DBEContact::pendingLeaverFlag),
+                    'pendingLeaverDate'             => $dbeContact->getValue(DBEContact::pendingLeaverDate),
+                    'specialAttentionContactFlag'   => $dbeContact->getValue(DBEContact::specialAttentionContactFlag),
+                    'linkedInURL'                   => $dbeContact->getValue(DBEContact::linkedInURL),
+                    'pendingFurloughAction'         => $dbeContact->getValue(DBEContact::pendingFurloughAction),
+                    'pendingFurloughActionDate'     => $dbeContact->getValue(DBEContact::pendingFurloughActionDate),
+                    'pendingFurloughActionLevel'    => $dbeContact->getValue(DBEContact::pendingFurloughActionLevel),
                     'siteNo'       => $dbeSite->getValue(DBESite::siteNo),
                     'active'       => $dbeContact->getValue(DBEContact::active),
                     'siteTitle'    => $dbeSite->getValue(DBESite::add1) . ' ' . $dbeSite->getValue(
                             DBESite::town
                         ) . ' ' . $dbeSite->getValue(DBESite::postcode),
                     "sitePhone"    => $dbeSite->getValue(DBESite::phone),
-                    "phone"        => $dbeContact->getValue(DBEContact::phone),
-                    "mobilePhone"  => $dbeContact->getValue(DBEContact::mobilePhone),
-                    "email"        => $dbeContact->getValue(DBEContact::email),
-                    'supportLevel' => $dbeContact->getValue(DBEContact::supportLevel),
-                    "notes"        => $dbeContact->getValue(DBEContact::notes),
                     "isPrimary"    => $primaryContact && $primaryContact->getValue(
                             DBEContact::contactID
                         ) === $dbeContact->getValue(DBEContact::contactID)
@@ -3418,5 +3435,58 @@ ORDER BY NAME,
             ];
         }
         echo json_encode($customers);
+    }
+
+    function addSite($data)
+    {
+                if (!isset($data['customerId'])) {
+                    throw new \CNCLTD\Exceptions\JsonHttpException(400, 'customerId is required');
+                }
+                if (!isset($data['addressLine'])) {
+                    throw new \CNCLTD\Exceptions\JsonHttpException(400, 'addressLine is required');
+                }
+                if (!isset($data['town'])) {
+                    throw new \CNCLTD\Exceptions\JsonHttpException(400, 'town is required');
+                }
+                if (!isset($data['postcode'])) {
+                    throw new \CNCLTD\Exceptions\JsonHttpException(400, 'postcode is required');
+                }
+                if (!isset($data['phone'])) {
+                    throw new \CNCLTD\Exceptions\JsonHttpException(400, 'phone is required');
+                }
+                if (!isset($data['maxTravelHours'])) {
+                    throw new \CNCLTD\Exceptions\JsonHttpException(400, 'maxTravelHours is required');
+                }
+                $dbeSite = new DBESite($this);
+                $dbeSite->setValue(DBESite::customerID, $data['customerId']);
+                $dbeSite->setValue(DBESite::add1, $data['addressLine']);
+                $dbeSite->setValue(DBESite::town, $data['town']);
+                $dbeSite->setValue(DBESite::postcode, $data['postcode']);
+                $dbeSite->setValue(DBESite::phone, $data['phone']);
+                $dbeSite->setValue(DBESite::maxTravelHours, $data['maxTravelHours']);
+                $dbeSite->setValue(DBESite::activeFlag, 'Y');
+                $dbeSite->insertRow();
+                $site = [
+                    "customerID"     => $dbeSite->getValue(DBESite::customerID),
+                    "siteNo"         => $dbeSite->getValue(DBESite::siteNo),
+                    "address1"       => $dbeSite->getValue(DBESite::add1),
+                    "address2"       => $dbeSite->getValue(DBESite::add2),
+                    "address3"       => $dbeSite->getValue(DBESite::add3),
+                    "town"           => $dbeSite->getValue(DBESite::town),
+                    "county"         => $dbeSite->getValue(DBESite::county),
+                    "postcode"       => $dbeSite->getValue(DBESite::postcode),
+                    "invoiceContact" => $dbeSite->getValue(DBESite::invoiceContactID),
+                    "deliverContact" => $dbeSite->getValue(DBESite::deliverContactID),
+                    "debtorCode"     => $dbeSite->getValue(DBESite::debtorCode),
+                    "sageRef"        => $dbeSite->getValue(DBESite::sageRef),
+                    "phone"          => $dbeSite->getValue(DBESite::phone),
+                    "maxTravelHours" => $dbeSite->getValue(DBESite::maxTravelHours),
+                    "active"         => $dbeSite->getValue(DBESite::activeFlag) == 'Y',
+                    "nonUKFlag"      => $dbeSite->getValue(DBESite::nonUKFlag) == 'Y',
+                    "what3Words"     => $dbeSite->getValue(DBESite::what3Words),
+                    "canDelete"      => true
+                ];
+                echo json_encode(["status" => "ok", "data" => $site]);
+                
     }
 }

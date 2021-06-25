@@ -1,6 +1,12 @@
 import React from 'react';
-import APIPortalDocuments from '../services/APIPortalDocuments';
+import { params} from "../utils/utils";
+import APICustomers from '../services/APICustomers';
 import MainComponent from '../shared/MainComponent';
+import Table from '../shared/table/table';
+import APIPortalDocuments from '../services/APIPortalDocuments';
+import ToolTip from '../shared/ToolTip';
+import Spinner from "../shared/Spinner/Spinner";
+import Modal from "../shared/Modal/modal.js";
 // import {
 //     addNewPortalCustomerDocument,
 //     deletePortalCustomerDocument,
@@ -18,17 +24,244 @@ import MainComponent from '../shared/MainComponent';
 // import AddPortalCustomerDocumentComponent from "./modals/AddPortalCustomerDocumentComponent";
 
 export default class PortalCustomerDocumentsComponent extends MainComponent{
-    api=new APIPortalDocuments();
-
+    api =new APICustomers();
+    apiPortalDocument=new APIPortalDocuments();
     constructor(props) {
         super(props);
         this.state={
             ...this.state,
-            documents:[]
+            customerId:null,
+            documents:[],
+            reset: false,
+            showModal: false,
+            isNew: true,
+            data: {...this.getInitData()},
         }
     }
+
     componentDidMount() {
-        //get data and table
+        this.getData();
+    }
+
+    getData=()=>{
+        const customerId=params.get("customerID");
+        this.api.getPortalCustomerDocuments(customerId).then(res=>{
+            console.log(res);           
+            this.setState({documents:res.data,customerId});
+        })
+    }
+
+    getTable=()=>{
+        const columns=[
+            {
+               path: "description",
+               label: "Description",
+               hdToolTip: "Description",               
+               icon: "pointer",
+               sortable: true,         
+               width:300,
+               content: (document) => <a style={{color: 'black'}}
+               href={`/PortalCustomerDocument.php?action=viewFile&portalCustomerDocumentID=${document.id}`}
+               target="_blank"
+>{document.description}</a>                 
+            },
+            {
+                path: "filename",
+                label: "File",
+                hdToolTip: "Filename",               
+                icon: "pointer",
+                sortable: true,      
+                width:300,
+                content: (document) => <a style={{color: 'black'}}
+                href={`/PortalCustomerDocument.php?action=viewFile&portalCustomerDocumentID=${document.id}`}
+                target="_blank"
+ >{document.filename}</a>                            
+             },
+             {
+                path: "customerContract",
+                label: "Customer Contract",
+                hdToolTip: "Customer Contract",               
+                icon: "pointer",
+                sortable: true,      
+                width:150,
+                content: (document) => document.customerContract ? 'Y' : 'N'                       
+             },
+             {
+                path: "mainContactOnlyFlag",
+                label: "Main Contact Only",
+                hdToolTip: "Main Contact Only",               
+                icon: "pointer",
+                sortable: true,      
+                width:150,
+                content: (document) => document.mainContactOnlyFlag ? 'Y' : 'N'                       
+             },
+             {
+                path: "edit",
+                label: "",
+                hdToolTip: "Edit Document",               
+                //icon: "fal fa-2x fa-signal color-gray2 pointer",
+                sortable: false,                              
+                content:(document)=>this.getEditElement(document,()=>this.handleEdit(document))
+             },
+             {
+                path: "delete",
+                label: "",
+                hdToolTip: "Delete Document",               
+                //icon: "fal fa-2x fa-signal color-gray2 pointer",
+                sortable: false,                              
+                content:(document)=>this.getDeleteElement(document,()=>this.handleDelete(document),document.isDeletable)
+             },
+        ]
+        return <Table           
+                     
+        key="documents"  
+        pk="id"
+        style={{maxWidth:1300}}
+        columns={columns}
+        data={this.state.documents||[]}
+        search={true}
+        >
+        </Table>
+    }
+
+    getInitData() {
+        return {
+            id: '',
+            description: '',
+            filename: '',
+            customerContract: '',
+            mainContactOnlyFlag: '',
+        };
+    }
+
+    handleEdit=(document)=>{
+        console.log("Edit Document",document);
+        this.setState({data: document, showModal: true, isNew: false});
+        //window.location=`PortalCustomerDocument.php?action=edit&portalCustomerDocumentID=${document.id}`;
+    }
+
+    handleDelete=async (document)=>{
+        console.log("Delete document",document);
+        if(await this.confirm("Are you sure you want to delete this document?")){
+            this.apiPortalDocument.deletePortalDocument(document.id).then(res=>{
+                console.log(res);
+                this.getData();
+            })
+        }
+    }
+
+    handleNewItem = () => {
+        this.setState({showModal: true, isNew: true, data: {...this.getInitData()}});
+    }
+
+    getCheckBox = (name, yesNo = true) => {
+        const {data} = this.state;
+        let trueValue = 'Y';
+        let falseValue = 'N';
+        if (!yesNo) {
+            trueValue = 1;
+            falseValue = 0;
+        }
+        return <input checked={data[name] == trueValue}
+                      onChange={() => this.setValue(name, data[name] == trueValue ? falseValue : trueValue)}
+                      type="checkbox"
+        />
+    }
+  
+    handleClose = () => {
+        this.setState({showModal: false});
+    }
+
+    handleSave = () => {
+        const {data, isNew} = this.state;
+        if (!data.description) {
+            this.alert("Please enter description");
+            return;
+        }
+        if (!isNew) {
+            this.apiPortalDocument.updateDocument(data).then((res) => {
+                if (res.state) {
+                    this.setState({showModal: false, reset: true}, () =>
+                        this.getData()
+                    );
+                }
+            });
+        } else {
+            data.id = null;
+            this.apiPortalDocument.addItem(data).then((res) => {
+                if (res.state) {
+                    this.setState({showModal: false, reset: true}, () =>
+                        this.getData()
+                    );
+                }
+            });
+        }
+    }
+
+    getModal = () => {
+        const {isNew, showModal} = this.state;
+        if (!showModal)
+            return null;
+        return <Modal
+            width={500}
+            title={isNew ? "Create Document" : "Update Document"}
+            show={showModal}
+            content={this.getModalContent()}
+            footer={<div key="footer">
+                <button onClick={this.handleClose}
+                        className="btn btn-secodary"
+                >Cancel
+                </button>
+                <button onClick={this.handleSave}>Save</button>
+            </div>}
+            onClose={this.handleClose}
+        >
+
+        </Modal>
+    }
+
+    getModalContent = () => {
+        const {data} = this.state;
+        return <div key="content">
+            <table className="table">
+                <tbody>
+                <tr>
+                    <td className="text-right">Description</td>
+                    <td><input required
+                               value={data.description}
+                               onChange={(event) => this.setValue("description", event.target.value)}
+                               className="form-control"
+                    /></td>
+                </tr>
+                <tr>
+                    <td className="text-right">Customer Contract?</td>
+                    <td align="left">{this.getCheckBox("customerContract")}</td>
+                </tr>
+                <tr>
+                    <td className="text-right">Main Contact Only?</td>
+                    <td align="left">{this.getCheckBox("mainContactOnlyFlag")}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    }
+
+    render() {
+        return <div>
+<Spinner show={this.state.showSpinner}/>
+            <ToolTip title="New Item"
+                     width={30}
+            >
+                <i className="fal fa-2x fa-plus color-gray1 pointer"
+                   onClick={this.handleNewItem}
+                />
+            </ToolTip>
+            {this.getConfirm()}
+            {this.getTable()}
+            <div className="modal-style">
+                {this.getModal()}
+            </div>
+        </div>      
     }
 /*
     renderPortalDocumentsRows() {
@@ -82,8 +315,8 @@ export default class PortalCustomerDocumentsComponent extends MainComponent{
         )
     }*/
 
-    render() {
-        return <div>New portal</div>
+    //render() {
+        //return <div>New portal2</div>
         // console.warn('portal customer rendered');
        /* const {
             newPortalDocument,
@@ -147,7 +380,7 @@ export default class PortalCustomerDocumentsComponent extends MainComponent{
             </Fragment>
 
         )*/
-    }
+    //}
 }
 
 /*

@@ -61,9 +61,43 @@ class APICustomers extends APIMain {
             return {id:item.sec_sectorno,name:item.sec_desc}
         }));
     }
+
     updateCustomer(data)
     {
         return this.post(`${ApiUrls.Customer}updateCustomer`,data,true);
+    }
+
+    getPortalCustomerDocuments(customerId) {
+        return fetch(`${ApiUrls.Customer}getPortalCustomerDocuments&customerID=${customerId}`)
+        .then(res => res.json())
+        ;
+    }
+
+    getCustomerSites(customerId) {
+        return fetch(`${ApiUrls.Customer}getCustomerSites&customerId=${customerId}`)
+        .then(res => res.json())
+        ;
+    }
+
+    addCustomerSite(data)
+    {
+        return this.post(`${ApiUrls.Customer}addSite`,data,true);
+    }
+
+    updateCustomerSite(data)
+    {
+        return this.post(`${ApiUrls.Customer}updateSite`,data,true);
+    }
+
+    deleteCustomerSite(data)
+    {
+        return this.post(`${ApiUrls.Customer}deleteSite`,data,true);
+    }
+
+    getCustomerContact(customerId) {
+        return fetch(`${ApiUrls.Customer}contacts&customerID=${customerId}`)
+        .then(res => res.json())
+        ;
     }
 }
 

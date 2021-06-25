@@ -5,6 +5,8 @@ import ReactDOM from 'react-dom';
 import CustomerEditMain from "./CustomerEditMain";
 import CustomerProjectsComponent from "./CustomerProjectsComponent";
 import PortalCustomerDocumentsComponent from "./PortalCustomerDocumentsComponent";
+import CustomerSitesComponent from "./CustomerSitesComponent";
+import CustomerContactsComponent from "./CustomerContactsComponent";
 
 //import configureStore from "./configureStore";
 /*
@@ -93,7 +95,7 @@ class CustomerEditComponent extends MainComponent {
           case this.TAB_CUSTOMER:
             return <CustomerEditMain customerId={customerId}/>;
           case this.TAB_CONTACTS:
-            return <label>Contacts</label>;
+            return <CustomerContactsComponent customerId={customerId}></CustomerContactsComponent>;
           case this.TAB_CRM:
             return <label>CRM</label>;
           case this.TAB_ORDERS:
@@ -103,7 +105,7 @@ class CustomerEditComponent extends MainComponent {
           case this.TAB_PROJECTS:
             return <CustomerProjectsComponent customerId={customerId}></CustomerProjectsComponent>;
           case this.TAB_SITES:
-            return <label>Sites</label>;
+            return <CustomerSitesComponent customerId={customerId}></CustomerSitesComponent>;
         }
     }
     render() {
