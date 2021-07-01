@@ -687,6 +687,16 @@ class CTCustomer extends CTCNC
                 $this->updateSite($this->getJSONData()); 
                 exit;
             }
+            case 'addContact':
+                {
+                     $this->addContact($this->getJSONData()); 
+                    exit;
+                }
+            case 'updateContact':
+            {
+                 $this->updateContact($this->getJSONData()); 
+                exit;
+            }
             case self::DELETE_PORTAL_DOCUMENT:
             {
                 $this->deletePortalDocument($this->getJSONData());               
@@ -2905,6 +2915,8 @@ ORDER BY NAME,
                 $contacts,
                 array(
                     'id'           => $dbeContact->getValue(DBEContact::contactID),
+                    'customerID'   => $dbeContact->getValue(DBEContact::customerID),
+                    'title'        => $dbeContact->getValue(DBEContact::title),
                     'position'     => $dbeContact->getValue(DBEContact::position),
                     'firstName'    => $dbeContact->getValue(DBEContact::firstName),
                     'lastName'     => $dbeContact->getValue(DBEContact::lastName),
@@ -3212,13 +3224,13 @@ ORDER BY NAME,
     function updateSite($data)
     {
                 $dbeSite = new DBESite($this);
-                if (!isset($data['customerId'])) {
+                if (!isset($data['customerID'])) {
                     throw new \CNCLTD\Exceptions\JsonHttpException(400, "Customer ID is mandatory");
                 }
                 if (!isset($data['siteNo'])) {
                     throw new \CNCLTD\Exceptions\JsonHttpException(400, "siteNo is mandatory");
                 }
-                $dbeSite->setValue(DBESite::customerID, $data['customerId']);
+                $dbeSite->setValue(DBESite::customerID, $data['customerID']);
                 $dbeSite->setValue(DBESite::siteNo, $data['siteNo']);
                 $dbeSite->getRowByCustomerIDSiteNo();
                 if (empty($data['lastUpdatedDateTime']) || $data['lastUpdatedDateTime'] < $dbeSite->getValue(
@@ -3231,10 +3243,13 @@ ORDER BY NAME,
                            ]
                     );
                 }
-                if (isset($data['fieldValueMap']['active']) && $data['siteNo'] == 0) {
-                    throw new \CNCLTD\Exceptions\JsonHttpException(400, "Cannot deactivate Site 0");
+                if(isset($data['fieldValueMap'])) {
+                    if (isset($data['fieldValueMap']['active']) && $data['siteNo'] == 0) {
+                        throw new \CNCLTD\Exceptions\JsonHttpException(400, "Cannot deactivate Site 0");
+                    }
+                    $dbeSite = \CNCLTD\Data\SiteMapper::fromDTOToDB($data['fieldValueMap'], $dbeSite);
                 }
-                $dbeSite = \CNCLTD\Data\SiteMapper::fromDTOToDB($data['fieldValueMap'], $dbeSite);
+              
                 $dbeSite->updateRow();
                 echo json_encode(
                     [
@@ -3488,5 +3503,102 @@ ORDER BY NAME,
                 ];
                 echo json_encode(["status" => "ok", "data" => $site]);
                 
+    }
+
+
+    function addContact($data)
+    {
+        $dbeContact = new DBEContact($this);
+        if (!isset($data['customerID'])) {
+            throw new \CNCLTD\Exceptions\JsonHttpException(400, "Customer ID is mandatory");
+        }
+        $dbeContact->setValue(DBEContact::siteNo, $data['siteNo']);   
+        $dbeContact->setValue(DBEContact::customerID, $data['customerID']);   
+       // $dbeContact->setValue(DBEContact::supplierID, $data['supplierID']);   
+        $dbeContact->setValue(DBEContact::title, $data['title']);   
+        $dbeContact->setValue(DBEContact::position, $data['position']);   
+        $dbeContact->setValue(DBEContact::firstName, $data['firstName']);   
+        $dbeContact->setValue(DBEContact::lastName, $data['lastName']);   
+        $dbeContact->setValue(DBEContact::email, $data['email']);   
+        $dbeContact->setValue(DBEContact::phone, $data['phone']);   
+        $dbeContact->setValue(DBEContact::mobilePhone, $data['mobilePhone']);   
+        $dbeContact->setValue(DBEContact::fax, $data['fax']);   
+        //$dbeContact->setValue(DBEContact::portalPassword, $data['portalPassword']);   
+        $dbeContact->setValue(DBEContact::mailshot, $data['mailshot']);   
+        $dbeContact->setValue(DBEContact::mailshot2Flag, $data['mailshot2Flag']);   
+        $dbeContact->setValue(DBEContact::mailshot3Flag, $data['mailshot3Flag']);   
+        $dbeContact->setValue(DBEContact::mailshot8Flag, $data['mailshot8Flag']);   
+        $dbeContact->setValue(DBEContact::mailshot9Flag, $data['mailshot9Flag']);   
+        $dbeContact->setValue(DBEContact::mailshot11Flag, $data['mailshot11Flag']);   
+        $dbeContact->setValue(DBEContact::notes, $data['notes']);   
+        $dbeContact->setValue(DBEContact::failedLoginCount, $data['failedLoginCount']);   
+        $dbeContact->setValue(DBEContact::reviewUser, $data['reviewUser']);   
+        $dbeContact->setValue(DBEContact::hrUser, $data['hrUser']);   
+        $dbeContact->setValue(DBEContact::supportLevel, $data['supportLevel']);   
+        $dbeContact->setValue(DBEContact::initialLoggingEmail, $data['initialLoggingEmail']);   
+        $dbeContact->setValue(DBEContact::othersInitialLoggingEmailFlag, $data['othersInitialLoggingEmailFlag']);   
+        $dbeContact->setValue(DBEContact::othersWorkUpdatesEmailFlag, $data['othersWorkUpdatesEmailFlag']);   
+        $dbeContact->setValue(DBEContact::othersFixedEmailFlag, $data['othersFixedEmailFlag']);   
+        $dbeContact->setValue(DBEContact::pendingLeaverFlag, $data['pendingLeaverFlag']);   
+        $dbeContact->setValue(DBEContact::pendingLeaverDate, $data['pendingLeaverDate']);   
+        $dbeContact->setValue(DBEContact::specialAttentionContactFlag, $data['specialAttentionContactFlag']);   
+        $dbeContact->setValue(DBEContact::linkedInURL, $data['linkedInURL']);   
+        $dbeContact->setValue(DBEContact::active, $data['active']);   
+        $dbeContact->insertRow();
+        echo json_encode(
+            [
+                "status" => "ok",
+            ]
+        );
+    }
+
+    function updateContact($data)
+    {
+        $dbeContact = new DBEContact($this);
+        if (!isset($data['customerID'])) {
+            throw new \CNCLTD\Exceptions\JsonHttpException(400, "Customer ID is mandatory");
+        }
+        if (!isset($data['id'])) {
+            throw new \CNCLTD\Exceptions\JsonHttpException(400, "Contact ID is mandatory");
+        }
+        $dbeContact->getRow($data['id']);
+        $dbeContact->setValue(DBEContact::siteNo, $data['siteNo']);   
+        $dbeContact->setValue(DBEContact::customerID, $data['customerID']);   
+       // $dbeContact->setValue(DBEContact::supplierID, $data['supplierID']);   
+        $dbeContact->setValue(DBEContact::title, $data['title']);   
+        $dbeContact->setValue(DBEContact::position, $data['position']);   
+        $dbeContact->setValue(DBEContact::firstName, $data['firstName']);   
+        $dbeContact->setValue(DBEContact::lastName, $data['lastName']);   
+        $dbeContact->setValue(DBEContact::email, $data['email']);   
+        $dbeContact->setValue(DBEContact::phone, $data['phone']);   
+        $dbeContact->setValue(DBEContact::mobilePhone, $data['mobilePhone']);   
+        $dbeContact->setValue(DBEContact::fax, $data['fax']);   
+        //$dbeContact->setValue(DBEContact::portalPassword, $data['portalPassword']);   
+        $dbeContact->setValue(DBEContact::mailshot, $data['mailshot']);   
+        $dbeContact->setValue(DBEContact::mailshot2Flag, $data['mailshot2Flag']);   
+        $dbeContact->setValue(DBEContact::mailshot3Flag, $data['mailshot3Flag']);   
+        $dbeContact->setValue(DBEContact::mailshot8Flag, $data['mailshot8Flag']);   
+        $dbeContact->setValue(DBEContact::mailshot9Flag, $data['mailshot9Flag']);   
+        $dbeContact->setValue(DBEContact::mailshot11Flag, $data['mailshot11Flag']);   
+        $dbeContact->setValue(DBEContact::notes, $data['notes']);   
+        $dbeContact->setValue(DBEContact::failedLoginCount, $data['failedLoginCount']);   
+        $dbeContact->setValue(DBEContact::reviewUser, $data['reviewUser']);   
+        $dbeContact->setValue(DBEContact::hrUser, $data['hrUser']);   
+        $dbeContact->setValue(DBEContact::supportLevel, $data['supportLevel']);   
+        $dbeContact->setValue(DBEContact::initialLoggingEmail, $data['initialLoggingEmail']);   
+        $dbeContact->setValue(DBEContact::othersInitialLoggingEmailFlag, $data['othersInitialLoggingEmailFlag']);   
+        $dbeContact->setValue(DBEContact::othersWorkUpdatesEmailFlag, $data['othersWorkUpdatesEmailFlag']);   
+        $dbeContact->setValue(DBEContact::othersFixedEmailFlag, $data['othersFixedEmailFlag']);   
+        $dbeContact->setValue(DBEContact::pendingLeaverFlag, $data['pendingLeaverFlag']);   
+        $dbeContact->setValue(DBEContact::pendingLeaverDate, $data['pendingLeaverDate']);   
+        $dbeContact->setValue(DBEContact::specialAttentionContactFlag, $data['specialAttentionContactFlag']);   
+        $dbeContact->setValue(DBEContact::linkedInURL, $data['linkedInURL']);   
+        $dbeContact->setValue(DBEContact::active, $data['active']);   
+        $dbeContact->updateRow();
+        echo json_encode(
+            [
+                "status" => "ok",
+            ]
+        );
     }
 }

@@ -16,7 +16,7 @@ export default class CustomerContactsComponent extends MainComponent {
         this.state={
             ...this.state,
             customerId:null,
-            sites:[],
+            contacts:[],
             reset: false,
             showModal: false,
             isNew: true,
@@ -28,8 +28,8 @@ export default class CustomerContactsComponent extends MainComponent {
     }
     getData=()=>{
         const customerId=params.get("customerID");
-        this.api.getCustomerContacts(customerId).then(sites=>{
-            this.setState({sites,customerId});
+        this.api.getCustomerContacts(customerId).then(contacts=>{
+            this.setState({contacts,customerId});
         })
     }
     getTable=()=>{
@@ -85,32 +85,32 @@ export default class CustomerContactsComponent extends MainComponent {
                 icon: "pointer",
                 sortable: true,      
                 width:150,
-                content:(site)=> this.capitalizeFirstLetter(site.supportLevel)
+                content:(contact)=> this.capitalizeFirstLetter(contact.supportLevel)
              },
              {
                 path: "edit",
                 label: "",
-                hdToolTip: "Edit site",               
+                hdToolTip: "Edit contact",               
                 //icon: "fal fa-2x fa-signal color-gray2 pointer",
                 sortable: false,                              
-                content:(site)=>this.getEditElement(site,()=>this.handleEdit(site))
+                content:(contact)=>this.getEditElement(contact,()=>this.handleEdit(contact))
              },
              {
                 path: "delete",
                 label: "",
-                hdToolTip: "Delete site",               
+                hdToolTip: "Delete contact",               
                 //icon: "fal fa-2x fa-signal color-gray2 pointer",
                 sortable: false,                              
-                content:(site)=>this.getDeleteElement(site,()=>this.handleDelete(site),site.isDeletable)
+                content:(contact)=>this.getDeleteElement(contact,()=>this.handleDelete(contact),contact.isDeletable)
              },
         ]
         return <Table           
                      
-        key="sites"  
+        key="contacts"  
         pk="id"
         style={{maxWidth:1300}}
         columns={columns}
-        data={this.state.sites||[]}
+        data={this.state.contacts||[]}
         search={true}
         >
         </Table>
@@ -126,6 +126,8 @@ export default class CustomerContactsComponent extends MainComponent {
     getInitData() {
         return {
             id: '',
+            customerID: '',
+            title: '',
             position: '',
             firstName: '',
             lastName: '',
@@ -162,6 +164,7 @@ export default class CustomerContactsComponent extends MainComponent {
     }
 
     handleEdit=(contact)=>{
+        //contact['customerID'] = params.get("customerID");
         console.log("Edit Contact",contact);
         this.setState({data: contact, showModal: true, isNew: false});
     }
@@ -200,13 +203,14 @@ export default class CustomerContactsComponent extends MainComponent {
 
     handleSave = () => {
         const {data, isNew} = this.state;
-        if (!data.description) {
-            this.alert("Please enter description");
+        console.log(data)
+        if (!data.firstName) {
+            this.alert("Please enter firstname");
             return;
         }
         if (!isNew) {
             this.api.updateCustomerContact(data).then((res) => {
-                if (res.state) {
+                if (res.status == 200) {
                     this.setState({showModal: false, reset: true}, () =>
                         this.getData()
                     );
@@ -215,7 +219,7 @@ export default class CustomerContactsComponent extends MainComponent {
         } else {
             data.id = null;
             this.api.addCustomerContact(data).then((res) => {
-                if (res.state) {
+                if (res.status == 200) {
                     this.setState({showModal: false, reset: true}, () =>
                         this.getData()
                     );
@@ -252,61 +256,268 @@ export default class CustomerContactsComponent extends MainComponent {
             <table className="table">
                 <tbody>
                 <tr>
+                    <td className="text-right">Site</td>
+                    <td><input required
+                               value={data.siteNo||""}
+                               onChange={(event) => this.setValue("siteNo", event.target.value)}
+                               className="form-control"
+                    /></td>
+                     <td className="text-right">Title</td>
+                     <td><input required
+                               value={data.title||""}
+                               onChange={(event) => this.setValue("title", event.target.value)}
+                               className="form-control"
+                    /></td>
+                </tr>
+                <tr>
                     <td className="text-right">First</td>
                     <td><input required
-                               value={data.firstName}
+                               value={data.firstName||""}
                                onChange={(event) => this.setValue("firstName", event.target.value)}
                                className="form-control"
                     /></td>
                      <td className="text-right">Last</td>
                     <td><input required
-                               value={data.lastName}
+                               value={data.lastName||""}
                                onChange={(event) => this.setValue("lastName", event.target.value)}
                                className="form-control"
                     /></td>
                 </tr>
                 <tr>
                     <td className="text-right">Position</td>
-                    <td><input required
-                               value={data.position}
+                    <td><input
+                               value={data.position||""}
                                onChange={(event) => this.setValue("position", event.target.value)}
                                className="form-control"
                     /></td>
                      <td className="text-right">Email</td>
                     <td><input required
-                               value={data.email}
+                               value={data.email||""}
                                onChange={(event) => this.setValue("email", event.target.value)}
                                className="form-control"
                     /></td>
                 </tr>
                 <tr>
                     <td className="text-right">Phone</td>
-                    <td><input required
-                               value={data.phone}
+                    <td><input
+                               value={data.phone||""}
                                onChange={(event) => this.setValue("phone", event.target.value)}
                                className="form-control"
                     /></td>
                      <td className="text-right">Mobile</td>
-                    <td><input required
-                               value={data.mobilePhone}
+                    <td><input
+                               value={data.mobilePhone||""}
                                onChange={(event) => this.setValue("mobilePhone", event.target.value)}
                                className="form-control"
                     /></td>
                 </tr>
                 <tr>
-                    <td className="text-right">Active?</td>
-                    <td >
-                    <Toggle
-                              checked={data.activeFlag === "Y"}
-                              onChange={() =>
-                                this.setValue(
-                                  "activeFlag",
-                                  data.activeFlag === "Y" ? "N" : "Y"
-                                )
-                              }
-                            ></Toggle>
-                    </td>
+                    <td className="text-right">Failed Logins</td>
+                    <td><input
+                               value={data.failedLoginCount||""}
+                               onChange={(event) => this.setValue("failedLoginCount", event.target.value)}
+                               className="form-control"
+                    /></td>
+                     <td className="text-right">Notes</td>
+                    <td><input
+                               value={data.notes||""}
+                               onChange={(event) => this.setValue("notes", event.target.value)}
+                               className="form-control"
+                    /></td>
                 </tr>
+                <tr>
+                    <td className="text-right">Linkedin</td>
+                    <td><input
+                               value={data.linkedInURL||""}
+                               onChange={(event) => this.setValue("linkedInURL", event.target.value)}
+                               className="form-control"
+                    /></td>
+                    <td className="text-right"> Pending Leaver Date</td>
+                        <td><input type="date"
+                               value={data.pendingLeaverDate||""}
+                               onChange={(event) => this.setValue("pendingLeaverDate", event.target.value)}
+                               className="form-control"
+                    /></td>
+                </tr>
+                <tr>
+                <td className="text-right">Active?</td>
+                        <td >
+                        <Toggle
+                                checked={data.activeFlag === "Y"}
+                                onChange={() =>
+                                    this.setValue(
+                                    "activeFlag",
+                                    data.activeFlag === "Y" ? "N" : "Y"
+                                    )
+                                }
+                                ></Toggle>
+                        </td>
+                        <td className="text-right">Initial Logging?</td>
+                        <td >
+                        <Toggle
+                                checked={data.initialLoggingEmail === 1}
+                                onChange={() =>
+                                    this.setValue(
+                                    "initialLoggingEmail",
+                                    data.initialLoggingEmail === 1 ? 0 : 1
+                                    )
+                                }
+                                ></Toggle>
+                        </td>
+                </tr>
+                <tr>
+                    <td className="text-right">Others Initial Logging</td>
+                    <td >
+                        <Toggle
+                                checked={data.othersInitialLoggingEmailFlag === "Y"}
+                                onChange={() =>
+                                    this.setValue(
+                                    "othersInitialLoggingEmailFlag",
+                                    data.othersInitialLoggingEmailFlag === "Y" ? "N" : "Y"
+                                    )
+                                }
+                                ></Toggle>
+                    </td>
+                    <td className="text-right"> Others Fixed?</td>
+                    <td >
+                        <Toggle
+                                checked={data.othersFixedEmailFlag === "Y"}
+                                onChange={() =>
+                                    this.setValue(
+                                    "othersFixedEmailFlag",
+                                    data.othersFixedEmailFlag === "Y" ? "N" : "Y"
+                                    )
+                                }
+                                ></Toggle>
+                        </td>
+                        </tr>
+                        <tr>
+                        <td className="text-right">Inv</td>
+                        <td >
+                        <Toggle
+                                checked={data.mailshot2Flag === "Y"}
+                                onChange={() =>
+                                    this.setValue(
+                                    "mailshot2Flag",
+                                    data.mailshot2Flag === "Y" ? "N" : "Y"
+                                    )
+                                }
+                                ></Toggle>
+                        </td>
+                        <td className="text-right"> News</td>
+                        <td >
+                        <Toggle
+                                checked={data.mailshot3Flag === "Y"}
+                                onChange={() =>
+                                    this.setValue(
+                                    "mailshot3Flag",
+                                    data.mailshot3Flag === "Y" ? "N" : "Y"
+                                    )
+                                }
+                                ></Toggle>
+                        </td>
+                        </tr>
+                        <tr>
+                        <td className="text-right"></td>
+                        <td ></td>
+                        <td className="text-right"> HR</td>
+                        <td >
+                        <Toggle
+                                checked={data.hrUser === "Y"}
+                                onChange={() =>
+                                    this.setValue(
+                                    "hrUser",
+                                    data.hrUser === "Y" ? "N" : "Y"
+                                    )
+                                }
+                                ></Toggle>
+                        </td>
+                        </tr>
+                        <tr>
+                        <td className="text-right">Review</td>
+                        <td >
+                        <Toggle
+                                checked={data.reviewUser === "Y"}
+                                onChange={() =>
+                                    this.setValue(
+                                    "reviewUser",
+                                    data.reviewUser === "Y" ? "N" : "Y"
+                                    )
+                                }
+                                ></Toggle>
+                        </td>
+                        <td className="text-right"> Top</td>
+                        <td >
+                        <Toggle
+                                checked={data.mailshot8Flag === "Y"}
+                                onChange={() =>
+                                    this.setValue(
+                                    "mailshot8Flag",
+                                    data.mailshot8Flag === "Y" ? "N" : "Y"
+                                    )
+                                }
+                                ></Toggle>
+                        </td>
+                        </tr>
+                        <tr>
+                        <td className="text-right">SR Rep</td>
+                        <td >
+                        <Toggle
+                                checked={data.mailshot11Flag === "Y"}
+                                onChange={() =>
+                                    this.setValue(
+                                    "mailshot11Flag",
+                                    data.mailshot11Flag === "Y" ? "N" : "Y"
+                                    )
+                                }
+                                ></Toggle>
+                        </td>
+                        <td className="text-right"> Rep</td>
+                        <td >
+                        <Toggle
+                                checked={data.mailshot9Flag === "Y"}
+                                onChange={() =>
+                                    this.setValue(
+                                    "mailshot9Flag",
+                                    data.mailshot9Flag === "Y" ? "N" : "Y"
+                                    )
+                                }
+                                ></Toggle>
+                        </td>
+                        </tr>
+                        <tr>
+                        <td className="text-right">Pending Leaver</td>
+                        <td >
+                        <Toggle
+                                checked={data.pendingLeaverFlag === "Y"}
+                                onChange={() =>
+                                    this.setValue(
+                                    "pendingLeaverFlag",
+                                    data.pendingLeaverFlag === "Y" ? "N" : "Y"
+                                    )
+                                }
+                                ></Toggle>
+                        </td>
+                        <td className="text-right">Special Attention</td>
+                        <td >
+                        <Toggle
+                                checked={data.specialAttentionContactFlag === "Y"}
+                                onChange={() =>
+                                    this.setValue(
+                                    "specialAttentionContactFlag",
+                                    data.specialAttentionContactFlag === "Y" ? "N" : "Y"
+                                    )
+                                }
+                                ></Toggle>
+                        </td>
+                        </tr>
+                        <tr>
+                        
+                        <td className="text-right"></td>
+                        <td ></td>
+                        <td ></td>
+                        <td ></td>
+                        </tr>
                 </tbody>
             </table>
         </div>

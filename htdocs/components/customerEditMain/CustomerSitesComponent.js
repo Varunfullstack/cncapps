@@ -128,6 +128,7 @@ export default class CustomerSitesComponent extends MainComponent {
     }
 
     handleEdit=(site)=>{
+        site['customerID'] = params.get("customerID");
         console.log("Edit Site",site);
         this.setState({data: site, showModal: true, isNew: false});
     }
@@ -172,7 +173,7 @@ export default class CustomerSitesComponent extends MainComponent {
         }
         if (!isNew) {
             this.api.updateCustomerSite(data).then((res) => {
-                if (res.state) {
+                if (res.status == 'ok') {
                     this.setState({showModal: false, reset: true}, () =>
                         this.getData()
                     );
@@ -181,7 +182,7 @@ export default class CustomerSitesComponent extends MainComponent {
         } else {
             data.id = null;
             this.api.addCustomerSite(data).then((res) => {
-                if (res.state) {
+                if (res.status == 'ok') {
                     this.setState({showModal: false, reset: true}, () =>
                         this.getData()
                     );
@@ -233,7 +234,7 @@ export default class CustomerSitesComponent extends MainComponent {
                 </tr>
                 <tr>
                     <td className="text-right"></td>
-                    <td><input required
+                    <td><input
                                value={data.add3}
                                onChange={(event) => this.setValue("add3", event.target.value)}
                                className="form-control"

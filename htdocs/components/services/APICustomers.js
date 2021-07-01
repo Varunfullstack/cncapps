@@ -94,10 +94,21 @@ class APICustomers extends APIMain {
         return this.post(`${ApiUrls.Customer}deleteSite`,data,true);
     }
 
-    getCustomerContact(customerId) {
+    getCustomerContact(customerId) 
+    {
         return fetch(`${ApiUrls.Customer}contacts&customerID=${customerId}`)
         .then(res => res.json())
         ;
+    }
+
+    addCustomerContact(data) 
+    {
+        return this.post(`${ApiUrls.Customer}addContact`,data,true);
+    }
+
+    updateCustomerContact(data) 
+    {
+        return this.post(`${ApiUrls.Customer}updateContact`,data,true);
     }
 }
 
