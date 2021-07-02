@@ -9,7 +9,7 @@ class APIPortalDocuments extends APIMain {
         return this.get(`${ApiUrls.PortalCustomerDocument}documents`);
     }     
     updateDocument(document){
-        return this.put(`${ApiUrls.PortalCustomerDocument}documents`, document);
+        return this.put(`${ApiUrls.PortalCustomerDocument}documents`, document,true);
         //return this.uploadFiles(`${ApiUrls.PortalCustomerDocument}documents`,files,"userfile",body,true);
     }
     deletePortalDocument(portalDocumentID){

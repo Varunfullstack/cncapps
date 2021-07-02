@@ -41,7 +41,7 @@ class CustomerEditComponent extends MainComponent {
             customerID:null,
             loaded: true,
             filter: {                
-                activeTab: this.TAB_CUSTOMER,                 
+                activeTab: this.TAB_PORTAL_DOCUMENT,                 
             },
         }
         this.tabs = [

@@ -44,6 +44,24 @@ class CTPortalCustomerDocument extends CTCNC
     function defaultAction()
     {
         switch ($this->getAction()) {
+            case "documents":
+                switch($this->requestMethod){
+                    // case 'GET':
+                    //     echo  json_encode($this->getItemTypes(),JSON_NUMERIC_CHECK);
+                    //     break;
+                    // case 'POST':
+                    //     echo  json_encode($this->addItemType(),JSON_NUMERIC_CHECK);
+                    //     break;
+                    case 'PUT':
+                        echo  json_encode($this->update(),JSON_NUMERIC_CHECK);
+                        exit;
+                    // case 'DELETE':
+                    //     echo  json_encode($this->deleteItemType(),JSON_NUMERIC_CHECK);
+                    //     break;
+                    default:
+                        # code...
+                        break;
+                }
             case CTPORTALCUSTOMERDOCUMENT_ACT_EDIT:
             case CTPORTALCUSTOMERDOCUMENT_ACT_ADD:
                 $this->edit();
@@ -221,10 +239,17 @@ class CTPortalCustomerDocument extends CTCNC
      */
     function update()
     {
-        $this->setMethodName('update');
-        $this->formError = !$this->dsPortalCustomerDocument->populateFromArray(
-            $this->getParam('portalCustomerDocument')
-        );
+        $body=$this->getBody();
+        $dbePortalDocument=new DBEPortalCustomerDocument($this);
+        $dbePortalDocument->getRow($body->id);
+        $dbePortalDocument->setValue(DBEPortalCustomerDocument::description,$body->description);
+        $dbePortalDocument->setValue(DBEPortalCustomerDocument::customerContract,$body->customerContract);
+        $dbePortalDocument->setValue(DBEPortalCustomerDocument::mainContactOnlyFlag,$body->mainContactOnlyFlag?"Y":"N");        
+        return $this->success($dbePortalDocument->updateRow());
+        // $this->setMethodName('update');
+        // $this->formError = !$this->dsPortalCustomerDocument->populateFromArray(
+        //     $this->getParam('portalCustomerDocument')
+        // );
         /*
         Need a file when creating new
         */
@@ -275,6 +300,60 @@ class CTPortalCustomerDocument extends CTCNC
                 )
             );
         header('Location: ' . $urlNext);
+        // $this->setMethodName('update');
+        // $this->formError = !$this->dsPortalCustomerDocument->populateFromArray(
+        //     $this->getParam('portalCustomerDocument')
+        // );
+        // /*
+        // Need a file when creating new
+        // */
+
+        // if ($_FILES['userfile']['name'] == '' && !$this->dsPortalCustomerDocument->getValue(
+        //         DBEPortalCustomerDocument::portalCustomerDocumentID
+        //     )) {
+        //     $this->setFormErrorMessage('Please enter a file path');
+        // } else {
+        //     /* uploading a file */
+        //     if (!$this->dsPortalCustomerDocument->getValue(DBEPortalCustomerDocument::createdDate)) {
+        //         $this->dsPortalCustomerDocument->setValue(
+        //             DBEPortalCustomerDocument::createdDate,
+        //             (new DateTime())->format(DATE_MYSQL_DATETIME)
+        //         );
+        //     }
+
+        //     if ($_FILES['userfile']['name'] != '' && !is_uploaded_file($_FILES['userfile']['tmp_name'])) {
+        //         $this->setFormErrorMessage(
+        //             'Document not loaded - is it bigger than ' .
+        //             $this->return_bytes(ini_get('upload_max_filesize')) / 1024 / 1024 . '
+        //                                     MBytes ? '
+        //         );
+        //     }
+
+        // }
+
+        // if ($this->formError) {
+        //     if ($this->dsPortalCustomerDocument->getValue(
+        //         DBEPortalCustomerDocument::portalCustomerDocumentID
+        //     )) {                    // attempt to insert
+        //         $this->setAction(CTPORTALCUSTOMERDOCUMENT_ACT_EDIT);
+        //     } else {
+        //         $this->setAction(CTPORTALCUSTOMERDOCUMENT_ACT_ADD);
+        //     }
+        //     $this->edit();
+        //     exit;
+        // }
+
+        // $this->buPortalCustomerDocument->updateDocument($this->dsPortalCustomerDocument, $_FILES['userfile']);
+
+        // $urlNext =
+        //     Controller::buildLink(
+        //         'Customer.php',
+        //         array(
+        //             'customerID' => $this->dsPortalCustomerDocument->getValue(DBEPortalCustomerDocument::customerID),
+        //             'action'     => CTCNC_ACT_DISP_EDIT
+        //         )
+        //     );
+        // header('Location: ' . $urlNext);
     }
 
     /**

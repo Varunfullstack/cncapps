@@ -73,7 +73,7 @@ export default class DragAndDropUploaderComponent extends React.PureComponent {
     }
 
     render() {
-        const {children} = this.props;
+        const {children,iconStyle} = this.props;
         const {dragging} = this.state;
         return (
             <div
@@ -113,6 +113,7 @@ export default class DragAndDropUploaderComponent extends React.PureComponent {
 
                     <ToolTip title="Add document">
                         <i className="fal fa-plus pointer icon font-size-4"
+                        style={iconStyle}
                            onClick={() => this.fakeUploaderClick()}
                         />
                     </ToolTip>
