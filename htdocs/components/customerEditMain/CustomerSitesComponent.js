@@ -115,6 +115,7 @@ export default class CustomerSitesComponent extends MainComponent {
   getInitData() {
     return {
       id: "",
+      customerID: params.get("customerID"),
       add1: "",
       add2: "",
       add3: "",
@@ -133,7 +134,6 @@ export default class CustomerSitesComponent extends MainComponent {
   }
 
   handleEdit = (site) => {
-    site["customerID"] = params.get("customerID");
     console.log("Edit Site", site);
     this.setState({ data: site, showModal: true, isNew: false });
   };
@@ -181,13 +181,14 @@ export default class CustomerSitesComponent extends MainComponent {
 
   handleSave = () => {
     const { data, isNew } = this.state;
-    if (!data.add1) {
-      this.alert("Please enter description");
+    if(!this.isFormValid('siteformdata'))
+    {
+      this.alert("Please enter required data");
       return;
     }
     if (!isNew) {
       this.api.updateCustomerSite(data).then((res) => {
-        if (res.status == "ok") {
+        if (res.status == 200) {
           this.setState({ showModal: false, reset: true }, () =>
             this.getData()
           );
@@ -196,7 +197,7 @@ export default class CustomerSitesComponent extends MainComponent {
     } else {
       data.id = null;
       this.api.addCustomerSite(data).then((res) => {
-        if (res.status == "ok") {
+        if (res.status == 200) {
           this.setState({ showModal: false, reset: true }, () =>
             this.getData()
           );
@@ -230,7 +231,7 @@ export default class CustomerSitesComponent extends MainComponent {
   getModalContent = () => {
     const { data } = this.state;
     return (
-      <div key="content">
+      <div key="content" id='siteformdata'>
         <table className="table">
           <tbody>
             <tr>
@@ -238,7 +239,7 @@ export default class CustomerSitesComponent extends MainComponent {
               <td>
                 <input
                   required
-                  value={data.add1}
+                  value={data.add1 || ""}
                   onChange={(event) =>
                     this.setValue("add1", event.target.value)
                   }
@@ -251,7 +252,7 @@ export default class CustomerSitesComponent extends MainComponent {
               <td>
                 <input
                   required
-                  value={data.add2}
+                  value={data.add2 || ""}
                   onChange={(event) =>
                     this.setValue("add2", event.target.value)
                   }
@@ -263,7 +264,7 @@ export default class CustomerSitesComponent extends MainComponent {
               <td className="text-right"></td>
               <td>
                 <input
-                  value={data.add3}
+                  value={data.add3 || ""}
                   onChange={(event) =>
                     this.setValue("add3", event.target.value)
                   }
@@ -276,7 +277,7 @@ export default class CustomerSitesComponent extends MainComponent {
               <td>
                 <input
                   required
-                  value={data.town}
+                  value={data.town || ""}
                   onChange={(event) =>
                     this.setValue("town", event.target.value)
                   }
@@ -285,11 +286,11 @@ export default class CustomerSitesComponent extends MainComponent {
               </td>
             </tr>
             <tr>
-              <td className="text-right">County</td>
+              <td className="text-right">Country</td>
               <td>
                 <input
                   required
-                  value={data.county}
+                  value={data.county || ""}
                   onChange={(event) =>
                     this.setValue("county", event.target.value)
                   }
@@ -302,7 +303,7 @@ export default class CustomerSitesComponent extends MainComponent {
               <td>
                 <input
                   required
-                  value={data.postcode}
+                  value={data.postcode || ""}
                   onChange={(event) =>
                     this.setValue("postcode", event.target.value)
                   }
@@ -315,7 +316,7 @@ export default class CustomerSitesComponent extends MainComponent {
               <td>
                 <input
                   required
-                  value={data.what3Words}
+                  value={data.what3Words || ""}
                   onChange={(event) =>
                     this.setValue("what3Words", event.target.value)
                   }
@@ -328,7 +329,7 @@ export default class CustomerSitesComponent extends MainComponent {
               <td>
                 <input
                   required
-                  value={data.phone}
+                  value={data.phone || ""}
                   onChange={(event) =>
                     this.setValue("phone", event.target.value)
                   }
@@ -341,7 +342,7 @@ export default class CustomerSitesComponent extends MainComponent {
               <td>
                 <input
                   required
-                  value={data.maxTravelHours}
+                  value={data.maxTravelHours || ""}
                   onChange={(event) =>
                     this.setValue("maxTravelHours", event.target.value)
                   }
@@ -370,6 +371,7 @@ export default class CustomerSitesComponent extends MainComponent {
   };
 
   render() {
+      const arr=[{id:1,name:'test 1'},{id:2,name:'test 2'}]
     return (
       <div>
         <Spinner show={this.state.showSpinner} />
@@ -379,7 +381,11 @@ export default class CustomerSitesComponent extends MainComponent {
             onClick={this.handleNewItem}
           />
         </ToolTip>
+        <select className='form-control' >
+            {arr.map(item=><option key={item.id} value={item.id}>{item.name}</option>)}
+        </select>
         {this.getConfirm()}
+        {this.getAlert()}
         {this.getTable()}
         <div className="modal-style">{this.getModal()}</div>
       </div>

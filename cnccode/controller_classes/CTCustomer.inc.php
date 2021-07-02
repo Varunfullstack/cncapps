@@ -2799,6 +2799,7 @@ class CTCustomer extends CTCNC
             $siteDesc = $dbeSite->getValue(DBESite::add1) . ' ' . $dbeSite->getValue(
                     DBESite::town
                 ) . ' ' . $dbeSite->getValue(DBESite::postcode);
+            $customerID = $dbeSite->getValue(DBESite::customerID);
             $siteNo   = $dbeSite->getValue(DBESite::siteNo);
             $add1     = $dbeSite->getValue(DBESite::add1);
             $add2     = $dbeSite->getValue(DBESite::add2);
@@ -2818,6 +2819,7 @@ class CTCustomer extends CTCNC
             $lastUpdatedDateTime   = $dbeSite->getValue(DBESite::lastUpdatedDateTime);
             array_push($sites, [
                 "id"     => $siteNo, 
+                "customerID" => $customerID, 
                 "title"  => $siteDesc,
                 "siteNo" => $siteNo,
                 "add1"   => $add1,
@@ -3232,8 +3234,9 @@ ORDER BY NAME,
                 }
                 $dbeSite->setValue(DBESite::customerID, $data['customerID']);
                 $dbeSite->setValue(DBESite::siteNo, $data['siteNo']);
-                $dbeSite->getRowByCustomerIDSiteNo();
-                if (empty($data['lastUpdatedDateTime']) || $data['lastUpdatedDateTime'] < $dbeSite->getValue(
+                $dbeSite->getRow($data['siteNo']);
+                //$dbeSite->getRowByCustomerIDSiteNo();
+                /*if (empty($data['lastUpdatedDateTime']) || $data['lastUpdatedDateTime'] < $dbeSite->getValue(
                         DBESite::lastUpdatedDateTime
                     )) {
                     throw new \CNCLTD\Exceptions\JsonHttpException(
@@ -3242,14 +3245,23 @@ ORDER BY NAME,
                                "lastUpdatedDateTime" => $dbeSite->getValue(DBESite::lastUpdatedDateTime)
                            ]
                     );
-                }
+                }*/
                 if(isset($data['fieldValueMap'])) {
                     if (isset($data['fieldValueMap']['active']) && $data['siteNo'] == 0) {
                         throw new \CNCLTD\Exceptions\JsonHttpException(400, "Cannot deactivate Site 0");
                     }
                     $dbeSite = \CNCLTD\Data\SiteMapper::fromDTOToDB($data['fieldValueMap'], $dbeSite);
                 }
-              
+                $dbeSite->setValue(DBESite::add1, $data['add1']);
+                $dbeSite->setValue(DBESite::add2, $data['add2']);
+                $dbeSite->setValue(DBESite::add3, $data['add3']);
+                $dbeSite->setValue(DBESite::town, $data['town']);
+                $dbeSite->setValue(DBESite::postcode, $data['postcode']);
+                $dbeSite->setValue(DBESite::phone, $data['phone']);
+                $dbeSite->setValue(DBESite::county, $data['county']);
+                $dbeSite->setValue(DBESite::what3Words, $data['what3Words']);
+                $dbeSite->setValue(DBESite::maxTravelHours, $data['maxTravelHours']);
+                $dbeSite->setValue(DBESite::activeFlag, $data['activeFlag']);
                 $dbeSite->updateRow();
                 echo json_encode(
                     [
@@ -3454,10 +3466,10 @@ ORDER BY NAME,
 
     function addSite($data)
     {
-                if (!isset($data['customerId'])) {
-                    throw new \CNCLTD\Exceptions\JsonHttpException(400, 'customerId is required');
+                if (!isset($data['customerID'])) {
+                    throw new \CNCLTD\Exceptions\JsonHttpException(400, 'customerID is required');
                 }
-                if (!isset($data['addressLine'])) {
+                if (!isset($data['add1'])) {
                     throw new \CNCLTD\Exceptions\JsonHttpException(400, 'addressLine is required');
                 }
                 if (!isset($data['town'])) {
@@ -3473,11 +3485,15 @@ ORDER BY NAME,
                     throw new \CNCLTD\Exceptions\JsonHttpException(400, 'maxTravelHours is required');
                 }
                 $dbeSite = new DBESite($this);
-                $dbeSite->setValue(DBESite::customerID, $data['customerId']);
-                $dbeSite->setValue(DBESite::add1, $data['addressLine']);
+                $dbeSite->setValue(DBESite::customerID, $data['customerID']);
+                $dbeSite->setValue(DBESite::add1, $data['add1']);
+                $dbeSite->setValue(DBESite::add2, $data['add2']);
+                $dbeSite->setValue(DBESite::add3, $data['add3']);
                 $dbeSite->setValue(DBESite::town, $data['town']);
                 $dbeSite->setValue(DBESite::postcode, $data['postcode']);
                 $dbeSite->setValue(DBESite::phone, $data['phone']);
+                $dbeSite->setValue(DBESite::county, $data['county']);
+                $dbeSite->setValue(DBESite::what3Words, $data['what3Words']);
                 $dbeSite->setValue(DBESite::maxTravelHours, $data['maxTravelHours']);
                 $dbeSite->setValue(DBESite::activeFlag, 'Y');
                 $dbeSite->insertRow();
