@@ -19,16 +19,21 @@ export default class CustomerSitesComponent extends MainComponent {
       reset: false,
       showModal: false,
       isNew: true,
+      showSpinner: true,
       data: { ...this.getInitData() },
+      filter:{
+        showInActive:false
+      }
     };
   }
   componentDidMount() {
     this.getData();
   }
   getData = () => {
-    const customerId = params.get("customerID");
-    this.api.getCustomerSites(customerId).then((sites) => {
-      this.setState({ sites, customerId });
+    this.setState({ showSpinner: true });
+    const customerId = params.get("customerID");    
+    this.api.getCustomerSites(customerId,this.state.filter.showInActive).then((sites) => {
+      this.setState({ sites, customerId, showSpinner: false });
     });
   };
   getTable = () => {
@@ -76,6 +81,7 @@ export default class CustomerSitesComponent extends MainComponent {
         icon: "pointer",
         sortable: true,
         width: 150,
+        content:(site)=><Toggle checked={site.activeFlag == 'Y'} onChange={()=>null}></Toggle>
       },
       {
         path: "edit",
@@ -134,15 +140,15 @@ export default class CustomerSitesComponent extends MainComponent {
   }
 
   handleEdit = (site) => {
-    console.log("Edit Site", site);
+    //console.log("Edit Site", site);
     this.setState({ data: site, showModal: true, isNew: false });
   };
 
   handleDelete = async (site) => {
-    console.log("Delete site", site);
+    //console.log("Delete site", site);
     if (await this.confirm("Are you sure you want to delete this site?")) {
       this.APICustomers.deleteCustomerSite(site.id).then((res) => {
-        console.log(res);
+        //console.log(res);
         this.getData();
       });
     }
@@ -181,8 +187,7 @@ export default class CustomerSitesComponent extends MainComponent {
 
   handleSave = () => {
     const { data, isNew } = this.state;
-    if(!this.isFormValid('siteformdata'))
-    {
+    if (!this.isFormValid("siteformdata")) {
       this.alert("Please enter required data");
       return;
     }
@@ -231,7 +236,7 @@ export default class CustomerSitesComponent extends MainComponent {
   getModalContent = () => {
     const { data } = this.state;
     return (
-      <div key="content" id='siteformdata'>
+      <div key="content" id="siteformdata">
         <table className="table">
           <tbody>
             <tr>
@@ -370,19 +375,37 @@ export default class CustomerSitesComponent extends MainComponent {
     );
   };
 
+  getFilter=()=>{
+    const {filter}=this.state;
+    return <div className="flex-row flex-center" style={{marginTop:-20}}>
+            <label className="mr-3">Show InActive Sites</label>
+            <Toggle checked={filter.showInActive} onChange={()=>this.handleFilterChange("showInActive",!filter.showInActive)}></Toggle>
+          </div>
+  }
+  handleFilterChange=(prop,value)=>{    
+     this.setFilter(prop,value,()=>this.getData());
+  }
+
   render() {
-      const arr=[{id:1,name:'test 1'},{id:2,name:'test 2'}]
+    const arr = [
+      { id: 1, name: "test 1" },
+      { id: 2, name: "test 2" },
+    ];
+    if (this.state.showSpinner)
+      return <Spinner show={this.state.showSpinner} />;
     return (
       <div>
-        <Spinner show={this.state.showSpinner} />
-        <ToolTip title="New Site" width={30}>
-          <i
-            className="fal fa-2x fa-plus color-gray1 pointer"
-            onClick={this.handleNewItem}
-          />
-        </ToolTip>
+        <div className="m-5">
+          <ToolTip title="New Site" width={30}>
+            <i
+              className="fal fa-2x fa-plus color-gray1 pointer"
+              onClick={this.handleNewItem}
+            />
+          </ToolTip>
+        </div>
         {this.getConfirm()}
         {this.getAlert()}
+        {this.getFilter()}
         {this.getTable()}
         <div className="modal-style">{this.getModal()}</div>
       </div>

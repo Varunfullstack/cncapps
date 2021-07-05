@@ -818,6 +818,9 @@ class CTCustomer extends CTCNC
             case "getCustomersHaveOpenSR":
                 echo json_encode($this->getCustomersHaveOpenSR());
                 exit;
+            case "letters":
+                echo json_encode($this->getCustomeLetters(),JSON_NUMERIC_CHECK);
+                exit;
             default:
                 $this->displaySearchForm();
                 break;
@@ -2787,13 +2790,14 @@ class CTCustomer extends CTCNC
     function getCustomerSites()
     {
         $customerId = $_GET["customerId"];
+        $showInActive= $_GET["showInActive"]??"N";
         if (!$customerId) return [];
         $dbeSite = new DBESite($this);
         $dbeSite->setValue(
             DBESite::customerID,
             $customerId
-        );
-        $dbeSite->getRowsByCustomerID();
+        );        
+        $dbeSite->getRowsByCustomerID($showInActive=='N');
         $sites = array();
         while ($dbeSite->fetchNext()) {
             $siteDesc = $dbeSite->getValue(DBESite::add1) . ' ' . $dbeSite->getValue(
@@ -3617,4 +3621,28 @@ ORDER BY NAME,
             ]
         );
     }
+    function getCustomeLetters(){
+        /*
+        Get the list of custom letter template file names from the custom letter directory
+        */
+        $dir                   = LETTER_TEMPLATE_DIR . "/custom/";
+        $customLetterTemplates = [];
+        if (is_dir($dir)) {
+
+            $dh = opendir($dir);
+            while (false !== ($filename = readdir($dh))) {
+
+                $ext = explode(
+                    '.',
+                    $filename
+                );
+                $ext = $ext[count($ext) - 1];
+                if ($ext == 'htm') {
+                    $customLetterTemplates[] = $filename;
+                }
+            }
+        }
+        return $this->success( $customLetterTemplates);
+    }
+
 }

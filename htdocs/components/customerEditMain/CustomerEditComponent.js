@@ -39,10 +39,10 @@ class CustomerEditComponent extends MainComponent {
     constructor(props) {
         super(props);
          this.state = {
-            customerID:null,
+            customerId:null,
             loaded: true,
             filter: {                
-                activeTab: this.TAB_ORDERS,                 
+                activeTab: this.TAB_CONTACTS,                 
             },
         }
         this.tabs = [
@@ -109,10 +109,17 @@ class CustomerEditComponent extends MainComponent {
             return <CustomerSitesComponent customerId={customerId}></CustomerSitesComponent>;
         }
     }
+    getActions=()=>{
+        return <div>
+            <a className="m-3" target="_blank" href={`RenewalReport.php?action=produceReport&customerID=${this.state.customerId}`}>Renewal Information</a>
+            <a className="m-3" target="_blank" href={`ThirdPartyContact.php?action=list&customerID=${this.state.customerId}`}>Third Party Contacts</a>
+        </div>
+    }
     render() {
         //const {customerId} = this.props;
         
-        return <div>           
+        return <div>         
+                {this.getActions()}  
                 {this.getTabsElement()}
                 {this.getActiveTab()}
                </div>

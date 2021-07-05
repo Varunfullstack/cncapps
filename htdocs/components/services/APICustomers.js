@@ -19,8 +19,8 @@ class APICustomers extends APIMain {
 
     }
 
-    getCustomerSites(customerId) {
-        return fetch(`${ApiUrls.Customer}getCustomerSites&customerId=${customerId}`)
+    getCustomerSites(customerId,showInActive) {        
+        return fetch(`${ApiUrls.Customer}getCustomerSites&customerId=${customerId}&showInActive=${(showInActive?"Y":"N")}`)
             .then(res => res.json());
     }
 
@@ -73,12 +73,7 @@ class APICustomers extends APIMain {
         ;
     }
 
-    getCustomerSites(customerId) {
-        return fetch(`${ApiUrls.Customer}getCustomerSites&customerId=${customerId}`)
-        .then(res => res.json())
-        ;
-    }
-
+   
     addCustomerSite(data)
     {
         return this.post(`${ApiUrls.Customer}addSite`,data,true);
@@ -116,6 +111,13 @@ class APICustomers extends APIMain {
         return fetch(`${ApiUrls.Customer}getCustomerOrders&customerId=${customerId}`)
         .then(res => res.json())
         ;
+    }
+    getLetters(){
+        return this.get(`${ApiUrls.Customer}letters`)
+    }
+    removeSupportAndRefer(customerID){
+        return this.get(`${ApiUrls.Customer}removeSupportAndRefer&customerID=${customerID}`);
+
     }
 }
 

@@ -110,9 +110,13 @@ export default class CustomerProjectsComponent extends MainComponent {
     }
     render() {
         return <div>
-            <ToolTip title="Add New Project" width={50}>
-                <a style={{color:"#555",marginBottom:15}} className="fa fa-plus fa-2x" href={`Projects.php?action=add&customerID=${this.state.customerId}`} ></a>
+            <div className="m-5">
+            <ToolTip title="Add New Project" width={30}>
+                <i  className="fal fa-plus fa-2x pointer" 
+                onClick={()=>window.location=`Projects.php?action=add&customerID=${this.state.customerId}`}                
+                ></i>
             </ToolTip>
+            </div>
             {this.getConfirm()}
             {this.getTable()}
         </div>      
