@@ -17,10 +17,18 @@ export default class CustomerContactsComponent extends MainComponent {
             ...this.state,
             customerId:null,
             contacts:[],
+            sites:[],
             reset: false,
             showModal: false,
             isNew: true,
             data: {...this.getInitData()},
+            supportLevelOptions : [
+                'main',
+                'supervisor',
+                'support',
+                'delegate',
+                'furlough',
+            ]
         }
     }
     componentDidMount() {
@@ -31,9 +39,19 @@ export default class CustomerContactsComponent extends MainComponent {
         this.api.getCustomerContacts(customerId).then(contacts=>{
             this.setState({contacts,customerId});
         })
+        this.api.getCustomerSites(customerId).then((sites) => {
+          this.setState({ sites, customerId });
+        });
     }
     getTable=()=>{
         const columns=[
+            {
+                path: "title",
+                label: "Title",
+                hdToolTip: "Title",               
+                sortable: true,         
+                width:50                     
+             },
             {
                path: "firstName",
                label: "First",
@@ -126,7 +144,7 @@ export default class CustomerContactsComponent extends MainComponent {
     getInitData() {
         return {
             id: '',
-            customerID: '',
+            customerID: params.get("customerID"),
             title: '',
             position: '',
             firstName: '',
@@ -204,9 +222,10 @@ export default class CustomerContactsComponent extends MainComponent {
     handleSave = () => {
         const {data, isNew} = this.state;
         console.log(data)
-        if (!data.firstName) {
-            this.alert("Please enter firstname");
-            return;
+        if(!this.isFormValid('contactformdata'))
+        {
+          this.alert("Please enter required data");
+          return;
         }
         if (!isNew) {
             this.api.updateCustomerContact(data).then((res) => {
@@ -252,16 +271,20 @@ export default class CustomerContactsComponent extends MainComponent {
 
     getModalContent = () => {
         const {data} = this.state;
-        return <div key="content">
+        return <div key="content" id='contactformdata'>
             <table className="table">
                 <tbody>
                 <tr>
                     <td className="text-right">Site</td>
-                    <td><input required
-                               value={data.siteNo||""}
+                    <td><select required
+                               value={data.siteNo}
                                onChange={(event) => this.setValue("siteNo", event.target.value)}
-                               className="form-control"
-                    /></td>
+                               className="form-control">
+                                {this.state.sites.map((site, index) => {
+                                    return <option key={site.id} value={site.id}>{site.id}</option>;})
+                                }
+                               </select>
+                    </td>
                      <td className="text-right">Title</td>
                      <td><input required
                                value={data.title||""}
@@ -338,6 +361,22 @@ export default class CustomerContactsComponent extends MainComponent {
                                onChange={(event) => this.setValue("pendingLeaverDate", event.target.value)}
                                className="form-control"
                     /></td>
+                </tr>
+                <tr>
+                    <td className="text-right">Support Level</td>
+                    <td><select required
+                               value={data.supportLevel}
+                               onChange={(event) => this.setValue("supportLevel", event.target.value)}
+                               className="form-control">
+                                {this.state.supportLevelOptions.map((level) => {
+                                    return <option key={level} value={level}>
+                                        {level.replace(/^(.)|\s(.)/g, x => x.toUpperCase())}
+                                        </option>;})
+                                }
+                               </select>
+                    </td>
+                     <td className="text-right"></td>
+                     <td></td>
                 </tr>
                 <tr>
                 <td className="text-right">Active?</td>
@@ -524,6 +563,7 @@ export default class CustomerContactsComponent extends MainComponent {
     }
 
     render() {
+        
         return <div>
 <Spinner show={this.state.showSpinner}/>
             <ToolTip title="New Item"
@@ -534,6 +574,7 @@ export default class CustomerContactsComponent extends MainComponent {
                 />
             </ToolTip>
             {this.getConfirm()}
+            {this.getAlert()}
             {this.getTable()}
             <div className="modal-style">
                 {this.getModal()}
