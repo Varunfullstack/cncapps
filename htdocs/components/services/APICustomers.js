@@ -110,6 +110,13 @@ class APICustomers extends APIMain {
     {
         return this.post(`${ApiUrls.Customer}updateContact`,data,true);
     }
+
+    getCustomerOrders(customerId) 
+    {
+        return fetch(`${ApiUrls.Customer}getCustomerOrders&customerId=${customerId}`)
+        .then(res => res.json())
+        ;
+    }
 }
 
 export default APICustomers;

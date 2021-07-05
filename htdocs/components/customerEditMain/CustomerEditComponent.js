@@ -7,6 +7,7 @@ import CustomerProjectsComponent from "./CustomerProjectsComponent";
 import PortalCustomerDocumentsComponent from "./PortalCustomerDocumentsComponent";
 import CustomerSitesComponent from "./CustomerSitesComponent";
 import CustomerContactsComponent from "./CustomerContactsComponent";
+import CustomerOrdersComponent from "./CustomerOrdersComponent";
 
 //import configureStore from "./configureStore";
 /*
@@ -27,7 +28,7 @@ import './../style.css';
 import { params } from "../utils/utils";
 class CustomerEditComponent extends MainComponent {
     tabs = [];
-    TAB_CUSTOMER='customer';
+    TAB_CUSTOMER='customer';    
     TAB_PROJECTS='projects';
     TAB_PORTAL_DOCUMENT='portal_document';
     TAB_SITES='sites';
@@ -41,7 +42,7 @@ class CustomerEditComponent extends MainComponent {
             customerID:null,
             loaded: true,
             filter: {                
-                activeTab: this.TAB_PORTAL_DOCUMENT,                 
+                activeTab: this.TAB_ORDERS,                 
             },
         }
         this.tabs = [
@@ -99,7 +100,7 @@ class CustomerEditComponent extends MainComponent {
           case this.TAB_CRM:
             return <label>CRM</label>;
           case this.TAB_ORDERS:
-            return <label>Orders</label>;
+            return   <CustomerOrdersComponent customerId={customerId}/>;
           case this.TAB_PORTAL_DOCUMENT:
             return   <PortalCustomerDocumentsComponent customerId={customerId}/>;
           case this.TAB_PROJECTS:

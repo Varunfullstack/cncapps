@@ -8,14 +8,14 @@ import Spinner from "../shared/Spinner/Spinner";
 import Modal from "../shared/Modal/modal.js";
 import Toggle from "../shared/Toggle";
 
-export default class CustomerSitesComponent extends MainComponent {
+export default class CustomerOrdersComponent extends MainComponent {
   api = new APICustomers();
   constructor(props) {
     super(props);
     this.state = {
       ...this.state,
       customerId: null,
-      sites: [],
+      orders: [],
       reset: false,
       showModal: false,
       isNew: true,
@@ -27,86 +27,79 @@ export default class CustomerSitesComponent extends MainComponent {
   }
   getData = () => {
     const customerId = params.get("customerID");
-    this.api.getCustomerSites(customerId).then((sites) => {
-      this.setState({ sites, customerId });
+    this.api.getCustomerOrders(customerId).then((res) => {
+      this.setState({ orders:res.data, customerId });
     });
   };
   getTable = () => {
     const columns = [
       {
-        path: "add1",
-        label: "Site Address",
-        hdToolTip: "Site Address",
+        path: "id",
+        label: "ID",
+        hdToolTip: "ID",
+        sortable: true,
+        width: 200,
+        content: (order) => (
+          <a
+            style={{ color: "black" }}
+            href={`${order.url}`}
+            target="_blank"
+          >
+            {order.id}
+          </a>
+        ),
+      },
+      {
+        path: "type",
+        label: "Type",
+        hdToolTip: "Type",
         sortable: true,
         width: 200,
       },
       {
-        path: "town",
-        label: "Town",
-        hdToolTip: "Town",
+        path: "date",
+        label: "Date",
+        hdToolTip: "Date",
         sortable: true,
-        width: 150,
+        width: 200,
       },
       {
-        path: "county",
-        label: "Country",
-        hdToolTip: "Country",
+        path: "custPORef",
+        label: "POR Ref",
+        hdToolTip: "POR Ref",
         sortable: true,
-        width: 150,
-      },
-      {
-        path: "phone",
-        label: "Phone",
-        hdToolTip: "Phone",
-        sortable: true,
-        width: 150,
-      },
-      {
-        path: "what3Words",
-        label: "What3Words",
-        hdToolTip: "What3Words",
-        icon: "pointer",
-        sortable: true,
-        width: 150,
-      },
-      {
-        path: "activeFlag",
-        label: "Active",
-        hdToolTip: "Active",
-        icon: "pointer",
-        sortable: true,
-        width: 150,
+        width: 200,
       },
       {
         path: "edit",
         label: "",
-        hdToolTip: "Edit site",
+        hdToolTip: "Edit order",
         //icon: "fal fa-2x fa-signal color-gray2 pointer",
         sortable: false,
-        content: (site) =>
-          this.getEditElement(site, () => this.handleEdit(site)),
+        content: (order) =>
+          this.getEditElement(order, () => this.handleEdit(order)),
       },
       {
         path: "delete",
         label: "",
-        hdToolTip: "Delete site",
+        hdToolTip: "Delete order",
         //icon: "fal fa-2x fa-signal color-gray2 pointer",
         sortable: false,
-        content: (site) =>
+        content: (order) =>
           this.getDeleteElement(
-            site,
-            () => this.handleDelete(site),
-            site.isDeletable
+            order,
+            () => this.handleDelete(order),
+            order.isDeletable
           ),
       },
     ];
     return (
       <Table
-        key="sites"
+        key="orders"
         pk="id"
         style={{ maxWidth: 1300 }}
         columns={columns}
-        data={this.state.sites || []}
+        data={this.state.orders || []}
         search={true}
       ></Table>
     );
@@ -116,32 +109,21 @@ export default class CustomerSitesComponent extends MainComponent {
     return {
       id: "",
       customerID: params.get("customerID"),
-      add1: "",
-      add2: "",
-      add3: "",
-      town: "",
-      county: "",
-      postcode: "",
-      invoiceContactID: "",
-      deliverContactID: "",
-      debtorCode: "",
-      sageRef: "",
-      phone: "",
-      maxTravelHours: "",
-      activeFlag: "",
-      what3Words: "",
+      type: "",
+      date: "",
+      custPORef: "",
     };
   }
 
-  handleEdit = (site) => {
-    console.log("Edit Site", site);
-    this.setState({ data: site, showModal: true, isNew: false });
+  handleEdit = (order) => {
+    console.log("Edit Order", order);
+    this.setState({ data: order, showModal: true, isNew: false });
   };
 
-  handleDelete = async (site) => {
-    console.log("Delete site", site);
-    if (await this.confirm("Are you sure you want to delete this site?")) {
-      this.APICustomers.deleteCustomerSite(site.id).then((res) => {
+  handleDelete = async (order) => {
+    console.log("Delete Order", order);
+    if (await this.confirm("Are you sure you want to delete this order?")) {
+      this.APICustomers.deleteCustomerOrder(order.id).then((res) => {
         console.log(res);
         this.getData();
       });
@@ -181,13 +163,13 @@ export default class CustomerSitesComponent extends MainComponent {
 
   handleSave = () => {
     const { data, isNew } = this.state;
-    if(!this.isFormValid('siteformdata'))
+    if(!this.isFormValid('orderformdata'))
     {
       this.alert("Please enter required data");
       return;
     }
     if (!isNew) {
-      this.api.updateCustomerSite(data).then((res) => {
+      this.api.updateCustomerOrder(data).then((res) => {
         if (res.status == 200) {
           this.setState({ showModal: false, reset: true }, () =>
             this.getData()
@@ -196,7 +178,7 @@ export default class CustomerSitesComponent extends MainComponent {
       });
     } else {
       data.id = null;
-      this.api.addCustomerSite(data).then((res) => {
+      this.api.addCustomerOrder(data).then((res) => {
         if (res.status == 200) {
           this.setState({ showModal: false, reset: true }, () =>
             this.getData()
@@ -212,7 +194,7 @@ export default class CustomerSitesComponent extends MainComponent {
     return (
       <Modal
         width={500}
-        title={isNew ? "Create Site" : "Update Site"}
+        title={isNew ? "Create Order" : "Update Order"}
         show={showModal}
         content={this.getModalContent()}
         footer={
@@ -231,7 +213,7 @@ export default class CustomerSitesComponent extends MainComponent {
   getModalContent = () => {
     const { data } = this.state;
     return (
-      <div key="content" id='siteformdata'>
+      <div key="content" id='orderformdata'>
         <table className="table">
           <tbody>
             <tr>
@@ -260,97 +242,7 @@ export default class CustomerSitesComponent extends MainComponent {
                 />
               </td>
             </tr>
-            <tr>
-              <td className="text-right"></td>
-              <td>
-                <input
-                  value={data.add3 || ""}
-                  onChange={(event) =>
-                    this.setValue("add3", event.target.value)
-                  }
-                  className="form-control"
-                />
-              </td>
-            </tr>
-            <tr>
-              <td className="text-right">Town</td>
-              <td>
-                <input
-                  required
-                  value={data.town || ""}
-                  onChange={(event) =>
-                    this.setValue("town", event.target.value)
-                  }
-                  className="form-control"
-                />
-              </td>
-            </tr>
-            <tr>
-              <td className="text-right">Country</td>
-              <td>
-                <input
-                  required
-                  value={data.county || ""}
-                  onChange={(event) =>
-                    this.setValue("county", event.target.value)
-                  }
-                  className="form-control"
-                />
-              </td>
-            </tr>
-            <tr>
-              <td className="text-right">Postcode</td>
-              <td>
-                <input
-                  required
-                  value={data.postcode || ""}
-                  onChange={(event) =>
-                    this.setValue("postcode", event.target.value)
-                  }
-                  className="form-control"
-                />
-              </td>
-            </tr>
-            <tr>
-              <td className="text-right">What3Words</td>
-              <td>
-                <input
-                  required
-                  value={data.what3Words || ""}
-                  onChange={(event) =>
-                    this.setValue("what3Words", event.target.value)
-                  }
-                  className="form-control"
-                />
-              </td>
-            </tr>
-            <tr>
-              <td className="text-right">Phone</td>
-              <td>
-                <input
-                  required
-                  value={data.phone || ""}
-                  onChange={(event) =>
-                    this.setValue("phone", event.target.value)
-                  }
-                  className="form-control"
-                />
-              </td>
-            </tr>
-            <tr>
-              <td className="text-right">Max Travel Hours</td>
-              <td>
-                <input
-                  required
-                  value={data.maxTravelHours || ""}
-                  onChange={(event) =>
-                    this.setValue("maxTravelHours", event.target.value)
-                  }
-                  className="form-control"
-                />
-              </td>
-            </tr>
-            <tr>
+           <tr>
               <td className="text-right">Active?</td>
               <td>
                 <Toggle
@@ -371,11 +263,10 @@ export default class CustomerSitesComponent extends MainComponent {
   };
 
   render() {
-      const arr=[{id:1,name:'test 1'},{id:2,name:'test 2'}]
     return (
       <div>
         <Spinner show={this.state.showSpinner} />
-        <ToolTip title="New Site" width={30}>
+        <ToolTip title="New Order" width={30}>
           <i
             className="fal fa-2x fa-plus color-gray1 pointer"
             onClick={this.handleNewItem}
