@@ -6,6 +6,7 @@
  * Time: 14:47
  */
 use CNCLTD\Business\BUActivity;
+use CNCLTD\Data\DBEItem;
 global $cfg;
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_dbe"] . "/DBEDirectDebitContracts.php");
