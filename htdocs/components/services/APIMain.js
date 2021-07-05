@@ -29,6 +29,15 @@ class APIMain {
                 body: payload,
             }).then((res) => this.handleResponse(res));
     }
+    uploadFile(url, file, name, data = null ) {
+        let payload = new FormData();
+        payload.append(name, file);
+        if (data) payload.append("data", JSON.stringify(data));       
+            return fetch(url, {
+                method: "POST",
+                body: payload,
+            }).then((res) => this.handleResponse(res));
+    }
 
     post(url, payload, handleException = false) {
         if(handleException)
