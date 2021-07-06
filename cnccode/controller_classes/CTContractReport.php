@@ -64,14 +64,24 @@ class CTContractReport extends CTCNC
                     'expiryDate' => "date"
                 ];
                 /** @var dbSweetcode $db */ global $db;
-                $countQuery       = "select count(*) FROM custitem
+                $countQuery       = "select count(*) FROM (SELECT custitem.cui_cuino                                             as 'contractId',
+       custitem.cui_users                                             as 'users',
+       customer.cus_name                                              as 'customerName',
+       address.add_add1                                               as 'siteAddress',
+       item.itm_desc                                                  as 'itemDescription',
+       custitem.installationDate                                      as 'startDate',
+       getContractExpiryDate(installationDate, initialContractLength) as 'expiryDate',
+       custitem.cui_sale_price                                        as 'value',
+       custitem.curGSCBalance                                         as 'balance',
+       customer.gscTopUpAmount                                        as 'topUp', 
+       custitem.renewalStatus                                         as 'renewalStatus',
+       custitem.initialContractLength                                 as 'initialContractLength' from custitem
          JOIN customer ON customer.cus_custno = custitem.cui_custno
          JOIN item ON item.itm_itemno = custitem.cui_itemno
          JOIN address ON address.add_siteno = custitem.cui_siteno AND address.add_custno = custitem.cui_custno
-WHERE 1 = 1
-  AND customer.cus_custno <> 2511
+WHERE customer.cus_custno <> 2511
   AND item.renewalTypeID IS NOT NULL
-  AND item.renewalTypeID <> 0";
+  AND item.renewalTypeID <> 0) a where 1 = 1";
                 $totalCountResult = $db->query($countQuery);
                 $totalCount       = $totalCountResult->fetch_row()[0];
                 $defaultQuery     = "
