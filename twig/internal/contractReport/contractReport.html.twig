@@ -24,6 +24,9 @@
             data: 'renewalStatus'
         },
         {
+            data: 'initialContractLength',
+        },
+        {
             data: 'startDate',
             name: 'startDate',
             render: function (data) {
@@ -63,71 +66,103 @@
             if (this.dataset.defaultValue) {
                 defaultValue = this.dataset.defaultValue
             }
-            let inputType = null;
-            console.log(this.dataset);
+            let inputType = 'text';
             if (this.dataset.inputType) {
                 inputType = this.dataset.inputType;
             }
-
-            $(this).html('<input type="' + (inputType ? inputType : 'text') + '" placeholder="Search ' + title + '" ' + (inputLength ? "" : "") + (defaultValue ? 'value=' + defaultValue : '') + ' />');
-            const autocompleteURL = $(this).data().autocompleteUrl;
-            const autocompleteTermField = 'term' || $(this).data().autocompleteTermField;
             const performSearch = function (value, column) {
                 if (table.column(column).search() != value) {
                     table.column(column)
-                        .search(value);
+                            .search(value);
                     table.draw();
-                    // const newURL = UpdateQueryString(columnsData[column].data, value);
-                    // window.history.pushState({}, "", newURL);
                 }
             };
 
-            const filterInput = $(this).find('input');
-            filterInput.autocomplete({
-                minLength: 0,
-                source: function (request, responseCB) {
-                    const data = {};
-                    if (!autocompleteURL) {
-                        return responseCB();
-                    }
-                    data[autocompleteTermField] = request.term;
-                    $.ajax(
-                        autocompleteURL,
-                        {
-                            method: 'POST',
-                            dataType: 'json',
-                            data: data
-                        }
-                    ).then(response => {
-                        if (response.length > 40) {
-                            response = response.slice(0, 40);
-                            response.unshift({
-                                id: -1,
-                                name: 'Keep typing to filter, there are more results not shown here'
-                            });
-                        }
-                        responseCB(response.map(x => ({label: x.name, value: x.id})));
-                    })
+            if (inputType === 'select') {
+                const years = [1, 2, 3, 4, 5];
 
-                },
-                delay: 200,
-                select: function (event, ui) {
-                    event.preventDefault();
-                    event.target.value = ui.item.label;
-                    performSearch(ui.item.label, i);
+                const select = document.createElement('select');
+
+                const defaultOption = document.createElement('option');
+                defaultOption.value = "";
+                defaultOption.text = "All";
+                select.add(defaultOption);
+
+                for (let year of years) {
+                    const option = document.createElement('option');
+
+                    const months = String(year * 12);
+                    option.text = months;
+                    option.value = months;
+                    select.add(option);
                 }
-            }).focus(function () {
-                $(this).autocomplete("search", $(this).val());
-            }).on('change', function () {
-                performSearch(filterInput[0].value, i);
-            });
+
+                this.innerHTML = "";
+                this.append(select);
+                select.addEventListener("change", $event => {
+                    performSearch($event.target.value, i);
+                })
+
+            } else {
+                $(this).html('<input type="' + (inputType) + '" placeholder="Search ' + title + '" ' + (inputLength ? "" : "") + (defaultValue ? 'value=' + defaultValue : '') + ' />');
+                const autocompleteURL = $(this).data().autocompleteUrl;
+                const autocompleteTermField = 'term' || $(this).data().autocompleteTermField;
+
+                const filterInput = $(this).find('input');
+                filterInput.autocomplete({
+                    minLength: 0,
+                    source: function (request, responseCB) {
+                        const data = {};
+                        if (!autocompleteURL) {
+                            return responseCB();
+                        }
+                        data[autocompleteTermField] = request.term;
+                        $.ajax(
+                                autocompleteURL,
+                                {
+                                    method: 'POST',
+                                    dataType: 'json',
+                                    data: data
+                                }
+                        ).then(response => {
+                            if (response.length > 40) {
+                                response = response.slice(0, 40);
+                                response.unshift({
+                                    id: -1,
+                                    name: 'Keep typing to filter, there are more results not shown here'
+                                });
+                            }
+                            responseCB(response.map(x => ({label: x.name, value: x.id})));
+                        })
+
+                    },
+                    delay: 200,
+                    select: function (event, ui) {
+                        event.preventDefault();
+                        event.target.value = ui.item.label;
+                        performSearch(ui.item.label, i);
+                    }
+                }).focus(function () {
+                    $(this).autocomplete("search", $(this).val());
+                }).on('change', function () {
+                    performSearch(filterInput[0].value, i);
+                });
+            }
+
+
         });
 
         table = $('#example').DataTable({
-            dom: "lrtip",
+            dom: "Blrtip",
             serverSide: true,
             ajax: '?action=getData',
             orderCellsTop: true,
+            buttons: [
+                {
+                    extend: 'csv',
+                    bom: true
+                }
+            ],
             fixedHeader: true,
             pageLength: 100,
             columns: columnsData,
@@ -135,7 +170,7 @@
             footerCallback: (row, data, start, end, display) => {
                 const total = table.column(9, {page: 'current'}).data().reduce((acc, value) => acc += (+value), 0);
                 $(table.column(9).footer()).html(
-                    "Total Balance: &pound;" + total.toFixed(2)
+                        "Total Balance: &pound;" + total.toFixed(2)
                 )
             }
         });
@@ -156,6 +191,7 @@
         <th>Site</th>
         <th>Item</th>
         <th data-default-value="R">Renewal Status</th>
+        <th data-input-type="select">Initial Contract Length</th>
         <th data-input-type="date">Start</th>
         <th data-input-type="date">Expiry</th>
         <th>Value</th>
@@ -171,6 +207,7 @@
         <th>Site</th>
         <th>Item</th>
         <th>Renewal Status</th>
+        <th>Initial Contract Length</th>
         <th>Start</th>
         <th>Expiry</th>
         <th>Value</th>
