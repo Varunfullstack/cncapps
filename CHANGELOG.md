@@ -1,6 +1,11 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.13.5]
+### Changed
+- Add "Initial Contract Length" field to contractReport, with a dropdown filter that has "all" as default value, allow 
+  to sort by that column and also CSV export capabilities 
+
 ## [v5.13.4] - 2021-07-05
 ### Fixed
 - Fixed issue with direct debit.
