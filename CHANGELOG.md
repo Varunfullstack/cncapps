@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [v5.13.5]
+## [v5.13.5] - 2021-07-06
 ### Changed
 - Add "Initial Contract Length" field to contractReport, with a dropdown filter that has "all" as default value, allow 
   sorting by that column and also CSV export capabilities 
