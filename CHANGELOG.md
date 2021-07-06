@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.13.6] - 2021-07-06
+### Changed
+- Change start and expiry fields in contractReport to reflect the installDate and the expiry date shown when editing the contract
+
 ## [v5.13.5] - 2021-07-06
 ### Changed
 - Add "Initial Contract Length" field to contractReport, with a dropdown filter that has "all" as default value, allow 
