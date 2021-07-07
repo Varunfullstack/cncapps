@@ -3,22 +3,22 @@ import React from "react";
 import ReactDOM from "react-dom"; 
 import Spinner from "../shared/Spinner/Spinner";
 import '../style.css';
-import './CustomerTypeComponent.css';
-import APICustomerType from "./services/APICustomerType.js";
+import './ReviewListComponent.css';
+import APIReviewList from "./services/APIReviewList.js";
 import Table from "../shared/table/table.js";
 import ToolTip from "../shared/ToolTip.js";
 import Modal from "../shared/Modal/modal.js";
 import Toggle from "../shared/Toggle.js";
 
 class ReviewListComponent extends MainComponent {
-   api=new APICustomerType();
+   api=new APIReviewList();
     constructor(props) {
         super(props);
         this.state = {
             ...this.state,    
             showSpinner:false ,
             showModal:false,
-            types:[]   ,
+            reviews:[]   ,
             mode:"new"   ,
             data:{
                 id:'',
@@ -32,9 +32,9 @@ class ReviewListComponent extends MainComponent {
     }
 
     getData=()=>{
-        this.api.getAllTypes().then(res=>{
+        this.api.getReviews().then(res=>{
             if(res.state)
-            this.setState({types:res.data});
+            this.setState({reviews:res.data});
         });
     }
 
@@ -76,7 +76,7 @@ class ReviewListComponent extends MainComponent {
         key="leadStatus"
         pk="id"
         columns={columns}
-        data={this.state.types||[]}
+        data={this.state.reviews||[]}
         search={true}
         >
         </Table>
@@ -84,17 +84,17 @@ class ReviewListComponent extends MainComponent {
     showEditModal=(data)=>{        
         this.setState({showModal:true,data,mode:'edit'});
     }
-    handleDelete=async (type)=>{
-        const conf=await this.confirm("Are you sure to delete this type?")
+    handleDelete=async (review)=>{
+        const conf=await this.confirm("Are you sure to delete this review?")
         if(conf)
-        this.api.deleteType(type.id).then(res=>{
+        this.api.deleteReview(review.id).then(res=>{
             if(res.state)
             this.getData();
             else this.alert(res.error);
         })
     }
      
-    handleNewType=()=>{
+    handleNewReview=()=>{
         this.setState({mode:"new",showModal:true, data:{
             id:'',
             description:'',            
@@ -108,7 +108,7 @@ class ReviewListComponent extends MainComponent {
         return <Modal 
         width={500}
         show={this.state.showModal}
-        title={mode=="new"?"Add New Type":"Edit Type"}
+        title={mode=="new"?"Add New Review":"Edit Review"}
         onClose={this.hideModal}
         content={
             <div key="content">
@@ -130,11 +130,11 @@ class ReviewListComponent extends MainComponent {
     handleSave=()=>{
         const { data, mode } = this.state;
         if (data.description == "") {
-          this.alert("Type name required.");
+          this.alert("Review name required.");
           return;
         }
         if (mode == "new") {
-          this.api.addType(data).then((result) => {
+          this.api.addReview(data).then((result) => {
             if (result.state) {
               this.setState({ showModal: false });
              
@@ -146,7 +146,7 @@ class ReviewListComponent extends MainComponent {
         }
         else if(mode=='edit')
         {
-            this.api.updateType(data).then((result) => {
+            this.api.updateReview(data).then((result) => {
               if (result.state) {
                 this.setState({ showModal: false });              
               } else {
@@ -156,11 +156,12 @@ class ReviewListComponent extends MainComponent {
             });
         }
     }
-    render() {        
+    render() { 
+        return 'test';       
         return <div>
             <Spinner show={this.state.showSpinner}></Spinner>
-            <ToolTip title="New Type" width={30}>
-                <i className="fal fa-2x fa-plus color-gray1 pointer" onClick={this.handleNewType}></i>
+            <ToolTip title="New Review" width={30}>
+                <i className="fal fa-2x fa-plus color-gray1 pointer" onClick={this.handleNewReview}></i>
             </ToolTip>
             {this.getConfirm()}
             {this.getAlert()}
@@ -170,9 +171,9 @@ class ReviewListComponent extends MainComponent {
     }
 }
 
-export default CustomerTypeComponent;
+export default ReviewListComponent;
 document.addEventListener('DOMContentLoaded', () => {
-    const domContainer = document.querySelector("#reactCustomerType");
+    const domContainer = document.querySelector("#reactReviewList");
     if (domContainer)
-        ReactDOM.render(React.createElement(CustomerTypeComponent), domContainer);
+        ReactDOM.render(React.createElement(ReviewListComponent), domContainer);
 });

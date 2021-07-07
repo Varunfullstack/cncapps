@@ -40,5 +40,6 @@ export default class ApiUrls {
     static UtilityEmails="/UtilityEmails.php?action=";
     static IgnoredADDomains="/IgnoredADDomains.php?action=";
     static Office365Licenses="/Office365Licenses.php?action=";
-    static PendingChargeableRequests="/PendingChargeableRequests.php?action="
+    static PendingChargeableRequests="/PendingChargeableRequests.php?action=";
+    static ReviewList="/ReviewList.php?action=";
 }

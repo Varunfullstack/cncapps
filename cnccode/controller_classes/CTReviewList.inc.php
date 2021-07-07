@@ -38,8 +38,34 @@ class CTReviewList extends CTCNC
         if ($i == "getData") {
             $this->getData();
         } else {
-            $this->displayReviewList();
+            $this->displayForm();
         }
+    }
+
+        /**
+     * Export expenses that have not previously been exported
+     * @access private
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
+     */
+    function displayForm()
+    {
+        $this->setPageTitle('Review List');
+        $this->setTemplateFiles(
+            'ReviewList',
+            'ReviewList.inc'
+        );
+        $this->template->parse(
+            'CONTENTS',
+            'ReviewList',
+            true
+        );
+        $this->loadReactScript('ReviewListComponent.js');
+        $this->loadReactCSS('ReviewListComponent.css'); 
+        $this->parsePage();       
     }
 
     private function getData()
