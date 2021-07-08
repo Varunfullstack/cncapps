@@ -196,6 +196,7 @@ class BUActivity extends Business
     const customerActivityFormFromDate     = 'fromDate';
     const customerActivityFormToDate       = 'toDate';
     const SalesOrderCreatedRequest         = 'SalesOrderCreatedRequest';
+    const KINGSWOOD_CUSTOMER_ID            = '6391';
 
 
     /** @var Template */
@@ -6855,6 +6856,39 @@ class BUActivity extends Business
         return $nextid;
     }
 
+    function processKingswoodAutomatedRequest(AutomatedRequest $automatedRequest)
+    {
+        // see if we have already a service request for this
+        $emailSubjectSummary = "Incident #{$automatedRequest->getServiceRequestID()}";
+        $dbeProblem = new DBEProblem($this);
+        $dbeProblem->getServiceRequestForCustomerByEmailSubjectMatch(
+            $automatedRequest->getCustomerID(),
+            $emailSubjectSummary
+        );
+        if ($dbeProblem->rowCount()) {
+            $dbeProblem->fetchNext();
+            // what happens if the status is C ??????? we can't have more than one service request with the same emailSubjectSummary ...
+        }
+        $contactName = $automatedRequest->getSenderEmailAddress();
+        $dbeContact  = new DBEContact($this);
+        $dbeContact->getCustomerRowsByNameMatch(self::KINGSWOOD_CUSTOMER_ID, $contactName);
+        if (!$dbeContact->rowCount()) {
+            // we couldn't find an active contact for the request, add it as customer raised
+            return $this->addCustomerRaisedRequest(
+                $automatedRequest,
+                null,
+                null,
+                "Kingswood HEAT #{$automatedRequest->getServiceRequestID()}"
+            );
+        }
+        if ($dbeContact->getValue(DBEContact::supportLevel) === DBEContact::supportLevelFurlough) {
+            $dbeContact->unfurlough();
+            $dbeContact->updateRow();
+        }
+
+
+    }
+
     /**
      * @param AutomatedRequest $automatedRequest
      * @return bool|mixed
@@ -6877,6 +6911,9 @@ class BUActivity extends Business
                 null,
                 $prependMessage
             );
+        }
+        if ($automatedRequest->getCustomerID() === self::KINGSWOOD_CUSTOMER_ID) {
+            return $this->processKingsWoodAutomatedRequest($automatedRequest);
         }
         echo "<div>We do have a customer ID, we can continue: " . $automatedRequest->getCustomerID() . "</div>";
         if ($automatedRequest->getServiceRequestID()) {

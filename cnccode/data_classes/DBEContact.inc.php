@@ -382,6 +382,14 @@ class DBEContact extends DBCNCEntity
 
     }
 
+    function unfurlough()
+    {
+        $this->setValue(self::supportLevel, $this->getValue(self::pendingFurloughActionLevel));
+        $this->setValue(self::pendingFurloughAction, null);
+        $this->setValue(self::pendingFurloughActionDate, null);
+        $this->setValue(self::pendingFurloughActionLevel, null);
+    }
+
     /**
      * Delete Rows By CustomerID
      * @access public
