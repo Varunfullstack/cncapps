@@ -15,66 +15,159 @@ class ReviewListComponent extends MainComponent {
     constructor(props) {
         super(props);
         this.state = {
-            ...this.state,    
-            showSpinner:false ,
-            showModal:false,
-            reviews:[]   ,
-            mode:"new"   ,
-            data:{
-                id:'',
-                description:'',                 
-            }
+            ...this.state,
+            filter: {
+                limit: 100,
+                page: 1,
+                orderBy: 'customerName',
+                orderDir: 'asc',
+                q: '',
+                discontinued: false
+            },
+            reset: false,
+            items: [],
+            showSpinner: false,
+            showModal: false,
+            isNew: true,
+            data: {...this.getInitData()},
         };
     }
 
-    componentDidMount() {      
+    componentDidMount() {
         this.getData();
+        window.addEventListener('scroll', this.handleScroll, true);
     }
 
-    getData=()=>{
+    componentWillUnmount() {
+        window.removeEventListener('scroll', this.handleScroll);
+    }
+
+    getInitData() {
+        return {
+            customerName: '',
+            contactName: '',
+            contactEmail: '',
+            contactPhone: '',
+            leadStatus: '',
+            contactPhone: '',
+            reviewDate:'',
+            reviewTime:'',
+            latestUpdate:'',
+            reviewUserName:'',
+            customerId:'',
+        };
+    }
+
+    getData_old=()=>{
         this.api.getReviews().then(res=>{
-            if(res.state)
+            if(res.data)
             this.setState({reviews:res.data});
         });
+    }
+
+    getData = (noSpinner = false) => {
+        const {filter, reset, items} = this.state;
+        if (!noSpinner)
+            this.setState({showSpinner: true});
+        this.api.getReviews(filter.limit, filter.page, filter.orderBy, filter.orderDir, filter.q, filter.discontinued)
+            .then(res => {
+                if (!reset)
+                    this.setState({reviews: [...items, ...res.data], showSpinner: false});
+                else
+                    this.setState({reviews: res.data, showSpinner: false});
+
+            })
+    }
+
+    handleScroll = (event) => {
+        const {filter} = this.state;
+        let scrollTop = window.scrollY;
+        let docHeight = document.body.offsetHeight;
+        let winHeight = window.innerHeight;
+        let scrollPercent = scrollTop / (docHeight - winHeight);
+        let scrollPercentRounded = Math.round(scrollPercent * 100);
+        if (scrollPercentRounded > 70) {
+            if (this.scrollTimer) clearTimeout(this.scrollTimer);
+            this.scrollTimer = setTimeout(() => {
+                filter.page++;
+                this.setState({filter, reset: false}, () => this.getData(true));
+            }, 500);
+        }
     }
 
     getDataTable=()=>{
         const columns=[
             {
-               path: "description",
-               label: "",
+               path: "customerName",
+               label: "Customer",
                hdToolTip: "Name",
                hdClassName: "text-center",
-               icon: "fal fa-2x fa-text color-gray2 pointer",
                sortable: true,
-               //className: "text-center",                
-            },             
+               content:(review)=> <a href={`/CustomerCRM.php?action=displayEditForm&customerID=${review.customerId}`}>{ review.customerName }</a>             
+
+            }, 
             {
-                path: "edit",
-                label: "",
-                hdToolTip: "Edit",
+                path: "contactName",
+                label: "Contact",
+                hdToolTip: "Name",
                 hdClassName: "text-center",
-                icon: "fal fa-2x fa-edit color-gray2 pointer",
-                sortable: false,                
-                className: "text-center",   
-                content:(type)=> <i className="fal fa-2x fa-edit color-gray pointer" onClick={()=>this.showEditModal(type)}></i>,             
+                sortable: true,
              },
              {
-                path: "trash",
-                label: "",
-                hdToolTip: "Delete",
+                path: "contactEmail",
+                label: "Email",
+                hdToolTip: "Email",
                 hdClassName: "text-center",
-                icon: "fal fa-2x fa-trash-alt color-gray2 pointer",
-                sortable: false,                
-                className: "text-center",   
-                content:(type)=>type.canDelete? <i className="fal fa-2x fa-trash-alt color-gray pointer" onClick={()=>this.handleDelete(type)}></i>:null,             
+                sortable: true,
+             },
+             {
+                path: "contactPhone",
+                label: "Phone",
+                hdToolTip: "Phone",
+                hdClassName: "text-center",
+                sortable: true,
+             },
+             {
+                path: "leadStatus",
+                label: "Status",
+                hdToolTip: "status",
+                hdClassName: "text-center",
+                sortable: true,
+             },
+             {
+                path: "reviewDate",
+                label: "Date",
+                hdToolTip: "Date",
+                hdClassName: "text-center",
+                sortable: true,
+             }, 
+             {
+                path: "reviewTime",
+                label: "Time",
+                hdToolTip: "Time",
+                hdClassName: "text-center",
+                sortable: true,
+             },
+             {
+                path: "lastUpdate",
+                label: "Last Update",
+                hdToolTip: "Last Update",
+                hdClassName: "text-center",
+                sortable: true,
+             },
+             {
+                path: "reviewUserName",
+                label: "User",
+                hdToolTip: "User",
+                hdClassName: "text-center",
+                sortable: true,
              }
         ];
     
         return <Table           
-        style={{width:500,marginTop:20}}
-        key="leadStatus"
-        pk="id"
+        style={{marginTop:20}}
+        key="reviews"
+        pk="customerId"
         columns={columns}
         data={this.state.reviews||[]}
         search={true}
@@ -157,7 +250,6 @@ class ReviewListComponent extends MainComponent {
         }
     }
     render() { 
-        return 'test';       
         return <div>
             <Spinner show={this.state.showSpinner}></Spinner>
             <ToolTip title="New Review" width={30}>
