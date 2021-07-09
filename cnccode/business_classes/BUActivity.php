@@ -6905,9 +6905,10 @@ class BUActivity extends Business
         }
 
         if ($dbeContact->getValue(DBEContact::supportLevel) === DBEContact::supportLevelFurlough) {
-
-            $dbeContact->unfurlough();
-            $dbeContact->updateRow();
+            $toUpdate = new DBEContact($this);
+            $toUpdate->getRow($dbeContact->getValue(DBEContact::contactID));
+            $toUpdate->unfurlough();
+            $toUpdate->updateRow();
         }
         return $this->raiseKingswoodRequest($automatedRequest, $dbeContact, $emailSubjectSummary);
 
