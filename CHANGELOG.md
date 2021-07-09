@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.13.7] - 2021-07-09
+### Fixed
+- Fix issue with automated request import to customer problem.
+
 ## [v5.13.6] - 2021-07-06
 ### Changed
 - Change start and expiry fields in contractReport to reflect the installDate and the expiry date shown when editing the contract
