@@ -6903,6 +6903,8 @@ class BUActivity extends Business
                 "Kingswood HEAT #{$automatedRequest->getServiceRequestID()}"
             );
         }
+        var_dump($dbeContact->getRowAsAssocArray());
+        exit;
         if ($dbeContact->getValue(DBEContact::supportLevel) === DBEContact::supportLevelFurlough) {
 
             $dbeContact->unfurlough();
@@ -6914,17 +6916,17 @@ class BUActivity extends Business
 
     function raiseKingswoodRequest(AutomatedRequest $automatedRequest, DBEContact $contact, string $emailSubjectSummary)
     {
-        $customerID       = $record->getCustomerID();
+
+        $customerID       = $automatedRequest->getCustomerID();
         $dbeProblem       = new DBEProblem($this);
-        $dbeContact       = new DBEContact($this);
         $forceHidden      = false;
-        $supportLevel     = $dbeContact->getValue(DBEContact::supportLevel);
+        $supportLevel     = $contact->getValue(DBEContact::supportLevel);
         $slaResponseHours = $this->getSlaResponseHours(
-            $record->getPriority(),
+            $automatedRequest->getPriority(),
             $customerID,
-            $dbeContact->getValue(DBEContact::contactID)
+            $contact->getValue(DBEContact::contactID)
         );
-        $siteNo           = $dbeContact->getValue(DBEContact::siteNo);
+        $siteNo           = $contact->getValue(DBEContact::siteNo);
         $dbeProblem->setValue(
             DBEProblem::hdLimitMinutes,
             $this->dsHeader->getValue(DBEHeader::hdTeamLimitMinutes)
@@ -6956,7 +6958,7 @@ class BUActivity extends Business
         );
         $dbeProblem->setValue(
             DBEProblem::priority,
-            $record->getPriority()
+            $automatedRequest->getPriority()
         );
         $dbeProblem->setValue(
             DBEProblem::dateRaised,
@@ -6964,13 +6966,13 @@ class BUActivity extends Business
         ); // default
         $dbeProblem->setValue(
             DBEProblem::contactID,
-            $dbeContact->getValue(DBEContact::contactID)
+            $contact->getValue(DBEContact::contactID)
         );
         $dbeProblem->setValue(
             DBEJProblem::hideFromCustomerFlag,
             'Y'
         );
-        $raisedDateTime = new DateTime($record->getCreateDateTime());
+        $raisedDateTime = new DateTime($automatedRequest->getCreateDateTime());
         $queueNo = 1;
         $dbeProblem->setValue(
             DBEJProblem::queueNo,
@@ -6978,19 +6980,19 @@ class BUActivity extends Business
         );
         $dbeProblem->setValue(
             DBEJProblem::monitorName,
-            $record->getMonitorName()
+            $automatedRequest->getMonitorName()
         );
         $dbeProblem->setValue(
             DBEJProblem::monitorAgentName,
-            $record->getMonitorAgentName()
+            $automatedRequest->getMonitorAgentName()
         );
         $dbeProblem->setValue(
             DBEJProblem::rootCauseID,
-            $record->getRootCauseID()
+            $automatedRequest->getRootCauseID()
         );
         $dbeProblem->setValue(
             DBEJProblem::contractCustomerItemID,
-            $record->getContractCustomerItemID()
+            $automatedRequest->getContractCustomerItemID()
         );
         $dbeProblem->setValue(
             DBEJProblem::userID,
@@ -7013,7 +7015,7 @@ class BUActivity extends Business
         );
         $dbeCallActivity->setValue(
             DBEJCallActivity::contactID,
-            $dbeContact->getValue(DBEContact::contactID)
+            $contact->getValue(DBEContact::contactID)
         );
         $dbeCallActivity->setValue(
             DBEJCallActivity::callActTypeID,
@@ -7038,10 +7040,10 @@ class BUActivity extends Business
         );
         $dbeCallActivity->setValue(
             DBEJCallActivity::serverGuard,
-            $record->getServerGuardFlag()
+            $automatedRequest->getServerGuardFlag()
         );
-        $details = $record->getSubjectLine() . " ";
-        $details .= $record->getTextBody();
+        $details = $automatedRequest->getSubjectLine() . " ";
+        $details .= $automatedRequest->getTextBody();
         $dbeCallActivity->setValue(
             DBEJCallActivity::reason,
             Controller::formatForHTML($details)

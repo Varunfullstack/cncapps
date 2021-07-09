@@ -548,7 +548,10 @@ class DBEContact extends DBCNCEntity
             ) . "%'" . " OR " . $this->getDBColumnName(self::firstName) . " LIKE '%" . mysqli_real_escape_string(
                 $this->db->link_id(),
                 $match
-            ) . "%')" . " AND " . $this->getDBColumnName(
+            ) . "%'" . " or concat(".$this->getDBColumnName(self::firstName).",' ', ".$this->getDBColumnName(self::lastName).") like '%" . mysqli_real_escape_string(
+                $this->db->link_id(),
+                $match
+            ) . "%') AND " . $this->getDBColumnName(
                 self::discontinuedFlag
             ) . " <> 'Y'" . " AND " . $this->getDBColumnName(self::customerID) . " = " . $this->getFormattedValue(
                 self::customerID
