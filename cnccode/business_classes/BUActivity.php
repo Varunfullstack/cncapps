@@ -7078,7 +7078,7 @@ class BUActivity extends Business
             ],
             [
                 "type"  => "s",
-                "value" => substr($record->getSubjectLine(), 0, 50)
+                "value" => substr($record->getSubjectLine(), 0, 49)
             ]
         ];
         $db->preparedQuery(
