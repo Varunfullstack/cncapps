@@ -25,7 +25,7 @@ class ReviewListComponent extends MainComponent {
                 discontinued: false
             },
             reset: false,
-            items: [],
+            reviews: [],
             showSpinner: false,
             showModal: false,
             isNew: true,
@@ -66,13 +66,13 @@ class ReviewListComponent extends MainComponent {
     }
 
     getData = (noSpinner = false) => {
-        const {filter, reset, items} = this.state;
+        const {filter, reset, reviews} = this.state;
         if (!noSpinner)
             this.setState({showSpinner: true});
         this.api.getReviews(filter.limit, filter.page, filter.orderBy, filter.orderDir, filter.q, filter.discontinued)
             .then(res => {
                 if (!reset)
-                    this.setState({reviews: [...items, ...res.data], showSpinner: false});
+                    this.setState({reviews: [...reviews, ...res.data], showSpinner: false});
                 else
                     this.setState({reviews: res.data, showSpinner: false});
 
@@ -119,6 +119,7 @@ class ReviewListComponent extends MainComponent {
                 hdToolTip: "Email",
                 hdClassName: "text-center",
                 sortable: true,
+                content:(review)=> <a href={`mailto:${review.contactEmail}`}>{ review.contactEmail }</a>
              },
              {
                 path: "contactPhone",
@@ -126,6 +127,7 @@ class ReviewListComponent extends MainComponent {
                 hdToolTip: "Phone",
                 hdClassName: "text-center",
                 sortable: true,
+                content:(review)=> <a href={`tel:${review.contactPhone}`}>{ review.contactPhone }</a>             
              },
              {
                 path: "leadStatus",
@@ -136,10 +138,11 @@ class ReviewListComponent extends MainComponent {
              },
              {
                 path: "reviewDate",
-                label: "Date",
-                hdToolTip: "Date",
+                label: "IT Review Date",
+                hdToolTip: "IT Review Date",
                 hdClassName: "text-center",
                 sortable: true,
+                content:(review)=> this.getCorrectDate(review.reviewDate) 
              }, 
              {
                 path: "reviewTime",
@@ -252,9 +255,6 @@ class ReviewListComponent extends MainComponent {
     render() { 
         return <div>
             <Spinner show={this.state.showSpinner}></Spinner>
-            <ToolTip title="New Review" width={30}>
-                <i className="fal fa-2x fa-plus color-gray1 pointer" onClick={this.handleNewReview}></i>
-            </ToolTip>
             {this.getConfirm()}
             {this.getAlert()}
             {this.getModalElement()}
