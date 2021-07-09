@@ -6893,8 +6893,8 @@ class BUActivity extends Business
         }
         $contactName = $automatedRequest->getSenderEmailAddress();
         $dbeContact  = new DBEContact($this);
-        $dbeContact->getCustomerRowsByNameMatch(self::KINGSWOOD_CUSTOMER_ID, $contactName);
-        if (!$dbeContact->rowCount()) {
+        $dbeContact->getCustomerRowsByContactFullNameMatch(self::KINGSWOOD_CUSTOMER_ID, $contactName);
+        if (!$dbeContact->fetchNext()) {
             // we couldn't find an active contact for the request, add it as customer raised
             return $this->addCustomerRaisedRequest(
                 $automatedRequest,
@@ -6903,8 +6903,7 @@ class BUActivity extends Business
                 "Kingswood HEAT #{$automatedRequest->getServiceRequestID()}"
             );
         }
-        var_dump($dbeContact->getRowAsAssocArray());
-        exit;
+
         if ($dbeContact->getValue(DBEContact::supportLevel) === DBEContact::supportLevelFurlough) {
 
             $dbeContact->unfurlough();
@@ -7087,7 +7086,7 @@ class BUActivity extends Business
                 $prependMessage
             );
         }
-        if ($automatedRequest->getCustomerID() === self::KINGSWOOD_CUSTOMER_ID) {
+        if ($automatedRequest->getCustomerID() == self::KINGSWOOD_CUSTOMER_ID) {
             return $this->processKingsWoodAutomatedRequest($automatedRequest);
         }
         echo "<div>We do have a customer ID, we can continue: " . $automatedRequest->getCustomerID() . "</div>";
