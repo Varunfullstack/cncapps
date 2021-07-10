@@ -3180,8 +3180,13 @@ ORDER BY NAME,
                             "lastContractSent"             => $dbeCustomer->getValue(DBECustomer::lastContractSent),
                             "statementContactId"           => $dbeCustomer->getValue(DBECustomer::statementContactId),
                             "inclusiveOOHCallOuts"         => $dbeCustomer->getValue(DBECustomer::inclusiveOOHCallOuts),
-                            "eligiblePatchManagement"     => $dbeCustomer->getValue(DBECustomer::eligiblePatchManagement ),
+                            "eligiblePatchManagement"      => $dbeCustomer->getValue(DBECustomer::eligiblePatchManagement ),
                             "excludeFromWebrootChecks"     => $dbeCustomer->getValue(DBECustomer::excludeFromWebrootChecks),  
+                            "inviteSent"                   => $dbeCustomer->getValue(DBECustomer::inviteSent),  
+                            "reportProcessed"              => $dbeCustomer->getValue(DBECustomer::reportProcessed),  
+                            "reportSent"                   => $dbeCustomer->getValue(DBECustomer::reportSent),  
+                            "rating"                       => $dbeCustomer->getValue(DBECustomer::rating),  
+                            "meeting_datetime"             => $dbeCustomer->getValue(DBECustomer::meetingDateTime),  
                         ]
                     ]
                 );

@@ -112,12 +112,18 @@ class APICustomers extends APIMain {
         .then(res => res.json())
         ;
     }
+
     getLetters(){
         return this.get(`${ApiUrls.Customer}letters`)
     }
+
     removeSupportAndRefer(customerID){
         return this.get(`${ApiUrls.Customer}removeSupportAndRefer&customerID=${customerID}`);
 
+    }
+
+    getLeadStatuses(){
+        return this.get(`${ApiUrls.Customer}getLeadStatuses`)
     }
 }
 

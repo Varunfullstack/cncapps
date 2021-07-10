@@ -8,6 +8,7 @@ import PortalCustomerDocumentsComponent from "./PortalCustomerDocumentsComponent
 import CustomerSitesComponent from "./CustomerSitesComponent";
 import CustomerContactsComponent from "./CustomerContactsComponent";
 import CustomerOrdersComponent from "./CustomerOrdersComponent";
+import CustomerCRMComponent from "./CustomerCRMComponent";
 
 //import configureStore from "./configureStore";
 /*
@@ -42,7 +43,7 @@ class CustomerEditComponent extends MainComponent {
             customerId:null,
             loaded: true,
             filter: {                
-                activeTab: this.TAB_CONTACTS,                 
+                activeTab: this.TAB_CRM,                 
             },
         }
         this.tabs = [
@@ -98,7 +99,8 @@ class CustomerEditComponent extends MainComponent {
           case this.TAB_CONTACTS:
             return <CustomerContactsComponent customerId={customerId}></CustomerContactsComponent>;
           case this.TAB_CRM:
-            return <label>CRM</label>;
+            //return <label>CRM</label>;
+            return   <CustomerCRMComponent customerId={customerId}/>;
           case this.TAB_ORDERS:
             return   <CustomerOrdersComponent customerId={customerId}/>;
           case this.TAB_PORTAL_DOCUMENT:
