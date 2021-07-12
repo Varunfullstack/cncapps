@@ -72,6 +72,8 @@ export default class CustomerCRMComponent extends MainComponent {
 
   handleSave=()=>{
     const {data}=this.state;
+    console.log(data);
+
     this.api.updateCustomer(data).then(res=>{
         if(res.status)
         {
@@ -85,7 +87,6 @@ export default class CustomerCRMComponent extends MainComponent {
         console.log(error);
         this.alert("Data not saved successfully");
     })
-    console.log(data);
   }
 
   getCustomerData=()=>{
@@ -96,6 +97,7 @@ export default class CustomerCRMComponent extends MainComponent {
         this.alert("Error in get customer data");
         console.log(error);
     });
+  }
     
   getLeadInformationCard=()=>{       
     const { data } = this.state; 
@@ -252,41 +254,17 @@ export default class CustomerCRMComponent extends MainComponent {
     </div>
     }
 
-  getOpportunityDealCard=()=>{   
-        CKEditor.editorUrl = '/ckeditor/ckeditor.js'
-
-        const ckeditorConfig = {
-            contentsCss: '/screen.css',
-            toolbarStartupExpanded: false,
-            disableNativeSpellChecker: false,
-            toolbar: 'CNCToolbar',
-            toolbar_CNCToolbar:
-                [
-                    ['Source', '-', '-', 'Bold', 'Italic', 'Underline', 'Strike', 'TextColor', 'BGColor'],
-                    ['NumberedList', 'BulletedList'],
-                    ['Table'],
-                    ['Format', 'Font', 'FontSize'],
-                    ['Anchor', 'Link'],
-                    ['Undo', 'Redo']
-                ],
-            extraPlugins: 'font,wordcount',
-            fontSize_sizes: '8/8pt;9/9pt;10/10pt;11/11pt;12/12pt;14/14pt;16/16pt;18/18pt;20/20pt;22/22pt;24/24pt;26/26pt;28/28pt;36/36pt;48/48pt;72/72pt',
-            wordcount: {
-                showParagraphs: false,
-                showCharCount: true,
-            },
-        };
-            
+  getOpportunityDealCard=()=>{
         const { data } = this.state;
         return <div className="card m-5">
         <div className="card-header">
             <h3>Opportunity Deal</h3>
         </div>
         <div className="card-body">
-            <CKEditor config={ckeditorConfig}
+            <CKEditor  
             value={data.opportunity_deal || ""}
-            onChange={($event) =>
-                this.handleUpdateGenericField($event)
+            onChange={(value) =>
+            this.setValue("opportunity_deal",value)
             }
             />
         </div>
