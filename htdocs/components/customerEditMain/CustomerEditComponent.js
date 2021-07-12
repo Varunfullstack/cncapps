@@ -9,6 +9,7 @@ import CustomerSitesComponent from "./CustomerSitesComponent";
 import CustomerContactsComponent from "./CustomerContactsComponent";
 import CustomerOrdersComponent from "./CustomerOrdersComponent";
 import CustomerCRMComponent from "./CustomerCRMComponent";
+import CustomerNotesComponent from "./CustomerNotesComponent";
 
 //import configureStore from "./configureStore";
 /*
@@ -36,6 +37,7 @@ class CustomerEditComponent extends MainComponent {
     TAB_ORDERS='orders';
     TAB_CONTACTS='contacts';
     TAB_CRM='crm';
+    TAB_NOTES='notes';
 
     constructor(props) {
         super(props);
@@ -54,6 +56,7 @@ class CustomerEditComponent extends MainComponent {
             {id: this.TAB_ORDERS, title: "Orders", icon: null},
             {id: this.TAB_CONTACTS, title: "contacts", icon: null},
             {id: this.TAB_CRM, title: "CRM", icon: null},            
+            {id: this.TAB_NOTES, title: "Notes", icon: null},            
         ];
        // store.dispatch(fetchAllData(customerId));
     }
@@ -109,6 +112,8 @@ class CustomerEditComponent extends MainComponent {
             return <CustomerProjectsComponent customerId={customerId}></CustomerProjectsComponent>;
           case this.TAB_SITES:
             return <CustomerSitesComponent customerId={customerId}></CustomerSitesComponent>;
+          case this.TAB_NOTES:
+            return <CustomerNotesComponent customerId={customerId}></CustomerNotesComponent>;
         }
     }
     getActions=()=>{
