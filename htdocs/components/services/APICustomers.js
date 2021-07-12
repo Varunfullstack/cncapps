@@ -125,6 +125,10 @@ class APICustomers extends APIMain {
     getLeadStatuses(){
         return this.get(`${ApiUrls.Customer}getLeadStatuses`)
     }
+    updateCRM(body)
+    {
+        return this.post(`${ApiUrls.Customer}CRM`,body,true);
+    }
 }
 
 export default APICustomers;

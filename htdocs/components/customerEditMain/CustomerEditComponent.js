@@ -113,8 +113,8 @@ class CustomerEditComponent extends MainComponent {
     }
     getActions=()=>{
         return <div>
-            <a className="m-3" target="_blank" href={`RenewalReport.php?action=produceReport&customerID=${this.state.customerId}`}>Renewal Information</a>
-            <a className="m-3" target="_blank" href={`ThirdPartyContact.php?action=list&customerID=${this.state.customerId}`}>Third Party Contacts</a>
+            <a className="m-3" target="_blank" rel="noreferrer"  href={`RenewalReport.php?action=produceReport&customerID=${this.state.customerId}`}>Renewal Information</a>
+            <a className="m-3" target="_blank" rel="noreferrer"  href={`ThirdPartyContact.php?action=list&customerID=${this.state.customerId}`}>Third Party Contacts</a>
         </div>
     }
     render() {

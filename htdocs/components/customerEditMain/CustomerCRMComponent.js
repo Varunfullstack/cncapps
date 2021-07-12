@@ -2,13 +2,9 @@ import React from "react";
 import { params } from "../utils/utils";
 import APICustomers from "../services/APICustomers";
 import MainComponent from "../shared/MainComponent";
-import Table from "../shared/table/table";
-import ToolTip from "../shared/ToolTip";
 import Spinner from "../shared/Spinner/Spinner";
-import Modal from "../shared/Modal/modal.js";
 import Toggle from "../shared/Toggle";
-import { Fragment } from "react";
-import CKEditor from "ckeditor4-react";
+import CNCCKEditor from "../shared/CNCCKEditor";
 
 export default class CustomerCRMComponent extends MainComponent {
   api = new APICustomers();
@@ -60,7 +56,7 @@ export default class CustomerCRMComponent extends MainComponent {
       reportProcessed: "",
       reportSent: "",
       rating: "",
-      opportunity_deal: "",
+      opportunityDeal: "",
     };
   }
 
@@ -74,15 +70,14 @@ export default class CustomerCRMComponent extends MainComponent {
     const {data}=this.state;
     console.log(data);
 
-    this.api.updateCustomer(data).then(res=>{
+    this.api.updateCRM(data).then(res=>{
         if(res.status)
         {
             this.alert("Data saved successfully");
             this.getCustomerData();
         }
         else
-        this.alert("Data not saved successfully");
-
+            this.alert("Data not saved successfully");
     },error=>{
         console.log(error);
         this.alert("Data not saved successfully");
@@ -149,7 +144,7 @@ export default class CustomerCRMComponent extends MainComponent {
                 </tr>
                 <tr>
                     <td>
-                        <label >Meeting Confirmed</label>
+                        Meeting Confirmed
                     </td>
                    <td>
                    <input
@@ -167,9 +162,8 @@ export default class CustomerCRMComponent extends MainComponent {
                     </td>
                 </tr>
                 <tr>
-                    <td>
-                        <label>
-                        Meeting Date</label>
+                    <td> 
+                        Meeting Date 
                     </td>
                     <td>
                    <input
@@ -260,13 +254,17 @@ export default class CustomerCRMComponent extends MainComponent {
         <div className="card-header">
             <h3>Opportunity Deal</h3>
         </div>
-        <div className="card-body">
-            <CKEditor  
-            value={data.opportunity_deal || ""}
+        <div className="card-body"  >
+            <CNCCKEditor
+            width={900}
+            height={180}
+            value={data.opportunityDeal  }
             onChange={(value) =>
-            this.setValue("opportunity_deal",value)
-            }
-            />
+                this.setValue("opportunityDeal",value)
+                }
+            >
+            </CNCCKEditor>
+           
         </div>
     </div>
   }

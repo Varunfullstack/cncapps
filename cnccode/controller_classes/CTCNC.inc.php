@@ -1284,4 +1284,12 @@ class CTCNC extends Controller
         return new APIException($code, $message);
 
     }
+    /**
+     * return response of json
+     */
+    public function response($data)
+    {
+        return json_encode($data,JSON_NUMERIC_CHECK);
+
+    }
 }

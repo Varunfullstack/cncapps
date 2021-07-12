@@ -12,6 +12,7 @@ use CNCLTD\Business\BUActivity;
 use CNCLTD\Data\DBConnect;
 use CNCLTD\Data\DBEJProblem;
 use CNCLTD\Encryption;
+use CNCLTD\Exceptions\APIException;
 use CNCLTD\SupportedCustomerAssets\UnsupportedCustomerAssetService;
 use CNCLTD\Utils;
 
@@ -820,6 +821,16 @@ class CTCustomer extends CTCNC
                 exit;
             case "letters":
                 echo json_encode($this->getCustomeLetters(),JSON_NUMERIC_CHECK);
+                exit;
+            case "CRM":
+                switch ($this->requestMethod) {
+                    case 'POST':
+                        echo $this->response($this->updateCRM());                        
+                        break;                    
+                    default:
+                        # code...
+                        break;
+                }
                 exit;
             default:
                 $this->displaySearchForm();
@@ -3649,5 +3660,25 @@ ORDER BY NAME,
         }
         return $this->success( $customLetterTemplates);
     }
-
+    /*
+    update customer CRM Info
+    */
+    function updateCRM(){
+        $body=$this->getBody();
+        $dbeCustomer=new DBECustomer($this);
+        $dbeCustomer->getRow($body->customerID);
+        if(!$dbeCustomer->rowCount())
+            return $this->fail(APIException::notFound,"Customer Not Found");
+        $dbeCustomer->setValue(DBECustomer::leadStatusId,$body->leadStatusId);
+        $dbeCustomer->setValue(DBECustomer::mailshotFlag,$body->mailshotFlag);
+        $dbeCustomer->setValue(DBECustomer::dateMeetingConfirmed,$body->dateMeetingConfirmed);
+        $dbeCustomer->setValue(DBECustomer::meetingDateTime,$body->meeting_datetime);
+        $dbeCustomer->setValue(DBECustomer::inviteSent,$body->inviteSent);
+        $dbeCustomer->setValue(DBECustomer::reportProcessed,$body->reportProcessed);
+        $dbeCustomer->setValue(DBECustomer::reportSent,$body->reportSent);
+        $dbeCustomer->setValue(DBECustomer::rating,$body->rating);
+        $dbeCustomer->setValue(DBECustomer::opportunityDeal,$body->opportunityDeal);
+        $dbeCustomer->updateRow();
+        return $this->success( );
+    }
 }
