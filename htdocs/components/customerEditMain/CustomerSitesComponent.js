@@ -222,10 +222,11 @@ export default class CustomerSitesComponent extends MainComponent {
         content={this.getModalContent()}
         footer={
           <div key="footer">
-            <button onClick={this.handleClose} className="btn btn-secodary">
+          
+            <button onClick={this.handleSave}>Save</button>
+            <button onClick={this.handleClose} >
               Cancel
             </button>
-            <button onClick={this.handleSave}>Save</button>
           </div>
         }
         onClose={this.handleClose}
@@ -291,10 +292,9 @@ export default class CustomerSitesComponent extends MainComponent {
               </td>
             </tr>
             <tr>
-              <td className="text-right">Country</td>
+              <td className="text-right">County</td>
               <td>
-                <input
-                  required
+                <input                   
                   value={data.county || ""}
                   onChange={(event) =>
                     this.setValue("county", event.target.value)

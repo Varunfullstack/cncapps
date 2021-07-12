@@ -429,12 +429,12 @@ export default class CustomerContactsComponent extends MainComponent {
               </td>
             </tr>
             <tr>
-              <td className="text-right">Failed Logins</td>
+              <td className="text-right">Linkedin</td>
               <td>
                 <input
-                  value={data.failedLoginCount || ""}
+                  value={data.linkedInURL || ""}
                   onChange={(event) =>
-                    this.setValue("failedLoginCount", event.target.value)
+                    this.setValue("linkedInURL", event.target.value)
                   }
                   className="form-control"
                 />
@@ -451,16 +451,6 @@ export default class CustomerContactsComponent extends MainComponent {
               </td>
             </tr>
             <tr>
-              <td className="text-right">Linkedin</td>
-              <td>
-                <input
-                  value={data.linkedInURL || ""}
-                  onChange={(event) =>
-                    this.setValue("linkedInURL", event.target.value)
-                  }
-                  className="form-control"
-                />
-              </td>
               <td className="text-right"> Pending Leaver Date</td>
               <td>
                 <input
@@ -472,8 +462,6 @@ export default class CustomerContactsComponent extends MainComponent {
                   className="form-control"
                 />
               </td>
-            </tr>
-            <tr>
               <td className="text-right">Support Level</td>
               <td>
                 <select
@@ -493,69 +481,45 @@ export default class CustomerContactsComponent extends MainComponent {
                   })}
                 </select>
               </td>
-              {data.id?<Fragment>
-              <td className="text-right">Letter</td>
-              <td>
-                  <select className="form-control" onChange={(event)=>window.open(event.target.value,"_blank")}>
-                      <option>Send Letter</option>
-                      {this.state.letters.map(l=><option value={`LetterForm.php?contactID=${data.id}&letterTemplate=${l}`}>{l}</option>)}
-                  </select>
-              </td></Fragment>:null
-              }
             </tr>
             <tr>
-              <td className="text-right">Initial Logging?</td>
-              <td>
-                <Toggle
-                  checked={data.initialLoggingEmail === 1}
-                  onChange={() =>
-                    this.setValue(
-                      "initialLoggingEmail",
-                      data.initialLoggingEmail === 1 ? 0 : 1
-                    )
-                  }
-                ></Toggle>
-              </td>              
-              {this.getYNFlag("Others Initial Logging","othersInitialLoggingEmailFlag")}
+              {this.getYNFlag(
+                "Special Attention",
+                "specialAttentionContactFlag"
+              )}
+              {this.getYNFlag("Company Information Reports", "mailshot9Flag")}
             </tr>
             <tr>
-             
-              {this.getYNFlag("Fixed?","fixedEmailFlag")}
-              {this.getYNFlag("Others Fixed?","othersFixedEmailFlag")}
-
-            </tr>
-            <tr>               
-              {this.getYNFlag("Inv","mailshot2Flag")}
-              {this.getYNFlag("News","mailshot3Flag")}
-
-            </tr>
-            <tr>               
-              {this.getYNFlag("Active","activeFlag")}
-              {this.getYNFlag("HR","hrUser")}
-
-            </tr>
-            <tr>               
-              {this.getYNFlag("Review","reviewUser")}
-              {this.getYNFlag("Top","mailshot8Flag")}
-
-            </tr>
-            <tr>              
-              {this.getYNFlag("SR Rep","mailshot11Flag")}
-              {this.getYNFlag("Rep","mailshot9Flag")}
-
-            </tr>
-            <tr>               
-              {this.getYNFlag("Pending Leaver","pendingLeaverFlag")}
-              {this.getYNFlag("Special Attention","specialAttentionContactFlag")}              
+              {this.getYNFlag("Daily SR Reports", "mailshot11Flag")}
+              {this.getYNFlag("Newsletter", "mailshot3Flag")}
             </tr>
             <tr>
-                {this.getYNFlag("Accounts","accountsFlag")}
-                {this.getYNFlag("stm","mailshot4Flag")}
+              {this.getYNFlag(
+                "Send Others Initial Logging Email?",
+                "othersInitialLoggingEmailFlag"
+              )}
+              {this.getYNFlag("Mailshot", "sendMailshotFlag")}
             </tr>
             <tr>
-                {this.getYNFlag("Mailshot","sendMailshotFlag")}                
+              {this.getYNFlag(
+                "Send Others Fixed Email?",
+                "othersFixedEmailFlag"
+              )}
+              {this.getYNFlag("Accounts", "accountsFlag")}
             </tr>
-            
+            <tr>
+              {this.getYNFlag("Pending Leaver", "pendingLeaverFlag")}
+              {this.getYNFlag("PrePay TopUp Notifications", "mailshot8Flag")}
+            </tr>
+            <tr>
+              {this.getYNFlag("Active", "activeFlag")}
+              {this.getYNFlag("Receive Invoices", "mailshot2Flag")}
+            </tr>
+            <tr>
+              {this.getYNFlag("Attends Review Meeting", "reviewUser")}
+              {this.getYNFlag("Receive Statements", "mailshot4Flag")}
+            </tr>
+            <tr>{this.getYNFlag("HR User to edit contacts", "hrUser")}</tr>
           </tbody>
         </table>
       </div>
@@ -579,7 +543,7 @@ export default class CustomerContactsComponent extends MainComponent {
     const { filter } = this.state;
     return (
       <div className="flex-row flex-center" style={{ marginTop: -30 }}>
-        <label className="mr-3">Show InActive</label>
+        <label className="mr-3">Show Inactive</label>
         <Toggle
           checked={filter.showInActive}
           onChange={() =>

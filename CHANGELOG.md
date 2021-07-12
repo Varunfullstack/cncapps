@@ -7,6 +7,7 @@ This project changes will be shown here.
 - Issue 913 - Customer Page Main Section Rewrite
 - Issue 914 - Customer Page Customer Notes, Projects, Portal Documents Rewrite
 - Issue 915 - Customer Page Sites Rewrite
+- Issue 916 - Customer Page  Rewrite
 
 ## [v5.13.1] - 2021-06-11
 ### Fixed

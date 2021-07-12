@@ -28,6 +28,7 @@ import ContactsComponent from "./contacts/ContactsComponent";
 //const store = configureStore();
 import './../style.css';
 import { params } from "../utils/utils";
+import ToolTip from "../shared/ToolTip";
 class CustomerEditComponent extends MainComponent {
     tabs = [];
     TAB_CUSTOMER='customer';    
@@ -45,18 +46,18 @@ class CustomerEditComponent extends MainComponent {
             customerId:null,
             loaded: true,
             filter: {                
-                activeTab: this.TAB_CRM,                 
+                activeTab: this.TAB_CUSTOMER,                 
             },
         }
         this.tabs = [
             {id: this.TAB_CUSTOMER, title: "Customer", icon: null},
+            {id: this.TAB_CONTACTS, title: "Contacts", icon: null},
+            {id: this.TAB_SITES, title: "Sites", icon: null},
             {id: this.TAB_PROJECTS, title: "Projects", icon: null},
             {id: this.TAB_PORTAL_DOCUMENT, title: "Portal Documents", icon: null},
-            {id: this.TAB_SITES, title: "Sites", icon: null},
-            {id: this.TAB_ORDERS, title: "Orders", icon: null},
-            {id: this.TAB_CONTACTS, title: "contacts", icon: null},
-            {id: this.TAB_CRM, title: "CRM", icon: null},            
-            {id: this.TAB_NOTES, title: "Notes", icon: null},            
+            {id: this.TAB_CRM, title: "CRM", icon: null},      
+            {id: this.TAB_NOTES, title: "Notes", icon: null},    
+            {id: this.TAB_ORDERS, title: "Orders", icon: null},         
         ];
        // store.dispatch(fetchAllData(customerId));
     }
@@ -117,10 +118,14 @@ class CustomerEditComponent extends MainComponent {
         }
     }
     getActions=()=>{
-        return <div>
-            <a className="m-3" target="_blank" rel="noreferrer"  href={`RenewalReport.php?action=produceReport&customerID=${this.state.customerId}`}>Renewal Information</a>
-            <a className="m-3" target="_blank" rel="noreferrer"  href={`ThirdPartyContact.php?action=list&customerID=${this.state.customerId}`}>Third Party Contacts</a>
-        </div>
+        return <div className="flex-row">
+            <ToolTip title="Renewal Information" width={35}>
+            <i className="fal fa-tasks fa-2x m-5 pointer icon" onClick={()=>window.open(`RenewalReport.php?action=produceReport&customerID=${this.state.customerId}`,"_blank")}></i>
+            </ToolTip>
+            <ToolTip title="Third Party Contacts" width={35}>
+            <i className="fal fa-users fa-2x m-5 pointer icon" onClick={()=>window.open(`ThirdPartyContact.php?action=list&customerID=${this.state.customerId}`,"_blank")}></i>
+            </ToolTip>
+         </div>
     }
     render() {
         //const {customerId} = this.props;

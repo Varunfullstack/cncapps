@@ -129,6 +129,21 @@ class APICustomers extends APIMain {
     {
         return this.post(`${ApiUrls.Customer}CRM`,body,true);
     }
+    getCustomerReviewData(customerID){
+        return this.get(`${ApiUrls.Customer}getCustomerReviewData&&customerID=${customerID}`);
+    }
+    updateCustomerReviewData(data){
+        return this.post(`${ApiUrls.Customer}updateCustomerReview`,data,true);
+    }
+    getCustomerNotes(customerId){
+        return this.get(`${ApiUrls.CustomerNote}getCustomerNotes&customerId=${customerId}`);
+    }
+    deleteCustomerNote(noteId){
+        return this.delete(`${ApiUrls.CustomerNote}deleteNote&noteId=${noteId}`,true);
+    }
+    saveCustomerNote(body){
+        return this.postJson(`${ApiUrls.CustomerNote}updateNote`,body);
+    }
 }
 
 export default APICustomers;

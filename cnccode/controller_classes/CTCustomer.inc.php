@@ -3092,7 +3092,14 @@ ORDER BY NAME,
     
     //--------------------------------new
     function displayForm(){
-        $this->setPageTitle('Customer');
+        $customerName="";
+        if(@$_REQUEST["customerID"])
+        {
+            $dbeCustomer=new DBECustomer($this);
+            $dbeCustomer->getRow($_REQUEST["customerID"]);
+            $customerName=$dbeCustomer->getValue(DBECustomer::name);
+        }
+        $this->setPageTitle('Customer '.$customerName);
         $this->setTemplateFiles(
             'CustomerEdit',
             'CustomerEditSimple.inc'
