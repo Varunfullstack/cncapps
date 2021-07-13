@@ -6918,11 +6918,12 @@ class BUActivity extends Business
     {
 
         $customerID       = $automatedRequest->getCustomerID();
+        $priority = 3;
         $dbeProblem       = new DBEProblem($this);
         $forceHidden      = false;
         $supportLevel     = $contact->getValue(DBEContact::supportLevel);
         $slaResponseHours = $this->getSlaResponseHours(
-            $automatedRequest->getPriority(),
+            $priority,
             $customerID,
             $contact->getValue(DBEContact::contactID)
         );
@@ -6958,7 +6959,7 @@ class BUActivity extends Business
         );
         $dbeProblem->setValue(
             DBEProblem::priority,
-            3
+            $priority
         );
         $dbeProblem->setValue(
             DBEProblem::dateRaised,
