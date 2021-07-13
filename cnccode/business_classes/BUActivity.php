@@ -6958,7 +6958,7 @@ class BUActivity extends Business
         );
         $dbeProblem->setValue(
             DBEProblem::priority,
-            $automatedRequest->getPriority()
+            3
         );
         $dbeProblem->setValue(
             DBEProblem::dateRaised,
