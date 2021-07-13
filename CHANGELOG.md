@@ -9,6 +9,32 @@ This project changes will be shown here.
 - Issue 915 - Customer Page Sites Rewrite
 - Issue 916 - Customer Page  Rewrite
 
+## [v5.13.7] - 2021-07-09
+### Fixed
+- Fix issue with automated request import to customer problem.
+
+## [v5.13.6] - 2021-07-06
+### Changed
+- Change start and expiry fields in contractReport to reflect the installDate and the expiry date shown when editing the contract
+
+## [v5.13.5] - 2021-07-06
+### Changed
+- Add "Initial Contract Length" field to contractReport, with a dropdown filter that has "all" as default value, allow 
+  sorting by that column and also CSV export capabilities 
+
+## [v5.13.4] - 2021-07-05
+### Fixed
+- Fixed issue with direct debit.
+
+## [v5.13.3] - 2021-06-17
+### Fixed
+- Fixed issue with call back activities not having proper "status".
+
+## [v5.13.2] - 2021-06-17
+### Fixed
+- Fix hardcoded path in ContactImport.php
+- Fix issue with importing
+
 ## [v5.13.1] - 2021-06-11
 ### Fixed
 - Fixed issue with Supplier field outline in supplier selector react component.

@@ -1425,6 +1425,33 @@ class BUCustomer extends Business
     }
 
     /**
+     * Get next prospect to be reviewed
+     * @param DataSet $dsResults
+     * @return bool
+     */
+    function getNextReviewProspect(&$dsResults)
+    {
+        $this->dbeCustomer->getReviewProspectRow();
+        $this->getData(
+            $this->dbeCustomer,
+            $dsResults
+        );
+        $gotRow = $dsResults->fetchNext();
+        return $gotRow;
+    }
+
+    /**
+     * Count customers to be reviewed
+     *
+     * Based on the review date
+     *
+     */
+    function getReviewCount()
+    {
+        return $this->dbeCustomer->countReviewRows();
+    }
+
+    /**
      * @param $dsResults
      * @param bool $onlyCurrentCustomers
      * @return bool
@@ -1436,6 +1463,25 @@ class BUCustomer extends Business
             $this->dbeCustomer,
             $dsResults
         );
+    }
+
+    function hasDefaultInvoiceContactsAtAllSites($customerID)
+    {
+        $db          = new dbSweetcode (); // database connection for query
+        $dbeCustomer = new DBECustomer($this);
+        $dbeSite     = new DBESite($this);
+        $sql         = "SELECT COUNT(*) AS recCount
+			FROM {$dbeCustomer->getTableName()}
+				JOIN {$dbeSite->getTableName()} ON {$dbeCustomer->getDBColumnName(DBECustomer::customerID)} = {$dbeSite->getDBColumnName(DBESite::customerID)} AND {$dbeCustomer->getDBColumnName(DBECustomer::invoiceSiteNo)} = {$dbeSite->getDBColumnName(DBESite::siteNo)}
+			WHERE
+				{$dbeSite->getDBColumnName(DBESite::invoiceContactID)} = 0
+				AND {$dbeCustomer->getDBColumnName(DBECustomer::becameCustomerDate)} is not null and {$dbeCustomer->getDBColumnName(DBECustomer::droppedCustomerDate)} is null
+				AND {$dbeCustomer->getDBColumnName(DBECustomer::mailshotFlag)} = 'Y'
+				AND {$dbeCustomer->getDBColumnName(DBECustomer::customerID)} = " . $customerID;
+        $db->query($sql);
+        $db->next_record();
+        return $db->Record ['recCount'];
+
     }
 
     function getSpecialAttentionCustomers(&$dsResults)

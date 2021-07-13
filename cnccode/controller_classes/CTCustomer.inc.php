@@ -735,6 +735,9 @@ class CTCustomer extends CTCNC
             case 'createCustomerFolder':
                 $this->createCustomerFolder();
                 break;
+            case 'displayNextReviewProspect':
+                $this->displayNextReviewProspect();
+                break;
             case 'displayReviewList':
                 $this->displayReviewList();
                 break;
@@ -1055,6 +1058,34 @@ class CTCustomer extends CTCNC
             'customerID',
             $customerID
         );
+    }
+
+    /**
+     * Displays next prospect to review (if any)
+     *
+     * @throws Exception
+     */
+    function displayNextReviewProspect()
+    {
+        $this->setMethodName('displayNextReviewProspect');
+        $dsCustomer = new DataSet($this);
+        if ($this->buCustomer->getNextReviewProspect($dsCustomer)) {
+
+            $nextURL = Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action'     => CTCNC_ACT_DISP_EDIT,
+                    'customerID' => $dsCustomer->getValue(DBECustomer::customerID)
+                )
+            );
+            header('Location: ' . $nextURL);
+
+        } else {
+            echo "There are no more prospects to review - well done!";
+        }
+        exit;
+
+
     }
 
     /**
@@ -1647,6 +1678,7 @@ class CTCustomer extends CTCNC
                 'customerName'                            => $this->dsCustomer->getValue(DBECustomer::name),
                 'deliverSiteNo'                           => $this->dsCustomer->getValue(DBECustomer::deliverSiteNo),
                 'invoiceSiteNo'                           => $this->dsCustomer->getValue(DBECustomer::invoiceSiteNo),
+                'reviewCount'                             => $this->buCustomer->getReviewCount(),
                 'customerFolderLink'                      => $customerFolderLink,
                 'websiteURL'                              => $this->dsCustomer->getValue(DBECustomer::websiteURL),
                 'customerNameClass'                       => $this->dsCustomer->getValue(self::customerFormNameClass),
@@ -1740,6 +1772,19 @@ class CTCustomer extends CTCNC
                 'slaP3'                                   => $this->dsCustomer->getValue(DBECustomer::slaP3),
                 'slaP4'                                   => $this->dsCustomer->getValue(DBECustomer::slaP4),
                 'slaP5'                                   => $this->dsCustomer->getValue(DBECustomer::slaP5),
+                'slaP1PenaltiesAgreedChecked'             => $this->dsCustomer->getValue(
+                    DBECustomer::slaP1PenaltiesAgreed
+                ) ? 'checked' : null,
+                'slaP2PenaltiesAgreedChecked'             => $this->dsCustomer->getValue(
+                    DBECustomer::slaP2PenaltiesAgreed
+                ) ? 'checked' : null,
+                'slaP3PenaltiesAgreedChecked'             => $this->dsCustomer->getValue(
+                    DBECustomer::slaP3PenaltiesAgreed
+                ) ? 'checked' : null,
+                'slaFixHoursP1'                           => $this->dsCustomer->getValue(DBECustomer::slaFixHoursP1),
+                'slaFixHoursP2'                           => $this->dsCustomer->getValue(DBECustomer::slaFixHoursP2),
+                'slaFixHoursP3'                           => $this->dsCustomer->getValue(DBECustomer::slaFixHoursP3),
+                'slaFixHoursP4'                           => $this->dsCustomer->getValue(DBECustomer::slaFixHoursP4),
                 'isShowingInactive'                       => $this->getParam('showInactiveContacts') ? 'true' : 'false',
                 'primaryMainMandatory'                    => count($mainContacts) ? 'required' : null,
                 'sortCode'                                => $this->dsCustomer->getValue(DBECustomer::sortCode),
@@ -2393,7 +2438,7 @@ class CTCustomer extends CTCNC
             $data['customerId'],
             $data['siteNo']
         )) {
-            throw new \CNCLTD\Exceptions\JsonHttpException(403, 'Site Number Required');
+            throw new \CNCLTD\Exceptions\JsonHttpException(403, 'Cannot delete Site because is in use');
         }
         $this->buCustomer->deleteSite(
             $data['customerId'],

@@ -25,7 +25,6 @@ class DBEContact extends DBCNCEntity
     const fax              = "fax";
     const portalPassword   = "portalPassword";
     const mailshot         = "mailshot";
-    const discontinuedFlag = "discontinuedFlag";
     const accountsFlag     = "accountsFlag";
     const mailshot2Flag    = "mailshot2Flag";
     const mailshot3Flag    = "mailshot3Flag";
@@ -150,12 +149,7 @@ class DBEContact extends DBCNCEntity
             null,
             0
         );
-        // $this->addColumn(
-        //     self::accountsFlag,
-        //     DA_YN,
-        //     DA_NOT_NULL,
-        //     "con_accounts_flag"
-        // );
+
         $this->addColumn(
             self::mailshot2Flag,
             DA_YN,

@@ -140,7 +140,8 @@ class DBECustomer extends DBCNCEntity
             self::referredFlag,
             DA_BOOLEAN,
             DA_ALLOW_NULL,
-            "isReferred"
+            "isReferred",
+            false
         );
         $this->addColumn(
             self::customerTypeID,

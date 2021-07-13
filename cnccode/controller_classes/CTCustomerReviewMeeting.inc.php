@@ -527,8 +527,8 @@ class CTCustomerReviewMeeting extends CTCNC
                     $labtechDB = new PDO(
                         $dsn, LABTECH_DB_USERNAME, LABTECH_DB_PASSWORD, $options
                     );
-                } catch (\Exception $exception) {
-                    throw new \MongoDB\Driver\Exception\ConnectionException('Unable to connect to labtech');
+                } catch (Exception $exception) {
+                    throw new Exception('Unable to connect to labtech');
                 }
                 $statement = $labtechDB->prepare(
                     'SELECT computers.name as agentName,letter as driveLetter,size as driveSize, free as driveFreeSpace, free/size  as freePercent FROM  drives 

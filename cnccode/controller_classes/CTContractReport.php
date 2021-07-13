@@ -40,6 +40,7 @@ class CTContractReport extends CTCNC
                     'siteAddress',
                     'itemDescription',
                     'renewalStatus',
+                    'initialContractLength',
                     'startDate',
                     'expiryDate',
                     'value',
@@ -47,17 +48,18 @@ class CTContractReport extends CTCNC
                     'topUp',
                 ];
                 $columnsDefinition = [
-                    'contractId'      => 'custitem.cui_cuino',
-                    'users'           => 'custitem.cui_users',
-                    'customerName'    => 'customer.cus_name',
-                    'siteAddress'     => 'address.add_add1',
-                    'itemDescription' => 'item.itm_desc',
-                    'renewalStatus'   => 'custitem.renewalStatus',
-                    'startDate'       => 'custitem.cui_desp_date',
-                    'expiryDate'      => 'custitem.cui_expiry_date',
-                    'value'           => 'custitem.cui_sale_price',
-                    'balance'         => 'custitem.curGSCBalance',
-                    'topUp'           => 'customer.gscTopUpAmount',
+                    'contractId'            => 'contractId',
+                    'users'                 => 'users',
+                    'customerName'          => 'customerName',
+                    'siteAddress'           => 'siteAddress',
+                    'itemDescription'       => 'itemDescription',
+                    'renewalStatus'         => 'renewalStatus',
+                    'initialContractLength' => 'initialContractLength',
+                    'startDate'             => 'startDate',
+                    'expiryDate'            => 'expiryDate',
+                    'value'                 => 'value',
+                    'balance'               => 'balance',
+                    'topUp'                 => 'topUp',
                 ];
 
                 $columnsTypes = [
@@ -67,28 +69,40 @@ class CTContractReport extends CTCNC
 
                 /** @var dbSweetcode $db */
                 global $db;
-                $countQuery = "select count(*) FROM custitem
+                $countQuery       = "select count(*) FROM (SELECT custitem.cui_cuino                                             as 'contractId',
+       custitem.cui_users                                             as 'users',
+       customer.cus_name                                              as 'customerName',
+       address.add_add1                                               as 'siteAddress',
+       item.itm_desc                                                  as 'itemDescription',
+       custitem.installationDate                                      as 'startDate',
+       getContractExpiryDate(installationDate, initialContractLength) as 'expiryDate',
+       custitem.cui_sale_price                                        as 'value',
+       custitem.curGSCBalance                                         as 'balance',
+       customer.gscTopUpAmount                                        as 'topUp', 
+       custitem.renewalStatus                                         as 'renewalStatus',
+       custitem.initialContractLength                                 as 'initialContractLength' from custitem
          JOIN customer ON customer.cus_custno = custitem.cui_custno
          JOIN item ON item.itm_itemno = custitem.cui_itemno
          JOIN address ON address.add_siteno = custitem.cui_siteno AND address.add_custno = custitem.cui_custno
-WHERE 1 = 1
-  AND customer.cus_custno <> 2511
+WHERE customer.cus_custno <> 2511
   AND item.renewalTypeID IS NOT NULL
-  AND item.renewalTypeID <> 0";
+  AND item.renewalTypeID <> 0) a where 1 = 1";
                 $totalCountResult = $db->query($countQuery);
                 $totalCount = $totalCountResult->fetch_row()[0];
                 $defaultQuery = "
+select * from (
 SELECT custitem.cui_cuino                                as 'contractId',
        custitem.cui_users                                as 'users',
        customer.cus_name                                 as 'customerName',
        address.add_add1                                  as 'siteAddress',
        item.itm_desc                                     as 'itemDescription',
-       custitem.cui_desp_date                            as 'startDate',
-       custitem.cui_expiry_date                          as 'expiryDate',
+       custitem.installationDate                                      as 'startDate',
+       getContractExpiryDate(installationDate, initialContractLength) as 'expiryDate',
        custitem.cui_sale_price                           as 'value',
        custitem.curGSCBalance                            as 'balance',
        customer.gscTopUpAmount                           as 'topUp',
-       custitem.renewalStatus                            as 'renewalStatus'
+       custitem.renewalStatus                                         as 'renewalStatus',
+       custitem.initialContractLength                                 as 'initialContractLength'
 FROM custitem
          JOIN customer ON customer.cus_custno = custitem.cui_custno
          JOIN item ON item.itm_itemno = custitem.cui_itemno
@@ -96,7 +110,7 @@ FROM custitem
 WHERE 1 = 1
   AND customer.cus_custno <> 2511
   AND item.renewalTypeID IS NOT NULL
-  AND item.renewalTypeID <> 0";
+  AND item.renewalTypeID <> 0 ) a where 1 = 1 ";
                 $columnSearch = [];
                 $parameters = [];
                 foreach ($columns as $column) {

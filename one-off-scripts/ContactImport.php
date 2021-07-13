@@ -13,15 +13,16 @@ if (!is_cli()) {
 $shortopts = "p:";
 $longopts  = [];
 $options   = getopt($shortopts, $longopts);
-if (!isset($options["p"])) {
+$filePath         = @$options["p"];
+if (!isset($filePath)) {
     echo 'The path to the CSV file to import is mandatory' . PHP_EOL;
     exit;
 }
-if (!file_exists($options['p'])) {
+if (!file_exists($filePath)) {
     echo 'The file does not exist, or the path is incorrect' . PHP_EOL;
     exit;
 }
-$csvFile = fopen("E:\\temp\\customers.csv", 'r');
+$csvFile = fopen($filePath, 'r');
 if (!$csvFile) {
     echo 'Failed to open file';
     exit;

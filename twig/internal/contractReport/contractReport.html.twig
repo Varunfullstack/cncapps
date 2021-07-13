@@ -24,6 +24,9 @@
             data: 'renewalStatus'
         },
         {
+            data: 'initialContractLength',
+        },
+        {
             data: 'startDate',
             name: 'startDate',
             render: function (data) {
@@ -63,24 +66,47 @@
             if (this.dataset.defaultValue) {
                 defaultValue = this.dataset.defaultValue
             }
-            let inputType = null;
-            console.log(this.dataset);
+            let inputType = 'text';
             if (this.dataset.inputType) {
                 inputType = this.dataset.inputType;
             }
-
-            $(this).html('<input type="' + (inputType ? inputType : 'text') + '" placeholder="Search ' + title + '" ' + (inputLength ? "" : "") + (defaultValue ? 'value=' + defaultValue : '') + ' />');
-            const autocompleteURL = $(this).data().autocompleteUrl;
-            const autocompleteTermField = 'term' || $(this).data().autocompleteTermField;
             const performSearch = function (value, column) {
                 if (table.column(column).search() != value) {
                     table.column(column)
                         .search(value);
                     table.draw();
-                    // const newURL = UpdateQueryString(columnsData[column].data, value);
-                    // window.history.pushState({}, "", newURL);
                 }
             };
+
+            if (inputType === 'select') {
+                const years = [1, 2, 3, 4, 5];
+
+                const select = document.createElement('select');
+
+                const defaultOption = document.createElement('option');
+                defaultOption.value = "";
+                defaultOption.text = "All";
+                select.add(defaultOption);
+
+                for (let year of years) {
+                    const option = document.createElement('option');
+
+                    const months = String(year * 12);
+                    option.text = months;
+                    option.value = months;
+                    select.add(option);
+                }
+
+                this.innerHTML = "";
+                this.append(select);
+                select.addEventListener("change", $event => {
+                    performSearch($event.target.value, i);
+                })
+
+            } else {
+                $(this).html('<input type="' + (inputType) + '" placeholder="Search ' + title + '" ' + (inputLength ? "" : "") + (defaultValue ? 'value=' + defaultValue : '') + ' />');
+                const autocompleteURL = $(this).data().autocompleteUrl;
+                const autocompleteTermField = 'term' || $(this).data().autocompleteTermField;
 
             const filterInput = $(this).find('input');
             filterInput.autocomplete({
@@ -121,13 +147,22 @@
             }).on('change', function () {
                 performSearch(filterInput[0].value, i);
             });
+            }
+
+
         });
 
         table = $('#example').DataTable({
-            dom: "lrtip",
+            dom: "Blrtip",
             serverSide: true,
             ajax: '?action=getData',
             orderCellsTop: true,
+            buttons: [
+                {
+                    extend: 'csv',
+                    bom: true
+                }
+            ],
             fixedHeader: true,
             pageLength: 100,
             columns: columnsData,
@@ -156,6 +191,7 @@
         <th>Site</th>
         <th>Item</th>
         <th data-default-value="R">Renewal Status</th>
+        <th data-input-type="select">Initial Contract Length</th>
         <th data-input-type="date">Start</th>
         <th data-input-type="date">Expiry</th>
         <th>Value</th>
@@ -171,6 +207,7 @@
         <th>Site</th>
         <th>Item</th>
         <th>Renewal Status</th>
+        <th>Initial Contract Length</th>
         <th>Start</th>
         <th>Expiry</th>
         <th>Value</th>
