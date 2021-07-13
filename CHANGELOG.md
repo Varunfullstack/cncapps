@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 1455 - Change the way Kingswood Automated Requests are processed.
+
 ## [v5.13.6] - 2021-07-06
 ### Changed
 - Change start and expiry fields in contractReport to reflect the installDate and the expiry date shown when editing the contract
