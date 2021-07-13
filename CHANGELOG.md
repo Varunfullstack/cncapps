@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [unreleased]
+## [v5.14.0] - 2021-07-13
 ### Changed
 - Issue 1455 - Change the way Kingswood Automated Requests are processed.
 
