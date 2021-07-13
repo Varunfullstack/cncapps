@@ -196,6 +196,7 @@ class BUActivity extends Business
     const customerActivityFormFromDate     = 'fromDate';
     const customerActivityFormToDate       = 'toDate';
     const SalesOrderCreatedRequest         = 'SalesOrderCreatedRequest';
+    const KINGSWOOD_CUSTOMER_ID            = '6391';
 
 
     /** @var Template */
@@ -6855,6 +6856,216 @@ class BUActivity extends Business
         return $nextid;
     }
 
+    function processKingswoodAutomatedRequest(AutomatedRequest $automatedRequest)
+    {
+        $automatedRequest->setPriority(3);
+        // see if we have already a service request for this
+        $emailSubjectSummary = "Incident #{$automatedRequest->getServiceRequestID()}";
+        $dbeProblem          = new DBEProblem($this);
+        $dbeProblem->getServiceRequestForCustomerByEmailSubjectMatch(
+            $automatedRequest->getCustomerID(),
+            $emailSubjectSummary
+        );
+        if ($dbeProblem->rowCount()) {
+            $dbeProblem->fetchNext();
+            // what happens if the status is C ??????? we can't have more than one service request with the same emailSubjectSummary ...
+            if ($dbeProblem->getValue(DBEProblem::status) === 'C') {
+                return $this->addCustomerRaisedRequest(
+                    $automatedRequest,
+                    null,
+                    null,
+                    "Kingswood HEAT #{$automatedRequest->getServiceRequestID()}"
+                );
+            }
+            $dbeLastActivity = $this->getLastActivityInProblem($dbeProblem->getValue(DBEProblem::problemID));
+            $this->createFollowOnActivity(
+                $dbeLastActivity->getValue(DBEJCallActivity::callActivityID),
+                CONFIG_CUSTOMER_CONTACT_ACTIVITY_TYPE_ID,
+                $dbeProblem->getValue(DBEProblem::contactID),
+                $automatedRequest->getHtmlBody(),
+                false,
+                true,
+                USER_SYSTEM,
+                false,
+                true,
+                true
+            );
+            return true;
+        }
+        $contactName = $automatedRequest->getSenderEmailAddress();
+        $dbeContact  = new DBEContact($this);
+        $dbeContact->getCustomerRowsByContactFullNameMatch(self::KINGSWOOD_CUSTOMER_ID, $contactName);
+        if (!$dbeContact->fetchNext()) {
+            // we couldn't find an active contact for the request, add it as customer raised
+            return $this->addCustomerRaisedRequest(
+                $automatedRequest,
+                null,
+                null,
+                "Kingswood HEAT #{$automatedRequest->getServiceRequestID()}"
+            );
+        }
+
+        if ($dbeContact->getValue(DBEContact::supportLevel) === DBEContact::supportLevelFurlough) {
+            $toUpdate = new DBEContact($this);
+            $toUpdate->getRow($dbeContact->getValue(DBEContact::contactID));
+            $toUpdate->unfurlough();
+            $toUpdate->updateRow();
+        }
+        return $this->raiseKingswoodRequest($automatedRequest, $dbeContact, $emailSubjectSummary);
+
+    }
+
+    function raiseKingswoodRequest(AutomatedRequest $automatedRequest, DBEContact $contact, string $emailSubjectSummary)
+    {
+
+        $customerID       = $automatedRequest->getCustomerID();
+        $priority = 3;
+        $dbeProblem       = new DBEProblem($this);
+        $forceHidden      = false;
+        $supportLevel     = $contact->getValue(DBEContact::supportLevel);
+        $slaResponseHours = $this->getSlaResponseHours(
+            $priority,
+            $customerID,
+            $contact->getValue(DBEContact::contactID)
+        );
+        $siteNo           = $contact->getValue(DBEContact::siteNo);
+        $dbeProblem->setValue(
+            DBEProblem::hdLimitMinutes,
+            $this->dsHeader->getValue(DBEHeader::hdTeamLimitMinutes)
+        );
+        $dbeProblem->setValue(
+            DBEProblem::esLimitMinutes,
+            $this->dsHeader->getValue(DBEHeader::esTeamLimitMinutes)
+        );
+        $dbeProblem->setValue(
+            DBEProblem::smallProjectsTeamLimitMinutes,
+            $this->dsHeader->getValue(DBEHeader::smallProjectsTeamLimitMinutes)
+        );
+        $dbeProblem->setValue(
+            DBEProblem::projectTeamLimitMinutes,
+            $this->dsHeader->getValue(DBEHeader::projectTeamLimitMinutes)
+        );
+        $dbeProblem->setValue(
+            DBEProblem::slaResponseHours,
+            $slaResponseHours
+        );
+        $dbeProblem->setValue(DBEProblem::emailSubjectSummary, $emailSubjectSummary);
+        $dbeProblem->setValue(
+            DBEProblem::customerID,
+            $customerID
+        );
+        $dbeProblem->setValue(
+            DBEProblem::status,
+            'I'
+        );
+        $dbeProblem->setValue(
+            DBEProblem::priority,
+            $priority
+        );
+        $dbeProblem->setValue(
+            DBEProblem::dateRaised,
+            date(DATE_MYSQL_DATETIME)
+        ); // default
+        $dbeProblem->setValue(
+            DBEProblem::contactID,
+            $contact->getValue(DBEContact::contactID)
+        );
+        $dbeProblem->setValue(
+            DBEJProblem::hideFromCustomerFlag,
+            'Y'
+        );
+        $raisedDateTime = new DateTime($automatedRequest->getCreateDateTime());
+        $queueNo = 1;
+        $dbeProblem->setValue(
+            DBEJProblem::queueNo,
+            $queueNo
+        );
+        $dbeProblem->setValue(
+            DBEJProblem::monitorName,
+            $automatedRequest->getMonitorName()
+        );
+        $dbeProblem->setValue(
+            DBEJProblem::monitorAgentName,
+            $automatedRequest->getMonitorAgentName()
+        );
+        $dbeProblem->setValue(
+            DBEJProblem::rootCauseID,
+            $automatedRequest->getRootCauseID()
+        );
+        $dbeProblem->setValue(
+            DBEJProblem::contractCustomerItemID,
+            $automatedRequest->getContractCustomerItemID()
+        );
+        $dbeProblem->setValue(
+            DBEJProblem::userID,
+            null
+        );        // not allocated
+        $raiseTypeId = BUProblemRaiseType::EMAILID;
+        $dbeProblem->setValue(
+            DBEJProblem::raiseTypeId,
+            $raiseTypeId
+        );
+        $dbeProblem->insertRow();
+        $dbeCallActivity = new DBECallActivity($this);
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::callActivityID,
+            0
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::siteNo,
+            $siteNo
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::contactID,
+            $contact->getValue(DBEContact::contactID)
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::callActTypeID,
+            CONFIG_INITIAL_ACTIVITY_TYPE_ID
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::date,
+            $raisedDateTime->format(DATE_MYSQL_DATE)
+        );
+        $startTime = $raisedDateTime->format('H:i');
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::startTime,
+            $startTime
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::endTime,
+            $startTime
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::status,
+            'C'
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::serverGuard,
+            $automatedRequest->getServerGuardFlag()
+        );
+        $details = $automatedRequest->getSubjectLine() . " ";
+        $details .= $automatedRequest->getTextBody();
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::reason,
+            Controller::formatForHTML($details)
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::problemID,
+            $dbeProblem->getPKValue()
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::userID,
+            USER_SYSTEM
+        );
+        $dbeCallActivity->insertRow();
+        $dsCustomer = new DBECustomer($this);
+        $dsCustomer->getRow($customerID);
+        echo "<p>Logged ServiceRequest with ID: {$dbeProblem->getPKValue()}</p>";
+        $this->sendAutomaticallyLoggedServiceRequestEmail($dbeCallActivity->getValue(DBECallActivity::callActivityID));
+        return true;
+    }
+
     /**
      * @param AutomatedRequest $automatedRequest
      * @return bool|mixed
@@ -6877,6 +7088,9 @@ class BUActivity extends Business
                 null,
                 $prependMessage
             );
+        }
+        if ($automatedRequest->getCustomerID() == self::KINGSWOOD_CUSTOMER_ID) {
+            return $this->processKingsWoodAutomatedRequest($automatedRequest);
         }
         echo "<div>We do have a customer ID, we can continue: " . $automatedRequest->getCustomerID() . "</div>";
         if ($automatedRequest->getServiceRequestID()) {

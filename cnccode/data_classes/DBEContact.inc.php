@@ -382,6 +382,14 @@ class DBEContact extends DBCNCEntity
 
     }
 
+    function unfurlough()
+    {
+        $this->setValue(self::supportLevel, $this->getValue(self::pendingFurloughActionLevel));
+        $this->setValue(self::pendingFurloughAction, null);
+        $this->setValue(self::pendingFurloughActionDate, null);
+        $this->setValue(self::pendingFurloughActionLevel, null);
+    }
+
     /**
      * Delete Rows By CustomerID
      * @access public
@@ -524,8 +532,8 @@ class DBEContact extends DBCNCEntity
      * @param $match
      * @return bool Success
      */
-    function getCustomerRowsByNameMatch($customerId,
-                                        $match
+    function getCustomerRowsByContactFullNameMatch($customerId,
+                                                   $match
     )
     {
         $this->setMethodName("getCustomerRowsByNameMatch");
@@ -534,13 +542,10 @@ class DBEContact extends DBCNCEntity
             $customerId
         );
         $queryString = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName(
-            ) . " WHERE (" . $this->getDBColumnName(self::lastName) . " LIKE '%" . mysqli_real_escape_string(
+            ) . " WHERE concat(".$this->getDBColumnName(self::firstName).",' ', ".$this->getDBColumnName(self::lastName).") like '%" . mysqli_real_escape_string(
                 $this->db->link_id(),
                 $match
-            ) . "%'" . " OR " . $this->getDBColumnName(self::firstName) . " LIKE '%" . mysqli_real_escape_string(
-                $this->db->link_id(),
-                $match
-            ) . "%')" . " AND " . $this->getDBColumnName(
+            ) . "%' AND " . $this->getDBColumnName(
                 self::discontinuedFlag
             ) . " <> 'Y'" . " AND " . $this->getDBColumnName(self::customerID) . " = " . $this->getFormattedValue(
                 self::customerID

@@ -689,6 +689,8 @@ class DBEntity extends DataAccess
         }
     }
 
+
+
     /**
      * Get column value by name or column number and trim trailing spaces
      * @access public

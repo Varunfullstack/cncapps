@@ -66,7 +66,7 @@ class BUImportRequests extends Business
                 $dbeLastActivity = $this->buActivity->getLastActivityInProblem(
                     $automatedRequest->getServiceRequestID()
                 );
-                if ($dbeLastActivity->rowCount > 0) $this->buActivity->updateInbound(
+                if ($dbeLastActivity && $dbeLastActivity->rowCount > 0) $this->buActivity->updateInbound(
                     $dbeLastActivity->getValue(DBEJCallActivity::callActivityID),
                     true
                 );

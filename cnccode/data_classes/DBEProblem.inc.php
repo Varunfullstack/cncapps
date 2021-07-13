@@ -462,6 +462,15 @@ class DBEProblem extends DBEntity
         }
     }
 
+    public function getServiceRequestForCustomerByEmailSubjectMatch(int $customerId, string $emailSubjectSummary)
+    {
+        $this->setQueryString(
+            "SELECT {$this->getDBColumnNamesAsString()} FROM {$this->getTableName()} WHERE 
+                              {$this->getDBColumnName(self::customerID)} = $customerId AND {$this->getDBColumnName(self::emailSubjectSummary)} like '%{$emailSubjectSummary}%'"
+        );
+        return parent::getRows();
+    }
+
     public function deleteRow($pkValue = '')
     {
         parent::deleteRow($pkValue);

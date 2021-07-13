@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.14.0] - 2021-07-13
+### Changed
+- Issue 1455 - Change the way Kingswood Automated Requests are processed.
+
 ## [v5.13.7] - 2021-07-09
 ### Fixed
 - Fix issue with automated request import to customer problem.
