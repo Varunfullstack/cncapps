@@ -190,7 +190,7 @@ class BUManagementReports extends Business
 			    cus_became_customer_date as becameCustomerDate,
         noOfPCs,
         noOfServers,
-        (select count(*) from address where add_custno = customer.cus_custno) as noOfSites  ,
+        noOfSites,
         sec_desc AS sector ";
 
         for ($month = 1; $month <= 12; $month++) {

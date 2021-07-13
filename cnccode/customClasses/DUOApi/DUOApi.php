@@ -5,7 +5,7 @@ namespace CNCLTD\DUOApi;
 use CNCLTD\DUOApi\AccountInfo\AccountInfo;
 use CNCLTD\DUOApi\AccountInfo\AccountInfoResponse;
 use CNCLTD\DUOApi\AccountInfo\AccountInfoResponseTransformer;
-use CNCLTD\DUOApi\AccountInfo\SubscriptionTransformer;
+use CNCLTD\DUOApi\AccountInfo\AccountInfoTransformer;
 use CNCLTD\DUOApi\Accounts\Account;
 use CNCLTD\DUOApi\Accounts\AccountsResponse;
 use CNCLTD\DUOApi\Accounts\AccountsResponseTransformer;
@@ -22,6 +22,7 @@ use CNCLTD\DUOApi\AuthLog\AuthLogTransformer;
 use CNCLTD\DUOApi\Users\RetrieveUsersResponse;
 use CNCLTD\DUOApi\Users\RetrieveUsersResponseTransformer;
 use CNCLTD\DUOApi\Users\UserTransformer;
+use CNCLTD\StreamOneProcessing\Subscription\Subscription;
 use DateTime;
 use DuoAPI\Admin;
 use DuoAPI\Auth;
@@ -133,7 +134,7 @@ class DUOApi
             throw new Exception('Failed to pull account info: ' . json_encode($response));
         }
         $jsonDecoder = new JsonDecoder();
-        $jsonDecoder->register(new SubscriptionTransformer());
+        $jsonDecoder->register(new AccountInfoTransformer());
         $jsonDecoder->register(new AccountInfoResponseTransformer());
         /** @var AccountInfoResponse $accountInfoResponse */
         $accountInfoResponse = $jsonDecoder->decode($response['response'], AccountInfoResponse::class);

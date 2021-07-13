@@ -655,6 +655,7 @@ class CTCurrentActivityReport extends CTCNC
         $startTime = (clone $endTime)->sub(new DateInterval('PT3M'));
         $dbeCallActivity->setValue(DBECallActivity::startTime, $startTime->format('H:i'));
         $dbeCallActivity->setValue(DBECallActivity::endTime, $endTime->format('H:i'));
+        $dbeCallActivity->setValue(DBECallActivity::status, 'C');
         $additionalInfo = !empty($description) ? "<p> Additional information: " . $description . '</p>' : '';
         $dbeCallActivity->setValue(
             DBECallActivity::reason,
@@ -823,6 +824,7 @@ class CTCurrentActivityReport extends CTCNC
             $dbeCallActivity->setValue(DBECallActivity::startTime, date('H:i'));
             $endTime = new DateTime();
             $dbeCallActivity->setValue(DBECallActivity::endTime, $endTime->format('H:i'));
+            $dbeCallActivity->setValue(DBECallActivity::status, 'C');
             $dbeCallActivity->setValue(
                 DBECallActivity::reason,
                 $staffName . ' cancelled this call back for the following reason: ' . $reason

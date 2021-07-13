@@ -825,6 +825,11 @@ class CTCNC extends Controller
                 "href"  => "LeadStatusReport.php",
             ],
             [
+                "id"    => 403,
+                "label" => "Customer CRM",
+                "href"  => "CustomerCRM.php",
+            ],
+            [
                 "id"    => 404,
                 "label" => "Customer Review Meetings",
                 "href"  => "CustomerReviewMeetingsReport.php",
@@ -1282,14 +1287,6 @@ class CTCNC extends Controller
     public function fail($code, $message = "")
     {
         return new APIException($code, $message);
-
-    }
-    /**
-     * return response of json
-     */
-    public function response($data)
-    {
-        return json_encode($data,JSON_NUMERIC_CHECK);
 
     }
 }

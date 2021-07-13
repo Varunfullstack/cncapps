@@ -15,8 +15,6 @@ class DBEPortalCustomerDocumentWithoutFile extends DBEntity
     const mainContactOnlyFlag = "mainContactOnlyFlag";
     const createdDate = "createdDate";
     const createdUserID = "createdUserID";
-    public const filename = "filename";
-    public const fileMimeType = "fileMimeType";
 
     /**
      * portals constructor()
@@ -43,8 +41,6 @@ class DBEPortalCustomerDocumentWithoutFile extends DBEntity
             (new DateTime())->format(DATE_MYSQL_DATETIME)
         );
         $this->addColumn(self::createdUserID, DA_ID, DA_ALLOW_NULL);
-        $this->addColumn(self::filename, DA_STRING, DA_ALLOW_NULL);
-        $this->addColumn(self::fileMimeType, DA_STRING, DA_NOT_NULL);
         $this->setPK(0);
         $this->setAddColumnsOff();
     }

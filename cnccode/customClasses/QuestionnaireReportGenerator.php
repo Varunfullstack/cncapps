@@ -439,7 +439,7 @@ class QuestionnaireReportGenerator
           WHERE
            ans_date BETWEEN ? AND ?
            AND que_questionnaireno = ?
-           AND mailshot
+           AND cus_mailshot = 'Y'
           GROUP BY
             ans_name           ";
         return $this->db->preparedQuery(

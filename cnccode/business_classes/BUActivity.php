@@ -905,7 +905,7 @@ class BUActivity extends Business
                 throw new JsonHttpException(400, 'Service Request in progress, reason required');
             }
             $message = "{$this->dbeUser->getValue(DBEUser::name)} Escalated from {$this->workQueueDescriptionArray[$oldQueueNo]} to {$this->workQueueDescriptionArray[$newQueueNo]}";
-            //if ($dbeProblem->getValue(DBEProblem::status) == 'P')
+            //if ($dbeProblem->getValue(DBEProblem::status) == 'P') 
             if ($reason != '') {
                 $message .= " because of {$reason}";
             }
@@ -7078,7 +7078,7 @@ class BUActivity extends Business
             ],
             [
                 "type"  => "s",
-                "value" => substr($record->getSubjectLine(), 0, 50)
+                "value" => substr($record->getSubjectLine(), 0, 49)
             ]
         ];
         $db->preparedQuery(

@@ -105,7 +105,7 @@ class BUProject extends Business
             $customerID,
             $dsProject,
             date(DATE_MYSQL_DATE)
-        );
+        );        
         $projects=array();
         while ($dsProject->fetchNext()) {
             $url = Controller::buildLink(
@@ -119,7 +119,7 @@ class BUProject extends Business
             [
                 "projectID"=> $dsProject->getValue(DBEProject::projectID),
                 "description"=>$dsProject->getValue(DBEProject::description),
-                "editUrl"=> $url
+                "editUrl"=> $url 
             ]);
         }
         return $projects;*/
@@ -158,17 +158,14 @@ class BUProject extends Business
         return $this->dbeProject->getCurrentProjects();
     }
 
-    /**
-     * @param $ID
-     * @return bool
-     */
     function deleteProject($ID)
     {
         $this->setMethodName('deleteProject');
-        if (!$this->canDelete($ID)) {
-            throw new \CNCLTD\Exceptions\ProjectCannotBeDeletedException();
+        if ($this->canDelete($ID)) {
+            return $this->dbeProject->deleteRow($ID);
+        } else {
+            return FALSE;
         }
-        return $this->dbeProject->deleteRow($ID);
     }
 
     /**
@@ -181,8 +178,15 @@ class BUProject extends Business
     {
         $dbeProblem = new DBEProblem($this);
         // validate no activities of this type
-        $dbeProblem->setValue(DBEProblem::projectID, $ID);
-        return $dbeProblem->countRowsByColumn(DBEProblem::projectID) < 1;
+        $dbeProblem->setValue(
+            DBEProblem::projectID,
+            $ID
+        );
+        if ($dbeProblem->countRowsByColumn(DBEProblem::projectID) < 1) {
+            return TRUE;
+        } else {
+            return FALSE;
+        }
     }
 
     /**

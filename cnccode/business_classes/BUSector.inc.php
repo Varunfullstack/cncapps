@@ -41,6 +41,7 @@ class BUSector extends Business
     function getAll(&$dsResults)
     {
         $this->dbeSector->getRows('description');
+
         return ($this->getData($this->dbeSector, $dsResults));
     }
 
@@ -70,5 +71,23 @@ class BUSector extends Business
         }
     }
 
+    function getCustomerWithoutSector()
+    {
+        $sql =
+            "SELECT
+        cus_custno
+      FROM
+        customer
+      WHERE
+        ( cus_sectorno IS NULL OR cus_sectorno = 0 )
+        AND ( cus_mailshot = 'Y' OR cus_referred = 'Y' OR cus_pcx = 'Y' )
+      ORDER BY
+        RAND()
+      LIMIT 1,1
+        ";
+
+        return $this->db->query($sql)->fetch_object()->cus_custno;
+
+    }
 }// End of class
 ?>

@@ -4,7 +4,11 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
-global $cfg;
+
+global
+
+
+$cfg;
 require_once($cfg["path_gc"] . "/Business.inc.php");
 
 class BUCNC extends Business
@@ -23,7 +27,7 @@ class BUCNC extends Business
      * Get all rows from a data access object but NOT into a dataset (as in Business base class)
      * Instead the data object is copied to the dataset which is just a cheat
      * to get BUSalesOrder working very quickly without fiddling about with existing code too much :)
-     * @param Database &$Source Data access object
+     * @param  &$Source
      * @param DataSet &$Destinantion Set of data
      * @return bool
      * @access private
