@@ -1224,8 +1224,8 @@ class CTCNC extends Controller
         );
         $stmt = $db->prepare($query, $params);
         foreach ($params as $key => $value) {
-            if (($params[$key] != null || $params[$key] == '0') && is_numeric($params[$key])) {
-                $params[$key] = (int)$params[$key];
+            if (($value != null || $value == '0') && is_numeric($value)) {
+                $params[$key] = (int)$value;
                 $stmt->bindParam($key, $params[$key], PDO::PARAM_INT);
             } else
                 $stmt->bindParam($key, $params[$key]);

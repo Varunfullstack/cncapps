@@ -5,6 +5,7 @@ namespace CNCLTD;
 
 
 use DBESignableEnvelope;
+use Psr\Log\LoggerInterface;
 
 class CustomerFormSignableProcess implements SignableProcess
 {
@@ -15,7 +16,7 @@ class CustomerFormSignableProcess implements SignableProcess
         $this->quotationID = $quotationID;
     }
 
-    public function process($signableEnvelopeResponse)
+    public function process($signableEnvelopeResponse, LoggerInterface $logger)
     {
         switch ($signableEnvelopeResponse['action']) {
             case 'signed-envelope-complete':

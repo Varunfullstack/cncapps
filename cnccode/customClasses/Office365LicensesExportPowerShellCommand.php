@@ -598,7 +598,7 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
             $licensesArray = explode(", ", $licenseValue);
             sort($licensesArray);
             $licenseValue = implode(", ", $licensesArray);
-            switch ($mailboxes[$key]['RecipientTypeDetails']) {
+            switch ($datum['RecipientTypeDetails']) {
                 case "SharedMailbox":
                     $mailboxes[$key]['RecipientTypeDetails'] = "Shared";
                     if (!$mailboxes[$key]['IsLicensed']) {
@@ -1041,7 +1041,7 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
         $dateTime            = new DateTime();
         $sparedLicenseErrors = [];
         foreach ($licenses as $key => $datum) {
-            $licenses[$key][array_key_last($licenses[$key])] = null;
+            $licenses[$key][array_key_last($datum)] = null;
             $dbeOffice365Licenses->getRowForLicense($datum['AccountSkuId']);
             if ($dbeOffice365Licenses->rowCount()) {
                 $licenses[$key]['AccountSkuId'] = str_replace(

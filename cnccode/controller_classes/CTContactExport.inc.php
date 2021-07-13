@@ -355,7 +355,7 @@ WHERE customer.`cus_referred` <> 'Y'
 
             $searchForm = $this->getParam('searchForm')[1];
             foreach ($searchForm as $key => $value) {
-                if ($searchForm[$key] === '') {
+                if ($value === '') {
                     $searchForm[$key] = null;
                 }
             }

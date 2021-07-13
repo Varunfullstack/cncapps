@@ -201,9 +201,6 @@ class CTHeader extends CTCNC
             "daysInAdvanceExpensesNextMonthAlert"            => $dbeHeader->getValue(
                 DBEHeader::daysInAdvanceExpensesNextMonthAlert
             ),
-            "fixSLABreachWarningHours"                       => $dbeHeader->getValue(
-                DBEHeader::fixSLABreachWarningHours
-            ),
             "srAutocompleteThresholdHours"                   => $dbeHeader->getValue(
                 DBEHeader::srAutocompleteThresholdHours
             ),
@@ -212,21 +209,6 @@ class CTHeader extends CTCNC
             ),
             "srPromptContractThresholdHours"                 => $dbeHeader->getValue(
                 DBEHeader::srPromptContractThresholdHours
-            ),
-            "fixSLABreachWarningHours"                       => $dbeHeader->getValue(
-                DBEHeader::fixSLABreachWarningHours
-            ),
-            "fixSLABreachWarningHours"                       => $dbeHeader->getValue(
-                DBEHeader::fixSLABreachWarningHours
-            ),
-            "fixSLABreachWarningHours"                       => $dbeHeader->getValue(
-                DBEHeader::fixSLABreachWarningHours
-            ),
-            "fixSLABreachWarningHours"                       => $dbeHeader->getValue(
-                DBEHeader::fixSLABreachWarningHours
-            ),
-            "fixSLABreachWarningHours"                       => $dbeHeader->getValue(
-                DBEHeader::fixSLABreachWarningHours
             ),
             "fixSLABreachWarningHours"                       => $dbeHeader->getValue(
                 DBEHeader::fixSLABreachWarningHours
