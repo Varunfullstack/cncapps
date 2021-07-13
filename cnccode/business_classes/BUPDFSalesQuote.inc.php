@@ -2,6 +2,7 @@
 global $cfg;
 
 use CNCLTD\Data\DBEItem;
+use CNCLTD\Email\AttachmentCollection;
 
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_bu"] . "/BUPDF.inc.php");
@@ -581,7 +582,7 @@ class BUPDFSalesQuote extends Business
             $dsOrdhead->getValue(DBEOrdhead::delContactEmail),
             CONFIG_SALES_EMAIL
         ];
-        $attachments      = new \CNCLTD\Email\AttachmentCollection();
+        $attachments      = new AttachmentCollection();
         $attachments->add(
             $quoteFile,
             'application/pdf',

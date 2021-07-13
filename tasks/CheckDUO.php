@@ -3,6 +3,7 @@
 use CNCLTD\Business\BUActivity;
 use CNCLTD\DUOApi\DUOApi;
 use CNCLTD\DUOUsersReportGenerator\DUOClientReportGenerator;
+use CNCLTD\Exceptions\ColumnOutOfRangeException;
 use CNCLTD\LoggerCLI;
 
 global $cfg;
@@ -37,7 +38,7 @@ $adminHostName       = "api-8f3a2990.duosecurity.com";
 /**
  * @param DUOApi $clientDUO
  * @param DBECustomer $dbeCustomer
- * @throws \CNCLTD\Exceptions\ColumnOutOfRangeException
+ * @throws ColumnOutOfRangeException
  */
 function updateClientReport(DUOApi $clientDUO, DBECustomer $dbeCustomer, $accountId)
 {
@@ -67,7 +68,7 @@ foreach ($duoAPI->getAccountsList() as $account) {
     $dbeCustomer->fetchNext();
     try {
         updateClientReport($duoAPI, $dbeCustomer, $account->accountId);
-    } catch (\Exception $exception) {
+    } catch (Exception $exception) {
         $logger->error('Could not update client DUO Excel Document');
     }
     $dbeCustomerItem = new DBECustomerItem($thing);

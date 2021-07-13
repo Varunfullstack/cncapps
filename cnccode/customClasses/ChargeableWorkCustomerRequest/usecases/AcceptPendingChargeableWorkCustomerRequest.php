@@ -30,6 +30,7 @@ use DBEOrdhead;
 use DBEOrdline;
 use DBEProblem;
 use DBEUser;
+use Exception;
 
 class AcceptPendingChargeableWorkCustomerRequest
 {
@@ -122,7 +123,7 @@ class AcceptPendingChargeableWorkCustomerRequest
      * @param string|null $comments
      * @param bool $hasPrepay
      * @throws ColumnOutOfRangeException
-     * @throws \Exception
+     * @throws Exception
      */
     private function logCustomerContactActivity(ChargeableWorkCustomerRequest $request,
                                                 ?DateTimeInterface $requestApprovedAt,

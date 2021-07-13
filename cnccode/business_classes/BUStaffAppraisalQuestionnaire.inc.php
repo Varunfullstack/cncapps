@@ -193,7 +193,7 @@ GROUP BY a.`questionnaireID`) stats ON stats.questionnaireID = id";
                 'dateSent'       => $db->Record['dateSent']
             ];
 
-        };
+        }
         return $stats;
     }
 
@@ -239,7 +239,7 @@ WHERE test.status = '$type' order by firstName, lastName"
                 'status'          => $db->Record['status']
             ];
 
-        };
+        }
         return $stats;
     }
 }

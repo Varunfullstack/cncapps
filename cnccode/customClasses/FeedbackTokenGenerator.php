@@ -4,15 +4,18 @@
 namespace CNCLTD;
 
 
+use dbSweetcode;
+use Exception;
+
 class FeedbackTokenGenerator
 {
     private $db;
 
     /**
      * FeedbackTokenGenerator constructor.
-     * @param \dbSweetcode $db
+     * @param dbSweetcode $db
      */
-    public function __construct(\dbSweetcode $db)
+    public function __construct(dbSweetcode $db)
     {
 
         $this->db = $db;
@@ -40,7 +43,7 @@ class FeedbackTokenGenerator
     /**
      * @param $token
      * @return TokenData|null
-     * @throws \Exception
+     * @throws Exception
      */
     public function getTokenData($token): ?TokenData
     {

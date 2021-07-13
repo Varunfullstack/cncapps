@@ -332,7 +332,7 @@ WHERE problem.`pro_date_raised` >= '2020-01-01'
      */
     private function getDailySource()
     {
-        $from = (@$_REQUEST['from'] ?? '') == '' ? null : $_REQUEST['from'];;
+        $from = (@$_REQUEST['from'] ?? '') == '' ? null : $_REQUEST['from'];
         $to         = (@$_REQUEST['to'] ?? '') == '' ? null : $_REQUEST['to'];
         $customerID = (@$_REQUEST['customerID'] ?? '') == '' ? null : $_REQUEST['customerID'];
         $query      = "SELECT r.`description` as type,
@@ -388,7 +388,7 @@ WHERE problem.`pro_date_raised` >= '2020-01-01'
 
     function getDailyContact()
     {
-        $from = (@$_REQUEST['from'] ?? '') == '' ? null : $_REQUEST['from'];;
+        $from = (@$_REQUEST['from'] ?? '') == '' ? null : $_REQUEST['from'];
         $to     = (@$_REQUEST['to'] ?? '') == '' ? null : $_REQUEST['to'];
         $where  = "";
         $params = [];

@@ -1,7 +1,9 @@
 <?php
 
 namespace CNCLTD\AdditionalChargesRates\Domain;
-class CannotDeleteAdditionalChargeRateException extends \Exception
+use Exception;
+
+class CannotDeleteAdditionalChargeRateException extends Exception
 {
 
     /**

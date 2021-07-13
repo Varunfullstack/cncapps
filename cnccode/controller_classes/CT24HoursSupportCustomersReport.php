@@ -7,7 +7,11 @@
  * @authors Karim Ahmed - Sweet Code Limited
  */
 
-global $cfg;
+global
+
+use CNCLTD\Exceptions\JsonHttpException;
+
+$cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
 
@@ -61,7 +65,7 @@ class CT24HoursSupportCustomersReport extends CTCNC
                 if (!empty($_REQUEST['startDate'])) {
                     $startDate = DateTime::createFromFormat(DATE_MYSQL_DATE, $_REQUEST['startDate']);
                     if (!$startDate) {
-                        throw new \CNCLTD\Exceptions\JsonHttpException(400,'startDate format should be YYYY-MM-DD');
+                        throw new JsonHttpException(400,'startDate format should be YYYY-MM-DD');
                     }
                     $query .= " and createdAt >= ?";
                     $params[] = [
@@ -72,7 +76,7 @@ class CT24HoursSupportCustomersReport extends CTCNC
                 if (!empty($_REQUEST['endDate'])) {
                     $endDate = DateTime::createFromFormat(DATE_MYSQL_DATE, $_REQUEST['endDate']);
                     if (!$endDate) {
-                        throw new \CNCLTD\Exceptions\JsonHttpException(400,'endDate format should be YYYY-MM-DD');
+                        throw new JsonHttpException(400,'endDate format should be YYYY-MM-DD');
                     }
                     $query .= " and createdAt <= ?";
                     $params[] = [

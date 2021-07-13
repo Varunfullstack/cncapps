@@ -6,6 +6,7 @@ use BUCustomer;
 use BUHeader;
 use BUPassword;
 use CNCLTD\Business\BURenContract;
+use CNCLTD\Utils;
 use DataSet;
 use DateInterval;
 use DateTime;
@@ -169,7 +170,7 @@ class AssetListExporter
     {
 
 
-        $summarySpreadSheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $summarySpreadSheet = new Spreadsheet();
         $summarySpreadSheet->getDefaultStyle()->getFont()->setName('Arial');
         $summarySpreadSheet->getDefaultStyle()->getFont()->setSize(10);
         $summarySheet = $summarySpreadSheet->getActiveSheet();
@@ -208,8 +209,8 @@ class AssetListExporter
         foreach (range('A', $summarySheet->getHighestDataColumn()) as $col) {
             $summarySheet->getColumnDimension($col)->setAutoSize(true);
         }
-        $password   = \CNCLTD\Utils::generateStrongPassword(16);
-        $writer     = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($summarySpreadSheet);
+        $password   = Utils::generateStrongPassword(16);
+        $writer     = new Xlsx($summarySpreadSheet);
         $folderName = TECHNICAL_DIR;
         if (!file_exists($folderName)) {
             mkdir(

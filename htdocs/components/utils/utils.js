@@ -378,7 +378,7 @@ function editDistance(s1, s2) {
     s1 = s1.toLowerCase();
     s2 = s2.toLowerCase();
 
-    var costs = new Array();
+    var costs = [];
     for (var i = 0; i <= s1.length; i++) {
         var lastValue = i;
         for (var j = 0; j <= s2.length; j++) {

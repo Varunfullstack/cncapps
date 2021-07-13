@@ -1,7 +1,9 @@
 <?php
 
 namespace CNCLTD;
-class SalesOrderWithoutServiceRequestDTO implements \JsonSerializable
+use JsonSerializable;
+
+class SalesOrderWithoutServiceRequestDTO implements JsonSerializable
 {
     private $salesOrderId;
     private $customerName;

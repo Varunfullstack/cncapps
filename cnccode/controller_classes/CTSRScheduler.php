@@ -9,6 +9,7 @@
 global $cfg;
 
 use CNCLTD\Exceptions\ColumnOutOfRangeException;
+use RRule\RRule;
 
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_dbe'] . '/DBESRScheduler.php');
@@ -88,8 +89,8 @@ class CTSRScheduler extends CTCNC
                 $toUpdateItem->setValue(DBESRScheduler::emptyAssetReason, $this->getParam('emptyAssetReason'));
                 // before we update we want to test the rule
                 try {
-                    $rrule = new \RRule\RRule($this->getParam('rruleString'));
-                } catch (\Exception $exception) {
+                    $rrule = new RRule($this->getParam('rruleString'));
+                } catch (Exception $exception) {
                     echo json_encode(["status" => "error", "error" => $exception->getMessage()]);
                     http_response_code(400);
                     exit;
@@ -132,8 +133,8 @@ class CTSRScheduler extends CTCNC
                 $newItem->setValue(DBESRScheduler::updatedAt, (new DateTime())->format(DATE_MYSQL_DATETIME));
                 $newItem->setValue(DBESRScheduler::emailSubjectSummary, $this->getParam('emailSubjectSummary'));
                 try {
-                    $rrule = new \RRule\RRule($this->getParam('rruleString'));
-                } catch (\Exception $exception) {
+                    $rrule = new RRule($this->getParam('rruleString'));
+                } catch (Exception $exception) {
                     echo json_encode(["status" => "error", "error" => $exception->getMessage()]);
                     http_response_code(400);
                     exit;

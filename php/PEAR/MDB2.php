@@ -2808,7 +2808,7 @@ class MDB2_Driver_Common extends PEAR
             $query = "INSERT INTO $table ($insert) VALUES ($values)";
             $result =& $this->_doQuery($query, true, $connection);
             if (!PEAR::isError($result)) {
-                $affected_rows += $this->_affectedRows($connection, $result);;
+                $affected_rows += $this->_affectedRows($connection, $result);
             }
         }
 

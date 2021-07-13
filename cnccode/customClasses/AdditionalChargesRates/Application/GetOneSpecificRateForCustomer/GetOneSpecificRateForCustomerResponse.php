@@ -3,8 +3,9 @@
 namespace CNCLTD\AdditionalChargesRates\Application\GetOneSpecificRateForCustomer;
 
 use CNCLTD\Shared\Domain\Bus\Response;
+use JsonSerializable;
 
-class GetOneSpecificRateForCustomerResponse implements Response, \JsonSerializable
+class GetOneSpecificRateForCustomerResponse implements Response, JsonSerializable
 {
     /** @var string */
     private $description;

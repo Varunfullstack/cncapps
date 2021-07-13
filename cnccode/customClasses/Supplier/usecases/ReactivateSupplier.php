@@ -4,6 +4,7 @@ namespace CNCLTD\Supplier\usecases;
 
 use CNCLTD\Supplier\SupplierId;
 use CNCLTD\Supplier\SupplierRepository;
+use Exception;
 
 class ReactivateSupplier
 {
@@ -25,7 +26,7 @@ class ReactivateSupplier
     {
         $supplier = $this->repository->getById($supplierId);
         if (!$supplier) {
-            throw new \Exception('Supplier not found');
+            throw new Exception('Supplier not found');
         }
         $supplier->reactivate();
         $this->repository->save($supplier);

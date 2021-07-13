@@ -5077,7 +5077,7 @@ class CTSalesOrder extends CTCNC
         $dbeOrdHead = new DBEOrdhead($this);
         if (!$dbeOrdHead->getRow($salesOrderId)) {
             throw new JsonHttpException(404, "Could not found Sales order with Id: {$salesOrderId}!");
-        };
+        }
         if ($dbeOrdHead->getValue(DBEOrdhead::type) !== 'I') {
             throw new JsonHttpException(
                 400, "Sales order with Id: {$salesOrderId} is not in Initial State, cannot change it to Quotation!"
@@ -5100,7 +5100,7 @@ class CTSalesOrder extends CTCNC
         $dbeOrdHead = new DBEOrdhead($this);
         if (!$dbeOrdHead->getRow($salesOrderId)) {
             throw new JsonHttpException(404, "Could not found Sales order with Id: {$salesOrderId}!");
-        };
+        }
         if ($dbeOrdHead->getValue(DBEOrdhead::type) !== 'C') {
             throw new JsonHttpException(
                 400, "Sales order with Id: {$salesOrderId} is not in Completed State, cannot change it to Initial!"

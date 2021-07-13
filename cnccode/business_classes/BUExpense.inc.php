@@ -6,7 +6,9 @@
  */
 
 use CNCLTD\ExpenseExportItem;
+use CNCLTD\ExpenseOvertimeEngineerExport;
 use CNCLTD\OvertimeExportItem;
+use Twig\Environment;
 
 global $cfg;
 require_once($cfg["path_gc"] . "/Business.inc.php");
@@ -259,7 +261,7 @@ class BUExpense extends Business
                 continue;
             }
             if (!isset($engineersData[$expenseExportItem->engineerName])) {
-                $engineersData[$expenseExportItem->engineerName] = new \CNCLTD\ExpenseOvertimeEngineerExport(
+                $engineersData[$expenseExportItem->engineerName] = new ExpenseOvertimeEngineerExport(
                     $monthYear
                 );
             }
@@ -287,7 +289,7 @@ class BUExpense extends Business
                 continue;
             }
             if (!isset($engineersData[$overtimeExportItem->engineerName])) {
-                $engineersData[$overtimeExportItem->engineerName] = new \CNCLTD\ExpenseOvertimeEngineerExport(
+                $engineersData[$overtimeExportItem->engineerName] = new ExpenseOvertimeEngineerExport(
                     $monthYear
                 );
             }
@@ -321,7 +323,7 @@ class BUExpense extends Business
         }
         /**
          * @var string $engineerName
-         * @var \CNCLTD\ExpenseOvertimeEngineerExport $engineersDatum
+         * @var ExpenseOvertimeEngineerExport $engineersDatum
          */
         foreach ($engineersData as $engineerName => $engineersDatum) {
             if ($runType == 'Export') {
@@ -537,9 +539,9 @@ ORDER BY cns_name, caa_date";
         return $toReturn;
     }
 
-    private function sendEngineerOvertimeExpenseSummaryEmail(\CNCLTD\ExpenseOvertimeEngineerExport $engineersDatum)
+    private function sendEngineerOvertimeExpenseSummaryEmail(ExpenseOvertimeEngineerExport $engineersDatum)
     {
-        /** @var \Twig\Environment $twig */ global $twig;
+        /** @var Environment $twig */ global $twig;
         $body      = $twig->render(
             '@internal/expensesOvertimeIndividualEmail.html.twig',
             [

@@ -1,7 +1,9 @@
 <?php
 
 namespace CNCLTD\StreamOneProcessing;
-class StreamOneLicenseData implements \JsonSerializable
+use JsonSerializable;
+
+class StreamOneLicenseData implements JsonSerializable
 {
     private $sku;
     private $endCustomerEmail;

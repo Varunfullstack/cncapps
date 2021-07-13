@@ -680,5 +680,5 @@ class MDB_Manager_pgsql extends MDB_Manager_common
     }
 }
 
-};
+}
 ?>

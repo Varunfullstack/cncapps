@@ -1,7 +1,9 @@
 <?php
 
 namespace CNCLTD\ChildItem;
-class ChildItemDTO implements \JsonSerializable
+use JsonSerializable;
+
+class ChildItemDTO implements JsonSerializable
 {
     private $parentItemId;
     private $childItemId;

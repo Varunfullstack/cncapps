@@ -1,7 +1,9 @@
 <?php
 
 namespace CNCLTD\AdditionalChargesRates\Domain;
-class TimeBudgetMinutesCannotBeNegativeException extends \Exception
+use Exception;
+
+class TimeBudgetMinutesCannotBeNegativeException extends Exception
 {
 
     /**

@@ -1,7 +1,9 @@
 <?php
 
 namespace CNCLTD\Exceptions;
-class ColumnOutOfRangeException extends \Exception
+use Exception;
+
+class ColumnOutOfRangeException extends Exception
 {
 
     /**

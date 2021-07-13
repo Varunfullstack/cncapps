@@ -4,7 +4,9 @@
 namespace CNCLTD\CustomerValidation;
 
 
-class SiteValidationErrorCollection implements \Countable
+use Countable;
+
+class SiteValidationErrorCollection implements Countable
 {
 
     private $postCode;

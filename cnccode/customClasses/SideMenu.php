@@ -1,6 +1,9 @@
 <?php
 
 namespace CNCLTD;
+use Exception;
+use UnexpectedValueException;
+
 class SideMenu
 {
     /** @var MenuSection[] */
@@ -20,12 +23,12 @@ class SideMenu
      * @param $icon
      * @param $items
      * @param null $name
-     * @throws \Exception
+     * @throws Exception
      */
     public function addSection($key, $icon, $items, $name = null)
     {
         if ($this->getSection($key)) {
-            throw new \Exception("This key already exists");
+            throw new Exception("This key already exists");
         }
         $section              = new MenuSection($key, $icon, $name);
         $this->sections[$key] = $section;
@@ -49,7 +52,7 @@ class SideMenu
     public function addItemToSection($sectionKey, MenuItem $menuItem)
     {
         if (!$section = $this->getSection($sectionKey)) {
-            throw new \UnexpectedValueException("Section does not exist");
+            throw new UnexpectedValueException("Section does not exist");
         }
         if ($this->favouriteMenu->isFavourite($menuItem->getId())) {
             $menuItem->makeFavourite();

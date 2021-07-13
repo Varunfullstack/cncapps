@@ -3,6 +3,7 @@
 namespace CNCLTD\ServiceRequestInternalNote;
 
 use DateTimeImmutable;
+use DBEUser;
 
 class ServiceRequestInternalNote
 {
@@ -113,10 +114,10 @@ class ServiceRequestInternalNote
         return $this->content;
     }
 
-    public function updateContent($content, \DBEUser $currentUser)
+    public function updateContent($content, DBEUser $currentUser)
     {
         $this->content   = $content;
-        $this->updatedBy = $currentUser->getValue(\DBEUser::userID);
+        $this->updatedBy = $currentUser->getValue(DBEUser::userID);
         $this->updatedAt = new DateTimeImmutable();
     }
 

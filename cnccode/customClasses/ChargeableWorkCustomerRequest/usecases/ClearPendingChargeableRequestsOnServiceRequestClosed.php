@@ -4,6 +4,7 @@ namespace CNCLTD\ChargeableWorkCustomerRequest\usecases;
 
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestRepository;
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestServiceRequestId;
+use DBEProblem;
 
 class ClearPendingChargeableRequestsOnServiceRequestClosed
 {
@@ -22,10 +23,10 @@ class ClearPendingChargeableRequestsOnServiceRequestClosed
         $this->repository = $repository;
     }
 
-    public function __invoke(\DBEProblem $serviceRequest)
+    public function __invoke(DBEProblem $serviceRequest)
     {
         $this->repository->deleteChargeableRequestsForServiceRequest(
-            new ChargeableWorkCustomerRequestServiceRequestId($serviceRequest->getValue(\DBEProblem::problemID))
+            new ChargeableWorkCustomerRequestServiceRequestId($serviceRequest->getValue(DBEProblem::problemID))
         );
     }
 }

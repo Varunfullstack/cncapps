@@ -4,6 +4,8 @@
 namespace CNCLTD;
 
 
+use InvalidArgumentException;
+
 class PowerShellParamCollection extends Collection
 {
     public function current(): ?PowerShellParam
@@ -19,7 +21,7 @@ class PowerShellParamCollection extends Collection
     public function offsetSet($offset, $value)
     {
         if (!$value instanceof PowerShellParam) {
-            throw new \InvalidArgumentException("value must be instance of PowerShellParam.");
+            throw new InvalidArgumentException("value must be instance of PowerShellParam.");
         }
 
         parent::offsetSet($offset, $value);

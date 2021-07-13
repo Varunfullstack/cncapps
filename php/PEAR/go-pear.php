@@ -115,7 +115,7 @@ if (WEBINSTALLER && isset($_GET['action']) && $_GET['action'] == 'img' && isset(
             exit;
         default:
             exit;
-    };
+    }
 }
 
 // Check if PHP version is sufficient
@@ -248,7 +248,7 @@ if (WEBINSTALLER) {
         $_SESSION['go-pear']['http_proxy'] = strip_magic_quotes($_POST['proxy']['host']) . ':' . strip_magic_quotes($_POST['proxy']['port']);
         if ($_SESSION['go-pear']['http_proxy'] == ':') {
             $_SESSION['go-pear']['http_proxy'] = '';
-        };
+        }
 
         $www_errors = array();
         foreach ($_POST['config'] as $key => $value) {
@@ -427,7 +427,7 @@ if (!$ok) {
     // Adjust TEMPDIR envvars
     if (!isset($_ENV)) {
         $_ENV = array();
-    };
+    }
     $_ENV['TMPDIR'] = $_ENV['TEMP'] = $prefix . '/tmp';
 }
 
@@ -523,7 +523,7 @@ foreach ($config_vars as $var) {
     $dir = $$var;
     if (!preg_match('/_dir$/', $var)) {
         continue;
-    };
+    }
     if (!@is_dir($dir)) {
         if (!mkdir_p($dir)) {
             $root = WINDOWS ? 'administrator' : 'root';
@@ -569,7 +569,7 @@ if (!extension_loaded('zlib')) {
 print "Loading zlib: " . ($have_gzip ? 'ok' : 'failed') . "\n";
 if (!$have_gzip) {
     print "Downloading uncompressed packages\n";
-};
+}
 
 if ($install_pfc) {
     $to_install = array_merge($installer_packages, $pfc_packages);
@@ -587,9 +587,9 @@ if ($dh) {
     while ($file = @readdir($dh)) {
         if ($file == '.' || $file == '..' || !is_file(dirname(__FILE__) . '/go-pear-bundle/' . $file)) {
             continue;
-        };
+        }
         $local_dir[] = $file;
-    };
+    }
 }
 
 foreach ($installer_packages as $pkg) {
@@ -601,8 +601,8 @@ foreach ($installer_packages as $pkg) {
             echo "ok\n";
             displayHTMLProgress($progress += round(65 / count($to_install)));
             continue 2;
-        };
-    };
+        }
+    }
 
     $msg = str_pad("Downloading package: $pkg", max(38, 21 + strlen($pkg) + 4), '.');
     print $msg;
@@ -663,8 +663,8 @@ if ($install_pfc) {
                 echo "ok\n";
                 displayHTMLProgress($progress += round(65 / count($to_install)));
                 continue 2;
-            };
-        };
+            }
+        }
 
         $msg = str_pad("Downloading package: $pkg", max(38, 21 + strlen($pkg) + 4), '.');
         print $msg;
@@ -701,7 +701,7 @@ if (WEBINSTALLER) {
     $config = &PEAR_Config::singleton($prefix . "/pear.conf", '');
 } else {
     $config = &PEAR_Config::singleton();
-};
+}
 $config->set('preferred_state', 'stable');
 foreach ($config_vars as $var) {
     $config->set($var, $$var);
@@ -857,15 +857,15 @@ if (WEBINSTALLER) {
         foreach ($out as $line => $value) {
             if (preg_match('/ok$/', $value)) {
                 $value = preg_replace('/(ok)$/', '<span class="green">\1</span>', $value);
-            };
+            }
             if (preg_match('/^install ok:/', $value)) {
                 $value = preg_replace('/^(install ok:)/', '<span class="green">\1</span>', $value);
-            };
+            }
             if (preg_match('/^Warning:/', $value)) {
                 $value = '<span style="color: #ff0000">' . $value . '</span>';
-            };
+            }
             $out[$line] = $value;
-        };
+        }
         $out = nl2br(implode("\n", $out));
         ob_end_clean();
 
@@ -946,7 +946,7 @@ function download_url($url, $destfile = null, $proxy = null)
         }
         if (preg_match('/^Content-Length: (.*)$/i', $line, $matches)) {
             $content_length = trim($matches[1]);
-        };
+        }
         if ($use_suggested_filename && !strncasecmp($line, $cdh, $cdhl)) {
             if (eregi('filename="([^"]+)"', $line, $matches)) {
                 $destfile = basename($matches[1]);
@@ -955,7 +955,7 @@ function download_url($url, $destfile = null, $proxy = null)
     }
     if ($content_length) {
         displayHTMLSetDownload($destfile);
-    };
+    }
     $wp = fopen($destfile, "wb");
     if (!$wp) {
         bail("could not open $destfile for writing\n");
@@ -968,7 +968,7 @@ function download_url($url, $destfile = null, $proxy = null)
         if ($content_length != 0 && floor($bytes_read * 10 / $content_length) != $progress) {
             $progress = floor($bytes_read * 10 / $content_length);
             displayHTMLDownloadProgress($progress * 10);
-        };
+        }
     }
     fclose($fp);
     fclose($wp);
@@ -1030,7 +1030,7 @@ function bail($msg = '')
         @ob_end_clean();
         displayHTML('error', $msg);
         exit;
-    };
+    }
     if ($msg && !WEBINSTALLER) {
         die($msg);
     }
@@ -1901,7 +1901,7 @@ function displayHTMLFooter()
 </body>
 </html>
 <?php
-};
+}
 
 // }}}
 // {{{ displayHTMLInstallationSummary
@@ -1991,8 +1991,6 @@ function strip_magic_quotes($value)
     return $value;
 }
 
-;
-
 // }}}
 // {{{ showImage
 
@@ -2017,8 +2015,6 @@ function showImage($img)
     echo base64_decode($images[$img]['data']);
 }
 
-;
-
 // }}}
 // {{{ displayHTMLProgress
 
@@ -2026,7 +2022,7 @@ function displayHTMLProgress($progress)
 {
     if (!(WEBINSTALLER && isset($_SESSION['go-pear']['DHTML']) && $_SESSION['go-pear']['DHTML'])) {
         return;
-    };
+    }
     $msg = ob_get_contents();
     ob_end_clean();
 
@@ -2034,27 +2030,25 @@ function displayHTMLProgress($progress)
     foreach ($msg as $key => $value) {
         if (preg_match('/ok$/', $value)) {
             $value = preg_replace('/(ok)$/', '<span class="green">\1</span>', $value);
-        };
+        }
         if (preg_match('/failed$/', $value)) {
             $value = preg_replace('/(failed)$/', '<span style="color: #ff0000">\1</span>', $value);
-        };
+        }
         if (preg_match('/^install ok:/', $value)) {
             $value = preg_replace('/^(install ok:)/', '<span class="green">\1</span>', $value);
-        };
+        }
         if (preg_match('/^Warning:/', $value)) {
             $value = '<span style="color: #ff0000">' . $value . '</span>';
-        };
+        }
         $msg[$key] = $value;
-    };
+    }
     $msg = implode('<br>', $msg);
 
-    $msg .= '<script type="text/javascript"> parent.setprogress(' . ((int)$progress) . ');  </script>';
+    $msg .= '<script type="text/javascript"> parent.setprogress(' . ((int)$progress) . ')  </script>';
 
     echo $msg;
     ob_start();
 }
-
-;
 
 // }}}
 // {{{ displayHTMLDownloadProgress
@@ -2063,17 +2057,15 @@ function displayHTMLDownloadProgress($progress)
 {
     if (!(WEBINSTALLER && isset($_SESSION['go-pear']['DHTML']) && $_SESSION['go-pear']['DHTML'])) {
         return;
-    };
+    }
     $msg = ob_get_contents();
     ob_end_clean();
 
-    echo '<script type="text/javascript"> parent.setdownloadprogress(' . ((int)$progress) . ');  </script>';
+    echo '<script type="text/javascript"> parent.setdownloadprogress(' . ((int)$progress) . ')  </script>';
 
     ob_start();
     echo $msg;
 }
-
-;
 
 // }}}
 // {{{ displayHTMLSetDownload
@@ -2082,7 +2074,7 @@ function displayHTMLSetDownload($file)
 {
     if (!(WEBINSTALLER && isset($_SESSION['go-pear']['DHTML']) && $_SESSION['go-pear']['DHTML'])) {
         return;
-    };
+    }
     $msg = ob_get_contents();
     ob_end_clean();
 
@@ -2091,8 +2083,6 @@ function displayHTMLSetDownload($file)
     ob_start();
     echo $msg;
 }
-
-;
 
 // }}}
 // {{{ win32BrowseForFolder

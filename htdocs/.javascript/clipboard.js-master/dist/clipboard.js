@@ -301,7 +301,7 @@ E.prototype = {
     function listener () {
       self.off(name, listener);
       callback.apply(ctx, arguments);
-    };
+    }
 
     listener._ = callback
     return this.on(name, listener, ctx);

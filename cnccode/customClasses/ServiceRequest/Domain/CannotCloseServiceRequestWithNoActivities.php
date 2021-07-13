@@ -1,7 +1,9 @@
 <?php
 
 namespace CNCLTD\ServiceRequest\Domain;
-class CannotCloseServiceRequestWithNoActivities extends \Exception
+use Exception;
+
+class CannotCloseServiceRequestWithNoActivities extends Exception
 {
 
     /**

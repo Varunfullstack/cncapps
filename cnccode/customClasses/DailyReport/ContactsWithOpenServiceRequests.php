@@ -4,7 +4,9 @@
 namespace CNCLTD\DailyReport;
 
 
-class ContactsWithOpenServiceRequests implements \Iterator
+use Iterator;
+
+class ContactsWithOpenServiceRequests implements Iterator
 {
     /** @var ContactWithOpenServiceRequests[] */
     private $contactsWithOpenServiceRequests = [];

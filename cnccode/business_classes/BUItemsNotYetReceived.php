@@ -1,6 +1,7 @@
 <?php
 
 use CNCLTD\ItemNotYetReceived;
+use CNCLTD\SalesOrderWithoutServiceRequestDTO;
 
 /**
  * Created by PhpStorm.
@@ -149,7 +150,7 @@ GROUP BY ordline.`odl_ordno`
             []
         );
         $data      = [];
-        while ($item = $statement->fetch_object(\CNCLTD\SalesOrderWithoutServiceRequestDTO::class)) {
+        while ($item = $statement->fetch_object(SalesOrderWithoutServiceRequestDTO::class)) {
             $data[] = $item;
         }
         return $data;

@@ -245,18 +245,17 @@ function common_roundUpToQuarter($value)
     if ($diff > 0) {
         if ($diff <= 0.25) {
             $value = floor($value) + 0.25;
-        };
+        }
         if ($diff > 0.25 && $diff <= 0.5) {
             $value = floor($value) + 0.5;
-        };
+        }
         if ($diff > 0.5 && $diff <= 0.75) {
             $value = floor($value) + 0.75;
-        };
+        }
         if ($diff > 0.75) {
             $value = floor($value) + 1;
-        };
-    };
-
+        }
+    }
     return $value;
 }
 

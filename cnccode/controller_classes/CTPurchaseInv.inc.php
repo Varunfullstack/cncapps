@@ -101,7 +101,7 @@ class CTPurchaseInv extends CTCNC
     {
         $this->setMethodName('search');
         if (($this->getParam('porheadID')) && (!is_numeric($this->getParam('porheadID')))) {
-            $this->setFormErrorMessage('Order no must be numeric');;
+            $this->setFormErrorMessage('Order no must be numeric');
         }
         $found = false;
         if ($this->getFormError() == 0) {

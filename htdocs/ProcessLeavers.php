@@ -94,4 +94,4 @@ while ($dsContact->fetchNext()) {
         );
         $dbeProblem->updateRow();
     }
-};
+}

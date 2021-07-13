@@ -1,7 +1,9 @@
 <?php
 
 namespace CNCLTD\Exceptions;
-class SupplierContactCannotArchiveMain extends \Exception
+use Exception;
+
+class SupplierContactCannotArchiveMain extends Exception
 {
 
     /**

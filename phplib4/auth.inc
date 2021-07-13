@@ -300,7 +300,6 @@ class Auth
 
     function auth_refreshlogin()
     {
-        ;
     }
 
     ########################################################################
@@ -315,7 +314,6 @@ class Auth
 
     function auth_loginform()
     {
-        ;
     }
 
     ## This method can authenticate a user before the loginform
@@ -325,7 +323,6 @@ class Auth
 
     function auth_registerform()
     {
-        ;
     }
 
     ##
@@ -334,12 +331,10 @@ class Auth
 
     function auth_validatelogin()
     {
-        ;
     }
 
     function auth_doregister()
     {
-        ;
     }
 
     function logout($nobody = "")

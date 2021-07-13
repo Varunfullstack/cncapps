@@ -4,6 +4,9 @@ namespace CNCLTD\InternalDocuments\Entity;
 
 use CNCLTD\InternalDocuments\Base64FileDTO;
 use DataURI\Parser;
+use DateTime;
+use DateTimeInterface;
+use Exception;
 
 class InternalDocument
 {
@@ -29,7 +32,7 @@ class InternalDocument
                                  $originalFileName,
                                  $storedFileName,
                                  $mimeType,
-                                 \DateTimeInterface $createdAt
+                                 DateTimeInterface $createdAt
     )
     {
         $this->id               = $id;
@@ -50,7 +53,7 @@ class InternalDocument
         if (!is_dir($path)) {
             mkdir($path, null, true);
             if (!is_dir($path)) {
-                throw new \Exception("Failed to create folder!! {$path} ");
+                throw new Exception("Failed to create folder!! {$path} ");
             }
         }
         file_put_contents("{$path}/$storedFileName", $dataObject->getData());
@@ -60,7 +63,7 @@ class InternalDocument
             $originalFileName,
             $storedFileName,
             $dataObject->getMimeType(),
-            new \DateTime()
+            new DateTime()
         );
     }
 
@@ -69,7 +72,7 @@ class InternalDocument
                                   $originalFileName,
                                   $storedFileName,
                                   $mimeType,
-                                  \DateTimeInterface $createdAt
+                                  DateTimeInterface $createdAt
     )
     {
         return new self($id, $serviceRequestId, $originalFileName, $storedFileName, $mimeType, $createdAt);
@@ -131,9 +134,9 @@ class InternalDocument
     }
 
     /**
-     * @return \DateTimeInterface
+     * @return DateTimeInterface
      */
-    public function createdAt(): \DateTimeInterface
+    public function createdAt(): DateTimeInterface
     {
         return $this->createdAt;
     }

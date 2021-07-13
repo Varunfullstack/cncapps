@@ -719,5 +719,5 @@ class MDB_Manager_Common
     }
 }
 
-};
+}
 ?>

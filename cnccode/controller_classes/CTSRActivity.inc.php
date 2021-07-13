@@ -1981,7 +1981,7 @@ AND c.caa_problemno = ? ',
         $serviceRequestId = @$_GET['serviceRequestId'];
         if (!$this->handleUploads($serviceRequestId)) {
             return ["status" => "error", "message" => "Failed to upload files"];
-        };
+        }
         return ["status" => "ok"];
     }
 

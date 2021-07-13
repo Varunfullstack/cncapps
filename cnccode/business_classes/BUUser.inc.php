@@ -6,6 +6,9 @@
  */
 
 use Twig\Environment;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
 
 global $cfg;
 require_once($cfg["path_gc"] . "/Business.inc.php");
@@ -123,9 +126,9 @@ class BUUser extends Business
      * @param $days
      * @param string $sickTime
      * @param DBEUser|DataSet $reporter
-     * @throws \Twig\Error\LoaderError
-     * @throws \Twig\Error\RuntimeError
-     * @throws \Twig\Error\SyntaxError
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
      */
     function setUserAbsent($userID,
                            $startDate,

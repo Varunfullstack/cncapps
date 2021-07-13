@@ -6,7 +6,9 @@ use BUHeader;
 use DataSet;
 use DateInterval;
 use DateTime;
+use DBECustomer;
 use DBEHeader;
+use DBEOSSupportDates;
 use PDO;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 
@@ -26,13 +28,13 @@ class ExportedItemCollection
 
     /**
      * ExportedItemCollection constructor.
-     * @param \DBECustomer $customer
+     * @param DBECustomer $customer
      * @param OperatingSystemsSupportDatesCollection $collection
-     * @param \PDO $labTechDB
+     * @param PDO $labTechDB
      */
-    public function __construct(\DBECustomer $customer,
+    public function __construct(DBECustomer $customer,
                                 OperatingSystemsSupportDatesCollection $collection,
-                                \PDO $labTechDB
+                                PDO $labTechDB
     )
     {
         $BUHeader  = new BUHeader($this);
@@ -293,7 +295,7 @@ GROUP BY plugin_vm_esxhosts.`DeviceId`
 ORDER BY location, operatingSystem DESC, computerName';
         $statement            = $labTechDB->prepare($query);
         $queryExecutionResult = $statement->execute(
-            [$customer->getValue(\DBECustomer::customerID), $customer->getValue(\DBECustomer::customerID)]
+            [$customer->getValue(DBECustomer::customerID), $customer->getValue(DBECustomer::customerID)]
         );
         if (!$queryExecutionResult) {
             echo '<div>Something went wrong...' . implode(
@@ -317,12 +319,12 @@ ORDER BY location, operatingSystem DESC, computerName';
             $this->labTechData[]   = ["dataItem" => $labtechDatum, "supportDates" => $supportDates];
             $operatingSystemString = str_replace('Microsoft Windows', "", $labtechDatum->getOperatingSystem());
             if ($supportDates) {
-                $isServer      = $supportDates[\DBEOSSupportDates::isServer];
-                $dateString    = $supportDates[\DBEOSSupportDates::endOfLifeDate];
-                $dateTime      = \DateTime::createFromFormat(DATE_MYSQL_DATE, $dateString);
+                $isServer      = $supportDates[DBEOSSupportDates::isServer];
+                $dateString    = $supportDates[DBEOSSupportDates::endOfLifeDate];
+                $dateTime      = DateTime::createFromFormat(DATE_MYSQL_DATE, $dateString);
                 $endOfLifeDate = Date::PHPToExcel($dateTime->getTimestamp());
-                if (isset($supportDates[\DBEOSSupportDates::friendlyName])) {
-                    $operatingSystemString = "{$operatingSystemString} ({$supportDates[\DBEOSSupportDates::friendlyName]})";
+                if (isset($supportDates[DBEOSSupportDates::friendlyName])) {
+                    $operatingSystemString = "{$operatingSystemString} ({$supportDates[DBEOSSupportDates::friendlyName]})";
                 }
             }
             $this->countPatchManagementElegible($labtechDatum);
@@ -349,7 +351,7 @@ ORDER BY location, operatingSystem DESC, computerName';
                 $labtechDatum->antivirusDefinitionAsExcelDate()
             ];
             $this->customerData[] = $genericRow;
-            $summaryRow           = array_merge([$customer->getValue(\DBECustomer::name)], $genericRow);
+            $summaryRow           = array_merge([$customer->getValue(DBECustomer::name)], $genericRow);
             $this->summaryData[]  = $summaryRow;
             if ($isServer) {
                 $this->servers++;
@@ -385,7 +387,7 @@ ORDER BY location, operatingSystem DESC, computerName';
         }
         return DateTime::createFromFormat(
             DATE_MYSQL_DATE,
-            $found['supportDates'][\DBEOSSupportDates::endOfLifeDate]
+            $found['supportDates'][DBEOSSupportDates::endOfLifeDate]
         );
     }
 

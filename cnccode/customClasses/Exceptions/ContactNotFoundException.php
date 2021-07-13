@@ -4,7 +4,9 @@
 namespace CNCLTD\Exceptions;
 
 
-class ContactNotFoundException extends \Exception
+use Exception;
+
+class ContactNotFoundException extends Exception
 {
 
     /**

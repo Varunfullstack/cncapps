@@ -62,7 +62,7 @@ while ($dbePassword->fetchNext()) {
                 DBEPassword::URL,
                 $buPassword->encrypt($matches[0][0])
             );
-        };
+        }
 
         $updateDBEPassword->setValue(
             DBEPassword::notes,

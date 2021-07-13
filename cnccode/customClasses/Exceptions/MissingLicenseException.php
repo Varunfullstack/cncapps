@@ -4,7 +4,9 @@
 namespace CNCLTD\Exceptions;
 
 
-class MissingLicenseException extends \Exception
+use Exception;
+
+class MissingLicenseException extends Exception
 {
 
 }

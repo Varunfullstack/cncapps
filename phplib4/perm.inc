@@ -88,8 +88,8 @@ class Perm
         while (list($a, $b) = each($permlist)) {
             if ($look_for == $b) {
                 return true;
-            };
-        };
+            }
+        }
         return false;
     }
 

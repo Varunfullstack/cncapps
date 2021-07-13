@@ -6,7 +6,11 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
-global $cfg;
+global
+
+use CNCLTD\Exceptions\JsonHttpException;
+
+$cfg;
 require_once($cfg ['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg ['path_bu'] . '/BUEscalationReport.inc.php');
 require_once($cfg ['path_dbe'] . '/DSForm.inc.php');
@@ -67,14 +71,14 @@ class CTTeamAndUserStatistics extends CTCNC
                 $data = $this->getJSONData();
 
                 if (empty($data['startDate'])) {
-                    throw new \CNCLTD\Exceptions\JsonHttpException(
+                    throw new JsonHttpException(
                         400,
                         'Please provide a start date in YYYY-MM-DD format'
                     );
                 }
                 $startDate = $data['startDate'];
                 if (empty($data['endDate'])) {
-                    throw new \CNCLTD\Exceptions\JsonHttpException(
+                    throw new JsonHttpException(
                         400, 'Please provide a end date in YYYY-MM-DD format'
                     );
                 }
@@ -134,14 +138,14 @@ WHERE CONCAT(
                 $data = $this->getJSONData();
 
                 if (empty($data['startDate'])) {
-                    throw new \CNCLTD\Exceptions\JsonHttpException(
+                    throw new JsonHttpException(
                         400,
                         'Please provide a start date in YYYY-MM-DD format'
                     );
                 }
                 $startDate = $data['startDate'];
                 if (empty($data['endDate'])) {
-                    throw new \CNCLTD\Exceptions\JsonHttpException(
+                    throw new JsonHttpException(
                         400, 'Please provide a end date in YYYY-MM-DD format'
                     );
                 }

@@ -6,8 +6,9 @@ namespace CNCLTD;
 
 use DBEJCallActivity;
 use DBEUser;
+use Iterator;
 
-class TeamLeaderWithPendingTimeRequestsWithoutServiceRequest implements \Iterator
+class TeamLeaderWithPendingTimeRequestsWithoutServiceRequest implements Iterator
 {
     /**
      * @var PendingTimeRequestWithoutServiceRequestTwigDTO[]
@@ -21,7 +22,7 @@ class TeamLeaderWithPendingTimeRequestsWithoutServiceRequest implements \Iterato
      */
     public function __construct($email) { $this->email = $email; }
 
-    public function addPendingTimeRequest(\DBEJCallActivity $DBEJCallActivity, \DBEUser $requestingUser)
+    public function addPendingTimeRequest(DBEJCallActivity $DBEJCallActivity, DBEUser $requestingUser)
     {
         $this->pendingRequests[] = new PendingTimeRequestWithoutServiceRequestTwigDTO(
             $DBEJCallActivity->getValue(DBEJCallActivity::callActivityID),
@@ -31,7 +32,7 @@ class TeamLeaderWithPendingTimeRequestsWithoutServiceRequest implements \Iterato
         );
     }
 
-    private function getSubmittedDateTimeFromActivity(\DBEJCallActivity $DBEJCallActivity)
+    private function getSubmittedDateTimeFromActivity(DBEJCallActivity $DBEJCallActivity)
     {
         return $DBEJCallActivity->getValue(DBEJCallActivity::date) . " " . $DBEJCallActivity->getValue(
                 DBEJCallActivity::startTime

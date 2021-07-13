@@ -4,12 +4,14 @@
 namespace CNCLTD;
 
 
+use DateTime;
+
 class SolarwindsAccountItem
 {
     public $name;
     public $contractId;
     /**
-     * @var \DateTime
+     * @var DateTime
      */
     public $lastSuccessfulBackupDate;
     public $protectedUsers;

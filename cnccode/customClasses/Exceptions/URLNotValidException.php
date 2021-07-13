@@ -1,7 +1,9 @@
 <?php
 
 namespace CNCLTD\Exceptions;
-class URLNotValidException extends \Exception
+use Exception;
+
+class URLNotValidException extends Exception
 {
 
     /**

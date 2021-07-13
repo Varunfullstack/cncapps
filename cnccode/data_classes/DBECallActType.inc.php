@@ -4,11 +4,14 @@
 * @access public
 */
 global $cfg;
+
+use CNCLTD\SortableDBE;
+
 require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBECallActType extends DBEntity
 {
-    use \CNCLTD\SortableDBE;
+    use SortableDBE;
 
     const callActTypeID                    = "callActTypeID";
     const description                      = "description";

@@ -58,6 +58,7 @@
  *            and Sascha Schumann <sascha@schumann.cx>
  */
 
+use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
 
 require_once 'PEAR.php';
 require_once 'Mail/mimePart.php';
@@ -371,7 +372,7 @@ class Mail_mime
     public function setHTMLBody($data, $isfile = false, $inlineCSS = true)
     {
         if ($inlineCSS) {
-            $cssToInlineStyles = new \TijsVerkoyen\CssToInlineStyles\CssToInlineStyles();
+            $cssToInlineStyles = new CssToInlineStyles();
             $data = $cssToInlineStyles->convert($data, $inlineCSS);
         }
         return $this->setBody('htmlbody', $data, $isfile);

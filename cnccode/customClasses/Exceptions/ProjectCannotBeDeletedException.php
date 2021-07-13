@@ -4,7 +4,9 @@
 namespace CNCLTD\Exceptions;
 
 
-class ProjectCannotBeDeletedException extends \RuntimeException
+use RuntimeException;
+
+class ProjectCannotBeDeletedException extends RuntimeException
 {
 
 }

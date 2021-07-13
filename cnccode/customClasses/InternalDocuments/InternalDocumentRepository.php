@@ -4,6 +4,7 @@ namespace CNCLTD\InternalDocuments;
 
 use CNCLTD\InternalDocuments\Entity\InternalDocument;
 use CNCLTD\InternalDocuments\Entity\InternalDocumentMapper;
+use Exception;
 
 class InternalDocumentRepository
 {
@@ -11,7 +12,7 @@ class InternalDocumentRepository
     /**
      * @param $serviceRequestId
      * @return InternalDocument[]
-     * @throws \Exception
+     * @throws Exception
      */
     public function getServiceRequestsDocuments($serviceRequestId)
     {
@@ -71,7 +72,7 @@ class InternalDocumentRepository
     /**
      * @param $documentId
      * @return InternalDocument
-     * @throws \Exception
+     * @throws Exception
      */
     public function getById($documentId): InternalDocument
     {

@@ -4,6 +4,9 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+
+use CNCLTD\Exceptions\JsonHttpException;
+
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_dbe"] . "/CNCMysqli.inc.php");
 require_once($cfg["path_dbe"] . "/DBECustomerNote.inc.php");
@@ -41,7 +44,7 @@ class BUCustomerNote extends Business
             if (!$lastUpdatedDateTimeString || $dbeCustomerNote->getValue(
                     DBECustomerNote::modifiedAt
                 ) > $lastUpdatedDateTimeString) {
-                throw new \CNCLTD\Exceptions\JsonHttpException(
+                throw new JsonHttpException(
                     400, "The note has been modified by someone else", [
                            "errorCode"           => 1002,
                            "lastUpdatedDateTime" => $dbeCustomerNote->getValue(DBECustomerNote::modifiedAt)

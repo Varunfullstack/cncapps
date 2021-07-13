@@ -10,6 +10,10 @@
 namespace CNCLTD;
 
 
+use DBEContact;
+use DBECustomerItem;
+use DBEProblem;
+
 class AutomatedRequest
 {
     protected $automatedRequestID;
@@ -55,26 +59,26 @@ class AutomatedRequest
         if (!$this->customerID) {
             echo "<div>customer ID is not set</div>";
             if ($this->serviceRequestID) {
-                $dbeProblem = new \DBEProblem($this);
+                $dbeProblem = new DBEProblem($this);
 
                 $dbeProblem->getRow($this->serviceRequestID);
                 if ($dbeProblem->rowCount()) {
-                    $this->customerID = $dbeProblem->getValue(\DBEProblem::customerID);
+                    $this->customerID = $dbeProblem->getValue(DBEProblem::customerID);
                     echo "<div>We have found customer ID from service Request: " . $this->customerID . "</div>";
                     return $this->customerID;
                 }
             }
 
             if ($this->senderEmailAddress) {
-                $dbeContact = new \DBEContact($this);
+                $dbeContact = new DBEContact($this);
                 $dbeContact->setValue(
-                    \DBEContact::email,
+                    DBEContact::email,
                     $this->senderEmailAddress
                 );
-                $dbeContact->getRowsByColumn(\DBEContact::email);
+                $dbeContact->getRowsByColumn(DBEContact::email);
                 if ($dbeContact->rowCount()) {
                     $dbeContact->fetchNext();
-                    $this->customerID = $dbeContact->getValue(\DBEContact::customerID);
+                    $this->customerID = $dbeContact->getValue(DBEContact::customerID);
                     echo "<div>We have found customer ID from contact's email: " . $this->customerID . "</div>";
                     return $this->customerID;
                 }
@@ -89,18 +93,18 @@ class AutomatedRequest
                     return null;
                 }
                 $dbeContact->fetchNext();
-                $this->customerID = $dbeContact->getValue(\DBEContact::customerID);
+                $this->customerID = $dbeContact->getValue(DBEContact::customerID);
                 echo "<div>We have found customer ID from domain : " . $this->customerID . "</div>";
                 return $this->customerID;
 
             }
 
             if ($this->contractCustomerItemID) {
-                $dbeItem = new \DBECustomerItem($this);
+                $dbeItem = new DBECustomerItem($this);
 
                 $dbeItem->getRow($this->contractCustomerItemID);
                 if ($dbeItem->rowCount()) {
-                    $this->customerID = $dbeItem->getValue(\DBECustomerItem::customerID);
+                    $this->customerID = $dbeItem->getValue(DBECustomerItem::customerID);
                     echo "<div>We have found customer ID from contractCustomerItemID: " . $this->customerID . "</div>";
                     return $this->customerID;
                 }

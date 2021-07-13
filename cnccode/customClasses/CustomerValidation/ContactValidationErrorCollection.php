@@ -4,7 +4,9 @@
 namespace CNCLTD\CustomerValidation;
 
 
-class ContactValidationErrorCollection implements \Countable
+use Countable;
+
+class ContactValidationErrorCollection implements Countable
 {
     private $contactName;
     private $contactId;

@@ -6,6 +6,7 @@
  * @authors Karim Ahmed - Sweet Code Limited
  */
 
+use CNCLTD\AutomatedRequest;
 use CNCLTD\Business\BUActivity;
 
 global $cfg;
@@ -51,8 +52,8 @@ class BUImportRequests extends Business
       LIMIT 15";
         $db->query($sql);
         $toDelete = [];
-        /** @var \CNCLTD\AutomatedRequest $automatedRequest */
-        while ($automatedRequest = $db->nextObjectRecord(\CNCLTD\AutomatedRequest::class)) {
+        /** @var AutomatedRequest $automatedRequest */
+        while ($automatedRequest = $db->nextObjectRecord(AutomatedRequest::class)) {
             echo 'Start processing ' . $automatedRequest->getAutomatedRequestID() . "<BR/>";
             echo '<br>Description: ';
             echo $automatedRequest->getTextBody();

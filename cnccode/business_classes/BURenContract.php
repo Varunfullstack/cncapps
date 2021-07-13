@@ -24,6 +24,7 @@ use DBEJRenContract;
 use DBEOrdhead;
 use DBEOrdline;
 use DSForm;
+use Exception;
 
 global $cfg;
 require_once($cfg ["path_gc"] . "/Business.inc.php");
@@ -213,7 +214,7 @@ class BURenContract extends Business
 
     /**
      * @param null $itemBillingCategoryID
-     * @throws \Exception
+     * @throws Exception
      */
     function createRenewalsSalesOrders($itemBillingCategoryID = null)
     {

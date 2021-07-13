@@ -3,6 +3,9 @@
 
 namespace CNCLTD;
 
+use dbSweetcode;
+use Exception;
+
 trait SortableWithQueryDBE
 {
     public function moveItemToBottom()
@@ -20,7 +23,7 @@ trait SortableWithQueryDBE
 
     public function getMaxSortOrder()
     {
-        /** @var $db \dbSweetcode */
+        /** @var $db dbSweetcode */
         global $db;
         $query = "select max({$this->getSortOrderColumnName()}) as maxSortOrder from {$this->getTableName()} where 
                                                    {$this->getDiscriminatorCondition()}
@@ -29,7 +32,7 @@ trait SortableWithQueryDBE
 
         $result = $db->query($query);
         if (!$result) {
-            throw new \Exception("Failed to execute query: $query");
+            throw new Exception("Failed to execute query: $query");
         }
         if (!$db->next_record(MYSQLI_ASSOC)) {
             return 0;
@@ -45,7 +48,7 @@ trait SortableWithQueryDBE
 
     public function swapPlaces($oldOrderId, $newOrderId)
     {
-        /** @var $db \dbSweetcode */
+        /** @var $db dbSweetcode */
         global $db;
         $query = "UPDATE
   {$this->getTableName()}

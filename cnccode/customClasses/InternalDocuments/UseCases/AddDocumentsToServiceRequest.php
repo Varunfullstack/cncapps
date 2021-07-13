@@ -5,6 +5,8 @@ namespace CNCLTD\InternalDocuments\UseCases;
 use CNCLTD\InternalDocuments\Base64FileDTO;
 use CNCLTD\InternalDocuments\Entity\InternalDocument;
 use CNCLTD\InternalDocuments\InternalDocumentRepository;
+use DBEProblem;
+use Exception;
 
 class AddDocumentsToServiceRequest
 {
@@ -13,12 +15,12 @@ class AddDocumentsToServiceRequest
      */
     private $internalDocumentRepository;
     /**
-     * @var \DBEProblem
+     * @var DBEProblem
      */
     private $problem;
 
     public function __construct(InternalDocumentRepository $internalDocumentRepository,
-                                \DBEProblem $problem
+                                DBEProblem $problem
     )
     {
 
@@ -29,15 +31,15 @@ class AddDocumentsToServiceRequest
     /**
      * @param $serviceRequestId
      * @param Base64FileDTO[] $files
-     * @throws \Exception
+     * @throws Exception
      */
     public function __invoke($serviceRequestId, $files)
     {
         if (!$serviceRequestId) {
-            throw new \Exception('Service request id required');
+            throw new Exception('Service request id required');
         }
         if (!$this->problem->getRow($serviceRequestId)) {
-            throw new \Exception('Service request does not exist');
+            throw new Exception('Service request does not exist');
         }
         foreach ($files as $file) {
             $id                     = $this->internalDocumentRepository->getNextId();

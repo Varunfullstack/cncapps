@@ -47,7 +47,7 @@ class BUStandardText extends Business
         $this->dbeStandardText->setPKValue($ID);
         if (!$this->dbeStandardText->getRow()) {
             throw new StandardTextNotFoundException($ID);
-        };
+        }
         return ($this->getData(
             $this->dbeStandardText,
             $dsResults

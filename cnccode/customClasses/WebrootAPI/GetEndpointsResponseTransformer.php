@@ -7,8 +7,9 @@ namespace CNCLTD\WebrootAPI;
 use Karriere\JsonDecoder\Bindings\AliasBinding;
 use Karriere\JsonDecoder\Bindings\ArrayBinding;
 use Karriere\JsonDecoder\ClassBindings;
+use Karriere\JsonDecoder\Transformer;
 
-class GetEndpointsResponseTransformer implements \Karriere\JsonDecoder\Transformer
+class GetEndpointsResponseTransformer implements Transformer
 {
 
     /**

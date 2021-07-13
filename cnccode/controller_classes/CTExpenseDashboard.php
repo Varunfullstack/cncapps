@@ -7,8 +7,12 @@
  */
 
 use CNCLTD\Business\BUActivity;
+use CNCLTD\CustomerCallOutsDB;
 use CNCLTD\Data\DBEJProblem;
 use Twig\Environment;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
 
 global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
@@ -851,9 +855,9 @@ WHERE
 
     /**
      * @param $dbeExpense DBEExpense
-     * @throws \Twig\Error\LoaderError
-     * @throws \Twig\Error\RuntimeError
-     * @throws \Twig\Error\SyntaxError
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
      */
     function sendDeniedExpenseEmail($dbeExpense)
     {
@@ -926,7 +930,7 @@ WHERE
             $amount,
             $customerId
         );
-        \CNCLTD\CustomerCallOutsDB::recordCallOut($customerId, !$notChargeableCallOutReason, $salesOrderId, $freebie);
+        CustomerCallOutsDB::recordCallOut($customerId, !$notChargeableCallOutReason, $salesOrderId, $freebie);
     }
 
     private function createCallOutSalesOrderHeader(DBECustomer $dsCustomer)
@@ -1017,7 +1021,7 @@ WHERE
                                                   DataSet $dsActivity
     ): ?string
     {
-        $currentMonthOutOfHoursUsedCallOuts             = \CNCLTD\CustomerCallOutsDB::getCustomerOutOfHoursUsedCallOutsForCurrentMonth(
+        $currentMonthOutOfHoursUsedCallOuts             = CustomerCallOutsDB::getCustomerOutOfHoursUsedCallOutsForCurrentMonth(
             $customerId
         );
         $BUCustomerItem                                 = new BUCustomerItem($this);
@@ -1153,9 +1157,9 @@ WHERE
      * @param null $denyReason
      * @param bool $isDeleted
      * @param null $overtimeDurationApproved
-     * @throws \Twig\Error\LoaderError
-     * @throws \Twig\Error\RuntimeError
-     * @throws \Twig\Error\SyntaxError
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
      * @throws Exception
      */
     private function processOvertime($activityId,
@@ -1235,9 +1239,9 @@ WHERE
 
     /**
      * @param $dbeCallActivity DBECallActivity
-     * @throws \Twig\Error\LoaderError
-     * @throws \Twig\Error\RuntimeError
-     * @throws \Twig\Error\SyntaxError
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
      */
     function sendDeniedOvertimeEmail($dbeCallActivity)
     {

@@ -5,6 +5,7 @@ namespace CNCLTD\DUOUsersReportGenerator;
 use CNCLTD\DUOApi\AuthLog\AuthLog;
 use CNCLTD\DUOApi\Users\User;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
+use PhpOffice\PhpSpreadsheet\Exception;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
@@ -157,7 +158,7 @@ class DUOClientReportGenerator
 
     /**
      * @param Spreadsheet $spreadsheet
-     * @throws \PhpOffice\PhpSpreadsheet\Exception
+     * @throws Exception
      */
     private function setFont(Spreadsheet $spreadsheet): void
     {

@@ -9,6 +9,7 @@ use CNCLTD\TwigDTOs\ChargeableWorkCustomerRequestEmailDTO;
 use CNCLTD\TwigDTOs\ChargeableWorkCustomerRequestProcessedEmailDTO;
 use DBEContact;
 use DBEProblem;
+use DBEUser;
 
 class CommunicationService
 {
@@ -33,7 +34,7 @@ class CommunicationService
         $dbeContact = new DBEContact($thing);
         $dbeContact->getRow($request->getRequesteeId()->value());
         $dbeProblem = new DBEProblem($thing);
-        $dbeUser    = new \DBEUser($thing);
+        $dbeUser    = new DBEUser($thing);
         $dbeUser->getRow($request->getRequesterId()->value());
         $serviceRequestId = $request->getServiceRequestId()->value();
         $dbeProblem->getRow($serviceRequestId);
@@ -46,7 +47,7 @@ class CommunicationService
             $dbeContact->getValue(DBEContact::firstName),
             $serviceRequestId,
             $request->getReason()->value(),
-            "{$dbeUser->getValue(\DBEUser::firstName)} {$dbeUser->getValue(\DBEUser::lastName)}",
+            "{$dbeUser->getValue(DBEUser::firstName)} {$dbeUser->getValue(DBEUser::lastName)}",
             $dbeItem->getValue(DBEItem::curUnitSale)
         );
         $body       = $twig->render(
@@ -83,7 +84,7 @@ class CommunicationService
         $serviceRequest   = new DBEProblem($thing);
         $serviceRequestId = $request->getServiceRequestId()->value();
         $serviceRequest->getRow($serviceRequestId);
-        $requester = new \DBEUser($thing);
+        $requester = new DBEUser($thing);
         $requester->getRow($request->getRequesterId()->value());
         $urlService = SITE_URL . '/SRActivity.php?action=displayActivity&serviceRequestId=' . $serviceRequestId;
         $dto        = new ChargeableWorkCustomerRequestProcessedEmailDTO(

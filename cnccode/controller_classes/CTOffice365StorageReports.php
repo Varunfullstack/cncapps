@@ -55,7 +55,7 @@ class CTOffice365StorageReports extends CTCNC
                 $endDate = $this->getParam('endDate');
                 try {
                     $data = $this->getData($customerID, $startDate, $endDate);
-                } catch (\Exception $exception) {
+                } catch (Exception $exception) {
                     $data = ['error' => $exception->getMessage()];
                     http_response_code(400);
                 }

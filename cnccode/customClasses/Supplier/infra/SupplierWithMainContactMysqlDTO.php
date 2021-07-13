@@ -1,7 +1,9 @@
 <?php
 
 namespace CNCLTD\Supplier\infra;
-class SupplierWithMainContactMysqlDTO implements \JsonSerializable
+use JsonSerializable;
+
+class SupplierWithMainContactMysqlDTO implements JsonSerializable
 {
     private $id;
     private $name;

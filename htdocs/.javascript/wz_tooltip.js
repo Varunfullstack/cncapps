@@ -64,7 +64,7 @@ var ttWidth       = 300;
 
 //////////////  TAGS WITH TOOLTIP FUNCTIONALITY  ////////////////////
 // List may be extended or shortened:
-var tt_tags = new Array("a","area","b","big","caption","center","code","dd","div","dl","dt","em","h1","h2","h3","h4","h5","h6","i","img","input","li","map","ol","p","pre","s","small","span","strike","strong","sub","sup","table","td","th","tr","tt","u","var","ul","layer");
+var tt_tags = ["a","area","b","big","caption","center","code","dd","div","dl","dt","em","h1","h2","h3","h4","h5","h6","i","img","input","li","map","ol","p","pre","s","small","span","strike","strong","sub","sup","table","td","th","tr","tt","u","var","ul","layer"];
 /////////////////////////////////////////////////////////////////////
 
 
@@ -121,7 +121,7 @@ String.prototype.wzReplace = wzReplace;
 function tt_N4Tags(tagtyp, t_d, t_y)
 {
 	t_d = t_d || document;
-	t_y = t_y || new Array();
+	t_y = t_y || [];
 	var t_x = (tagtyp=="a")? t_d.links : t_d.layers;
 	for(var z = t_x.length; z--;) t_y[t_y.length] = t_x[z];
 	for(z = t_d.layers.length; z--;) t_y = tt_N4Tags(tagtyp, t_d.layers[z].document, t_y);

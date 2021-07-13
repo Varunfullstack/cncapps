@@ -896,5 +896,5 @@ class MDB_Manager_fbsql extends MDB_Manager_Common
     // }}}
 }
 
-};
+}
 ?>

@@ -260,8 +260,7 @@ class CTQuoteTemplates extends CTCNC
         if (!$this->buQuotationTemplate->updateQuotationTemplate($this->dsQuotationTemplate)) {
             $this->edit();
             exit;
-        };
-
+        }
         $urlNext =
             Controller::buildLink(
                 $_SERVER['PHP_SELF'],

@@ -3,6 +3,7 @@
 namespace CNCLTD\ServiceRequestInternalNote\UseCases;
 
 use CNCLTD\ServiceRequestInternalNote\ServiceRequestInternalNoteRepository;
+use DBEUser;
 use Exception;
 
 class ChangeServiceRequestInternalNote
@@ -21,7 +22,7 @@ class ChangeServiceRequestInternalNote
         $this->serviceRequestInternalNoteRepository = $serviceRequestInternalNoteRepository;
     }
 
-    public function __invoke($serviceRequestId, $content, \DBEUser $currentUser)
+    public function __invoke($serviceRequestId, $content, DBEUser $currentUser)
     {
         $notes = $this->serviceRequestInternalNoteRepository->getServiceRequestInternalNotesForSR($serviceRequestId);
         if (count($notes) > 1) {

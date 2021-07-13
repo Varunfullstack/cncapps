@@ -4,6 +4,11 @@
 namespace CNCLTD\CustomerValidation;
 
 
+use BUCustomer;
+use DataSet;
+use DBEContact;
+use DBESite;
+
 class CustomerValidation
 {
     private $customerName;
@@ -21,8 +26,8 @@ class CustomerValidation
 
     private function runValidation()
     {
-        $dsContacts = new \DataSet($this);
-        $buCustomer = new \BUCustomer($this);
+        $dsContacts = new DataSet($this);
+        $buCustomer = new BUCustomer($this);
         $buCustomer->getContactsByCustomerID($this->customerId, $dsContacts);
         $atLeastOneAccount = false;
         $atLeastOneInvoice = false;
@@ -33,41 +38,41 @@ class CustomerValidation
         $atLeastOneReport = false;
 
         while ($dsContacts->fetchNext()) {
-            $contactValidation = new ContactValidation($dsContacts->getValue(\DBEContact::contactID));
-            if ($dsContacts->getValue(\DBEContact::accountsFlag) == 'Y' && !$atLeastOneAccount) {
+            $contactValidation = new ContactValidation($dsContacts->getValue(DBEContact::contactID));
+            if ($dsContacts->getValue(DBEContact::accountsFlag) == 'Y' && !$atLeastOneAccount) {
                 $atLeastOneAccount = true;
             }
 
-            if ($dsContacts->getValue(\DBEContact::mailshot2Flag) == 'Y' && !$atLeastOneInvoice) {
+            if ($dsContacts->getValue(DBEContact::mailshot2Flag) == 'Y' && !$atLeastOneInvoice) {
                 $atLeastOneInvoice = true;
             }
 
             if ($dsContacts->getValue(
-                    \DBEContact::supportLevel
-                ) == \DBEContact::supportLevelMain && !$atLeastOneMain) {
+                    DBEContact::supportLevel
+                ) == DBEContact::supportLevelMain && !$atLeastOneMain) {
                 $atLeastOneMain = true;
             }
 
-            if ($dsContacts->getValue(\DBEContact::reviewUser) == 'Y' && !$atLeastOneReview) {
+            if ($dsContacts->getValue(DBEContact::reviewUser) == 'Y' && !$atLeastOneReview) {
                 $atLeastOneReview = true;
             }
 
-            if ($dsContacts->getValue(\DBEContact::mailshot8Flag) == 'Y' && !$atLeastOneTopUp) {
+            if ($dsContacts->getValue(DBEContact::mailshot8Flag) == 'Y' && !$atLeastOneTopUp) {
                 $atLeastOneTopUp = true;
             }
 
-            if ($dsContacts->getValue(\DBEContact::mailshot9Flag) == 'Y' && !$atLeastOneReport) {
+            if ($dsContacts->getValue(DBEContact::mailshot9Flag) == 'Y' && !$atLeastOneReport) {
                 $atLeastOneReport = true;
             }
             if ($contactValidation->hasErrors()) {
                 $this->contactValidationErrors[] = $contactValidation;
             }
         }
-        $dbeSite = new \DBESite($this);
-        $dbeSite->setValue(\DBESite::customerID, $this->customerId);
+        $dbeSite = new DBESite($this);
+        $dbeSite->setValue(DBESite::customerID, $this->customerId);
         $dbeSite->getRowsByCustomerID();
         while ($dbeSite->fetchNext()) {
-            $siteValidation = new SiteValidation($this->customerId, $dbeSite->getValue(\DBESite::siteNo));
+            $siteValidation = new SiteValidation($this->customerId, $dbeSite->getValue(DBESite::siteNo));
             if ($siteValidation->hasErrors()) {
                 $this->siteValidationErrors[] = $siteValidation;
             }

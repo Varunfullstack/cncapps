@@ -4,6 +4,8 @@
 namespace CNCLTD;
 
 
+use DBESignableEnvelope;
+
 class CustomerFormSignableProcess implements SignableProcess
 {
     private $quotationID;
@@ -25,7 +27,7 @@ class CustomerFormSignableProcess implements SignableProcess
 
         }
 
-        $dbeSignableEnvelope = new \DBESignableEnvelope($this);
+        $dbeSignableEnvelope = new DBESignableEnvelope($this);
 
 
     }

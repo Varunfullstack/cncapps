@@ -216,7 +216,7 @@ SET sortOrder =
 
         while ($this->db->next_record(MYSQLI_ASSOC)) {
             $customers[] = $this->db->Record;
-        };
+        }
         return $customers;
     }
 

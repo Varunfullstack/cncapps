@@ -16,7 +16,7 @@ use DateTimeInterface;
 use DBEContact;
 use DBEProblem;
 use DBEUser;
-
+use Exception;
 
 class RejectPendingChargeableWorkCustomerRequest
 {
@@ -102,7 +102,7 @@ class RejectPendingChargeableWorkCustomerRequest
      * @param DBEProblem $serviceRequest
      * @param string|null $comments
      * @throws ColumnOutOfRangeException
-     * @throws \Exception
+     * @throws Exception
      */
     private function logCustomerContactActivity(ChargeableWorkCustomerRequest $request,
                                                 ?DateTimeInterface $requestApprovedAt,

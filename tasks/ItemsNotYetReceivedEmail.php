@@ -1,4 +1,6 @@
 <?php
+
+use CNCLTD\ItemNotYetReceived;
 use CNCLTD\LoggerCLI;
 
 require_once(__DIR__ . "/../htdocs/config.inc.php");
@@ -43,8 +45,9 @@ $result = $buItemsNotYetReceived->getItemsNotYetReceived();
 
 usort(
     $result,
-    function (\CNCLTD\ItemNotYetReceived $a,
-              \CNCLTD\ItemNotYetReceived $b
+    function (
+        ItemNotYetReceived $a,
+              ItemNotYetReceived $b
     ) {
 
         if ($a->getCustomerName() > $b->getCustomerName()) {

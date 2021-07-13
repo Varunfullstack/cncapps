@@ -7,6 +7,7 @@
  */
 
 use CNCLTD\Data\DBEItem;
+use CNCLTD\Email\AttachmentCollection;
 
 global $cfg;
 require_once($cfg ["path_gc"] . "/Business.inc.php");
@@ -621,7 +622,7 @@ class BUPrepay extends Business
         $buMail      = new BUMail($this);
         $senderEmail = CONFIG_SALES_EMAIL;
         $subject     = 'Pre-Pay Contract Statement: ' . Controller::dateYMDtoDMY($date);
-        $attachments = new \CNCLTD\Email\AttachmentCollection();
+        $attachments = new AttachmentCollection();
         $attachments->add($statementFilepath, 'text/html', null, true);
         while ($dsContact->fetchNext()) {
             global $twig;

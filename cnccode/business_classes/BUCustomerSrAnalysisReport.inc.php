@@ -239,7 +239,7 @@ class BUCustomerSrAnalysisReport extends Business
 
         if ($customerID) {
             $query .= " AND pro_custno = $customerID";
-        };
+        }
         return $this->db->query($query)->fetch_object()->hours;
     }
 

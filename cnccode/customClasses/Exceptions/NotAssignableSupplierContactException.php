@@ -1,7 +1,9 @@
 <?php
 
 namespace CNCLTD\Exceptions;
-class NotAssignableSupplierContactException extends \Exception
+use Exception;
+
+class NotAssignableSupplierContactException extends Exception
 {
 
     /**

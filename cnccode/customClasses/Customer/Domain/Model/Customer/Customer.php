@@ -2,6 +2,7 @@
 
 namespace CNCLTD\Customer\Domain\Model\Customer;
 use CNCLTD\Shared\Domain\Model\AggregateRoot;
+use DateTimeImmutable;
 
 class Customer implements AggregateRoot
 {
@@ -18,7 +19,7 @@ class Customer implements AggregateRoot
     protected $deliverSiteId;
     /** @var CustomerMailshotAllowed */
     protected $mailshotAllowed;
-    /** @var \DateTimeImmutable */
+    /** @var DateTimeImmutable */
     protected $createDate;
     /** @var CustomerIsReferred */
     protected $isReferred;

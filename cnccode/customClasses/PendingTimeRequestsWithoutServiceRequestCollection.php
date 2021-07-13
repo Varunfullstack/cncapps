@@ -4,24 +4,26 @@
 namespace CNCLTD;
 
 
+use DBEJCallActivity;
 use DBEUser;
+use Iterator;
 
-class PendingTimeRequestsWithoutServiceRequestCollection implements \Iterator
+class PendingTimeRequestsWithoutServiceRequestCollection implements Iterator
 {
 
     private $leadersMap = [];
 
-    public function add(\DBEUser $leader, \DBEJCallActivity $timeRequestWithoutSR, DBEUser $requestingUser)
+    public function add(DBEUser $leader, DBEJCallActivity $timeRequestWithoutSR, DBEUser $requestingUser)
     {
-        if (!isset($this->leadersMap[$leader->getValue(\DBEUser::userID)])) {
+        if (!isset($this->leadersMap[$leader->getValue(DBEUser::userID)])) {
             $this->leadersMap[$leader->getValue(
-                \DBEUser::userID
+                DBEUser::userID
             )] = new TeamLeaderWithPendingTimeRequestsWithoutServiceRequest(
                 $this->getEmailFromUser($leader)
             );
         }
         $this->leadersMap[$leader->getValue(
-            \DBEUser::userID
+            DBEUser::userID
         )]->addPendingTimeRequest($timeRequestWithoutSR, $requestingUser);
     }
 

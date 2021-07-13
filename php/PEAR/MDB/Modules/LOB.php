@@ -89,9 +89,9 @@ class MDB_LOB
         $this->position += $length;
         return($length);
     }
-};
+}
 
-class MDB_LOB_Result extends MDB_LOB
+    class MDB_LOB_Result extends MDB_LOB
 {
     var $result_lob = 0;
 
@@ -129,9 +129,9 @@ class MDB_LOB_Result extends MDB_LOB
         }
         return($read_length);
     }
-};
+}
 
-class MDB_LOB_Input_File extends MDB_LOB
+    class MDB_LOB_Input_File extends MDB_LOB
 {
     var $file = 0;
     var $opened_file = 0;
@@ -186,9 +186,9 @@ class MDB_LOB_Input_File extends MDB_LOB
         }
         return(strlen($data));
     }
-};
+}
 
-class MDB_LOB_Output_File extends MDB_LOB
+    class MDB_LOB_Output_File extends MDB_LOB
 {
     var $file = 0;
     var $opened_file = 0;
@@ -312,5 +312,5 @@ class MDB_LOB_Output_File extends MDB_LOB
     }
 }
 
-};
+}
 ?>

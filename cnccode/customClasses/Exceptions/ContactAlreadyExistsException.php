@@ -1,7 +1,9 @@
 <?php
 
 namespace CNCLTD\Exceptions;
-class ContactAlreadyExistsException extends \Exception
+use Exception;
+
+class ContactAlreadyExistsException extends Exception
 {
 
     /**

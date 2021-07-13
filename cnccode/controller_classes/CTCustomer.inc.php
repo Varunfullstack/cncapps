@@ -11,8 +11,10 @@ use CNCLTD\AdditionalChargesRates\Domain\CustomerId;
 use CNCLTD\Business\BUActivity;
 use CNCLTD\Data\DBConnect;
 use CNCLTD\Data\DBEJProblem;
+use CNCLTD\Data\SiteMapper;
 use CNCLTD\Encryption;
 use CNCLTD\Exceptions\APIException;
+use CNCLTD\Exceptions\JsonHttpException;
 use CNCLTD\SupportedCustomerAssets\UnsupportedCustomerAssetService;
 use CNCLTD\Utils;
 
@@ -2429,16 +2431,16 @@ class CTCustomer extends CTCNC
         $data = $this->getJSONData();
         $this->setMethodName('deleteSite');
         if (empty($data['customerId'])) {
-            throw new \CNCLTD\Exceptions\JsonHttpException(400, 'Customer Id Required');
+            throw new JsonHttpException(400, 'Customer Id Required');
         }
         if (empty($data['siteNo'])) {
-            throw new \CNCLTD\Exceptions\JsonHttpException(400, 'Site Number Required');
+            throw new JsonHttpException(400, 'Site Number Required');
         }
         if (!$this->buCustomer->canDeleteSite(
             $data['customerId'],
             $data['siteNo']
         )) {
-            throw new \CNCLTD\Exceptions\JsonHttpException(403, 'Cannot delete Site because is in use');
+            throw new JsonHttpException(403, 'Cannot delete Site because is in use');
         }
         $this->buCustomer->deleteSite(
             $data['customerId'],
@@ -3281,7 +3283,7 @@ ORDER BY NAME,
                 if (empty($data['lastUpdatedDateTime']) || $data['lastUpdatedDateTime'] < $dbeCustomer->getValue(
                         DBECustomer::lastUpdatedDateTime
                     )) {
-                    throw new \CNCLTD\Exceptions\JsonHttpException(
+                    throw new JsonHttpException(
                         400, "Updated by another user", [
                                "errorCode"           => 1002,
                                "lastUpdatedDateTime" => $dbeCustomer->getValue(DBECustomer::lastUpdatedDateTime)
@@ -3299,10 +3301,10 @@ ORDER BY NAME,
     {
                 $dbeSite = new DBESite($this);
                 if (!isset($data['customerID'])) {
-                    throw new \CNCLTD\Exceptions\JsonHttpException(400, "Customer ID is mandatory");
+                    throw new JsonHttpException(400, "Customer ID is mandatory");
                 }
                 if (!isset($data['siteNo'])) {
-                    throw new \CNCLTD\Exceptions\JsonHttpException(400, "siteNo is mandatory");
+                    throw new JsonHttpException(400, "siteNo is mandatory");
                 }
                 $dbeSite->setValue(DBESite::customerID, $data['customerID']);
                 $dbeSite->setValue(DBESite::siteNo, $data['siteNo']);
@@ -3320,9 +3322,9 @@ ORDER BY NAME,
                 }*/
                 if(isset($data['fieldValueMap'])) {
                     if (isset($data['fieldValueMap']['active']) && $data['siteNo'] == 0) {
-                        throw new \CNCLTD\Exceptions\JsonHttpException(400, "Cannot deactivate Site 0");
+                        throw new JsonHttpException(400, "Cannot deactivate Site 0");
                     }
-                    $dbeSite = \CNCLTD\Data\SiteMapper::fromDTOToDB($data['fieldValueMap'], $dbeSite);
+                    $dbeSite = SiteMapper::fromDTOToDB($data['fieldValueMap'], $dbeSite);
                 }
                 $dbeSite->setValue(DBESite::add1, $data['add1']);
                 $dbeSite->setValue(DBESite::add2, $data['add2']);
@@ -3346,7 +3348,7 @@ ORDER BY NAME,
     function deletePortalDocument($data)
     {
                 if (!isset($data['portalDocumentId'])) {
-                    throw new \CNCLTD\Exceptions\JsonHttpException(400, "portal document Id is required");
+                    throw new JsonHttpException(400, "portal document Id is required");
                 }
                 $dbePortalCustomerDocumentWithoutFile = new DBEPortalCustomerDocumentWithoutFile($this);
                 $dbePortalCustomerDocumentWithoutFile->deleteRow($data['portalDocumentId']);
@@ -3356,22 +3358,22 @@ ORDER BY NAME,
     function addPortalCustomerDocument($data)
     {
         if (!isset($data['customerId'])) {
-            throw new \CNCLTD\Exceptions\JsonHttpException(400, "customerId is required");
+            throw new JsonHttpException(400, "customerId is required");
         }
         if (!isset($data['description'])) {
-            throw new \CNCLTD\Exceptions\JsonHttpException(400, "description is required");
+            throw new JsonHttpException(400, "description is required");
         }
         if (!isset($data['fileName'])) {
-            throw new \CNCLTD\Exceptions\JsonHttpException(400, "fileName is required");
+            throw new JsonHttpException(400, "fileName is required");
         }
         if (!isset($data['encodedFile'])) {
-            throw new \CNCLTD\Exceptions\JsonHttpException(400, "encodedFile is required");
+            throw new JsonHttpException(400, "encodedFile is required");
         }
         if (!isset($data['customerContract'])) {
-            throw new \CNCLTD\Exceptions\JsonHttpException(400, "customerContract is required");
+            throw new JsonHttpException(400, "customerContract is required");
         }
         if (!isset($data['mainContractOnly'])) {
-            throw new \CNCLTD\Exceptions\JsonHttpException(400, "mainContractOnly is required");
+            throw new JsonHttpException(400, "mainContractOnly is required");
         }
         $fileAndMimeType           = $this->getFileDecodedAndMimeTypeFromBase64EncodedFile(
             $data['encodedFile']
@@ -3539,22 +3541,22 @@ ORDER BY NAME,
     function addSite($data)
     {
                 if (!isset($data['customerID'])) {
-                    throw new \CNCLTD\Exceptions\JsonHttpException(400, 'customerID is required');
+                    throw new JsonHttpException(400, 'customerID is required');
                 }
                 if (!isset($data['add1'])) {
-                    throw new \CNCLTD\Exceptions\JsonHttpException(400, 'addressLine is required');
+                    throw new JsonHttpException(400, 'addressLine is required');
                 }
                 if (!isset($data['town'])) {
-                    throw new \CNCLTD\Exceptions\JsonHttpException(400, 'town is required');
+                    throw new JsonHttpException(400, 'town is required');
                 }
                 if (!isset($data['postcode'])) {
-                    throw new \CNCLTD\Exceptions\JsonHttpException(400, 'postcode is required');
+                    throw new JsonHttpException(400, 'postcode is required');
                 }
                 if (!isset($data['phone'])) {
-                    throw new \CNCLTD\Exceptions\JsonHttpException(400, 'phone is required');
+                    throw new JsonHttpException(400, 'phone is required');
                 }
                 if (!isset($data['maxTravelHours'])) {
-                    throw new \CNCLTD\Exceptions\JsonHttpException(400, 'maxTravelHours is required');
+                    throw new JsonHttpException(400, 'maxTravelHours is required');
                 }
                 $dbeSite = new DBESite($this);
                 $dbeSite->setValue(DBESite::customerID, $data['customerID']);
@@ -3598,7 +3600,7 @@ ORDER BY NAME,
     {
         $dbeContact = new DBEContact($this);
         if (!isset($data['customerID'])) {
-            throw new \CNCLTD\Exceptions\JsonHttpException(400, "Customer ID is mandatory");
+            throw new JsonHttpException(400, "Customer ID is mandatory");
         }
         $dbeContact->setValue(DBEContact::siteNo, $data['siteNo']);   
         $dbeContact->setValue(DBEContact::customerID, $data['customerID']);   
@@ -3644,10 +3646,10 @@ ORDER BY NAME,
     {
         $dbeContact = new DBEContact($this);
         if (!isset($data['customerID'])) {
-            throw new \CNCLTD\Exceptions\JsonHttpException(400, "Customer ID is mandatory");
+            throw new JsonHttpException(400, "Customer ID is mandatory");
         }
         if (!isset($data['id'])) {
-            throw new \CNCLTD\Exceptions\JsonHttpException(400, "Contact ID is mandatory");
+            throw new JsonHttpException(400, "Contact ID is mandatory");
         }
         $dbeContact->getRow($data['id']);
         $dbeContact->setValue(DBEContact::siteNo, $data['siteNo']);   

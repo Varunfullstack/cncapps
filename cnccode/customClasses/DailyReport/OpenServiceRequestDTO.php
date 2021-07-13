@@ -5,6 +5,7 @@ namespace CNCLTD\DailyReport;
 
 
 use DateTime;
+use Exception;
 
 class OpenServiceRequestDTO
 {
@@ -49,7 +50,7 @@ class OpenServiceRequestDTO
 
     /**
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      */
     public function getRaisedOn()
     {

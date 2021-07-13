@@ -3,8 +3,9 @@
 namespace CNCLTD\AdditionalChargesRates\Application\GetRatesForCustomer;
 
 use CNCLTD\Shared\Domain\Bus\Response;
+use JsonSerializable;
 
-class GetRatesForCustomerResponse implements Response, \JsonSerializable
+class GetRatesForCustomerResponse implements Response, JsonSerializable
 {
     private $prices = [];
 

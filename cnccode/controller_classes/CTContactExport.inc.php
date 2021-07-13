@@ -231,7 +231,7 @@ WHERE customer.`cus_referred` <> 'Y'
                 $str
             );
             $count++;
-        };
+        }
         // we need to close the previous file
         fclose($file);
         $zip->addFile($files[count($files) - 1]);

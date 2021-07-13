@@ -7,9 +7,18 @@
  */
 
 namespace CNCLTD;
+use Controller;
+use DBEAnswerType;
+use DBEStaffAppraisalObjectives;
+use DBEStaffAppraisalQuestion;
+use DBEStaffAppraisalQuestionAnswer;
+use DBEStaffAppraisalQuestionnaireAnswer;
+use DBEUser;
+use setasign\Fpdi\Fpdi;
+
 require_once __DIR__."/../../cnccode/fpdf/fpdf_protection.php";
 
-class StaffAppraisalPDF extends \setasign\Fpdi\Fpdi
+class StaffAppraisalPDF extends Fpdi
 {
 
     private $leftMargin = 10;
@@ -53,10 +62,10 @@ class StaffAppraisalPDF extends \setasign\Fpdi\Fpdi
     private $hideFooter = false;
     private $hideHeader = false;
     private $passPhrase;
-    /** @var \DBEUser */
+    /** @var DBEUser */
     private $staffMember;
 
-    public function __construct(\DBEStaffAppraisalQuestionnaireAnswer $questionnaireAnswer,
+    public function __construct(DBEStaffAppraisalQuestionnaireAnswer $questionnaireAnswer,
                                 $passPhrase
     )
     {
@@ -79,7 +88,7 @@ class StaffAppraisalPDF extends \setasign\Fpdi\Fpdi
         $this->footerImage = $GLOBALS['cfg']['cncaddress_path'];
         list($originalWidth, $originalHeight) = getimagesize($this->footerImage);
         $this->footerImageRatio = $originalHeight / $originalWidth;
-        $this->footerImageWidth = $this->GetPageWidth() - $this->leftMargin - $this->rightMargin;;
+        $this->footerImageWidth = $this->GetPageWidth() - $this->leftMargin - $this->rightMargin;
         $this->footerHeight = ($this->footerImageWidth * $this->footerImageRatio) + $this->marginFromFooter;
         $this->footerPosition = $this->GetPageHeight() - $this->footerHeight;
 
@@ -108,16 +117,16 @@ class StaffAppraisalPDF extends \setasign\Fpdi\Fpdi
             $this->footerHeight
         );
 
-        $questionnaireAnswerID = $questionnaireAnswer->getValue(\DBEStaffAppraisalQuestionnaireAnswer::id);
+        $questionnaireAnswerID = $questionnaireAnswer->getValue(DBEStaffAppraisalQuestionnaireAnswer::id);
 
-        $staffMemberID = $questionnaireAnswer->getValue(\DBEStaffAppraisalQuestionnaireAnswer::staffMemberID);
-        $staffMember = new \DBEUser($this);
+        $staffMemberID = $questionnaireAnswer->getValue(DBEStaffAppraisalQuestionnaireAnswer::staffMemberID);
+        $staffMember = new DBEUser($this);
         $staffMember->getRow($staffMemberID);
 
         $this->staffMember = $staffMember;
 
-        $managerID = $questionnaireAnswer->getValue(\DBEStaffAppraisalQuestionnaireAnswer::managerID);
-        $manager = new \DBEUser($this);
+        $managerID = $questionnaireAnswer->getValue(DBEStaffAppraisalQuestionnaireAnswer::managerID);
+        $manager = new DBEUser($this);
         $manager->getRow($managerID);
 
         $this->AddPage();
@@ -132,7 +141,7 @@ class StaffAppraisalPDF extends \setasign\Fpdi\Fpdi
         $this->Cell(
             50,
             10,
-            $staffMember->getValue(\DBEUser::firstName) . " " . $staffMember->getValue(\DBEUser::lastName)
+            $staffMember->getValue(DBEUser::firstName) . " " . $staffMember->getValue(DBEUser::lastName)
         );
         $this->setBold();
         $this->Cell(
@@ -144,7 +153,7 @@ class StaffAppraisalPDF extends \setasign\Fpdi\Fpdi
         $this->Cell(
             50,
             10,
-            $manager->getValue(\DBEUser::firstName) . " " . $manager->getValue(\DBEUser::lastName)
+            $manager->getValue(DBEUser::firstName) . " " . $manager->getValue(DBEUser::lastName)
         );
         $this->Ln();
         $this->setBold();
@@ -158,8 +167,8 @@ class StaffAppraisalPDF extends \setasign\Fpdi\Fpdi
         $this->Cell(
             50,
             10,
-            \Controller::dateYMDtoDMY(
-                $staffMember->getValue(\DBEUser::startDate),
+            Controller::dateYMDtoDMY(
+                $staffMember->getValue(DBEUser::startDate),
                 '-'
             )
         );
@@ -173,7 +182,7 @@ class StaffAppraisalPDF extends \setasign\Fpdi\Fpdi
         $this->Cell(
             50,
             10,
-            $staffMember->getValue(\DBEUser::jobTitle)
+            $staffMember->getValue(DBEUser::jobTitle)
         );
         $this->Ln();
         $this->setBold();
@@ -186,13 +195,13 @@ class StaffAppraisalPDF extends \setasign\Fpdi\Fpdi
         $this->Cell(
             50,
             10,
-            $questionnaireAnswer->getValue(\DBEStaffAppraisalQuestionnaireAnswer::sickDaysThisYear)
+            $questionnaireAnswer->getValue(DBEStaffAppraisalQuestionnaireAnswer::sickDaysThisYear)
         );
 
         $this->Ln();
         $this->Ln();
-        $questionnaireID = $questionnaireAnswer->getValue(\DBEStaffAppraisalQuestionnaireAnswer::questionnaireID);
-        $dbeQuestions = new \DBEStaffAppraisalQuestion($this);
+        $questionnaireID = $questionnaireAnswer->getValue(DBEStaffAppraisalQuestionnaireAnswer::questionnaireID);
+        $dbeQuestions = new DBEStaffAppraisalQuestion($this);
 
         $dbeQuestions->getRowsForQuestionnaire($questionnaireID);
         $previousQuestionType = null;
@@ -204,7 +213,7 @@ class StaffAppraisalPDF extends \setasign\Fpdi\Fpdi
                 $previousQuestionType
             );
 
-            $previousQuestionType = $dbeQuestions->getValue(\DBEStaffAppraisalQuestion::answerTypeID);
+            $previousQuestionType = $dbeQuestions->getValue(DBEStaffAppraisalQuestion::answerTypeID);
             //lets assume we need at least 30mm per question
         }
 
@@ -252,40 +261,40 @@ class StaffAppraisalPDF extends \setasign\Fpdi\Fpdi
         );
     }
 
-    private function renderQuestion(\DBEStaffAppraisalQuestion $dbeQuestions,
+    private function renderQuestion(DBEStaffAppraisalQuestion $dbeQuestions,
                                     $questionnaireAnswerID,
                                     $previousQuestionType
     )
     {
         // we now look at the current question and render it as we should
-        $questionDescription = $dbeQuestions->getValue(\DBEStaffAppraisalQuestion::description);
-        $questionID = $dbeQuestions->getValue(\DBEStaffAppraisalQuestion::id);
-        $questionType = $dbeQuestions->getValue(\DBEStaffAppraisalQuestion::answerTypeID);
+        $questionDescription = $dbeQuestions->getValue(DBEStaffAppraisalQuestion::description);
+        $questionID = $dbeQuestions->getValue(DBEStaffAppraisalQuestion::id);
+        $questionType = $dbeQuestions->getValue(DBEStaffAppraisalQuestion::answerTypeID);
         $question = "";
 
-        $dbeQuestionAnswer = new \DBEStaffAppraisalQuestionAnswer($this);
+        $dbeQuestionAnswer = new DBEStaffAppraisalQuestionAnswer($this);
 
         $dbeQuestionAnswer->getRowByIDAndQuestionnaireAnswerID(
             $questionID,
             $questionnaireAnswerID
         );
-        $staffAnswer = $dbeQuestionAnswer->getValue(\DBEStaffAppraisalQuestionAnswer::staffAnswer);
-        $managerAnswer = $dbeQuestionAnswer->getValue(\DBEStaffAppraisalQuestionAnswer::managerAnswer);
-        if ($dbeQuestions->getValue(\DBEStaffAppraisalQuestion::answerTypeID) == 5) {
-            $dbeQuestionType = new \DBEAnswerType($this);
+        $staffAnswer = $dbeQuestionAnswer->getValue(DBEStaffAppraisalQuestionAnswer::staffAnswer);
+        $managerAnswer = $dbeQuestionAnswer->getValue(DBEStaffAppraisalQuestionAnswer::managerAnswer);
+        if ($dbeQuestions->getValue(DBEStaffAppraisalQuestion::answerTypeID) == 5) {
+            $dbeQuestionType = new DBEAnswerType($this);
             $dbeQuestionType->getRow($questionType);
 
-            $answerOptionsString = $dbeQuestionType->getValue(\DBEAnswerType::answerOptions);
+            $answerOptionsString = $dbeQuestionType->getValue(DBEAnswerType::answerOptions);
 
             $answerOptions = json_decode($answerOptionsString);
 
             $staffAnswer = $answerOptions[$staffAnswer];
             $managerAnswer = $answerOptions[$managerAnswer];
         }
-        $managerComments = $dbeQuestionAnswer->getValue(\DBEStaffAppraisalQuestionAnswer::managerComment);
+        $managerComments = $dbeQuestionAnswer->getValue(DBEStaffAppraisalQuestionAnswer::managerComment);
 
         $freeTextQuestions = [3, 4];
-        $currentQuestionType = $dbeQuestions->getValue(\DBEStaffAppraisalQuestion::answerTypeID);
+        $currentQuestionType = $dbeQuestions->getValue(DBEStaffAppraisalQuestion::answerTypeID);
         $isCurrentFreeType = in_array(
             $currentQuestionType,
             $freeTextQuestions
@@ -685,20 +694,20 @@ class StaffAppraisalPDF extends \setasign\Fpdi\Fpdi
 
     private function renderObjectives($questionnaireAnswerID)
     {
-        $dbeObjective = new \DBEStaffAppraisalObjectives($this);
+        $dbeObjective = new DBEStaffAppraisalObjectives($this);
 
         $dbeObjective->getRowsByAnswerID($questionnaireAnswerID);
 
         $shouldPrintHeader = true;
         while ($dbeObjective->fetchNext()) {
-            if (!empty($dbeObjective->getValue(\DBEStaffAppraisalObjectives::requirement)) ||
-                !empty($dbeObjective->getValue(\DBEStaffAppraisalObjectives::measure)) ||
-                !empty($dbeObjective->getValue(\DBEStaffAppraisalObjectives::comment))) {
+            if (!empty($dbeObjective->getValue(DBEStaffAppraisalObjectives::requirement)) ||
+                !empty($dbeObjective->getValue(DBEStaffAppraisalObjectives::measure)) ||
+                !empty($dbeObjective->getValue(DBEStaffAppraisalObjectives::comment))) {
 
                 // do I need to print the header?
-                $objectiveDescription = $dbeObjective->getValue(\DBEStaffAppraisalObjectives::requirement);
-                $objectiveMeasure = $dbeObjective->getValue(\DBEStaffAppraisalObjectives::measure);
-                $objectivesComment = $dbeObjective->getValue(\DBEStaffAppraisalObjectives::comment);
+                $objectiveDescription = $dbeObjective->getValue(DBEStaffAppraisalObjectives::requirement);
+                $objectiveMeasure = $dbeObjective->getValue(DBEStaffAppraisalObjectives::measure);
+                $objectivesComment = $dbeObjective->getValue(DBEStaffAppraisalObjectives::comment);
 
                 $widths = [
                     [$this->objectiveDescriptionWidth, $objectiveDescription],
@@ -783,7 +792,7 @@ class StaffAppraisalPDF extends \setasign\Fpdi\Fpdi
         }
     }
 
-    private function renderSalarySection(\DBEStaffAppraisalQuestionnaireAnswer $questionnaireAnswer)
+    private function renderSalarySection(DBEStaffAppraisalQuestionnaireAnswer $questionnaireAnswer)
     {
 
         if ($this->newPageIfNeeded(
@@ -793,8 +802,7 @@ class StaffAppraisalPDF extends \setasign\Fpdi\Fpdi
         )) {
             $this->AddPage();
             $this->SetY($this->headerHeight);
-        };
-
+        }
         $this->setBold();
         $this->SetFontSize(12);
         $this->Cell(
@@ -817,7 +825,7 @@ class StaffAppraisalPDF extends \setasign\Fpdi\Fpdi
 
         $currentSalary = "Not Set";
 
-        $currentSalaryEncrypted = $this->staffMember->getValue(\DBEUser::encryptedSalary);
+        $currentSalaryEncrypted = $this->staffMember->getValue(DBEUser::encryptedSalary);
 
         if ($currentSalaryEncrypted) {
             $currentSalaryValue = Encryption::decrypt(
@@ -825,7 +833,7 @@ class StaffAppraisalPDF extends \setasign\Fpdi\Fpdi
                 $this->passPhrase,
                 $currentSalaryEncrypted
             );
-            $currentSalary = \Controller::formatNumberCur(
+            $currentSalary = Controller::formatNumberCur(
                 $currentSalaryValue,
                 2,
                 ',',
@@ -843,8 +851,8 @@ class StaffAppraisalPDF extends \setasign\Fpdi\Fpdi
         $this->Cell(
             $this->objectiveMeasureWidth,
             $this->questionSeparation,
-            \Controller::formatNumberCur(
-                $questionnaireAnswer->getValue(\DBEStaffAppraisalQuestionnaireAnswer::proposedSalary),
+            Controller::formatNumberCur(
+                $questionnaireAnswer->getValue(DBEStaffAppraisalQuestionnaireAnswer::proposedSalary),
                 2,
                 ',',
                 false
@@ -853,8 +861,8 @@ class StaffAppraisalPDF extends \setasign\Fpdi\Fpdi
         $this->Cell(
             $this->objectiveCommentWidth,
             $this->questionSeparation,
-            \Controller::formatNumberCur(
-                $questionnaireAnswer->getValue(\DBEStaffAppraisalQuestionnaireAnswer::proposedBonus),
+            Controller::formatNumberCur(
+                $questionnaireAnswer->getValue(DBEStaffAppraisalQuestionnaireAnswer::proposedBonus),
                 2,
                 ',',
                 false
@@ -864,10 +872,10 @@ class StaffAppraisalPDF extends \setasign\Fpdi\Fpdi
         $this->Ln();
     }
 
-    private function renderTeamLeaderComments(\DBEStaffAppraisalQuestionnaireAnswer $questionnaireAnswer)
+    private function renderTeamLeaderComments(DBEStaffAppraisalQuestionnaireAnswer $questionnaireAnswer)
     {
 
-        $teamLeaderComments = $questionnaireAnswer->getValue(\DBEStaffAppraisalQuestionnaireAnswer::teamLeaderComments);
+        $teamLeaderComments = $questionnaireAnswer->getValue(DBEStaffAppraisalQuestionnaireAnswer::teamLeaderComments);
         if ($this->newPageIfNeeded(
             [[$this->teamLeaderCommentWidth, $teamLeaderComments]],
             8,
@@ -875,8 +883,7 @@ class StaffAppraisalPDF extends \setasign\Fpdi\Fpdi
         )) {
             $this->AddPage();
             $this->SetY($this->headerHeight);
-        };
-
+        }
         $this->setBold();
         $this->SetFontSize(12);
         $this->NewMultiCell(
@@ -895,9 +902,9 @@ class StaffAppraisalPDF extends \setasign\Fpdi\Fpdi
         }
     }
 
-    private function renderManagerComments(\DBEStaffAppraisalQuestionnaireAnswer $questionnaireAnswer)
+    private function renderManagerComments(DBEStaffAppraisalQuestionnaireAnswer $questionnaireAnswer)
     {
-        $managerComments = $questionnaireAnswer->getValue(\DBEStaffAppraisalQuestionnaireAnswer::managerComments);
+        $managerComments = $questionnaireAnswer->getValue(DBEStaffAppraisalQuestionnaireAnswer::managerComments);
         if ($this->newPageIfNeeded(
             [[$this->teamLeaderCommentWidth, $managerComments]],
             8,
@@ -905,8 +912,7 @@ class StaffAppraisalPDF extends \setasign\Fpdi\Fpdi
         )) {
             $this->AddPage();
             $this->SetY($this->headerHeight);
-        };
-
+        }
         $this->setBold();
         $this->SetFontSize(12);
         $this->NewMultiCell(

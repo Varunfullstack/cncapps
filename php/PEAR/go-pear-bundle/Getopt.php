@@ -208,7 +208,7 @@ class Console_Getopt {
             if (substr($long_opt, -1) == '=') {
                 if (substr($long_opt, -2) != '==') {
                     /* Long option requires an argument.
-                       Take the next argument if one wasn't specified. */;
+                       Take the next argument if one wasn't specified. */
                     if (!strlen($opt_arg) && !(list(, $opt_arg) = each($args))) {
                         return PEAR::raiseError("Console_Getopt: option --$opt requires an argument");
                     }

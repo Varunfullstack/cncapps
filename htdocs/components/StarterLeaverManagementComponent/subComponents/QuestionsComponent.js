@@ -70,7 +70,7 @@ export default class QuestionsComponent extends MainComponent {
     if(!this.isFormValid("form"))
     {
         this.alert("Please add all required inputs");
-        return;
+
     }
     //console.log(data);
   };
