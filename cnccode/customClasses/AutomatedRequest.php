@@ -39,6 +39,14 @@ class AutomatedRequest
     protected $queueNo;
 
     /**
+     * @param mixed $priority
+     */
+    public function setPriority($priority): void
+    {
+        $this->priority = $priority;
+    }
+
+    /**
      * @return mixed
      */
     public function getAutomatedRequestID()

@@ -6858,6 +6858,7 @@ class BUActivity extends Business
 
     function processKingswoodAutomatedRequest(AutomatedRequest $automatedRequest)
     {
+        $automatedRequest->setPriority(3);
         // see if we have already a service request for this
         $emailSubjectSummary = "Incident #{$automatedRequest->getServiceRequestID()}";
         $dbeProblem          = new DBEProblem($this);
