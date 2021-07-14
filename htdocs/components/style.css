@@ -826,7 +826,12 @@ input:checked + .slider:before {
     -ms-transform: translateX(13px);
     transform: translateX(13px);
 }
-
+input:disabled + .slider{
+    background-color:#bdbec1;
+}
+input[type="checkbox"][disabled]:checked + .slider {
+    background-color: #00b9f1;
+}
 /* Rounded sliders */
 
 .slider.round {

@@ -26,6 +26,13 @@ export default class CustomerContactsComponent extends MainComponent {
       data: { ...this.getInitData() },
       filter: {
         showInActive: false,
+        reviewUser: false,
+        hrUser:false,
+        accountsFlag:false,
+        mailshot8Flag:false,
+        mailshot2Flag:false,
+        mailshot4Flag:false,
+        mailshot9Flag:false
       },
       showSpinner: true,
       supportLevelOptions: [
@@ -52,6 +59,7 @@ export default class CustomerContactsComponent extends MainComponent {
     this.setState({ showSpinner: true });
     const customerId = params.get("customerID");
     this.api.getCustomerContacts(customerId).then((contacts) => {
+      console.log(contacts);
       this.setState({ contacts, customerId, showSpinner: false }, () =>
         this.applyFilter()
       );
@@ -61,10 +69,27 @@ export default class CustomerContactsComponent extends MainComponent {
 
   applyFilter = () => {
     const { filter, contacts } = this.state;
-    const contactsFiltered = filter.showInActive
-      ? contacts
-      : contacts.filter((c) => c.active == 1);
+    let contactsFiltered = [...contacts];    
+    contactsFiltered = filter.showInActive?contactsFiltered:contactsFiltered.filter((c) => c.active == 1);     
+
+    if(filter.reviewUser)
+    contactsFiltered =contactsFiltered.filter((c) => c.reviewUser == 'Y');  
     this.setState({ contactsFiltered });
+    if(filter.hrUser)
+    contactsFiltered =contactsFiltered.filter((c) => c.hrUser == 'Y');
+    // if(filter.accountsFlag)
+    // contactsFiltered =contactsFiltered.filter((c) => c.accountsFlag == 'Y');
+    if(filter.mailshot8Flag)
+    contactsFiltered =contactsFiltered.filter((c) => c.mailshot8Flag == 'Y');
+
+    if(filter.mailshot2Flag)
+    contactsFiltered =contactsFiltered.filter((c) => c.mailshot2Flag == 'Y');
+    // if(filter.mailshot4Flag)
+    // contactsFiltered =contactsFiltered.filter((c) => c.mailshot4Flag == 'Y');
+     if(filter.mailshot9Flag)
+    contactsFiltered =contactsFiltered.filter((c) => c.mailshot9Flag == 'Y');
+   
+    
   };
 
   getSiteTitle = (siteNo) => {
@@ -309,11 +334,11 @@ export default class CustomerContactsComponent extends MainComponent {
         show={showModal}
         content={this.getModalContent()}
         footer={
-          <div key="footer">
-            <button onClick={this.handleClose} className="btn btn-secodary">
+          <div key="footer">            
+            <button onClick={this.handleSave}>Save</button>
+            <button onClick={this.handleClose}  >
               Cancel
             </button>
-            <button onClick={this.handleSave}>Save</button>
           </div>
         }
         onClose={this.handleClose}
@@ -451,21 +476,12 @@ export default class CustomerContactsComponent extends MainComponent {
               </td>
             </tr>
             <tr>
-              <td className="text-right"> Pending Leaver Date</td>
-              <td>
-                <input
-                  type="date"
-                  value={data.pendingLeaverDate || ""}
-                  onChange={(event) =>
-                    this.setValue("pendingLeaverDate", event.target.value)
-                  }
-                  className="form-control"
-                />
-              </td>
+              
               <td className="text-right">Support Level</td>
               <td>
                 <select
                   required
+                  name="supportLevel"
                   value={data.supportLevel}
                   onChange={(event) =>
                     this.setValue("supportLevel", event.target.value)
@@ -481,6 +497,17 @@ export default class CustomerContactsComponent extends MainComponent {
                   })}
                 </select>
               </td>
+              <td className="text-right"> Pending Leaver Date</td>
+              <td>
+                <input
+                  type="date"
+                  value={data.pendingLeaverDate || ""}
+                  onChange={(event) =>
+                    this.setValue("pendingLeaverDate", event.target.value)
+                  }
+                  className="form-control"
+                />
+              </td>
             </tr>
             <tr>
               {this.getYNFlag(
@@ -495,15 +522,17 @@ export default class CustomerContactsComponent extends MainComponent {
             </tr>
             <tr>
               {this.getYNFlag(
-                "Send Others Initial Logging Email?",
-                "othersInitialLoggingEmailFlag"
+                "Send Others Initial Logging Email",
+                "othersInitialLoggingEmailFlag",
+                data.supportLevel=="support"||data.supportLevel=="delegate"
               )}
               {this.getYNFlag("Mailshot", "sendMailshotFlag")}
             </tr>
             <tr>
               {this.getYNFlag(
-                "Send Others Fixed Email?",
-                "othersFixedEmailFlag"
+                "Send Others Fixed Email",
+                "othersFixedEmailFlag",
+                data.supportLevel=="support"||data.supportLevel=="delegate"
               )}
               {this.getYNFlag("Accounts", "accountsFlag")}
             </tr>
@@ -512,44 +541,59 @@ export default class CustomerContactsComponent extends MainComponent {
               {this.getYNFlag("PrePay TopUp Notifications", "mailshot8Flag")}
             </tr>
             <tr>
-              {this.getYNFlag("Active", "activeFlag")}
+            {this.getYNFlag("Attends Review Meeting", "reviewUser")}
               {this.getYNFlag("Receive Invoices", "mailshot2Flag")}
             </tr>
             <tr>
-              {this.getYNFlag("Attends Review Meeting", "reviewUser")}
+            {this.getYNFlag("HR User to edit contacts", "hrUser")}
               {this.getYNFlag("Receive Statements", "mailshot4Flag")}
             </tr>
-            <tr>{this.getYNFlag("HR User to edit contacts", "hrUser")}</tr>
+            <tr>
+             {this.getYNFlag("Active", "activeFlag")}
+            </tr>
           </tbody>
         </table>
       </div>
     );
   };
-  getYNFlag = (label, prop) => {
+  getYNFlag = (label, prop,disabled=false) => {
     const { data } = this.state;
     return (
       <Fragment>
         <td  className="text-right">{label}</td>
         <td>
           <Toggle
+            disabled={disabled}
             checked={data[prop] === "Y"}
-            onChange={() => this.setValue(prop, data[prop] === "Y" ? "N" : "Y")}
+            onChange={() => this.setValue(prop,disabled?data[prop]: (data[prop] === "Y" ? "N" : "Y"))}
           ></Toggle>
         </td>
       </Fragment>
     );
   };
+  getFilterItem=(label,name)=>{
+    const {filter}=this.state;
+    return <div>
+      <label className="mr-3 ml-5">{label}</label>
+        <Toggle
+          checked={filter[name]}
+          onChange={() =>
+            this.handleFilterChange(name, !filter[name])
+          }
+        ></Toggle>
+    </div>
+  }
   getFilter = () => {
     const { filter } = this.state;
     return (
-      <div className="flex-row flex-center" style={{ marginTop: -30 }}>
-        <label className="mr-3">Show Inactive</label>
-        <Toggle
-          checked={filter.showInActive}
-          onChange={() =>
-            this.handleFilterChange("showInActive", !filter.showInActive)
-          }
-        ></Toggle>
+      <div className="flex-row flex-center" style={{ marginTop: 5 }}>
+        {this.getFilterItem("Show Inactive","showInActive")}
+        {this.getFilterItem("HR User to edit contacts","hrUser")}
+        {this.getFilterItem("Accounts","accountsFlag")}
+        {this.getFilterItem("PrePay TopUp Notifications","mailshot8Flag")}
+        {this.getFilterItem("Receive Invoices","mailshot2Flag")}
+        {this.getFilterItem("Receive Statements","mailshot4Flag")}
+        {this.getFilterItem("Company Information Reports","mailshot9Flag")}
       </div>
     );
   };
@@ -601,6 +645,7 @@ export default class CustomerContactsComponent extends MainComponent {
       return <Spinner show={this.state.showSpinner} />;
     return (
       <div>
+          {this.getFilter()}
         <div className="flex-row m-5">
             <button onClick={this.handleClearSupportLevel}>Clear Support Level</button>
           <ToolTip title="New Item" width={30}>
@@ -612,7 +657,7 @@ export default class CustomerContactsComponent extends MainComponent {
         </div>
         {this.getConfirm()}
         {this.getAlert()}
-        {this.getFilter()}
+      
         {this.getSummaryElement()}
         {this.getTable()}
         <div className="modal-style">{this.getModal()}</div>
