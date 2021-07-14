@@ -56,7 +56,11 @@ export default class QuestionDetailsComponent extends MainComponent {
     data.multi=data.multi?1:0;
 
     if(data.options)
+    {
       data.options=JSON.stringify(data.options);
+      console.log('options error',data)
+    }
+    
     if(data.questionID!=null)//update question
     {
       this.api.updateQuestion(data).then(res=>{
