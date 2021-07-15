@@ -8,6 +8,7 @@
  */
 global $cfg;
 
+use CNCLTD\Exceptions\APIException;
 use CNCLTD\Supplier\infra\MySQLSupplierRepository;
 use CNCLTD\Supplier\SupplierId;
 
@@ -55,7 +56,7 @@ class CTGoodsIn extends CTCNC
     public $buGoodsIn;
     /** @var DSForm */
     public $dsPorhead;
-
+    const LINES='lines';
     public $orderTypeArray = array(
         "I" => "Initial",
         "P" => "Part Received",
@@ -118,65 +119,55 @@ class CTGoodsIn extends CTCNC
     {
         switch ($this->getAction()) {
             case CTCNC_ACT_SEARCH:
-                $this->search();
+                echo json_encode($this->search(),JSON_NUMERIC_CHECK);
+                break;
+            case self::LINES:
+                switch ($this->requestMethod) {
+                    case 'GET':
+                        echo json_encode($this->getOrderLines(),JSON_NUMERIC_CHECK);
+                        break;
+                    case 'POST':
+                        echo json_encode($this->handleReceive(),JSON_NUMERIC_CHECK);
+                        break;
+                    default:
+                        # code...
+                        break;
+                }
                 break;
             case CTGOODSIN_ACT_DISP_SEARCH:
                 $this->displaySearchForm();
                 break;
             case CTCNC_ACT_DISPLAY_GOODS_IN:
-                $this->displayGoodsIn();
-                break;
+                // $this->displayGoodsIn();
+                // break;
             case CTGOODSIN_ACT_RECEIVE:
-                $this->receive();
-                break;
+                
             default:
-                $this->displaySearchForm();
+                $this->displaySearch();
                 break;
         }
         exit;
     }
 
-    /**
-     * Run search based upon passed parameters
-     * Display search form with results
+   /**
+     * Display list of types
      * @access private
      * @throws Exception
      */
-    function search()
-    {
-        $this->setMethodName('search');
-        // remove trailing spaces from params passed
-        foreach ($_REQUEST as $key => $value) {
-            $_REQUEST[$key] = trim($value);
-        }
-        if (($this->getParam('porheadID')) && (!is_numeric($this->getParam('porheadID')))) {
-            $this->setFormErrorMessage('Order no must be numeric');
-        }
-        if (!$this->getFormError()) {
-            $this->buGoodsIn->search(
-                $this->dsPorhead,
-                $this->getParam('supplierID'),
-                $this->getParam('porheadID'),
-                null,
-                null,
-                'B'
-            );
-        }
-        if ($this->dsPorhead->rowCount() == 1) {
-            $this->dsPorhead->fetchNext();
-            $urlNext = Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action'    => CTCNC_ACT_DISPLAY_GOODS_IN,
-                    'porheadID' => $this->dsPorhead->getValue(DBEPorhead::porheadID)
-                )
-            );
-            header('Location: ' . $urlNext);
-            exit;
-        } else {
-            $this->setAction(CTGOODSIN_ACT_DISP_SEARCH);
-            $this->displaySearchForm();
-        }
+    function displaySearch()
+    {   
+        $this->setPageTitle('Goods In');
+        $this->setTemplateFiles(
+            array('GoodsInComponent' => 'GoodsInSearch.inc')
+        );
+        $this->loadReactScript('GoodsInComponent.js');
+        $this->loadReactCSS('GoodsInComponent.css');
+        $this->template->parse(
+            'CONTENTS',
+            'GoodsInComponent',
+            true
+        );
+        $this->parsePage();
     }
 
     /**
@@ -526,5 +517,228 @@ class CTGoodsIn extends CTCNC
             header('Location: ' . $urlNext);
             exit;
         }
+    }
+    //-------------------new 
+      /**
+     * Run search based upon passed parameters
+     * Display search form with results
+     * @access private
+     * @throws Exception
+     */
+    function search()
+    {
+        foreach ($_REQUEST as $key => $value) {
+            $_REQUEST[$key] = trim($value);
+        }
+        $supplierID=@$_REQUEST["supplierID"];
+        $porheadID=@$_REQUEST["porheadID"];      
+        if ($porheadID && (!is_numeric($porheadID))) {            
+            return $this->fail(APIException::badRequest,'Order no must be numeric');
+        }
+        $data =[];
+        $this->dsPorhead->initialise();
+        $this->buGoodsIn->search(
+            $this->dsPorhead,
+            $supplierID,
+            $porheadID,
+            null,
+            null,
+            'B'
+        );
+        if ($this->dsPorhead->rowCount() > 0) {         
+            $supplierNameCol = $this->dsPorhead->columnExists(DBEJPorhead::supplierName);
+            $typeCol         = $this->dsPorhead->columnExists(DBEJPorhead::type);
+            $customerNameCol = $this->dsPorhead->columnExists(DBEJPorhead::customerName);
+            $porheadIDCol    = $this->dsPorhead->columnExists(DBEJPorhead::porheadID);
+            $supplierRefCol  = $this->dsPorhead->columnExists(DBEJPorhead::supplierRef);
+            while ($this->dsPorhead->fetchNext()) {            
+                $customerName = $this->dsPorhead->getValue($customerNameCol);
+                $supplierName = $this->dsPorhead->getValue($supplierNameCol);
+                $data []=
+                    array(
+                        'customerName' => $customerName,
+                        'supplierName' => $supplierName,                        
+                        'porheadID'    => $this->dsPorhead->getValue($porheadIDCol),
+                        'orderType'    => $this->orderTypeArray[$this->dsPorhead->getValue($typeCol)],
+                        'supplierRef'  => $this->dsPorhead->getValue($supplierRefCol),
+                        'ordheadID'        => $this->dsPorhead->getValue(DBEPorhead::ordheadID),
+                        'customerID'       => $this->dsPorhead->getValue(DBEJPorhead::customerID),
+                    
+                );
+               
+            }
+        }
+        return  $this->success( $data ) ;
+    }
+     
+     /**
+     * Display the results of order search
+     * @access private
+     * @throws Exception
+     */
+    function getOrderLines()
+    {
+        $porheadID =@$_REQUEST["porheadID"];
+        $dsPorhead = &$this->dsPorhead;
+        $dsPorline = &$this->dsPorline;
+        if (!$porheadID) {
+            return $this->fail(APIException::badRequest,CTGOODSIN_MSG_PORHEADID_NOT_PASSED);            
+        }
+        $this->buPurchaseOrder->getHeaderByID(
+            $porheadID,
+            $dsPorhead
+        );
+      
+        $dsPorhead->fetchNext();
+        //return $this->success( $dsPorhead->getValue(DBEPorhead::porheadID));        
+        $this->buPurchaseOrder->getLinesByID(
+            $dsPorhead->getValue(DBEPorhead::porheadID),
+            $dsPorline
+        );
+        $dsOrdhead = new DataSet($this);
+        // determine whether we should be asking for serial no and warranty for any items on this
+        // order. e.g. There is a sales order and addItem flag is set.
+        if ($dsPorhead->getValue(DBEPorhead::ordheadID) != 0) {
+            $buSalesOrder = new BUSalesOrder($this);
+            $buSalesOrder->getOrdheadByID(
+                $dsPorhead->getValue(DBEPorhead::ordheadID),
+                $dsOrdhead
+            );
+            $addCustomerItems = ($dsOrdhead->getValue(DBEOrdhead::addItem) == 'Y');
+        } else {
+            $addCustomerItems = FALSE;
+        }
+        if (!$this->getFormError()) {
+
+            /*
+            If the customer is an internal stock location then update the appropriate stock level
+            */
+            if ($dsPorhead->getValue(DBEPorhead::supplierID) == CONFIG_SALES_STOCK_SUPPLIERID) {
+                $this->buGoodsIn->getInitialStockReceiveQtys(
+                    CONFIG_SALES_STOCK_CUSTOMERID,
+                    $dsPorline,
+                    $this->dsGoodsIn
+                );
+            } else if ($dsPorhead->getValue(DBEPorhead::supplierID) == CONFIG_MAINT_STOCK_SUPPLIERID) {
+                $this->buGoodsIn->getInitialStockReceiveQtys(
+                    CONFIG_MAINT_STOCK_CUSTOMERID,
+                    $dsPorline,
+                    $this->dsGoodsIn
+                );
+            } else {
+                $this->buGoodsIn->getInitialReceiveQtys(
+                    $dsPorline,
+                    $this->dsGoodsIn,
+                    $addCustomerItems
+                );
+            }
+        }
+        $porheadID = $dsPorhead->getValue(DBEPorhead::porheadID);        
+        $dsWarranty = new DataSet($this);
+        $warranties =[];
+        $lines=[];
+        if ($addCustomerItems) {
+            $this->buGoodsIn->getAllWarranties($dsWarranty);
+        }
+        $dsPorline->initialise();
+        $this->dsGoodsIn->initialise();
+        if ($this->dsGoodsIn->rowCount() > 0) {           
+            while ($this->dsGoodsIn->fetchNext()) {
+                $lineDisabled=false;
+                if ($this->dsGoodsIn->getValue(BUGoodsIn::receiveDataSetAllowReceive) == FALSE) {
+                    $lineDisabled =true;
+                }  
+                $disabled=false;
+                if ($this->dsGoodsIn->getValue(BUGoodsIn::receiveDataSetRequireSerialNo)) {                    
+                    // There is a warranty drop-down for each line
+                    $dsWarranty->initialise();
+                    $thisWarrantyID = $this->dsGoodsIn->getValue(BUGoodsIn::receiveDataSetWarrantyID);
+                    while ($dsWarranty->fetchNext()) {
+                        $warranties []=
+                            array(
+                                'warrantyDescription' => $dsWarranty->getValue(DBEWarranty::description),
+                                'warrantyID'          => $dsWarranty->getValue(DBEWarranty::warrantyID),
+                                'warrantySelected'    => ($thisWarrantyID == $dsWarranty->getValue(
+                                        DBEWarranty::warrantyID
+                                    )) ? CT_SELECTED : null
+                                );
+                    } // while ($dsWarranty->fetchNext()
+                } 
+                else
+                $disabled=true;
+                $lines []=
+                    [
+                        'lineDisabled'    => $lineDisabled,
+                        'description'     => Controller::htmlDisplayText(
+                            $this->dsGoodsIn->getValue(BUGoodsIn::receiveDataSetDescription)
+                        ),
+                        'sequenceNo'      => $this->dsGoodsIn->getValue(BUGoodsIn::receiveDataSetSequenceNo),
+                        'orderSequenceNo' => $this->dsGoodsIn->getValue(BUGoodsIn::receiveDataSetOrderSequenceNo),                
+                        'qtyOrdered'      => number_format(
+                            $this->dsGoodsIn->getValue(BUGoodsIn::receiveDataSetQtyOrdered),
+                            1,
+                            '.',
+                            ''
+                        ),
+                        'itemID'          => $this->dsGoodsIn->getValue(BUGoodsIn::receiveDataSetItemID),
+                        'partNo'          => Controller::htmlDisplayText(
+                            $this->dsGoodsIn->getValue(BUGoodsIn::receiveDataSetPartNo)
+                        ),
+                        'qtyOS'           => number_format(
+                            $this->dsGoodsIn->getValue(BUGoodsIn::receiveDataSetQtyOS),
+                            1,
+                            '.',
+                            ''
+                        ),
+                        'qtyToReceive'    => $this->dsGoodsIn->getValue(BUGoodsIn::receiveDataSetQtyToReceive),
+                        'serialNo'        => $this->dsGoodsIn->getValue(BUGoodsIn::receiveDataSetSerialNo)??"",
+                        'requireSerialNo' => $this->dsGoodsIn->getValue(BUGoodsIn::receiveDataSetRequireSerialNo),
+                        'allowReceive'    => $this->dsGoodsIn->getValue(BUGoodsIn::receiveDataSetAllowReceive),
+                        'renew'           => $this->dsGoodsIn->getValue(
+                            BUGoodsIn::receiveDataSetRenew
+                        ) ? CT_CHECKED : null,
+                        'customerItemID'  => $this->dsGoodsIn->getValue(BUGoodsIn::receiveDataSetCustomerItemID),
+                        "warranties" => $warranties ,
+                        "disabled"=>$disabled
+                        ];                
+            }
+        }      
+        return ["lines"=>$lines];
+    }
+  /**
+     * Perform receive
+     * @access private
+     * @throws Exception
+     */
+    function handleReceive()
+    {
+        $porheadID = @$_REQUEST["porheadID"];
+        $body = $this->getBody(true);
+        $dsGoodsIn = &$this->dsGoodsIn;
+        $this->buGoodsIn->initialiseReceiveDataset($dsGoodsIn);
+        if (!$porheadID) {
+            return $this->fail(APIException::notFound,"Missing parameters");
+        }
+        if (!$dsGoodsIn->populateFromArray($body)) {
+            return $this->fail(APIException::conflict, 'Quantities entered must be numeric');
+        }
+        if (!$this->buGoodsIn->validateQtys($dsGoodsIn)) {
+            return $this->fail(APIException::badRequest, 'Quantities to receive must not exceed outstanding quantities');
+        }
+        if (!$this->buGoodsIn->validateSerialNos($dsGoodsIn)) {
+            return $this->fail(APIException::badRequest, 'Please complete the serial numbers');
+        }
+        if (!$this->buGoodsIn->validateWarranties($dsGoodsIn)) {
+            return $this->fail(APIException::badRequest, 'Please select warranties for all items');
+        }
+        $this->buGoodsIn->receive(
+            $porheadID,
+            $dsGoodsIn
+        );
+        $this->buPurchaseOrder->getHeaderByID(
+            $porheadID,
+            $dsPorhead
+        );
+        return $this->success();
     }
 }

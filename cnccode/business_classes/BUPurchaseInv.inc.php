@@ -630,4 +630,5 @@ class BUPurchaseInv extends Business
         $dbeCustomerItem->setValue(DBEJCustomerItem::serialNo, $dsPurchaseInv->getValue(self::purchaseInvoiceSerialNo));
         $dbeCustomerItem->insertRow();
     }
+    
 }

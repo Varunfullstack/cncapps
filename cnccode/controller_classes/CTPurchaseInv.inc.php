@@ -3,12 +3,9 @@
  * Purchase Invoice controller class
  * CNC Ltd
  *
- * @access public
- * @authors Karim Ahmed - Sweet Code Limited
  */
 
-use CNCLTD\Supplier\infra\MySQLSupplierRepository;
-use CNCLTD\Supplier\SupplierId;
+use CNCLTD\Exceptions\APIException;
 
 global $cfg;
 require_once($cfg['path_bu'] . '/BUPurchaseInv.inc.php');
@@ -23,9 +20,6 @@ define('CTPURCHASEINV_MSG_PORHEADID_NOT_PASSED', 'porheadID not passed');
 define('CTPURCHASEINV_MSG_SEQNO_NOT_PASSED', 'sequence no not passed');
 define('CTPURCHASEINV_MSG_ORDLINE_NOT_FND', 'order line not found');
 // Actions
-define('CTPURCHASEINV_ACT_DISP_SEARCH', 'dispSearch');
-define('CTPURCHASEINV_ACT_UPDATE', 'doUpdate');
-define('CTPURCHASEINV_ACT_DISPLAY', 'display');
 
 class CTPurchaseInv extends CTCNC
 {
@@ -40,14 +34,7 @@ class CTPurchaseInv extends CTCNC
     /** @var DSForm */
     public $dsPorline;
     /** @var array */
-    public $orderTypeArray = array(
-        "I" => "Initial",
-        "P" => "Part Received",
-        "B" => "Both Initial & Part Received",
-        "C" => "Completed",
-        "A" => "Authorised"
-    );
-
+  
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
@@ -73,155 +60,85 @@ class CTPurchaseInv extends CTCNC
     {
         $this->checkPermissions(ACCOUNTS_PERMISSION);
         switch ($this->getAction()) {
-            case CTCNC_ACT_SEARCH:
-                $this->search();
+            case "orders":
+                switch ($this->requestMethod) {
+                    case 'GET':
+                        echo json_encode($this->getOrders());
+                        break;
+                    case 'PUT':
+                        echo json_encode($this->updateInvoice());
+                        break;
+                    default:
+                        # code...
+                        break;
+                }
                 break;
-            case CTPURCHASEINV_ACT_DISP_SEARCH:
-                $this->displaySearchForm();
-                break;
-            case CTPURCHASEINV_ACT_DISPLAY:
-                $this->display();
-                break;
-            case CTPURCHASEINV_ACT_UPDATE:
-                $this->doUpdate();
-                break;
+            case "lines":
+                echo json_encode($this->getOrdersLines()); 
+                break;        
             default:
-                $this->displaySearchForm();
+                $this->displaySearch();
                 break;
         }
     }
-
+ 
     /**
-     * Run search based upon passed parameters
-     * Display search form with results
+     * Display list of types
      * @access private
      * @throws Exception
      */
-    function search()
-    {
-        $this->setMethodName('search');
-        if (($this->getParam('porheadID')) && (!is_numeric($this->getParam('porheadID')))) {
-            $this->setFormErrorMessage('Order no must be numeric');;
-        }
-        $found = false;
-        if ($this->getFormError() == 0) {
-           
-            $found = $this->buPurchaseInv->search(
-                $this->getParam('supplierID'),
-                $this->getParam('porheadID'),
-                $this->getParam('supplierRef'),
-                $this->getParam('lineText'),
-                $this->dsPorhead
-            );
-        }
-        // one row and not already authorised
-        if ($found & $this->dsPorhead->rowCount() == 1) {
-            $this->dsPorhead->fetchNext();
-            $urlNext = Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action'    => CTPURCHASEINV_ACT_DISPLAY,
-                    'porheadID' => $this->dsPorhead->getValue(DBEJPorhead::porheadID)
-                )
-            );
-            header('Location: ' . $urlNext);
-            exit;
-        } else {
-            $this->setAction(CTPURCHASEINV_ACT_DISP_SEARCH);
-            $this->displaySearchForm();
-        }
-    }
-
-    /**
-     * Display the results of order search
-     * @access private
-     * @throws Exception
-     */
-    function displaySearchForm()
-    {
-        $this->setMethodName('displaySearchForm');
-        $this->setTemplateFiles('PurchaseInvSearch', 'PurchaseInvSearch.inc');
-// Parameters
-        $this->setPageTitle("Purchase Invoice Authorisation");
-        $submitURL        = Controller::buildLink($_SERVER['PHP_SELF'], array('action' => CTCNC_ACT_SEARCH));
-        $urlSupplierPopup = Controller::buildLink(
-            CTCNC_PAGE_SUPPLIER,
-            array(
-                'action'  => CTCNC_ACT_DISP_SUPPLIER_POPUP,
-                'htmlFmt' => CT_HTML_FMT_POPUP
-            )
+    function displaySearch()
+    {   
+        $this->setPageTitle('Purchase Invoice Authorisation');
+        $this->setTemplateFiles(
+            array('PurchaseInvComponent' => 'PurchaseInvSearch.inc')
         );
-        $this->dsPorhead->initialise();
-        if ($this->dsPorhead->rowCount() > 0) {
-            $this->template->set_block('PurchaseInvSearch', 'orderBlock', 'orders');
-            $supplierNameCol = $this->dsPorhead->columnExists(DBEJPorhead::supplierName);
-            $typeCol         = $this->dsPorhead->columnExists(DBEJPorhead::type);
-            $customerNameCol = $this->dsPorhead->columnExists(DBEJPorhead::customerName);
-            $porheadIDCol    = $this->dsPorhead->columnExists(DBEJPorhead::porheadID);
-            $porheadDateCol  = $this->dsPorhead->columnExists(DBEJPorhead::date);
-            $supplierRefCol  = $this->dsPorhead->columnExists(DBEJPorhead::supplierRef);
-            while ($this->dsPorhead->fetchNext()) {
-                $purchaseInvURL = Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action'    => CTPURCHASEINV_ACT_DISPLAY,
-                        'porheadID' => $this->dsPorhead->getValue($porheadIDCol)
-                    )
-                );
-                $customerName   = $this->dsPorhead->getValue($customerNameCol);
-                $supplierName   = $this->dsPorhead->getValue($supplierNameCol);
-                $this->template->set_var(
-                    array(
-                        'listCustomerName'   => $customerName,
-                        'listSupplierName'   => $supplierName,
-                        'listPurchaseInvURL' => $purchaseInvURL,
-                        'listPorheadID'      => $this->dsPorhead->getValue($porheadIDCol),
-                        'listDate'           => Controller::dateYMDtoDMY($this->dsPorhead->getValue($porheadDateCol)),
-                        'listOrderType'      => $this->orderTypeArray[$this->dsPorhead->getValue($typeCol)],
-                        'listSupplierRef'    => $this->dsPorhead->getValue($supplierRefCol)//,
-                    )
-                );
-                $this->template->parse('orders', 'orderBlock', true);
-            }
-        }
-// search parameter section
-        $supplierName = null;
-        if (($this->getParam('supplierID'))) {
-            $supplierRepo = new MySQLSupplierRepository();
-            $supplier     = $supplierRepo->getById(new SupplierId((int)$this->getParam('supplierID')));
-            $supplierName = $supplier->name()->value();
-        }
-        $this->template->set_var(
-            array(
-                'supplierName'     => $supplierName,
-                'porheadID'        => $this->getParam('porheadID'),
-                'supplierID'       => $this->getParam('supplierID'),
-                'lineText'         => $this->getParam('lineText'),
-                'submitURL'        => $submitURL,
-                'urlSupplierPopup' => $urlSupplierPopup
-            )
+        $this->loadReactScript('PurchaseInvComponent.js');
+        $this->loadReactCSS('PurchaseInvComponent.css');
+        $this->template->parse(
+            'CONTENTS',
+            'PurchaseInvComponent',
+            true
         );
-        $this->loadReactCSS('SupplierSearchComponent.css');
-        $this->loadReactScript('SupplierSearchComponent.js');
-        $this->template->parse('CONTENTS', 'PurchaseInvSearch', true);
         $this->parsePage();
     }
 
-    /**
-     * Display the results of order search
-     * @access private
-     * @throws Exception
-     */
-    function display()
-    {
-        $this->setMethodName('display');
+    function getOrders(){         
+         $this->buPurchaseInv->search(
+            null,
+            null,
+            null,
+            null,
+            $this->dsPorhead
+        );
+        $orders=[];
+        while( $this->dsPorhead->fetchNext()){
+            $orders []=[
+                "customerID"=>$this->dsPorhead->getValue(DBEJPorhead::customerID),
+                'porheadID'           => $this->dsPorhead->getValue(DBEJPorhead::porheadID),
+                'supplierName'        => $this->dsPorhead->getValue(DBEJPorhead::supplierName),
+                'vatRate'             => $this->dsPorhead->getValue(DBEJPorhead::vatRate),
+                'purchaseInvoiceDate' => $this->dsPorhead->getValue(DBEJPorhead::date),
+                'type'                => $this->dsPorhead->getValue(DBEJPorhead::type),
+                "supplierRef"         =>$this->dsPorhead->getValue(DBEJPorhead::supplierRef),
+                //'purchaseInvoiceNo'   => Controller::htmlDisplayText($this->getParam('purchaseInvoiceNo')),
+                'customerName'        => $this->dsPorhead->getValue(DBEJPorhead::customerName),
+                "ordheadID"           => $this->dsPorhead->getValue(DBEJPorhead::ordheadID),
+            ];
+        }
+        return $this->success($orders);
+    }
+
+    function getOrdersLines(){
+        $this->setMethodName('getOrdersLines');
         $dsPorhead = &$this->dsPorhead;
         $dsPorline = &$this->dsPorline;
-        if (!$this->getParam('porheadID')) {
-            $this->displayFatalError(CTPURCHASEINV_MSG_PORHEADID_NOT_PASSED);
-            return;
+        $porheadID=$_REQUEST["porheadID"];
+        if (! $porheadID) {
+            return $this->fail(APIException::badRequest,CTPURCHASEINV_MSG_PORHEADID_NOT_PASSED);            
         }
-        $this->buPurchaseOrder->getHeaderByID($this->getParam('porheadID'), $dsPorhead);
+        $lines=[];
+        $this->buPurchaseOrder->getHeaderByID($porheadID, $dsPorhead);
         $dsPorhead->fetchNext();
         $this->buPurchaseOrder->getLinesByID($dsPorhead->getValue(DBEJPorhead::porheadID), $dsPorline);
         // Do we require customer items to be created?
@@ -242,42 +159,8 @@ class CTPurchaseInv extends CTCNC
         );
         $this->setParam('purchaseInvoiceDate', date('Y-m-d'));
         $porheadID = $dsPorhead->getValue(DBEJPorhead::porheadID);
-        $this->setPageTitle("Purchase Invoice Authorisation");
-        $this->setTemplateFiles(array('PurchaseInvDisplay' => 'PurchaseInvDisplay.inc'));
-        $urlUpdate        = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            array(
-                'action'    => CTPURCHASEINV_ACT_UPDATE,
-                'porheadID' => $porheadID
-            )
-        );
-        $urlPurchaseOrder = Controller::buildLink(
-            CTCNC_PAGE_PURCHASEORDER,
-            array(
-                'action'    => CTCNC_ACT_DISPLAY_PO,
-                'porheadID' => $porheadID
-            )
-        );
-        $urlSalesOrder    = Controller::buildLink(
-            CTCNC_PAGE_SALESORDER,
-            array(
-                'action'    => CTCNC_ACT_DISP_SALESORDER,
-                'ordheadID' => $dsPorhead->getValue(DBEJPorhead::ordheadID),
-                'htmlFmt'   => CT_HTML_FMT_POPUP
-            )
-        );
-        $this->template->set_var(
-            array(
-                'porheadID'           => $porheadID,
-                'supplierName'        => Controller::htmlDisplayText($dsPorhead->getValue(DBEJPorhead::supplierName)),
-                'vatRate'             => $dsPorhead->getValue(DBEJPorhead::vatRate),
-                'purchaseInvoiceDate' => $this->getParam('purchaseInvoiceDate'),
-                'purchaseInvoiceNo'   => Controller::htmlDisplayText($this->getParam('purchaseInvoiceNo')),
-                'urlUpdate'           => $urlUpdate,
-                'urlPurchaseOrder'    => $urlPurchaseOrder,
-                'urlSalesOrder'       => $urlSalesOrder
-            )
-        );
+       
+       
         $dsWarranty = new DataSet($this);
         if ($addCustomerItems) {
             $buGoodsIn = new BUGoodsIn($this);
@@ -288,20 +171,29 @@ class CTPurchaseInv extends CTCNC
             $this->template->set_block('PurchaseInvDisplay', 'warrantyBlock', 'warranties'); // innermost first
             $this->template->set_block('PurchaseInvDisplay', 'orderLineBlock', 'orderLines');
             while ($this->dsPurchaseInv->fetchNext()) {
-                $this->template->set_var(
-                    array(
-                        'description'     => Controller::htmlDisplayText(
-                            $this->dsPurchaseInv->getValue(BUPurchaseInv::purchaseInvoiceDescription)
-                        ),
-                        'sequenceNo'      => $this->dsPurchaseInv->getValue(BUPurchaseInv::purchaseInvoiceSequenceNo),
-                        'orderSequenceNo' => $this->dsPurchaseInv->getValue(
-                            BUPurchaseInv::purchaseInvoiceOrderSequenceNo
-                        )
-                    )
-                );
-                $bodyTagExtras = 'onLoad="calculateTotals(); document.forms[0].elements[1].focus();"';
-                $this->template->set_var('bodyTagExtras', $bodyTagExtras);
-                $this->template->set_var(
+                $disabled = false;                         
+                   $warranties=[];
+                if ($this->dsPurchaseInv->getValue(BUPurchaseInv::purchaseInvoiceRequireSerialNo)) {
+                    // There is a warranty drop-down for each line
+                    $dsWarranty->initialise();
+                    $thisWarrantyID = $this->dsPurchaseInv->getValue(BUPurchaseInv::purchaseInvoiceWarrantyID);
+                    while ($dsWarranty->fetchNext()) {
+                        $warranties []=
+                            array(
+                                'warrantyDescription' => $dsWarranty->getValue(DBEWarranty::description),
+                                'warrantyID'          => $dsWarranty->getValue(DBEWarranty::warrantyID),
+                                'warrantySelected'    => ($thisWarrantyID == $dsWarranty->getValue(
+                                        DBEWarranty::warrantyID
+                                    )) ? CT_SELECTED : null
+                                );
+                        
+                        
+                    } 
+                } else {
+                    $disabled=true;
+                }
+             
+                $lines []=
                     array(
                         'qtyOrdered'      => number_format(
                             $this->dsPurchaseInv->getValue(BUPurchaseInv::purchaseInvoiceQtyOrdered),
@@ -343,135 +235,76 @@ class CTPurchaseInv extends CTCNC
                         ),
                         'serialNo'        => $this->dsPurchaseInv->getValue(BUPurchaseInv::purchaseInvoiceSerialNo),
                         'renew'           => $this->dsPurchaseInv->getValue(BUPurchaseInv::purchaseInvoiceRenew),
-                        'warrantyID'      => $this->dsPurchaseInv->getValue(BUPurchaseInv::purchaseInvoiceWarrantyID)
-                    )
-                );
-                /*
-                Prevent submit if renewals are not completed
-                */
-                if ($this->getFormError()) {
-                    $this->template->set_var('SUBMIT_DISABLED', 'DISABLED');
-                } else {
-                    $this->template->set_var('SUBMIT_DISABLED', null);
-                }
-                if ($this->dsPurchaseInv->getValue(BUPurchaseInv::purchaseInvoiceRequireSerialNo)) {
-
-                    $this->template->set_var('DISABLED', null);
-                    // There is a warranty drop-down for each line
-                    $dsWarranty->initialise();
-                    $thisWarrantyID = $this->dsPurchaseInv->getValue(BUPurchaseInv::purchaseInvoiceWarrantyID);
-                    while ($dsWarranty->fetchNext()) {
-                        $this->template->set_var(
-                            array(
-                                'warrantyDescription' => $dsWarranty->getValue(DBEWarranty::description),
-                                'warrantyID'          => $dsWarranty->getValue(DBEWarranty::warrantyID),
-                                'warrantySelected'    => ($thisWarrantyID == $dsWarranty->getValue(
-                                        DBEWarranty::warrantyID
-                                    )) ? CT_SELECTED : null
-                            )
-                        );
-                        $this->template->parse('warranties', 'warrantyBlock', true);
-                    } // while ($dsWarranty->fetchNext()
-                } else {
-                    $this->template->set_var('DISABLED', 'disabled'); // no serial no or warranty
-                }
-                $this->template->parse('orderLines', 'orderLineBlock', true);
-                $this->template->set_var('warranties', null); // clear for next line
-            } // while ($dsPorline->fetchNext())
-        }// if ($dsPorline->rowCount() > 0)
-        $this->template->parse('CONTENTS', 'PurchaseInvDisplay', true);
-        $this->parsePage();
+                        'warrantyID'      => $this->dsPurchaseInv->getValue(BUPurchaseInv::purchaseInvoiceWarrantyID),
+                        "warranties"      => $warranties,
+                        "lineDisabled"        => $disabled,   
+                        'description'     => Controller::htmlDisplayText(
+                            $this->dsPurchaseInv->getValue(BUPurchaseInv::purchaseInvoiceDescription)
+                        ),
+                        'sequenceNo'      => $this->dsPurchaseInv->getValue(BUPurchaseInv::purchaseInvoiceSequenceNo),
+                        'orderSequenceNo' => $this->dsPurchaseInv->getValue(
+                            BUPurchaseInv::purchaseInvoiceOrderSequenceNo
+                        )
+                    );
+            } 
+        }
+        return $this->success($lines);
     }
+    
+    function updateInvoice(){
+        $body=$this->getBody(true);
+        $porheadID=$body["porheadID"];
+        $items=$body["items"];
+        $invoiceNo=$body["invoiceNo"];
+        $invoiceDate=$body["invoiceDate"];
 
-    /**
-     * perform updates
-     * @throws Exception
-     */
-    function doUpdate()
-    {
-        $this->setMethodName('doUpdate');
+        $this->setMethodName('updateInvoice');
         $dsPurchaseInv = &$this->dsPurchaseInv;
         $this->buPurchaseInv->initialiseDataset($dsPurchaseInv);
-        if (!$this->getParam('porheadID')) {
-            $this->displayFatalError(CTGOODSIN_MSG_PORHEADID_NOT_PASSED);
+        //$dsPurchaseInv->debug=true;
+        if (!$porheadID) {
+            return $this->fail(APIException::badRequest,"porheadID is missing");
         }
-        if (!$dsPurchaseInv->populateFromArray($this->getParam('purchaseInv'))) {
-            $this->setFormErrorMessage('Values entered must be numeric');
-            $this->display();
-            exit;
+        if (!$dsPurchaseInv->populateFromArray($items)) {              
+            return $this->fail(APIException::badRequest,'Values entered must be numeric');
         }
         if (!$this->buPurchaseInv->validateQtys($dsPurchaseInv)) {
-            $this->setFormErrorMessage('Quantities to invoice must not exceed outstanding quantities');
-            $this->display();
-            exit;
+             return $this->fail(APIException::badRequest,'Quantities to invoice must not exceed outstanding quantities');
         }
-        if (!$this->buPurchaseInv->validatePrices($dsPurchaseInv)) {
-            $this->setFormErrorMessage('Invoice Prices and VAT amounts must be in range 0 to 99999');
-            $this->display();
-            exit;
+        if (!$this->buPurchaseInv->validatePrices($dsPurchaseInv)) {            
+            return $this->fail(APIException::badRequest,'Invoice Prices and VAT amounts must be in range 0 to 99999');
         }
-        if (!$this->buPurchaseInv->validateSerialNos($dsPurchaseInv)) {
-            $this->setFormErrorMessage('Please complete the serial numbers');
-            $this->display();
-            exit;
+        if (!$this->buPurchaseInv->validateSerialNos($dsPurchaseInv)) {            
+            return $this->fail(APIException::badRequest,'Please complete the serial numbers');
         }
         if (!$this->buPurchaseInv->validateWarranties($dsPurchaseInv)) {
-            $this->setFormErrorMessage('Please select warranties for all items');
-            $this->display();
-            exit;
+            return $this->fail(APIException::badRequest,'Please select warranties for all items');
         }
-        if (!$this->getParam('purchaseInvoiceNo')) {
-            $this->setFormErrorMessage('Please enter a purchase invoice number');
-            $this->display();
-            exit;
+        if (!$invoiceNo) {            
+            return $this->fail(APIException::badRequest,'Please enter a purchase invoice number');
         }
         if (!$this->buPurchaseInv->invoiceNoIsUnique(
-            $this->getParam('purchaseInvoiceNo'),
-            $this->getParam('porheadID')
-        )) {
-            $this->setFormErrorMessage('This purchase invoice no has already been used');
-            $this->display();
-            exit;
+            $invoiceNo,
+            $porheadID
+        )) {            
+            return $this->fail(APIException::badRequest,'This purchase invoice no has already been used');
         }
-        if (!$this->getParam('purchaseInvoiceDate')) {
-            $this->setFormErrorMessage('Please enter a purchase invoice date');
-            $this->display();
-            exit;
+        if (!$invoiceDate) {            
+            return $this->fail(APIException::badRequest,'Please enter a purchase invoice date');
         }
-        $dateString = $this->getParam('purchaseInvoiceDate');
-        $date       = DateTime::createFromFormat(DATE_MYSQL_DATE, $dateString);
-        if (!$date) {
-            $this->setFormErrorMessage('Please enter a valid purchase invoice date');
-            $this->display();
-            exit;
+        $date       = DateTime::createFromFormat(DATE_MYSQL_DATE, $invoiceDate);
+        if (!$date) {            
+            return $this->fail(APIException::badRequest,'Please enter a valid purchase invoice date');
         }
         $this->buPurchaseInv->update(
-            $this->getParam('porheadID'),
-            $this->getParam('purchaseInvoiceNo'),
+            $porheadID,
+            $invoiceNo,
             $date->format(DATE_MYSQL_DATE),
             $dsPurchaseInv,
             $this->userID
         );
         $dsPorhead = new DataSet($this);
-        $this->buPurchaseOrder->getHeaderByID($this->getParam('porheadID'), $dsPorhead);
-        if ($dsPorhead->getValue(DBEJPorhead::type) == 'A') {
-            $urlNext = Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action' => CTCNC_ACT_DISPLAY_SEARCH_FORM
-                )
-            );
-        } else {
-            $urlNext = Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action'    => CTCNC_ACT_DISPLAY_GOODS_IN,
-                    'porheadID' => $this->getParam('porheadID')
-                )
-            );
-        }
-        header('Location: ' . $urlNext);
-        exit;
+        $this->buPurchaseOrder->getHeaderByID($porheadID, $dsPorhead);
+        return $this->success(["type"=>$dsPorhead->getValue(DBEJPorhead::type)]);       
     }
-
 }

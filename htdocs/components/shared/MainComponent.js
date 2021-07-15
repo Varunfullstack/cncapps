@@ -4,8 +4,7 @@ import Prompt from "./Prompt.js";
 
 import React from 'react';
 import APIHeader from '../services/APIHeader';
-import * as PropTypes from "prop-types";
-import {TrueFalseIconComponent} from "./TrueFalseIconComponent/TrueFalseIconComponent";
+import ToolTip from "./ToolTip.js";
 
 export default class MainComponent extends React.Component {
 
@@ -71,7 +70,11 @@ export default class MainComponent extends React.Component {
             "scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0"
         );
     }
-
+    openTab(url) {
+        window.open(
+            url,          
+        );
+    }
     //----------------alert
     alert = (message, width = 500, title = "Alert", isHTML = false, autoClose = true) => {
         const {alert} = this.state;
@@ -238,12 +241,22 @@ export default class MainComponent extends React.Component {
         return variable == null || variable == '';
     }
 
-    getEditElement(obj, callBack, display = true) {
+    getEditElement(obj, callBack, display = true,title=null) {
         if (!display)
             return null;
-        return <i className="fal fa-2x fa-edit color-gray pointer"
+        return <ToolTip title={title||"Edit"}>
+         <i className="fal fa-2x fa-edit color-gray pointer"
                   onClick={() => callBack(obj)}
-        />
+        ></i>
+        </ToolTip>
+    }
+
+    getSearchElement(callBack) {     
+        return <ToolTip title="Search" width={30}>
+        <i className="fal fa-2x fa-search color-gray pointer"
+                  onClick={() => callBack()}
+        ></i>
+        </ToolTip>
     }
 
     getEditIcon() {

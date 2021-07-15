@@ -2,8 +2,8 @@
 <!-- Service requests fixed the previous day -->
 <head>
     <style type="text/css">
-        <!--
-        BODY, P, TD, TH {
+        
+        /* BODY, P, TD, TH {
             font-family: Arial, Helvetica, sans-serif;
             font-size: 9pt;
         }
@@ -14,9 +14,9 @@
 
         TABLE {
             border-spacing: 1px;
-        }
+        } */
 
-        -->
+        
     </style>
 </head>
 <body>
@@ -24,27 +24,27 @@
 <h3>Total Requests: {totalRequests} </h3>
 <table>
     <tr>
-        <th>Customer</th>
-        <th>SR No</th>
-        <th>Details</th>
-        <th>Fixed By</th>
-        <th>Duration(hours open)</th>
-        <th>Time Spent</th>
-        <th>Response Time</th>
-        <th>Fix Time</th>
-        <th>Contract</th>
+        <th style="text-align: left;">Customer</th>
+        <th style="text-align: right;">SR No</th>
+        <th style="text-align: left;">Details</th>
+        <th style="text-align: left;">Fixed By</th>
+        <th style="text-align: right;">Duration(hours open)</th>
+        <th style="text-align: right;">Time Spent</th>
+        <th style="text-align: right;">Response Time</th>
+        <th style="text-align: right;">Fix Time</th>
+        <th style="text-align: left;">Contract</th>
     </tr>
     <!-- BEGIN requestBlock -->
     <tr>
-        <td>{customer}</td>
+        <td style="text-align: left;">{customer}</td>
         <td><a href="{urlRequest}">{serviceRequestID}</a></td>
-        <td>{description}</td>
-        <td>{fixedBy}</td>
-        <td>{durationHours}</td>
-        <td>{timeSpentHours}</td>
-        <td>{responseTimeHours}</td>
-        <td>{fixTimeHours}</td>
-        <td>{contract}</td>
+        <td style="text-align: left;">{description}</td>
+        <td style="text-align: left;">{fixedBy}</td>
+        <td style="text-align: right;">{durationHours}</td>
+        <td style="text-align: right;">{timeSpentHours}</td>
+        <td style="text-align: right;">{responseTimeHours}</td>
+        <td style="text-align: right;">{fixTimeHours}</td>
+        <td style="text-align: left;">{contract}</td>
     </tr>
     <!-- END requestBlock -->
 </table>

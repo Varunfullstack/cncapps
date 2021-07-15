@@ -21,10 +21,10 @@
     <table class="details">
         <thead>
         <tr>
-            <th style="padding: 10px">Service Request</th>
-            <th>Raised By</th>
-            <th>Raised On</th>
-            <th>Status</th>
+            <th style="padding: 10px;text-align: right;">Service Request</th>
+            <th  style="text-align: left;">Raised By</th>
+            <th  style="text-align: left;">Raised On</th>
+            <th  style="text-align: left;">Status</th>
         </tr>
         </thead>
         <tbody>
@@ -32,11 +32,11 @@
 
         {% for sr in data %}
             <tr>
-                <td align="center" style="padding: 5px">
+                <td align="center" style="padding: 5px;text-align: right;">
                     <a href="https://www.cnc-ltd.co.uk/view/?serviceid={{ sr.id }}">{{ sr.id }}</a>
                 </td>
                 <td align="center"
-                    style="white-space: nowrap"
+                    style="white-space: nowrap;text-align: left;"
                 >
                     {{ sr.raisedBy }}
                     {% if onScreen %}
@@ -44,11 +44,11 @@
                     {% endif %}
                 </td>
                 <td align="center"
-                    style="white-space: nowrap"
+                    style="white-space: nowrap;text-align: left;"
                 >{{ sr.raisedOn }}
                 </td>
                 <td align="center"
-                    style="white-space: nowrap"
+                    style="white-space: nowrap;text-align: left;"
                 >{{ sr.status }}
                 </td>
             </tr>

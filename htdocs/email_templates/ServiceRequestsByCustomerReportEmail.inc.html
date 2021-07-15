@@ -1,7 +1,7 @@
 <html>
 <head>
   <style type="text/css">
-    <!--
+    
     BODY, P, TD, TH {
       font-family: Arial, Helvetica, sans-serif;
       font-size: 10pt;
@@ -19,7 +19,7 @@
     a{
       font-weight: bold;
     }
-    -->
+ 
   </style>
 </head>
 <body>
@@ -27,26 +27,26 @@
   <table>
     <thead>
       <tr>
-        <th>Customer</th>
-        <th align="right">Count</th>
-        <th align="right">Hours</th>
-        <th align="right">%</th>
+        <th style="text-align: left;">Customer</th>
+        <th  style="text-align: right;">Count</th>
+        <th  style="text-align: right;">Hours</th>
+        <th  style="text-align: right;">%</th>
       </tr>
     </thead>
     <tbody>
 <!-- BEGIN customersBlock -->
       <tr>
-        <td>{customerName}</td>
-        <td align="right">{srCount}</td>
-        <td align="right">{hours}</td>
-        <td align="right">{percentage}</td>
+        <td style="text-align: left;">{customerName}</td>
+        <td  style="text-align: right;">{srCount}</td>
+        <td  style="text-align: right;">{hours}</td>
+        <td  style="text-align: right;">{percentage}</td>
       </tr>
 <!-- END customersBlock -->
       <tr>
-        <td>TOTALS</td>
-        <td align="right">{totalSrCount}</td>
-        <td align="right">{totalHours}</td>
-        <td align="right">{totalPercentage}</td>
+        <td style="text-align: left;">TOTALS</td>
+        <td  style="text-align: right;">{totalSrCount}</td>
+        <td  style="text-align: right;">{totalHours}</td>
+        <td  style="text-align: right;">{totalPercentage}</td>
       </tr>
     </tbody>    
   </table>  

@@ -4,7 +4,8 @@ import './table.css';
 import TableHeader from "./tableHeader.js";
 import TableBody from "./tableBody.js";
 import TableFooter from "./tableFooter.js";
-
+import PropTypes from "prop-types";
+import {isNumeric} from "../../utils/utils"
 /**
  * -- main properties
  * key: "documents",
@@ -27,7 +28,9 @@ import TableFooter from "./tableFooter.js";
  * allowRowOrder Boolean allo rows drag and drops using jqueryUI
  * onOrderChange Event fire on row order changed and return current and next element
  * searchControls add other search control after search element
+ * cellType
  */
+export const CellType={Text:"Text",Number:"Number",Money:"Money",Default:"Default"};
 class Table extends React.Component {
     delayTimer;
 
@@ -170,12 +173,44 @@ class Table extends React.Component {
             return filterdData;
         } else return [...data];
     }
+    correctCellType(columns,data){
+        //console.log("before",columns,data);
+        if(columns && data)
+        {
+            for(let i=0;i<columns.length;i++)
+            {
+               // console.log(columns[i].cellType,columns[i].content);
 
+                if(!columns[i].cellType&&!columns[i].content){ // if we have the type then don't update it
+                    let isText=false;
+                    
+                    for(let j=0;j<data.length;j++)
+                    {
+                        //console.log(columns[i].path,data[j][columns[i].path],isNumeric(data[j][columns[i].path]));
+                        if(data[j][columns[i].path]&&!isNumeric(data[j][columns[i].path]))
+                        {
+                            isText=true;
+                            break;
+                        }
+                    }    
+                    if(isText)
+                        columns[i].cellType=CellType.Text;
+                    else 
+                        columns[i].cellType=CellType.Number;
+                }
+                else if(!columns[i].cellType&&columns[i].content)
+                    columns[i].cellType=CellType.Text;
+            }
+            
+        }
+        //console.log("after",columns);
+        return columns;
+    }
+     
     render() {
         const props = this.props;
         const {
-            data,
-            columns,
+            data,            
             pk,
             selected,
             selectedKey,
@@ -184,10 +219,13 @@ class Table extends React.Component {
             hasFooter,
             style
         } = props;
+        let {columns}= props;
         const {sortColumn} = this.state;
         const {handleSearch} = this;
         const el = React.createElement;
         const filterData = search ? this.filterData(data, columns) : data;
+        columns=this.correctCellType(columns,filterData);
+        //console.log("columns",columns)
         let striped = "table-striped";
         if (this.props.striped === false)
             striped = "";
@@ -222,8 +260,8 @@ class Table extends React.Component {
             el("table", {
                 key: "table" + this.props.id,
                 id: "table" + this.props.id,
-                className: "table " + striped,
-
+                className: "table  " + striped +" "+ (this.props.hover===false?"":"table-hover"),
+                
             }, [
                 el(TableHeader, {
                     key: "tableHeader",
@@ -247,6 +285,9 @@ class Table extends React.Component {
         );
     }
 }
-
+Table.propTypes={
+    defaultSortPath:PropTypes.string,
+    defaultSortOrder:PropTypes.string,
+}
 export default Table;
 

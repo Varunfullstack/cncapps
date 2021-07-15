@@ -227,6 +227,13 @@ dd {
     text-align: right;
 }
 
+.text-left {
+    text-align: left;
+}
+.text-center {
+    text-align: center;
+}
+
 .btn-search {
     width: 70px;
 }
@@ -459,9 +466,6 @@ dd {
 }
 
 /*end padding*/
-.text-center {
-    text-align: center;
-}
 
 .text-top {
     vertical-align: top !important;
@@ -1024,9 +1028,7 @@ input:checked + .slider:before {
     padding: 4px;
 }
 
-.text-left {
-    text-align: left;
-}
+
 
 input:focus:required:invalid {border: 1px solid red;}
 input:required:invalid {border: 1px solid red;}
@@ -1061,4 +1063,7 @@ select:required:valid { border: 1px solid black; }
 }
 .white{
     color: white;
+}
+input:disabled{
+    background-color: #cccccc;
 }

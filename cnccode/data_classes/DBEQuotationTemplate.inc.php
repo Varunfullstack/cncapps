@@ -43,7 +43,7 @@ class DBEQuotationTemplate extends DBEntity implements \CNCLTD\Sortable
         );
         $this->addColumn(
             self::sortOrder,
-            DA_INTEGER,
+            DA_FLOAT,
             DA_ALLOW_NULL
         );
 

@@ -1,4 +1,5 @@
 import React from 'react';
+import { CellType } from './table';
 
 // items
 class TableBody extends React.Component {
@@ -17,10 +18,26 @@ class TableBody extends React.Component {
         return result;
     }
 
-    addToolTip = (element, title) => {
-        return title ? this.el('div', {className: 'tooltip'}, element, this.el('div', {className: "tooltiptext tooltip-bottom"}, title)) : element;
+    addToolTip = (element, title,cell) => {
+        return <div style={{display:"flex",justifyContent:this.getCellAlign(cell)}}>          
+         {title ? this.el('div', {className: 'tooltip'}, element, this.el('div', {className: "tooltiptext tooltip-bottom"}, title)) : element}
+         </div>
     }
-
+    getCellAlign(c) {
+        if (c && c.cellType) {
+          switch (c.cellType) {
+            case CellType.Text:
+              return "flex-start";
+            case CellType.Number:
+              return "flex-end";
+            case CellType.Money:
+              return "flex-end";
+            case CellType.Default:
+              return "center";
+          }
+        }
+        return "center";
+      }
     render() {
         const {data, columns, pk, selected, selectedKey} = this.props;
         const {el, makeid} = this;
@@ -40,7 +57,7 @@ class TableBody extends React.Component {
 
                 }, this.addToolTip(
                 c.content ? c.content(item) :
-                    <div dangerouslySetInnerHTML={{__html: this.get(item, c.path)}}/>, c?.toolTip || null)
+                    <div dangerouslySetInnerHTML={{__html: this.get(item, c.path)}}/>, c?.toolTip || null,c)
             ))))
         );
     }

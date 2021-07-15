@@ -1,0 +1,12 @@
+.form-group{
+    display: flex;
+    flex-direction: column;
+    /* justify-content: space-between; */
+}
+.form-group label{
+    margin-left: 5px;
+}
+.label{
+    text-align: right;
+    color: #992211;
+}
