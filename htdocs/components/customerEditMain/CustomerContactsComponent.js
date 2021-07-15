@@ -28,10 +28,10 @@ export default class CustomerContactsComponent extends MainComponent {
         showInActive: false,
         reviewUser: false,
         hrUser:false,
-        accountsFlag:false,
+        
         mailshot8Flag:false,
         mailshot2Flag:false,
-        mailshot4Flag:false,
+        // mailshot4Flag:false,
         mailshot9Flag:false
       },
       showSpinner: true,
@@ -74,24 +74,38 @@ export default class CustomerContactsComponent extends MainComponent {
 
     if(filter.reviewUser)
     contactsFiltered =contactsFiltered.filter((c) => c.reviewUser == 'Y');  
-    this.setState({ contactsFiltered });
+    
     if(filter.hrUser)
     contactsFiltered =contactsFiltered.filter((c) => c.hrUser == 'Y');
-    // if(filter.accountsFlag)
-    // contactsFiltered =contactsFiltered.filter((c) => c.accountsFlag == 'Y');
+
     if(filter.mailshot8Flag)
     contactsFiltered =contactsFiltered.filter((c) => c.mailshot8Flag == 'Y');
-
-    if(filter.mailshot2Flag)
-    contactsFiltered =contactsFiltered.filter((c) => c.mailshot2Flag == 'Y');
-    // if(filter.mailshot4Flag)
-    // contactsFiltered =contactsFiltered.filter((c) => c.mailshot4Flag == 'Y');
-     if(filter.mailshot9Flag)
-    contactsFiltered =contactsFiltered.filter((c) => c.mailshot9Flag == 'Y');
    
+    if(filter.mailshot2Flag)
+      contactsFiltered =contactsFiltered.filter((c) => c.mailshot2Flag == 'Y');
+    
+    if(filter.mailshot9Flag)
+      contactsFiltered =contactsFiltered.filter((c) => c.mailshot9Flag == 'Y');
+     // if(filter.mailshot4Flag)
+    // contactsFiltered =contactsFiltered.filter((c) => c.mailshot4Flag == 'Y');
+
+    this.setState({ contactsFiltered });
+    console.log("contactsFiltered",contactsFiltered);
     
   };
-
+  getFilter = () => {
+    const { filter } = this.state;
+    return (
+      <div className="flex-row flex-center" style={{ marginTop: 5 }}>
+        {this.getFilterItem("Show Inactive","showInActive")}
+        {this.getFilterItem("HR User to edit contacts","hrUser")}       
+        {this.getFilterItem("PrePay TopUp Notifications","mailshot8Flag")}
+        {this.getFilterItem("Receive Invoices","mailshot2Flag")}
+        {/* {this.getFilterItem("Receive Statements","mailshot4Flag")} */}
+        {this.getFilterItem("Company Information Reports","mailshot9Flag")}
+      </div>
+    );
+  };
   getSiteTitle = (siteNo) => {
     const { sites } = this.state;
     const site = sites.find((s) => s.id == siteNo);
@@ -534,7 +548,7 @@ export default class CustomerContactsComponent extends MainComponent {
                 "othersFixedEmailFlag",
                 data.supportLevel=="support"||data.supportLevel=="delegate"
               )}
-              {this.getYNFlag("Accounts", "accountsFlag")}
+              
             </tr>
             <tr>
               {this.getYNFlag("Pending Leaver", "pendingLeaverFlag")}
@@ -546,7 +560,7 @@ export default class CustomerContactsComponent extends MainComponent {
             </tr>
             <tr>
             {this.getYNFlag("HR User to edit contacts", "hrUser")}
-              {this.getYNFlag("Receive Statements", "mailshot4Flag")}
+              {/* {this.getYNFlag("Receive Statements", "mailshot4Flag")} */}
             </tr>
             <tr>
              {this.getYNFlag("Active", "activeFlag")}
@@ -583,20 +597,7 @@ export default class CustomerContactsComponent extends MainComponent {
         ></Toggle>
     </div>
   }
-  getFilter = () => {
-    const { filter } = this.state;
-    return (
-      <div className="flex-row flex-center" style={{ marginTop: 5 }}>
-        {this.getFilterItem("Show Inactive","showInActive")}
-        {this.getFilterItem("HR User to edit contacts","hrUser")}
-        {this.getFilterItem("Accounts","accountsFlag")}
-        {this.getFilterItem("PrePay TopUp Notifications","mailshot8Flag")}
-        {this.getFilterItem("Receive Invoices","mailshot2Flag")}
-        {this.getFilterItem("Receive Statements","mailshot4Flag")}
-        {this.getFilterItem("Company Information Reports","mailshot9Flag")}
-      </div>
-    );
-  };
+ 
   handleFilterChange = (prop, value) => {
     this.setFilter(prop, value, () => this.applyFilter());
   };

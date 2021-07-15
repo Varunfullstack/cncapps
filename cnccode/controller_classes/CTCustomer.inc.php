@@ -430,10 +430,7 @@ class CTCustomer extends CTCNC
                 DBEContact::fax,
                 @$value['fax']
             );
-            $this->dsContact->setValue(
-                DBEContact::accountsFlag,
-                $this->getYN(@$value['accountsFlag'])
-            );
+           
             $this->dsContact->setValue(
                 DBEContact::supportLevel,
                 @$value['supportLevel']
@@ -1231,7 +1228,6 @@ class CTCustomer extends CTCNC
                 "fax"                           => $contact->getValue(DBEContact::fax),
                 "portalPassword"                => $contact->getValue(DBEContact::portalPassword),
                 "mailshot"                      => $contact->getValue(DBEContact::mailshot),
-                "accountsFlag"                  => $contact->getValue(DBEContact::accountsFlag),
                 "mailshot2Flag"                 => $contact->getValue(DBEContact::mailshot2Flag),
                 "mailshot3Flag"                 => $contact->getValue(DBEContact::mailshot3Flag),
                 "mailshot8Flag"                 => $contact->getValue(DBEContact::mailshot8Flag),
@@ -2991,7 +2987,6 @@ ORDER BY NAME,
                     "portalPassword"    => $dbeContact->getValue(DBEContact::portalPassword),
                     "mailshot"          => $dbeContact->getValue(DBEContact::mailshot),
                     //"discontinuedFlag"  => $dbeContact->getValue(DBEContact::discontinuedFlag),
-                    //"accountsFlag"      => $dbeContact->getValue(DBEContact::accountsFlag),
                     "mailshot2Flag"     => $dbeContact->getValue(DBEContact::mailshot2Flag),
                     "mailshot3Flag"     => $dbeContact->getValue(DBEContact::mailshot3Flag),
                     "mailshot8Flag"     => $dbeContact->getValue(DBEContact::mailshot8Flag),
