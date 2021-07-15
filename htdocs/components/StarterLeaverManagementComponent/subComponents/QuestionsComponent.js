@@ -181,15 +181,17 @@ export default class QuestionsComponent extends MainComponent {
         current.sortOrder=next.sortOrder;
         next.sortOrder=current.sortOrder+0.001;
         if(next.options)
-        next.options=JSON.stringify(next.options);
+          next.options=JSON.stringify(next.options);
         await this.api.updateQuestion(next);
     }
     if(!next)
     {        
         current.sortOrder=Math.max(...questions.map(i=>i.sortOrder))+0.001;
     }    
-    if(next.options)
+
+    if(current.options)
     current.options=JSON.stringify(current.options);
+
     await this.api.updateQuestion(current);
     this.getCustomerQuestions();
 }
