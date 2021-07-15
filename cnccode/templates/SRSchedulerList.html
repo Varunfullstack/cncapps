@@ -368,12 +368,12 @@
                     customerId: currentSRScheduler.customerId
                 };
                 $.ajax(
-                    '/Site.php?action=search',
-                    {
-                        method: 'POST',
-                        dataType: 'json',
-                        data: data
-                    }
+                        '/Site.php?action=search',
+                        {
+                            method: 'POST',
+                            dataType: 'json',
+                            data: data
+                        }
                 ).then(response => {
                     responseCB(response);
                 })
@@ -403,12 +403,12 @@
                     customerId: currentSRScheduler.customerId
                 };
                 $.ajax(
-                    '/Contact.php?action=search',
-                    {
-                        method: 'POST',
-                        dataType: 'json',
-                        data: data
-                    }
+                        '/Contact.php?action=search',
+                        {
+                            method: 'POST',
+                            dataType: 'json',
+                            data: data
+                        }
                 ).then(response => {
                     responseCB(response);
                 })
@@ -491,16 +491,16 @@
             dataType: 'json',
             data: currentSRScheduler
         }).then(function (result) {
-                dataTable.ajax.reload();
-                cancelEdit();
-            },
-            error => {
-                let errorMessage = "Failed to process scheduler";
-                if (error.responseJSON) {
-                    errorMessage = error.responseJSON.error;
+                    dataTable.ajax.reload();
+                    cancelEdit();
+                },
+                error => {
+                    let errorMessage = "Failed to process scheduler";
+                    if (error.responseJSON) {
+                        errorMessage = error.responseJSON.error;
+                    }
+                    alert(errorMessage);
                 }
-                alert(errorMessage);
-            }
         )
     }
 
@@ -538,17 +538,17 @@
         rruleObject.options.byhour = null;
         rruleObject.options.bysecond = null;
         document.querySelectorAll('input[name="freq"]')
-            .forEach(x => {
-                x.checked = +x.value === rruleObject.options.freq;
-                if (x.checked) {
-                    if (+x.value === rrule.Frequency.WEEKLY) {
-                        rruleObject.options.bymonthday = null;
-                        monthdayRow.hide();
-                    } else {
-                        monthdayRow.show();
+                .forEach(x => {
+                    x.checked = +x.value === rruleObject.options.freq;
+                    if (x.checked) {
+                        if (+x.value === rrule.Frequency.WEEKLY) {
+                            rruleObject.options.bymonthday = null;
+                            monthdayRow.hide();
+                        } else {
+                            monthdayRow.show();
+                        }
                     }
-                }
-            });
+                });
         document.querySelector('input[name="dtstart"]').value = moment(rruleObject.options.dtstart).format('YYYY-MM-DD');
         let selectedUntilOrCount = null;
         if (rruleObject.options.count) {
@@ -615,25 +615,25 @@
         }
         console.log(currentSRScheduler.customerId, currentSRScheduler.emptyAssetReason, currentSRScheduler.assetName);
         document.AssetPickerComponentRender(
-            "#reactAssetPicker",
-            currentSRScheduler.customerId,
-            currentSRScheduler.emptyAssetReason,
-            currentSRScheduler.assetName,
-            currentSRScheduler.assetTitle,
-            (value) => {
-                if (!value) {
-                    currentSRScheduler.assetName = null;
-                    currentSRScheduler.assetTitle = null;
-                    currentSRScheduler.emptyAssetReason = null;
-                    return;
-                }
-                if (value.isAsset) {
-                    currentSRScheduler.assetName = value.name;
-                    currentSRScheduler.assetTitle = value.name + " " + value.lastUsername + " " + value.biosVer;
-                } else {
-                    currentSRScheduler.emptyAssetReason = value.template;
-                }
-            })
+                "#reactAssetPicker",
+                currentSRScheduler.customerId,
+                currentSRScheduler.emptyAssetReason,
+                currentSRScheduler.assetName,
+                currentSRScheduler.assetTitle,
+                (value) => {
+                    if (!value) {
+                        currentSRScheduler.assetName = null;
+                        currentSRScheduler.assetTitle = null;
+                        currentSRScheduler.emptyAssetReason = null;
+                        return;
+                    }
+                    if (value.isAsset) {
+                        currentSRScheduler.assetName = value.name;
+                        currentSRScheduler.assetTitle = value.name + " " + value.lastUsername + " " + value.biosVer;
+                    } else {
+                        currentSRScheduler.emptyAssetReason = value.template;
+                    }
+                })
     }
 
     function changeUntilOrCount(value) {
@@ -691,23 +691,23 @@
             return;
         }
         fetch('?action=checkSalesOrder',
-            {
-                method: 'POST',
-                body: JSON.stringify({
-                    customerId: currentSRScheduler.customerId,
-                    salesOrderId
-                })
-            }
-        )
-            .then(res => res.json())
-            .then(response => {
-                if (!response.data) {
-                    alert('The provided sales order does not belong to the selected customer');
-                    linkedSalesOrderInput.val('');
-                } else {
-                    currentSRScheduler.linkedSalesOrderId = salesOrderId;
+                {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        customerId: currentSRScheduler.customerId,
+                        salesOrderId
+                    })
                 }
-            })
+        )
+                .then(res => res.json())
+                .then(response => {
+                    if (!response.data) {
+                        alert('The provided sales order does not belong to the selected customer');
+                        linkedSalesOrderInput.val('');
+                    } else {
+                        currentSRScheduler.linkedSalesOrderId = salesOrderId;
+                    }
+                })
     }
 
 </script>

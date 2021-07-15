@@ -4,14 +4,16 @@
 namespace CNCLTD;
 
 
+use dbSweetcode;
+
 class CustomerFeedbackRepository
 {
     /**
-     * @var \dbSweetcode
+     * @var dbSweetcode
      */
     private $db;
 
-    public function __construct(\dbSweetcode $db)
+    public function __construct(dbSweetcode $db)
     {
 
         $this->db = $db;

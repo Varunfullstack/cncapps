@@ -1,7 +1,9 @@
 <?php
 
 namespace CNCLTD\Exceptions;
-class DBQueryException extends \Exception
+use Exception;
+
+class DBQueryException extends Exception
 {
 
     /**

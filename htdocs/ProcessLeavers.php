@@ -21,11 +21,7 @@ while ($dsContact->fetchNext()) {
     $dbeContact = new DBEContact($thing);
     $dbeContact->getRow($dsContact->getValue(DBEContact::contactID));
     $dbeContact->setValue(
-        DBEContact::sendMailshotFlag,
-        'N'
-    );
-    $dbeContact->setValue(
-        DBEContact::discontinuedFlag,
+        DBEContact::mailshot,
         'N'
     );
     $dbeContact->setValue(
@@ -38,10 +34,6 @@ while ($dsContact->fetchNext()) {
     );
     $dbeContact->setValue(
         DBEContact::mailshot3Flag,
-        'N'
-    );
-    $dbeContact->setValue(
-        DBEContact::mailshot4Flag,
         'N'
     );
     $dbeContact->setValue(
@@ -65,35 +57,7 @@ while ($dsContact->fetchNext()) {
         'N'
     );
     $dbeContact->setValue(
-        DBEContact::initialLoggingEmailFlag,
-        'N'
-    );
-    $dbeContact->setValue(
-        DBEContact::workStartedEmailFlag,
-        'N'
-    );
-    $dbeContact->setValue(
-        DBEContact::workUpdatesEmailFlag,
-        'N'
-    );
-    $dbeContact->setValue(
-        DBEContact::fixedEmailFlag,
-        'N'
-    );
-    $dbeContact->setValue(
-        DBEContact::pendingClosureEmailFlag,
-        'N'
-    );
-    $dbeContact->setValue(
-        DBEContact::closureEmailFlag,
-        'N'
-    );
-    $dbeContact->setValue(
         DBEContact::othersInitialLoggingEmailFlag,
-        'N'
-    );
-    $dbeContact->setValue(
-        DBEContact::othersWorkStartedEmailFlag,
         'N'
     );
     $dbeContact->setValue(
@@ -102,14 +66,6 @@ while ($dsContact->fetchNext()) {
     );
     $dbeContact->setValue(
         DBEContact::othersFixedEmailFlag,
-        'N'
-    );
-    $dbeContact->setValue(
-        DBEContact::othersPendingClosureEmailFlag,
-        'N'
-    );
-    $dbeContact->setValue(
-        DBEContact::othersClosureEmailFlag,
         'N'
     );
     $dbeContact->setValue(
@@ -138,4 +94,4 @@ while ($dsContact->fetchNext()) {
         );
         $dbeProblem->updateRow();
     }
-};
+}

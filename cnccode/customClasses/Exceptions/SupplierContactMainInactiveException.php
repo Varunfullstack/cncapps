@@ -1,7 +1,9 @@
 <?php
 
 namespace CNCLTD\Exceptions;
-class SupplierContactMainInactiveException extends \Exception
+use Exception;
+
+class SupplierContactMainInactiveException extends Exception
 {
 
     /**

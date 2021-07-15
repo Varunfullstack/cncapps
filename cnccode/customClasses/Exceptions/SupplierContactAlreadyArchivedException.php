@@ -1,7 +1,9 @@
 <?php
 
 namespace CNCLTD\Exceptions;
-class SupplierContactAlreadyArchivedException extends \Exception
+use Exception;
+
+class SupplierContactAlreadyArchivedException extends Exception
 {
 
     /**

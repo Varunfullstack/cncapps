@@ -4,12 +4,14 @@
 namespace CNCLTD\CustomerValidation;
 
 
+use DBEContact;
+
 class ContactValidation
 {
 
     private $contactId;
     /**
-     * @var \DBEContact
+     * @var DBEContact
      */
     private $dbeContact;
     private $validationErrors;
@@ -18,7 +20,7 @@ class ContactValidation
     {
 
         $this->contactId = $contactId;
-        $this->dbeContact = new \DBEContact($this);
+        $this->dbeContact = new DBEContact($this);
         $this->dbeContact->getRow($contactId);
         $this->validationErrors = $this->runValidation();
     }
@@ -29,42 +31,42 @@ class ContactValidation
     private function runValidation()
     {
         $errorCollection = new ContactValidationErrorCollection($this->getContactName(), $this->contactId);
-        if (!$this->dbeContact->getValue(\DBEContact::firstName)) {
+        if (!$this->dbeContact->getValue(DBEContact::firstName)) {
             $errorCollection->addError("First Name Required");
         }
 
-        if (!$this->dbeContact->getValue(\DBEContact::lastName)) {
+        if (!$this->dbeContact->getValue(DBEContact::lastName)) {
             $errorCollection->addError("Last Name Required");
         }
 
-        if (!$this->dbeContact->getValue(\DBEContact::title)) {
+        if (!$this->dbeContact->getValue(DBEContact::title)) {
             $errorCollection->addError("Title Required");
         }
 
-        if ($email = $this->dbeContact->getValue(\DBEContact::email)) {
+        if ($email = $this->dbeContact->getValue(DBEContact::email)) {
             if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 $errorCollection->addError("Invalid Email");
             } else {
-                $testContact = new \DBEContact($this);
+                $testContact = new DBEContact($this);
                 if (!$testContact->validateUniqueEmail($email, $this->contactId)) {
                     $errorCollection->addError("Duplicated Email");
                 }
             }
         }
 
-        if ($this->dbeContact->getValue(\DBEContact::phone) && !preg_match(
+        if ($this->dbeContact->getValue(DBEContact::phone) && !preg_match(
                 "/^\d+$/",
-                $this->dbeContact->getValue(\DBEContact::phone)
+                $this->dbeContact->getValue(DBEContact::phone)
             )) {
-            $errorCollection->addError("Invalid Phone Number: " . $this->dbeContact->getValue(\DBEContact::phone));
+            $errorCollection->addError("Invalid Phone Number: " . $this->dbeContact->getValue(DBEContact::phone));
         }
 
-        if ($this->dbeContact->getValue(\DBEContact::mobilePhone) && !preg_match(
+        if ($this->dbeContact->getValue(DBEContact::mobilePhone) && !preg_match(
                 "/^\d+$/",
-                $this->dbeContact->getValue(\DBEContact::mobilePhone)
+                $this->dbeContact->getValue(DBEContact::mobilePhone)
             )) {
             $errorCollection->addError(
-                "Invalid Mobile Phone Number: " . $this->dbeContact->getValue(\DBEContact::mobilePhone)
+                "Invalid Mobile Phone Number: " . $this->dbeContact->getValue(DBEContact::mobilePhone)
             );
         }
         return $errorCollection;
@@ -72,8 +74,8 @@ class ContactValidation
 
     public function getContactName()
     {
-        return $this->dbeContact->getValue(\DBEContact::firstName) . " " . $this->dbeContact->getValue(
-                \DBEContact::lastName
+        return $this->dbeContact->getValue(DBEContact::firstName) . " " . $this->dbeContact->getValue(
+                DBEContact::lastName
             );
     }
 

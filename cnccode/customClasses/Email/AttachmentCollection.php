@@ -4,7 +4,9 @@
 namespace CNCLTD\Email;
 
 
-class AttachmentCollection implements \Iterator
+use Iterator;
+
+class AttachmentCollection implements Iterator
 {
     /**
      * @var AttachmentItem[]

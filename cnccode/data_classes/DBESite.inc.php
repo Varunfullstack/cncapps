@@ -28,6 +28,7 @@ class DBESite extends DBCNCEntity
     const activeFlag       = "activeFlag";
     const nonUKFlag        = "nonUKFlag";
     const what3Words       = "what3Words";
+    const lastUpdatedDateTime = "lastUpdatedDateTime";
 
     /**
      * calls constructor()
@@ -141,11 +142,30 @@ class DBESite extends DBCNCEntity
             DA_TEXT,
             DA_ALLOW_NULL
         );
+
+        $this->addColumn(
+            self::lastUpdatedDateTime,
+            DA_DATETIME,
+            DA_NOT_NULL
+        );
+
         $this->setPK(1);        // NOTE: This is not really the PK, just the second element
         $this->setAddColumnsOff();
         $this->setNewRowValue(
             -9
         );        // This allows for fact that first siteNo is zero. Used in DataAccess->replicate()
+    }
+
+    function updateRow()
+    {
+        $this->setValue(self::lastUpdatedDateTime, (new DateTime())->format(DATE_MYSQL_DATETIME));
+        return parent::updateRow();
+    }
+
+    function insertRow()
+    {
+        $this->setValue(self::lastUpdatedDateTime, (new DateTime())->format(DATE_MYSQL_DATETIME));
+        return parent::insertRow();
     }
 
     /**

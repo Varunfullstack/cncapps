@@ -4,11 +4,14 @@
 * @access public
 */
 global $cfg;
+
+use CNCLTD\SortableWithQueryDBE;
+
 require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBEOrdline extends DBEntity
 {
-    use \CNCLTD\SortableWithQueryDBE;
+    use SortableWithQueryDBE;
 
     const LINE_TYPE_ITEM    = 'I';
     const LINE_TYPE_COMMENT = 'C';

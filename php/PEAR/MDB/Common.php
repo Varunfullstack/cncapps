@@ -4544,5 +4544,6 @@ class MDB_Common extends PEAR
             $this->autoCommit(TRUE);
         }
     }
-};
+}
+
 ?>

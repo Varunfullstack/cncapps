@@ -981,5 +981,5 @@ class MDB_Manager_mysql extends MDB_Manager_Common
     // }}}
 }
 
-};
+}
 ?>

@@ -4,6 +4,7 @@
 namespace CNCLTD;
 
 
+use DateTime;
 use Exception;
 
 class SolarwindsBackupAPI
@@ -71,7 +72,7 @@ class SolarwindsBackupAPI
                     if ($key == 'AA1600') {
                         $contractId = $setting[$key];
                     } elseif ($key == 'TL') {
-                        $lastSuccessfulBackupDate = new \DateTime();
+                        $lastSuccessfulBackupDate = new DateTime();
                         $lastSuccessfulBackupDate->setTimestamp($setting[$key]);
                     } elseif ($key == 'I1') {
                         $name = $setting[$key];

@@ -6,6 +6,8 @@ use CNCLTD\ServiceRequestInternalNote\ServiceRequestInternalNote;
 use CNCLTD\ServiceRequestInternalNote\ServiceRequestInternalNotePDODTO;
 use CNCLTD\ServiceRequestInternalNote\ServiceRequestInternalNotePDOMapper;
 use CNCLTD\ServiceRequestInternalNote\ServiceRequestInternalNoteRepository;
+use dbSweetcode;
+use Exception;
 use mysqli;
 use PDO;
 
@@ -63,13 +65,13 @@ class ServiceRequestInternalNotePDORepository implements ServiceRequestInternalN
                 $serviceRequestInternalNote->getContent()
             ]
         )) {
-            throw new \Exception('Failed to save serviceRequestInternalNote:' . $statement->errorInfo()[2]);
+            throw new Exception('Failed to save serviceRequestInternalNote:' . $statement->errorInfo()[2]);
         }
     }
 
     public function newIdentity(): int
     {
-        /** @var \dbSweetcode */ global $db;
+        /** @var dbSweetcode */ global $db;
         return $db->nextid('serviceRequestInternalNote');
     }
 
@@ -86,7 +88,7 @@ class ServiceRequestInternalNotePDORepository implements ServiceRequestInternalN
                 $serviceRequestInternalNote->getId()
             ]
         )) {
-            throw new \Exception('Failed to save serviceRequestInternalNote:' . $statement->errorInfo()[2]);
+            throw new Exception('Failed to save serviceRequestInternalNote:' . $statement->errorInfo()[2]);
         }
     }
 }

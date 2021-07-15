@@ -6,7 +6,11 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
-global $cfg;
+global
+
+use CNCLTD\Exceptions\JsonHttpException;
+
+$cfg;
 require_once($cfg['path_bu'] . '/BUInvoice.inc.php');
 require_once($cfg['path_bu'] . '/BUPDFInvoice.inc.php');
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
@@ -1453,11 +1457,11 @@ class CTInvoice extends CTCNC
         $jsonData = $this->getJSONData();
 
         if (empty($jsonData['invheadID'])) {
-            throw new \CNCLTD\Exceptions\JsonHttpException(400, 'Invoice Head Id required');
+            throw new JsonHttpException(400, 'Invoice Head Id required');
         }
 
         if (empty($jsonData['sequenceNo'])) {
-            throw new \CNCLTD\Exceptions\JsonHttpException(400, 'Sequence No Required');
+            throw new JsonHttpException(400, 'Sequence No Required');
         }
 
         $this->setMethodName('deleteLine');

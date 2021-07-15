@@ -710,7 +710,7 @@ class DB_oci8 extends DB_common
      */
     function autoCommit($onoff = false)
     {
-        $this->autocommit = (bool)$onoff;;
+        $this->autocommit = (bool)$onoff;
         return DB_OK;
     }
 

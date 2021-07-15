@@ -4,6 +4,7 @@ namespace CNCLTD\AssetListExport;
 global $cfg;
 require_once($cfg["path_dbe"] . "/DBEOSSupportDates.php");
 use DBEOSSupportDates;
+use Exception;
 
 class OperatingSystemsSupportDatesCollection
 {
@@ -41,7 +42,7 @@ class OperatingSystemsSupportDatesCollection
             return null;
         }
         if (!preg_match("/(\d+\.\d+(\.\d+)?)/", $version, $matches)) {
-            throw new \Exception("The version does not match the regex!! $version");
+            throw new Exception("The version does not match the regex!! $version");
         }
         $version = $matches[0];
         if (!array_key_exists($operatingSystem, $this->operatingSystems)) {

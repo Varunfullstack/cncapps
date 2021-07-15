@@ -4,7 +4,10 @@
 namespace CNCLTD;
 
 
-class Collection implements \Iterator, \ArrayAccess
+use ArrayAccess;
+use Iterator;
+
+class Collection implements Iterator, ArrayAccess
 {
     private $position;
 

@@ -1,7 +1,9 @@
 <?php
 
 namespace CNCLTD\Exceptions;
-class AdditionalHoursRequestedInvalidValueException extends \Exception
+use Exception;
+
+class AdditionalHoursRequestedInvalidValueException extends Exception
 {
 
     /**

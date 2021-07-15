@@ -1,4 +1,9 @@
-<?php /** @noinspection PhpMissingBreakStatementInspection */
+<?php
+
+/** @noinspection PhpMissingBreakStatementInspection */
+
+use CNCLTD\Exceptions\APIException;
+
 /**
  * Further Action controller class
  * CNC Ltd
@@ -9,13 +14,8 @@
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BUPortalCustomerDocument.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
-// Actions
-define('CTPORTALCUSTOMERDOCUMENT_ACT_DISPLAY_LIST', 'documentList');
-define('CTPORTALCUSTOMERDOCUMENT_ACT_ADD', 'add');
-define('CTPORTALCUSTOMERDOCUMENT_ACT_EDIT', 'edit');
-define('CTPORTALCUSTOMERDOCUMENT_ACT_DELETE', 'delete');
-define('CTPORTALCUSTOMERDOCUMENT_ACT_UPDATE', 'update');
 
+     
 class CTPortalCustomerDocument extends CTCNC
 {
     var $dsPortalCustomerDocument = '';
@@ -42,18 +42,32 @@ class CTPortalCustomerDocument extends CTCNC
      * @throws Exception
      */
     function defaultAction()
-    {
-        switch ($this->getAction()) {
-            case CTPORTALCUSTOMERDOCUMENT_ACT_EDIT:
-            case CTPORTALCUSTOMERDOCUMENT_ACT_ADD:
-                $this->edit();
-                break;
-            case CTPORTALCUSTOMERDOCUMENT_ACT_DELETE:
-                $this->delete();
-                break;
-            case CTPORTALCUSTOMERDOCUMENT_ACT_UPDATE:
-                $this->update();
-                break;
+    { 
+        // Actions
+        switch ($this->getAction()) {           
+            case "documents":
+                switch ($this->requestMethod) {
+                    case 'GET':
+                        echo  json_encode($this->getPortalDocuments(), JSON_NUMERIC_CHECK);
+                        break;
+                    case 'POST':
+                        echo  json_encode($this->addDocument(), JSON_NUMERIC_CHECK);
+                        break;
+                    case 'PUT':
+                        echo  json_encode($this->update(), JSON_NUMERIC_CHECK);
+                        break;
+                    case 'DELETE':
+                        echo  json_encode($this->delete(), JSON_NUMERIC_CHECK);
+                        break;
+                    default:
+                        # code...
+                        break;
+                }
+                exit;
+            
+            case "uploadDocument":
+                echo  json_encode($this->uploadDocument(), JSON_NUMERIC_CHECK);
+                exit;
             case 'viewFile':
                 $this->viewFile();
                 break;
@@ -63,131 +77,47 @@ class CTPortalCustomerDocument extends CTCNC
     }
 
     /**
-     * Edit/Add Further Action
-     * @access private
+     * @param $customerID
+     * @return array
      * @throws Exception
      */
-    function edit()
+    function getPortalDocuments()
     {
-        $this->setMethodName('edit');
-        $dsPortalCustomerDocument = &$this->dsPortalCustomerDocument; // ref to class var
-
-        if (!$this->getFormError()) {
-            if ($this->getAction() == CTPORTALCUSTOMERDOCUMENT_ACT_EDIT) {
-                $this->buPortalCustomerDocument->getDocumentByID(
-                    $this->getParam('portalCustomerDocumentID'),
-                    $dsPortalCustomerDocument
-                );
-                $portalCustomerDocumentID = $this->getParam('portalCustomerDocumentID');
-            } else {                                                                    // creating new
-                $dsPortalCustomerDocument->initialise();
-                $dsPortalCustomerDocument->setValue(DBEPortalCustomerDocument::portalCustomerDocumentID, null);
-                $dsPortalCustomerDocument->setValue(
-                    DBEPortalCustomerDocument::customerID,
-                    $this->getParam('customerID')
-                );
-                $portalCustomerDocumentID = null;
-            }
-        } else {                                                                        // form validation error
-            $dsPortalCustomerDocument->initialise();
-            $dsPortalCustomerDocument->fetchNext();
-            $portalCustomerDocumentID = $dsPortalCustomerDocument->getValue(
-                DBEPortalCustomerDocument::portalCustomerDocumentID
-            );
-        }
-        if ($this->getAction() == CTPORTALCUSTOMERDOCUMENT_ACT_EDIT) {
-            $urlDelete =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action'                   => CTPORTALCUSTOMERDOCUMENT_ACT_DELETE,
-                        'portalCustomerDocumentID' => $portalCustomerDocumentID
-                    )
-                );
-            $txtDelete = 'Delete';
-        } else {
-            $urlDelete = '';
-            $txtDelete = '';
-        }
-
-
-        $urlUpdate =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action'                   => CTPORTALCUSTOMERDOCUMENT_ACT_UPDATE,
-                    'portalCustomerDocumentID' => $portalCustomerDocumentID
-                )
-            );
-        $urlDisplayCustomer =
-            Controller::buildLink(
-                'Customer . php',
-                array(
-                    'customerID' => $this->dsPortalCustomerDocument->getValue(DBEPortalCustomerDocument::customerID),
-                    'action'     => CTCNC_ACT_DISP_EDIT
-                )
-            );
-        $this->setPageTitle('Edit Document');
-        $this->setTemplateFiles(
-            array('PortalCustomerDocumentEdit' => 'PortalCustomerDocumentEdit.inc')
+        $customerID = $_REQUEST["customerID"];
+        $portalDocuments = new DBEPortalCustomerDocumentWithoutFile($customerID);
+        $portalDocuments->setValue(DBEPortalCustomerDocumentWithoutFile::customerID, $customerID);
+        $portalDocuments->getRowsByColumn(
+            DBEPortalCustomerDocument::customerID,
+            DBEPortalCustomerDocumentWithoutFile::description
         );
-
-        $createdDateString = (new DateTime())->format(DATE_MYSQL_DATETIME);
-
-        if ($dsPortalCustomerDocument->getValue(
-                DBEPortalCustomerDocument::createdDate
-            ) && $dsPortalCustomerDocument->getValue(
-                DBEPortalCustomerDocument::createdDate
-            ) != '0000-00-00 00:00:00') {
-            $createdDateString = $dsPortalCustomerDocument->getValue(
-                DBEPortalCustomerDocument::createdDate
-            );
+        $documents = [];
+        while ($portalDocuments->fetchNext()) {
+            $documents[] = [
+                'id'                  => $portalDocuments->getValue(
+                    DBEPortalCustomerDocument::portalCustomerDocumentID
+                ),
+                'description'         => $portalDocuments->getValue(
+                    DBEPortalCustomerDocumentWithoutFile::description
+                ),
+                'filename'            => $portalDocuments->getValue(
+                    DBEPortalCustomerDocumentWithoutFile::filename
+                ),
+                'customerContract'    => $portalDocuments->getValue(
+                    DBEPortalCustomerDocumentWithoutFile::customerContract
+                ),
+                'mainContactOnlyFlag' => $portalDocuments->getValue(
+                    DBEPortalCustomerDocument::mainContactOnlyFlag
+                ) === 'Y',
+            ];
         }
-
-
-        $this->template->set_var(
-            array(
-                'customerID'                 => $dsPortalCustomerDocument->getValue(
-                    DBEPortalCustomerDocument::customerID
-                ),
-                'portalCustomerDocumentID'   => $portalCustomerDocumentID,
-                'filename'                   => Controller::htmlDisplayText(
-                    $dsPortalCustomerDocument->getValue(DBEPortalCustomerDocument::filename)
-                ),
-                'description'                => Controller::htmlInputText(
-                    $dsPortalCustomerDocument->getValue(DBEPortalCustomerDocument::description)
-                ),
-                'descriptionMessage'         => Controller::htmlDisplayText(
-                    $dsPortalCustomerDocument->getMessage(DBEPortalCustomerDocument::description)
-                ),
-                'customerContractChecked'    => $dsPortalCustomerDocument->getValue(
-                    DBEPortalCustomerDocument::customerContract
-                ) ? 'checked' : null,
-                'customerContractMessage'    => Controller::htmlDisplayText(
-                    $dsPortalCustomerDocument->getMessage(DBEPortalCustomerDocument::customerContract)
-                ),
-                'mainContactOnlyFlagChecked' => Controller::htmlChecked(
-                    $dsPortalCustomerDocument->getValue(DBEPortalCustomerDocument::mainContactOnlyFlag)
-                ),
-                'mainContactOnlyFlagMessage' => Controller::htmlDisplayText(
-                    $dsPortalCustomerDocument->getMessage(DBEPortalCustomerDocument::mainContactOnlyFlag)
-                ),
-                'createdDate'                => $createdDateString,
-                'urlUpdate'                  => $urlUpdate,
-                'urlDelete'                  => $urlDelete,
-                'txtDelete'                  => $txtDelete,
-                'urlDisplayCustomer'         => $urlDisplayCustomer
-            )
-        );
-        $this->template->parse('CONTENTS', 'PortalCustomerDocumentEdit', true);
-        $this->parsePage();
-    }// end function editFurther Action()
+        return $this->success($documents);
+    }
 
     /**
      * Delete Further Action
      *
      * @access private
-     * @authors Karim Ahmed - Sweet Code Limited
+     * @authors Mustafa Taha
      * @throws Exception
      */
     function delete()
@@ -200,81 +130,80 @@ class CTPortalCustomerDocument extends CTCNC
         );
 
         if (!$this->buPortalCustomerDocument->deleteDocument($this->getParam('portalCustomerDocumentID'))) {
-            $this->displayFatalError('Cannot delete this document');
-            exit;
+            return $this->fail(APIException::badRequest, 'Cannot delete this document');
         } else {
-            $urlNext =
-                Controller::buildLink(
-                    'Customer.php',
-                    array(
-                        'customerID' => $dsPortalCustomerDocument->getValue(DBEPortalCustomerDocument::customerID),
-                        'action'     => CTCNC_ACT_DISP_EDIT
-                    )
-                );
-            header('Location: ' . $urlNext);
-            exit;
+            return $this->success();
         }
     }
-
+    /**
+     * @throws Exception
+     */
+    function addDocument()
+    {
+        $body = $this->getBody();
+        $dbePortalDocument = new DBEPortalCustomerDocument($this);
+        $dbePortalDocument->setValue(DBEPortalCustomerDocument::description, $body->description);
+        $dbePortalDocument->setValue(DBEPortalCustomerDocument::customerID, $body->customerID);
+        $dbePortalDocument->setValue(DBEPortalCustomerDocument::createdDate, (new DateTime())->format(DATE_MYSQL_DATETIME));
+        $dbePortalDocument->setValue(DBEPortalCustomerDocument::customerContract, $body->customerContract);
+        $dbePortalDocument->setValue(DBEPortalCustomerDocument::mainContactOnlyFlag, $body->mainContactOnlyFlag ? "Y" : "N");
+        $dbePortalDocument->insertRow();
+        return $this->success(["documentID" => $dbePortalDocument->getPKValue()]);
+    }
     /**
      * @throws Exception
      */
     function update()
     {
-        $this->setMethodName('update');
-        $this->formError = !$this->dsPortalCustomerDocument->populateFromArray(
-            $this->getParam('portalCustomerDocument')
-        );
-        /*
-        Need a file when creating new
-        */
+        $body = $this->getBody();
+        $dbePortalDocument = new DBEPortalCustomerDocument($this);
+        $dbePortalDocument->getRow($body->id);
+        $dbePortalDocument->setValue(DBEPortalCustomerDocument::description, $body->description);
+        $dbePortalDocument->setValue(DBEPortalCustomerDocument::customerContract, $body->customerContract);
+        $dbePortalDocument->setValue(DBEPortalCustomerDocument::mainContactOnlyFlag, $body->mainContactOnlyFlag ? "Y" : "N");
+        return $this->success($dbePortalDocument->updateRow());
+    }
+    function uploadDocument()
+    {
 
         if ($_FILES['userfile']['name'] == '' && !$this->dsPortalCustomerDocument->getValue(
-                DBEPortalCustomerDocument::portalCustomerDocumentID
-            )) {
-            $this->setFormErrorMessage('Please enter a file path');
+            DBEPortalCustomerDocument::portalCustomerDocumentID
+        )) {
+            return $this->fail(APIException::badRequest, "Please select file");
         } else {
-            /* uploading a file */
-            if (!$this->dsPortalCustomerDocument->getValue(DBEPortalCustomerDocument::createdDate)) {
-                $this->dsPortalCustomerDocument->setValue(
-                    DBEPortalCustomerDocument::createdDate,
-                    (new DateTime())->format(DATE_MYSQL_DATETIME)
-                );
+            $dbePortalDocument = new DBEPortalCustomerDocument($this);
+            $dbePortalDocument->getRow($_REQUEST["documentID"]);
+            if (!$dbePortalDocument->rowCount)
+                return $this->fail(APIException::notFound);
+
+            if (!$dbePortalDocument->getValue(DBEPortalCustomerDocument::createdDate)) {
+                $dbePortalDocument->setValue(DBEPortalCustomerDocument::createdDate, (new DateTime())->format(DATE_MYSQL_DATETIME));
             }
 
+            $userfile = $_FILES['userfile'];
+            //return $this->success(["userfile"=>$userfile]);
             if ($_FILES['userfile']['name'] != '' && !is_uploaded_file($_FILES['userfile']['tmp_name'])) {
-                $this->setFormErrorMessage(
-                    'Document not loaded - is it bigger than ' .
+                return $this->fail(APIException::badRequest, 'Document not loaded - is it bigger than ' .
                     $this->return_bytes(ini_get('upload_max_filesize')) / 1024 / 1024 . '
-                                            MBytes ? '
-                );
+                                    MBytes ? ');
             }
-
-        }
-
-        if ($this->formError) {
-            if ($this->dsPortalCustomerDocument->getValue(
-                DBEPortalCustomerDocument::portalCustomerDocumentID
-            )) {                    // attempt to insert
-                $this->setAction(CTPORTALCUSTOMERDOCUMENT_ACT_EDIT);
-            } else {
-                $this->setAction(CTPORTALCUSTOMERDOCUMENT_ACT_ADD);
-            }
-            $this->edit();
-            exit;
-        }
-
-        $this->buPortalCustomerDocument->updateDocument($this->dsPortalCustomerDocument, $_FILES['userfile']);
-
-        $urlNext =
-            Controller::buildLink(
-                'Customer.php',
-                array(
-                    'customerID' => $this->dsPortalCustomerDocument->getValue(DBEPortalCustomerDocument::customerID),
-                    'action'     => CTCNC_ACT_DISP_EDIT
-                )
+            $dbePortalDocument->setValue(
+                DBEPortalCustomerDocument::file,
+                fread(fopen($userfile['tmp_name'], 'rb'), $userfile['size'])
             );
-        header('Location: ' . $urlNext);
+            $dbePortalDocument->setValue(
+                DBEPortalCustomerDocument::filename,
+                $userfile['name']
+            );
+            $dbePortalDocument->setValue(
+                DBEPortalCustomerDocument::fileMimeType,
+                (string)$userfile['type']
+            );
+            $dbePortalDocument->updateRow();
+        }
+
+        //$this->buPortalCustomerDocument->updateDocument($dbePortalDocument, $_FILES['userfile']);
+        return $this->success();
     }
 
     /**
@@ -289,7 +218,7 @@ class CTPortalCustomerDocument extends CTCNC
         $val = substr($val, 0, -1); // necessary since PHP 7.1; otherwise optional
 
         switch ($last) {
-            // The 'G' modifier is available since PHP 5.1.0
+                // The 'G' modifier is available since PHP 5.1.0
             case 'g':
                 $val *= 1024;
             case 'm':
@@ -325,5 +254,4 @@ class CTPortalCustomerDocument extends CTCNC
         print $dsPortalCustomerDocument->getValue(DBEPortalCustomerDocument::file);
         exit;
     }
-
 }

@@ -5,9 +5,12 @@
 * @authors Karim Ahmed
 * @access public
 */
+
+use CNCLTD\Sortable;
+
 require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
-class DBEQuotationTemplate extends DBEntity implements \CNCLTD\Sortable
+class DBEQuotationTemplate extends DBEntity implements Sortable
 {
 
     const id = "id";

@@ -4,6 +4,7 @@ namespace CNCLTD\Supplier\usecases;
 
 use CNCLTD\Supplier\SupplierId;
 use CNCLTD\Supplier\SupplierRepository;
+use Exception;
 
 class ArchiveSupplier
 {
@@ -25,7 +26,7 @@ class ArchiveSupplier
     {
         $supplier = $this->repository->getById($supplierId);
         if (!$supplier) {
-            throw new \Exception('Supplier not found');
+            throw new Exception('Supplier not found');
         }
         $supplier->archive();
         $this->repository->save($supplier);

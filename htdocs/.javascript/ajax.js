@@ -54,5 +54,5 @@ function encodeHtml(value) {
 function ignoreXMLHTTPRequestResponse(){
 	ignore_xmlhttprequest_response = true;
 	pause(30);
-	return;
+
 }

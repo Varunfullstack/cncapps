@@ -2,7 +2,7 @@
 /*
  * Tree generation and output for PHP3
  *
- * © 1998 Alex Aulbach
+ * ï¿½ 1998 Alex Aulbach
  *
  * $Id: tree.inc,v 1.3 2002/04/02 23:23:12 layne_weathers Exp $
  *
@@ -80,7 +80,7 @@ class Tree {
 				if ("0" != $k) {
 					switch ($t) {
 						case "array" :
-							eval("\$tmp1=Count($eval2); \$tmp2=isset(${eval2}[\"0\"]);");
+							eval("])");
 							if ($tmp1==1 && $tmp2 ) {
 								eval("\$v=${eval2}[\"0\"];");
 								$this->leaftree($k,$v,$this->path_add($path,$k),$depth+1,$c,$i);

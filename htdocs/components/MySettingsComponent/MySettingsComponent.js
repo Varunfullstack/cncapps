@@ -201,7 +201,7 @@ class MySettingsComponent extends MainComponent {
         );
     }
     getMyFeedbackTab= ()=>{
-        const {feedbacks,filter}=this.state;;
+        const {feedbacks,filter}=this.state;
         const columns=[
             {
                 path: "value",

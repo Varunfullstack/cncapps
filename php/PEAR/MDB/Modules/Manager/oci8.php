@@ -426,5 +426,5 @@ class MDB_Manager_oci8 extends MDB_Manager_Common {
     }
 }
 
-};
+}
 ?>

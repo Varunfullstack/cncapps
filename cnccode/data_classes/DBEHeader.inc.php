@@ -29,13 +29,11 @@ class DBEHeader extends DBEntity
     const portal24HourPin                                = "portal24HourPin";
     const mailshot2FlagDef                               = "mailshot2FlagDef";
     const mailshot3FlagDef                               = "mailshot3FlagDef";
-    const mailshot4FlagDef                               = "mailshot4FlagDef";
     const mailshot8FlagDef                               = "mailshot8FlagDef";
     const mailshot9FlagDef                               = "mailshot9FlagDef";
     const mailshot11FlagDef                              = "mailshot11FlagDef";
     const mailshot2FlagDesc                              = "mailshot2FlagDesc";
     const mailshot3FlagDesc                              = "mailshot3FlagDesc";
-    const mailshot4FlagDesc                              = "mailshot4FlagDesc";
     const mailshot8FlagDesc                              = "mailshot8FlagDesc";
     const mailshot9FlagDesc                              = "mailshot9FlagDesc";
     const mailshot11FlagDesc                             = "mailshot11FlagDesc";
@@ -255,12 +253,6 @@ class DBEHeader extends DBEntity
             "hed_mailflg3_def"
         );
         $this->addColumn(
-            self::mailshot4FlagDef,
-            DA_YN,
-            DA_NOT_NULL,
-            "hed_mailflg4_def"
-        );
-        $this->addColumn(
             self::mailshot8FlagDef,
             DA_YN,
             DA_NOT_NULL,
@@ -289,12 +281,6 @@ class DBEHeader extends DBEntity
             DA_TEXT,
             DA_NOT_NULL,
             "hed_mailflg3_desc"
-        );
-        $this->addColumn(
-            self::mailshot4FlagDesc,
-            DA_STRING,
-            DA_NOT_NULL,
-            "hed_mailflg4_desc"
         );
         $this->addColumn(
             self::mailshot8FlagDesc,

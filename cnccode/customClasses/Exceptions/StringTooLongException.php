@@ -1,7 +1,9 @@
 <?php
 
 namespace CNCLTD\Exceptions;
-class StringTooLongException extends \Exception
+use Exception;
+
+class StringTooLongException extends Exception
 {
 
     /**

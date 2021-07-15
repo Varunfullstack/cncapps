@@ -1,6 +1,8 @@
 <?php
 
 namespace CNCLTD\ServiceRequestInternalNote;
+use DateTimeImmutable;
+
 class ServiceRequestInternalNotePDOMapper
 {
     public static function toDomain(ServiceRequestInternalNotePDODTO $fromDB): ServiceRequestInternalNote
@@ -9,9 +11,9 @@ class ServiceRequestInternalNotePDOMapper
             $fromDB->getId(),
             $fromDB->getServiceRequestId(),
             $fromDB->getCreatedBy(),
-            \DateTimeImmutable::createFromFormat(DATE_MYSQL_DATETIME, $fromDB->getCreatedAt()),
+            DateTimeImmutable::createFromFormat(DATE_MYSQL_DATETIME, $fromDB->getCreatedAt()),
             $fromDB->getUpdatedBy(),
-            \DateTimeImmutable::createFromFormat(DATE_MYSQL_DATETIME, $fromDB->getUpdatedAt()),
+            DateTimeImmutable::createFromFormat(DATE_MYSQL_DATETIME, $fromDB->getUpdatedAt()),
             $fromDB->getContent()
         );
     }

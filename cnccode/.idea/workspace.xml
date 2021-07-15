@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="862b1f9d-63e7-4ae7-9bf8-d3a214767ea4" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/controller_classes/CTCustomer.inc.php" beforeDir="false" afterPath="$PROJECT_DIR$/controller_classes/CTCustomer.inc.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../htdocs/components/customerEditMain/CustomerEditComponent.js" beforeDir="false" afterPath="$PROJECT_DIR$/../htdocs/components/customerEditMain/CustomerEditComponent.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../htdocs/components/customerEditMain/PortalCustomerDocumentsComponent.js" beforeDir="false" afterPath="$PROJECT_DIR$/../htdocs/components/customerEditMain/PortalCustomerDocumentsComponent.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../htdocs/components/services/APICustomers.js" beforeDir="false" afterPath="$PROJECT_DIR$/../htdocs/components/services/APICustomers.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../htdocs/components/services/APIPortalDocuments.js" beforeDir="false" afterPath="$PROJECT_DIR$/../htdocs/components/services/APIPortalDocuments.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../htdocs/components/services/ApiUrls.js" beforeDir="false" afterPath="$PROJECT_DIR$/../htdocs/components/services/ApiUrls.js" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ComposerSettings">
+    <execution />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="ProjectId" id="1uSKwjL0THRtJAMYTT5lJn14cmm" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="vue.rearranger.settings.migration" value="true" />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="862b1f9d-63e7-4ae7-9bf8-d3a214767ea4" name="Default Changelist" comment="" />
+      <created>1624653799722</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1624653799722</updated>
+      <workItem from="1624653804831" duration="84000" />
+    </task>
+    <servers />
+  </component>
+</project>

@@ -4,12 +4,16 @@
 namespace CNCLTD\CustomerValidation;
 
 
+use BUSite;
+use DataSet;
+use DBESite;
+
 class SiteValidation
 {
     private $customerId;
     private $siteId;
     /**
-     * @var \DataSet|\DBESite
+     * @var DataSet|DBESite
      */
     private $site;
     private $validationErrors;
@@ -23,8 +27,8 @@ class SiteValidation
     {
         $this->customerId = $customerId;
         $this->siteId = $siteId;
-        $buSite = new \BUSite($this);
-        $this->site = new \DataSet($this);
+        $buSite = new BUSite($this);
+        $this->site = new DataSet($this);
         $buSite->getSiteByID($customerId, $siteId, $this->site);
         $this->validationErrors = $this->runValidation();
     }
@@ -32,17 +36,17 @@ class SiteValidation
     private function runValidation()
     {
         $errors = new SiteValidationErrorCollection($this->getPostCode());
-        if (!$this->site->getValue(\DBESite::maxTravelHours)) {
+        if (!$this->site->getValue(DBESite::maxTravelHours)) {
             $errors->addError("Max Travel hours must be greater than 0");
         }
 
-        if ($this->site->getValue(\DBESite::phone) && !preg_match(
+        if ($this->site->getValue(DBESite::phone) && !preg_match(
                 "/^\d+$/",
-                $this->site->getValue(\DBESite::phone)
+                $this->site->getValue(DBESite::phone)
             )) {
-            $errors->addError("Invalid Phone Number: " . $this->site->getValue(\DBESite::phone));
+            $errors->addError("Invalid Phone Number: " . $this->site->getValue(DBESite::phone));
         }
-        if (!$this->site->getValue(\DBESite::what3Words)) {
+        if (!$this->site->getValue(DBESite::what3Words)) {
             $errors->addError("What3Words value is missing");
         }
 
@@ -51,7 +55,7 @@ class SiteValidation
 
     public function getPostCode()
     {
-        return $this->site->getValue(\DBESite::postcode);
+        return $this->site->getValue(DBESite::postcode);
     }
 
     /**

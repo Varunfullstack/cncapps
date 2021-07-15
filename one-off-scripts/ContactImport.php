@@ -47,7 +47,6 @@ while ($line = fgetcsv($csvFile)) {
         $customerInsert->setValue(DBECustomer::referredFlag, 'Y');
         $customerInsert->setValue(DBECustomer::modifyDate, $nowDateTime);
         $customerInsert->setValue(DBECustomer::noOfServers, 0);
-        $customerInsert->setValue(DBECustomer::noOfSites, 1);
         $customerInsert->setValue(DBECustomer::reviewDate, $reviewDate);
         $customerInsert->setValue(DBECustomer::reviewUserID, 137);
         $customerInsert->setValue(DBECustomer::modifyUserID, 110);
@@ -99,8 +98,8 @@ while ($line = fgetcsv($csvFile)) {
     if (!$dbeContact->rowCount()) {
         $contactInsert = new DBEContact($thing);
         $contactInsert->setValue(DBEContact::customerID, $customerId);
-        $contactInsert->setValue(DBEContact::sendMailshotFlag, 'Y');
-        $contactInsert->setValue(DBEContact::initialLoggingEmailFlag, 'Y');
+        $contactInsert->setValue(DBEContact::mailshot, 1);
+        $contactInsert->setValue(DBEContact::initialLoggingEmail, 1);
         $contactInsert->setValue(DBEContact::title, $line[1]);
         $contactInsert->setValue(DBEContact::firstName, $line[2]);
         $contactInsert->setValue(DBEContact::lastName, $line[3]);

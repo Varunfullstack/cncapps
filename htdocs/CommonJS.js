@@ -58,9 +58,9 @@ function LTrim(str)
  PURPOSE: Remove leading blanks from our string.
  IN: str - the string we want to LTrim
  */ {
-    var whitespace = new String(" \t\n\r");
+    var whitespace = String(" \t\n\r");
 
-    var s = new String(str);
+    var s = String(str);
 
     if (whitespace.indexOf(s.charAt(0)) != -1) {
         // We have a string with leading blank(s)...
@@ -93,9 +93,9 @@ function RTrim(str)
     // We don't want to trip JUST spaces, but also tabs,
     // line feeds, etc.  Add anything else you want to
     // "trim" here in Whitespace
-    var whitespace = new String(" \t\n\r");
+    var whitespace = String(" \t\n\r");
 
-    var s = new String(str);
+    var s = String(str);
 
     if (whitespace.indexOf(s.charAt(s.length - 1)) != -1) {
         // We have a string with trailing blank(s)...
@@ -166,7 +166,7 @@ function IsNumeric(sText) {
  */
 function MM_swapImage() { //v3.0
     var i, j = 0, x, a = MM_swapImage.arguments;
-    document.MM_sr = new Array;
+    document.MM_sr = [];
     for (i = 0; i < (a.length - 2); i += 3) {
         if ((x = MM_findObj(a[i])) != null) {
             document.MM_sr[j++] = x;
@@ -213,7 +213,7 @@ function SC_toggleDisplayAll() {
 /**
  * This array is used to remember mark status of rows in browse mode
  */
-var marked_row = new Array;
+var marked_row = [];
 
 /**
  * Sets/unsets the pointer and marker in browse mode

@@ -4,7 +4,9 @@
 namespace CNCLTD;
 
 
-class SignableAction extends \SplEnum
+use SplEnum;
+
+class SignableAction extends SplEnum
 {
     const __default = 'processing';
 

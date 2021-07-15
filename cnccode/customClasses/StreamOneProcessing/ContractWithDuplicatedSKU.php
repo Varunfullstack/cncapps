@@ -4,7 +4,9 @@
 namespace CNCLTD\StreamOneProcessing;
 
 
-class ContractWithDuplicatedSKU extends \Exception
+use Exception;
+
+class ContractWithDuplicatedSKU extends Exception
 {
     protected $duplicatedSKU;
     protected $contractA;

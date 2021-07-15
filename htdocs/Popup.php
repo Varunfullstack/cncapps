@@ -1,4 +1,7 @@
 <?php
+
+use CNCLTD\Utils;
+
 require_once("config.inc.php");
 session_start();
 page_open(
@@ -13,7 +16,7 @@ global $cfg;
 header("Cache-control: private");
 page_close();
 
-$currentVersion = \CNCLTD\Utils::getCurrentChangelogVersion();
+$currentVersion = Utils::getCurrentChangelogVersion();
 ?>
 
 

@@ -2,9 +2,12 @@
 
 namespace CNCLTD\SupportedCustomerAssets;
 
+use BUCustomerItem;
 use CNCLTD\AssetListExport\ExportedItemCollection;
 use CNCLTD\AssetListExport\OperatingSystemsSupportDatesCollection;
+use DataSet;
 use DBECustomer;
+use DBECustomerItem;
 use PDO;
 
 global $cfg;
@@ -37,29 +40,29 @@ class SupportedCustomerAssets
         $tabularData                      = new ExportedItemCollection(
             $dbeCustomer, $this->operatingSystemsCollection, $this->labTechDB
         );
-        $buCustomerItem                   = new \BUCustomerItem($this);
-        $validContract                    = new \DataSet($this);
+        $buCustomerItem                   = new BUCustomerItem($this);
+        $validContract                    = new DataSet($this);
         $buCustomerItem->getServerCareValidContractsByCustomerID($customerId, $validContract);
         if (!$validContract->fetchNext()) {
             return;
         }
-        $customerAssets = new \DataSet($this);
+        $customerAssets = new DataSet($this);
         $buCustomerItem->getCustomerItemsByContractID(
-            $validContract->getValue(\DBECustomerItem::customerItemID),
+            $validContract->getValue(DBECustomerItem::customerItemID),
             $customerAssets
         );
         while ($customerAssets->fetchNext()) {
-            if ($customerAssets->getValue(\DBECustomerItem::bypassCWAAgentCheck)) {
+            if ($customerAssets->getValue(DBECustomerItem::bypassCWAAgentCheck)) {
                 continue;
             }
-            $this->cncContractAssets[strtolower($customerAssets->getValue(\DBECustomerItem::serverName))] = [
+            $this->cncContractAssets[strtolower($customerAssets->getValue(DBECustomerItem::serverName))] = [
                 "matched" => false,
                 "item"    => new NotMatchedItemDTO(
                     $dbeCustomer->getValue(DBECustomer::name),
-                    $customerAssets->getValue(\DBECustomerItem::serverName),
+                    $customerAssets->getValue(DBECustomerItem::serverName),
                     $dbeCustomer->getValue(DBECustomer::customerID),
-                    $customerAssets->getValue(\DBECustomerItem::customerItemID),
-                    $validContract->getValue(\DBECustomerItem::customerItemID)
+                    $customerAssets->getValue(DBECustomerItem::customerItemID),
+                    $validContract->getValue(DBECustomerItem::customerItemID)
                 ),
             ];
         }

@@ -5,6 +5,7 @@ global $cfg;
 require_once($cfg ["path_dbe"] . "/DBECustomerItem.inc.php");
 require_once($cfg ["path_dbe"] . "/DBECustomer.inc.php");
 
+use BUMail;
 use CNCLTD\Data\DBEItem;
 use CNCLTD\Exceptions\ColumnOutOfRangeException;
 use CNCLTD\LoggerCLI;
@@ -244,7 +245,7 @@ class StreamOneContractsUpdates
 
     private function emailSales(array $errors)
     {
-        $buMail  = new \BUMail($this);
+        $buMail  = new BUMail($this);
         $subject = "StreamOne Issues Summary";
         $errors  = \Lambdish\Phunctional\sort(
             function ($error1, $error2) {

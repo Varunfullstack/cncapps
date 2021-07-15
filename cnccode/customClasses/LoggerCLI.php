@@ -3,6 +3,8 @@
 namespace CNCLTD;
 
 use Bramus\Monolog\Formatter\ColoredLineFormatter;
+use DateTime;
+use Monolog\Handler\RotatingFileHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 
@@ -20,11 +22,11 @@ class LoggerCLI
      */
     public function __construct($logName, int $loggerLevel = Logger::INFO)
     {
-        $date        = new \DateTime();
+        $date        = new DateTime();
         $this->log   = new Logger('logger');
         $logFileName = $logName . ".log";
         $logPath     = APPLICATION_LOGS . '/' . $logFileName;
-        $this->log->pushHandler(new \Monolog\Handler\RotatingFileHandler($logPath, 14, Logger::INFO));
+        $this->log->pushHandler(new RotatingFileHandler($logPath, 14, Logger::INFO));
         $consoleHandler = new StreamHandler('php://stdout', $loggerLevel);
         $consoleHandler->setFormatter(new ColoredLineFormatter());
         $this->log->pushHandler($consoleHandler);

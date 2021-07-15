@@ -6,8 +6,9 @@ namespace CNCLTD\DUOApi\Accounts;
 
 use Karriere\JsonDecoder\Bindings\ArrayBinding;
 use Karriere\JsonDecoder\ClassBindings;
+use Karriere\JsonDecoder\Transformer;
 
-class AccountsResponseTransformer implements \Karriere\JsonDecoder\Transformer
+class AccountsResponseTransformer implements Transformer
 {
 
     /**

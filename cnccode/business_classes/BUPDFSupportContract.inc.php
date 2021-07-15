@@ -560,10 +560,8 @@ class BUPDFSupportContract extends BaseObject
                     $dbeItem->getRow($itemID);
                     $annualPrice = $dbeItem->getValue(DBEItem::curUnitSale);
                     break;
+                case (CONFIG_HOSTING_RENEWAL_TYPE_ID):
                 case(CONFIG_CONTRACT_RENEWAL_TYPE_ID):
-                    $annualPrice = $dsContract->getValue(DBEJCustomerItem::curUnitSale);
-                    break;
-                case(CONFIG_HOSTING_RENEWAL_TYPE_ID):
                     $annualPrice = $dsContract->getValue(DBEJCustomerItem::curUnitSale);
                     break;
             }

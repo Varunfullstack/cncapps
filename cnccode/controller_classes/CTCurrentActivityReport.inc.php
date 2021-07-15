@@ -10,6 +10,7 @@
 use CNCLTD\Business\BUActivity;
 use CNCLTD\Data\CallBackStatus;
 use CNCLTD\Data\DBConnect;
+use CNCLTD\Exceptions\ColumnOutOfRangeException;
 use CNCLTD\SDManagerDashboard\ServiceRequestSummaryDTO;
 use CNCLTD\Utils;
 
@@ -169,7 +170,7 @@ class CTCurrentActivityReport extends CTCNC
     }
 
     /**
-     * @throws \CNCLTD\Exceptions\ColumnOutOfRangeException
+     * @throws ColumnOutOfRangeException
      */
     private function renderQueue($queueNo)
     {

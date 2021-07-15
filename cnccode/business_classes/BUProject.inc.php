@@ -217,7 +217,7 @@ class BUProject extends Business
             $testProject->getRowByColumn(DBEProject::ordHeadID);
             if ($testProject->rowCount()) {
                 throw new Exception('The Sales Order given does already have a linked project');
-            };
+            }
             $dbeProject->setValue(
                 DBEProject::ordHeadID,
                 $linkedOrderID
@@ -230,7 +230,7 @@ class BUProject extends Business
             $testProject->getRowByColumn(DBEProject::ordOriginalHeadID);
             if ($testProject->rowCount()) {
                 throw new Exception('The Sales Order given does already have a linked project');
-            };
+            }
             $dbeProject->setValue(
                 DBEProject::ordOriginalHeadID,
                 $linkedOrderID

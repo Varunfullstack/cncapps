@@ -1,7 +1,9 @@
 <?php
 
 namespace CNCLTD\Exceptions;
-class ChargeableWorkCustomerRequestNotFoundException extends \Exception
+use Exception;
+
+class ChargeableWorkCustomerRequestNotFoundException extends Exception
 {
 
     /**

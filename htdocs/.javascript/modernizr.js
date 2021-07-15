@@ -218,7 +218,7 @@
                     } else {
                         // cast to a Boolean, if not one already
                         if (Modernizr[featureNameSplit[0]] && !(Modernizr[featureNameSplit[0]] instanceof Boolean)) {
-                            Modernizr[featureNameSplit[0]] = new Boolean(Modernizr[featureNameSplit[0]]);
+                            Modernizr[featureNameSplit[0]] = Boolean(Modernizr[featureNameSplit[0]]);
                         }
 
                         Modernizr[featureNameSplit[0]][featureNameSplit[1]] = result;

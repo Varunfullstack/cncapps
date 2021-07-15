@@ -420,7 +420,7 @@ class  CTSecondSite extends CTCNC
                 'availableYearsBlock',
                 true
             );
-        };
+        }
         $this->template->setBlock(
             'SecondsiteList',
             'outOfDateBlock',

@@ -2,6 +2,7 @@
 global $cfg;
 
 use CNCLTD\Business\BURenContract;
+use CNCLTD\Utils;
 
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BURenQuotation.inc.php');
@@ -274,7 +275,7 @@ class CTRenewalsDashboard extends CTCNC
         if (!$dateTime) {
             return "";
         }
-        return \CNCLTD\Utils::dateTimeToString(
+        return Utils::dateTimeToString(
             $dateTime,
             DATE_MYSQL_DATE
         );

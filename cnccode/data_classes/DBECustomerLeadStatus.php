@@ -1,6 +1,7 @@
 <?php
 
 use CNCLTD\Data\DBConnect;
+use CNCLTD\SortableDBE;
 
 /**
  * Created by PhpStorm.
@@ -10,7 +11,7 @@ use CNCLTD\Data\DBConnect;
  */
 class DBECustomerLeadStatus extends DBEntity
 {
-    use \CNCLTD\SortableDBE;
+    use SortableDBE;
 
     const id             = "id";
     const name           = "name";

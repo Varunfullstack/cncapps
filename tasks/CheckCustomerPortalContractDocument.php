@@ -2,6 +2,7 @@
 
 
 use CNCLTD\LoggerCLI;
+use Twig\Environment;
 
 global $cfg;
 require_once(__DIR__ . "/../htdocs/config.inc.php");
@@ -68,7 +69,7 @@ if (count($failedCustomers)) {
     $buMail = new BUMail($thing);
     $senderEmail = CONFIG_SALES_EMAIL;
 
-    /** @var $twig \Twig\Environment */
+    /** @var $twig Environment */
     global $twig;
     $html = $twig->render(
         '@internal/customerWithoutContractDocumentEmail.html.twig',

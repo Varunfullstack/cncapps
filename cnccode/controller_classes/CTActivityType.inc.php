@@ -6,7 +6,11 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
-global $cfg;
+global
+
+use CNCLTD\Exceptions\JsonHttpException;
+
+$cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BUActivityType.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
@@ -412,7 +416,7 @@ class CTActivityType extends CTCNC
     {
         $data = $this->getJSONData();
         if (!isset($data['fromActivityTypeId'])) {
-            throw new \CNCLTD\Exceptions\JsonHttpException(400, 'fromActivityTypeId is required');
+            throw new JsonHttpException(400, 'fromActivityTypeId is required');
         }
         $dbeActivityTypeFrom = new DBECallActType($this);
         $dbeActivityTypeFrom->getRow($data['fromActivityTypeId']);

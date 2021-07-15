@@ -4,7 +4,9 @@
 namespace CNCLTD;
 
 
-class PowerShellScriptFailedToProcessException extends \Exception
+use Exception;
+
+class PowerShellScriptFailedToProcessException extends Exception
 {
     protected $output;
 

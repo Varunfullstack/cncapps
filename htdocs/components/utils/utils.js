@@ -10,6 +10,7 @@ export function get(o, p) {
     return p.split(".").reduce((a, v) => a[v], o) || '';
 }
 
+
 export function getServiceRequestWorkTitle(serviceRequest) {
     if (serviceRequest.isBeingWorkedOn) {
         return "Request being worked on currently";
@@ -255,6 +256,19 @@ export function getBase64(file) {
     })
 }
 
+
+export function entityMapToArray(allIds, idEntityMap) {
+    return allIds.map(id => idEntityMap[id]);
+}
+
+export function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+    })
+}
 export function getContactElementName(contact) {
     let name = `${contact.firstName} ${contact.lastName} ${contact.position ? `(${contact.position})` : ''}`;
     let suffix = "";
@@ -364,7 +378,7 @@ function editDistance(s1, s2) {
     s1 = s1.toLowerCase();
     s2 = s2.toLowerCase();
 
-    var costs = new Array();
+    var costs = [];
     for (var i = 0; i <= s1.length; i++) {
         var lastValue = i;
         for (var j = 0; j <= s2.length; j++) {

@@ -97,7 +97,7 @@ foreach ($data as $datum) {
             continue;
         }
         $logger->notice('The passwords match, do nothing');
-    } catch (\Exception $exception) {
+    } catch (Exception $exception) {
         $logger->warning('Failed to pull CNC password for customer');
     }
 }

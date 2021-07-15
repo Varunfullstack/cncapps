@@ -4,10 +4,10 @@ import ApiUrls from "./ApiUrls.js";
 
 class APIUser extends APIMain{    
     getAllUsers() {
-        return fetch(`${ApiUrls.User}all`).then(res => res.json());
+        return this.get(`${ApiUrls.User}all`);
     } 
     getActiveUsers() {
-        return fetch(`${ApiUrls.User}active`).then(res => res.json());
+        return this.get(`${ApiUrls.User}active`);
     } 
     getUsersByTeamLevel(teamLevel){
         return fetch(`${ApiUrls.User}getUsersByTeamLevel&teamLevel=${teamLevel}`).then(res => res.json());

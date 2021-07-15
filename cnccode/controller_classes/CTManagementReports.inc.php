@@ -6,7 +6,12 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
-global $cfg;
+global
+
+use CNCLTD\Supplier\infra\MySQLSupplierRepository;
+use CNCLTD\Supplier\SupplierId;
+
+$cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BUManagementReports.inc.php');
 require_once($cfg['path_dbe'] . '/DBECustomer.inc.php');
@@ -221,8 +226,8 @@ class CTManagementReports extends CTCNC
         );
         $supplierName     = null;
         if ($this->getParam('supplierID')) {
-            $supplierRepo = new \CNCLTD\Supplier\infra\MySQLSupplierRepository();
-            $supplier     = $supplierRepo->getById(new \CNCLTD\Supplier\SupplierId($this->getParam('supplierID')));
+            $supplierRepo = new MySQLSupplierRepository();
+            $supplier     = $supplierRepo->getById(new SupplierId($this->getParam('supplierID')));
             $supplierName = $supplier->name()->value();
         }
         $this->template->set_block('ManagementReportsSpendSupplier', 'resultsBlock', 'results');

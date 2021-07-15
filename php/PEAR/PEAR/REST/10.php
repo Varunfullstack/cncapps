@@ -547,7 +547,7 @@ class PEAR_REST_10
                             || stristr($inf['d'], $searchsummary) !== false)))
                     {
                         continue;
-                    };
+                    }
                 }
                 $releases = $this->_rest->retrieveData($base . 'r/' . strtolower($package) .
                     '/allreleases.xml', false, false, $channel);

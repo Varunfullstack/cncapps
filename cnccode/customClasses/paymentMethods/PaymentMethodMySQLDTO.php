@@ -1,7 +1,9 @@
 <?php
 
 namespace CNCLTD\paymentMethods;
-class PaymentMethodMySQLDTO implements \JsonSerializable
+use JsonSerializable;
+
+class PaymentMethodMySQLDTO implements JsonSerializable
 {
     private $pay_payno;
     private $pay_desc;

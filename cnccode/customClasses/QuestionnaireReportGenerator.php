@@ -4,6 +4,9 @@ namespace CNCLTD;
 
 use DateTime;
 use DateTimeInterface;
+use dbSweetcode;
+use MDB_PEAR_PROXY;
+use PDO;
 use Template;
 
 class QuestionnaireReportGenerator
@@ -18,7 +21,7 @@ class QuestionnaireReportGenerator
      */
     private $endDate;
     /**
-     * @var \dbSweetcode|\MDB_PEAR_PROXY|mixed|object|\PDO
+     * @var dbSweetcode|MDB_PEAR_PROXY|mixed|object|PDO
      */
     private $db;
     private $period;

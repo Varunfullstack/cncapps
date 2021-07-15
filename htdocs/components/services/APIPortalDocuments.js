@@ -5,14 +5,21 @@ import ApiUrls from "./ApiUrls";
 
 class APIPortalDocuments extends APIMain {
      
-    getPortalDocuments(){
-        return this.get(`${ApiUrls.PortalDocument}documents`);
+    getPortalDocuments(customerID){
+        return this.get(`${ApiUrls.PortalCustomerDocument}documents&customerID=${customerID}`);
     }     
-    updateDocument(body,files){
-        return this.uploadFiles(`${ApiUrls.PortalDocument}documents`,files,"userfile",body,true);
+    updateDocument(document){
+        return this.put(`${ApiUrls.PortalCustomerDocument}documents`, document,true);        
+        //return this.uploadFiles(`${ApiUrls.PortalCustomerDocument}documents`,files,"userfile",body,true);
     }
-    deletePortalDocuments(portalDocumentID){
-        return this.delete(`${ApiUrls.PortalDocument}documents&portalDocumentID=${portalDocumentID}`);
+    addDocument(document){
+        return this.postJson(`${ApiUrls.PortalCustomerDocument}documents`, document);
+    }
+    uploadDocument(documentID,file){
+        return this.uploadFile(`${ApiUrls.PortalCustomerDocument}uploadDocument&documentID=${documentID}`,file,'userfile');
+    }
+    deletePortalDocument(documentID){
+        return this.delete(`${ApiUrls.PortalCustomerDocument}documents&portalCustomerDocumentID=${documentID}`,true);
     }
 }
 

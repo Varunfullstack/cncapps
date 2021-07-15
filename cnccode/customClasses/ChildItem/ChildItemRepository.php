@@ -1,18 +1,21 @@
 <?php
 
 namespace CNCLTD\ChildItem;
+use dbSweetcode;
+use Exception;
+
 class ChildItemRepository
 {
     /**
-     * @var \dbSweetcode
+     * @var dbSweetcode
      */
     private $db;
 
     /**
      * ChildItemRepository constructor.
-     * @param \dbSweetcode $dbSweetcode
+     * @param dbSweetcode $dbSweetcode
      */
-    public function __construct(\dbSweetcode $dbSweetcode)
+    public function __construct(dbSweetcode $dbSweetcode)
     {
         $this->db = $dbSweetcode;
     }
@@ -20,7 +23,7 @@ class ChildItemRepository
     /**
      * @param $parentItemId
      * @return ChildItemDTO[]
-     * @throws \Exception
+     * @throws Exception
      */
     public function getChildItemsForItem($parentItemId): array
     {

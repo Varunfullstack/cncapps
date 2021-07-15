@@ -4,8 +4,9 @@ namespace CNCLTD\WebrootAPI;
 
 use Karriere\JsonDecoder\Bindings\AliasBinding;
 use Karriere\JsonDecoder\ClassBindings;
+use Karriere\JsonDecoder\Transformer;
 
-class EndpointTransformer implements \Karriere\JsonDecoder\Transformer
+class EndpointTransformer implements Transformer
 {
     public function register(ClassBindings $classBindings)
     {

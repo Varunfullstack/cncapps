@@ -878,7 +878,7 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
             }
             $currentSection = "" . $sectionTemplate;
             $currentSection = str_replace('{type}', ucwords($type), $currentSection);
-            $currentSection = str_replace('{count}', count($supportContacts[$type]), $currentSection);
+            $currentSection = str_replace('{count}', count($data), $currentSection);
             $currentSection = str_replace('{contactData}', $contactsInfo, $currentSection);
             $toReturn       .= $currentSection;
         }

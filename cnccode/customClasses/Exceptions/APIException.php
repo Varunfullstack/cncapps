@@ -3,7 +3,9 @@
 
 namespace CNCLTD\Exceptions;
 
-class APIException extends \Exception{
+use Exception;
+
+class APIException extends Exception{
     public function __construct($responseCode, $message)
     {        
         $this->state = false;

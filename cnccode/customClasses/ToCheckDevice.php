@@ -4,13 +4,15 @@
 namespace CNCLTD;
 
 
+use DateTimeInterface;
+
 class ToCheckDevice
 {
     /** @var string */
     public $customerName;
     /** @var string */
     public $computerName;
-    /** @var \DateTimeInterface */
+    /** @var DateTimeInterface */
     public $lastSeenDateTime;
 
     /**

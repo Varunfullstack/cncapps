@@ -483,5 +483,5 @@ class MDB_Manager_ibase extends MDB_Manager_common
     }
 }
 
-};
+}
 ?>

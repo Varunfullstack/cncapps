@@ -404,16 +404,7 @@ class BUCustomer extends Business
     {
         $this->setMethodName('insertCustomer');
         $ret = ($this->updateCustomer($dsData));
-        $this->addNewSiteRow(
-            $dsSite,
-            $dsData->getValue(DBECustomer::customerID)
-        );                        // New customerID
-        $dsSite->initialise();
-        $this->dbeSite->setCallbackMethod(
-            DA_BEFORE_POST,
-            $this,
-            'setSageRef'
-        );
+        $this->addNewSiteRow($dsData->getValue(DBECustomer::customerID));                        // New customerID
         $ret = $ret && ($this->updateSite($dsSite));
         $this->dbeSite->resetCallbackMethod(DA_BEFORE_POST);
         $this->addNewContactRow(
@@ -470,52 +461,93 @@ class BUCustomer extends Business
     }
 
     /**
-     * @param DataSet $dsSite
      * @param $customerID
      * @return bool
      */
-    function addNewSiteRow(&$dsSite,
-                           $customerID
-    )
+    function addNewSiteRow($customerID)
     {
         if (!$customerID) {
             $this->raiseError('customerID not passed');
             return FALSE;
         } else {
-            $dsSite->clearCurrentRow();
-            $dsSite->setUpdateModeInsert();
-            $dsSite->setValue(
-                DBESite::customerID,
-                $customerID
-            );
-            $dsSite->setValue(
+            $dbeSite = new DBESite($this);
+            $dbeSite->setValue(DBESite::customerID, $customerID);
+            $dbeSite->setValue(DBESite::sageRef, $this->getSageRef($customerID));
+            $dbeSite->setValue(
                 DBESite::activeFlag,
                 'Y'
             );
-            $dsSite->setValue(
+            $dbeSite->setValue(
                 DBESite::siteNo,
                 -9
             );
-            $dsSite->setValue(
+            $dbeSite->setValue(
                 DBESite::add1,
                 'Address Line 1'
             );
-            $dsSite->setValue(
+            $dbeSite->setValue(
                 DBESite::town,
                 'TOWN'
             );
-            $dsSite->setValue(
+            $dbeSite->setValue(
                 DBESite::maxTravelHours,
                 -1
             );    // means not set because 0 is now a valid distance
-            $dsSite->setValue(
+            $dbeSite->setValue(
                 DBESite::postcode,
                 'POSTCODE'
             );
-            $dsSite->post();
-//			$this->updateModify($dsSite->getValue(DBESite::CustomerID));
+            $dbeSite->insertRow();
             return TRUE;
         }
+    }
+
+    /**
+     * Calculate a unique Sage Reference for new customer site
+     * Based upon uppercase first two non-space characters of name plus integer starting at 1 (e.g. KA002)
+     * @access public
+     * @param $customerID
+     * @return string|null
+     */
+    function getSageRef($customerID)
+    {
+        $dbeCustomer = new DBECustomer($this);
+        $dbeCustomer->getRow($customerID);
+        $customerName = $dbeCustomer->getValue(DBECustomer::name);
+        $shortCode    = "";
+        for ($ixChar = 0; $ixChar <= strlen($customerName); $ixChar++) {
+            if (substr(
+                    $customerName,
+                    $ixChar,
+                    1
+                ) != " ") {
+                $shortCode = $shortCode . strtoupper(
+                        substr(
+                            $customerName,
+                            $ixChar,
+                            1
+                        )
+                    );
+                if (strlen($shortCode) == 2) {
+                    break;
+                }
+            }
+        }
+        $number       = 1;
+        $numberUnique = FALSE;
+        $dbeSite      = new DBESite($this);
+        $sageRef      = null;
+        while (!$numberUnique) {
+            $sageRef      = $shortCode . str_pad(
+                    $number,
+                    3,
+                    "0",
+                    STR_PAD_LEFT
+                );
+            $numberUnique = $dbeSite->uniqueSageRef($sageRef);
+            $number++;
+        }
+        return $sageRef;
     }
 
     /**
@@ -583,11 +615,7 @@ class BUCustomer extends Business
             $siteNo
         );
         $dsContact->setValue(
-            DBEContact::discontinuedFlag,
-            'N'
-        );
-        $dsContact->setValue(
-            DBEContact::sendMailshotFlag,
+            DBEContact::mailshot,
             'Y'
         );
         $dsContact->setValue(
@@ -603,10 +631,6 @@ class BUCustomer extends Business
             $this->dsHeader->getValue(DBEHeader::mailshot3FlagDef)
         );
         $dsContact->setValue(
-            DBEContact::mailshot4Flag,
-            $this->dsHeader->getValue(DBEHeader::mailshot4FlagDef)
-        );
-        $dsContact->setValue(
             DBEContact::mailshot8Flag,
             $this->dsHeader->getValue(DBEHeader::mailshot8FlagDef)
         );
@@ -618,36 +642,9 @@ class BUCustomer extends Business
             DBEContact::mailshot11Flag,
             $this->dsHeader->getValue(DBEHeader::mailshot11FlagDef)
         );
-        $dsContact->setValue(
-            DBEContact::initialLoggingEmailFlag,
-            'Y'
-        );
-        $dsContact->setValue(
-            DBEContact::workStartedEmailFlag,
-            'Y'
-        );
-        $dsContact->setValue(
-            DBEContact::workUpdatesEmailFlag,
-            'Y'
-        );
-        $dsContact->setValue(
-            DBEContact::fixedEmailFlag,
-            'Y'
-        );
-        $dsContact->setValue(
-            DBEContact::pendingClosureEmailFlag,
-            'Y'
-        );
-        $dsContact->setValue(
-            DBEContact::closureEmailFlag,
-            'Y'
-        );
+        $dsContact->setValue(DBEContact::initialLoggingEmail, 1);
         $dsContact->setValue(
             DBEContact::othersInitialLoggingEmailFlag,
-            'Y'
-        );
-        $dsContact->setValue(
-            DBEContact::othersWorkStartedEmailFlag,
             'Y'
         );
         $dsContact->setValue(
@@ -656,14 +653,6 @@ class BUCustomer extends Business
         );
         $dsContact->setValue(
             DBEContact::othersFixedEmailFlag,
-            'Y'
-        );
-        $dsContact->setValue(
-            DBEContact::othersPendingClosureEmailFlag,
-            'Y'
-        );
-        $dsContact->setValue(
-            DBEContact::othersClosureEmailFlag,
             'Y'
         );
         $dsContact->post();
@@ -707,59 +696,6 @@ class BUCustomer extends Business
     }
 
     /**
-     * Calculate a unique Sage Reference for new customer site
-     * Based upon uppercase first two non-space characters of name plus integer starting at 1 (e.g. KA002)
-     * @param DataSet &$source dataset
-     * @param DBESite &$dbeSite site database entity
-     * @return bool : Success
-     * @access public
-     */
-    function setSageRef(&$source,
-                        &$dbeSite
-    )
-    {
-        $customerName = $this->dbeCustomer->getValue(DBECustomer::name);
-        $shortCode    = "";
-        for ($ixChar = 0; $ixChar <= strlen($customerName); $ixChar++) {
-            if (substr(
-                    $customerName,
-                    $ixChar,
-                    1
-                ) != " ") {
-                $shortCode = $shortCode . strtoupper(
-                        substr(
-                            $customerName,
-                            $ixChar,
-                            1
-                        )
-                    );
-                if (strlen($shortCode) == 2) {
-                    break;
-                }
-            }
-        }
-        $number       = 1;
-        $numberUnique = FALSE;
-        $dbeSite      = new DBESite($this);
-        $sageRef      = null;
-        while (!$numberUnique) {
-            $sageRef      = $shortCode . str_pad(
-                    $number,
-                    3,
-                    "0",
-                    STR_PAD_LEFT
-                );
-            $numberUnique = $dbeSite->uniqueSageRef($sageRef);
-            $number++;
-        }
-        $source->setValue(
-            DBESite::sageRef,
-            $sageRef
-        );
-        return TRUE;
-    }
-
-    /**
      * @param DataSet $dsCustomer
      */
     function addNewCustomerRow(&$dsCustomer)
@@ -797,10 +733,6 @@ class BUCustomer extends Business
         $dsCustomer->setValue(
             DBECustomer::customerTypeID,
             0
-        );
-        $dsCustomer->setValue(
-            DBECustomer::pcxFlag,
-            'N'
         );
         $dsCustomer->setValue(
             DBECustomer::specialAttentionFlag,
@@ -1227,39 +1159,18 @@ class BUCustomer extends Business
                 DBEContact::lastName                      => $this->dbeContact->getValue(DBEContact::lastName),
                 DBEContact::email                         => $this->dbeContact->getValue(DBEContact::email),
                 DBEContact::supportLevel                  => $this->dbeContact->getValue(DBEContact::supportLevel),
-                DBEContact::initialLoggingEmailFlag       => $this->dbeContact->getValue(
-                    DBEContact::initialLoggingEmailFlag
-                ),
-                DBEContact::workStartedEmailFlag          => $this->dbeContact->getValue(
-                    DBEContact::workStartedEmailFlag
-                ),
-                DBEContact::workUpdatesEmailFlag          => $this->dbeContact->getValue(
-                    DBEContact::workUpdatesEmailFlag
-                ),
-                DBEContact::pendingClosureEmailFlag       => $this->dbeContact->getValue(
-                    DBEContact::pendingClosureEmailFlag
-                ),
-                DBEContact::fixedEmailFlag                => $this->dbeContact->getValue(
-                    DBEContact::fixedEmailFlag
+                DBEContact::initialLoggingEmail           => $this->dbeContact->getValue(
+                    DBEContact::initialLoggingEmail
                 ),
                 DBEContact::othersInitialLoggingEmailFlag => $this->dbeContact->getValue(
                     DBEContact::othersInitialLoggingEmailFlag
                 ),
-                DBEContact::othersWorkStartedEmailFlag    => $this->dbeContact->getValue(
-                    DBEContact::othersWorkStartedEmailFlag
-                ),
                 DBEContact::othersWorkUpdatesEmailFlag    => $this->dbeContact->getValue(
                     DBEContact::othersWorkUpdatesEmailFlag
-                ),
-                DBEContact::othersPendingClosureEmailFlag => $this->dbeContact->getValue(
-                    DBEContact::othersPendingClosureEmailFlag
                 ),
                 DBEContact::othersFixedEmailFlag          => $this->dbeContact->getValue(
                     DBEContact::othersFixedEmailFlag
                 ),
-                DBEContact::othersClosureEmailFlag        => $this->dbeContact->getValue(
-                    DBEContact::othersClosureEmailFlag
-                )
             ];
         }
         return $contacts;
@@ -1287,35 +1198,14 @@ class BUCustomer extends Business
                 DBEContact::lastName                      => $this->dbeContact->getValue(DBEContact::lastName),
                 DBEContact::email                         => $this->dbeContact->getValue(DBEContact::email),
                 DBEContact::supportLevel                  => $this->dbeContact->getValue(DBEContact::supportLevel),
-                DBEContact::initialLoggingEmailFlag       => $this->dbeContact->getValue(
-                    DBEContact::initialLoggingEmailFlag
-                ),
-                DBEContact::workStartedEmailFlag          => $this->dbeContact->getValue(
-                    DBEContact::workStartedEmailFlag
-                ),
-                DBEContact::workUpdatesEmailFlag          => $this->dbeContact->getValue(
-                    DBEContact::workUpdatesEmailFlag
-                ),
-                DBEContact::pendingClosureEmailFlag       => $this->dbeContact->getValue(
-                    DBEContact::pendingClosureEmailFlag
-                ),
-                DBEContact::fixedEmailFlag                => $this->dbeContact->getValue(
-                    DBEContact::fixedEmailFlag
+                DBEContact::initialLoggingEmail           => $this->dbeContact->getValue(
+                    DBEContact::initialLoggingEmail
                 ),
                 DBEContact::othersInitialLoggingEmailFlag => $this->dbeContact->getValue(
-                    DBEContact::initialLoggingEmailFlag
-                ),
-                DBEContact::othersWorkStartedEmailFlag    => $this->dbeContact->getValue(
-                    DBEContact::workStartedEmailFlag
-                ),
-                DBEContact::othersWorkUpdatesEmailFlag    => $this->dbeContact->getValue(
-                    DBEContact::workUpdatesEmailFlag
-                ),
-                DBEContact::othersPendingClosureEmailFlag => $this->dbeContact->getValue(
-                    DBEContact::pendingClosureEmailFlag
+                    DBEContact::othersInitialLoggingEmailFlag
                 ),
                 DBEContact::othersFixedEmailFlag          => $this->dbeContact->getValue(
-                    DBEContact::fixedEmailFlag
+                    DBEContact::othersFixedEmailFlag
                 ),
             ];
         }

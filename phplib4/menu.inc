@@ -192,13 +192,17 @@ class Menu {
    * They are called when certain events happen during menu display.
    * They should be overridden in your subclass.
    */
-  function shift_in($oldlevel, $level) { ; }
+  function shift_in($oldlevel, $level) {
+  }
   
-  function shift_out($oldlevel, $level) { ; }
+  function shift_out($oldlevel, $level) {
+  }
 
-  function start_menu() { ; }
+  function start_menu() {
+  }
 
-  function end_menu() { ; }
+  function end_menu() {
+  }
 
   /*
    * private: normalize current menu position

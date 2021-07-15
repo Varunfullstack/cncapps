@@ -11,7 +11,7 @@ use CNCLTD\Exceptions\APIException;
 
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BUSector.inc.php');
-require_once($cfg['path_dbe'] . '/DSForm.inc.php'); 
+require_once($cfg['path_dbe'] . '/DSForm.inc.php');
 
 class CTSector extends CTCNC
 {
@@ -68,12 +68,12 @@ class CTSector extends CTCNC
                 }
                 exit;
                 break;
-            
+
             case self::getCustomerWithoutSector:
                 $this->checkPermissions(SALES_PERMISSION);
                 $this->getCustomerWithoutSector();
                 break;
-          
+
             default:
                 $this->checkPermissions(MAINTENANCE_PERMISSION);
                 $this->displayList();
@@ -125,15 +125,15 @@ class CTSector extends CTCNC
         );
         $this->template->parse(
             'CONTENTS',
-            'SectorList',             
+            'SectorList',
         );
-        
+
         $this->loadReactScript('SectorComponent.js');
-        $this->loadReactCSS('SectorComponent.css'); 
-        $this->parsePage();        
+        $this->loadReactCSS('SectorComponent.css');
+        $this->parsePage();
     }
 
-    //-----------------------new 
+    //-----------------------new
     function getSectors()
     {
         $dsSector = new DataSet($this);
@@ -143,14 +143,14 @@ class CTSector extends CTCNC
             while ($dsSector->fetchNext()) {
 
                 $sectorID = $dsSector->getValue(DBESector::sectorID);
-                $canDelete = false;                
+                $canDelete = false;
                 if ($this->buSector->canDelete($sectorID)) {
                     $canDelete=true;
                 }
                 $data []=array(
                         'id'    => $sectorID,
                         'description' => Controller::htmlDisplayText($dsSector->getValue(DBESector::description)),
-                        'canDelete'     => $canDelete,                        
+                        'canDelete'     => $canDelete,
                     );
             }//while $dsSector->fetchNext()
         }
@@ -162,7 +162,7 @@ class CTSector extends CTCNC
         $description=$body->description;
         if(!isset($description))
             return $this->fail(APIException::badRequest,"Missing Data");
-        $dbeSector=new DBESector($this);        
+        $dbeSector=new DBESector($this);
         $dbeSector->setValue(DBESector::description, $description);
         $dbeSector->insertRow();
         return $this->success();
@@ -172,7 +172,7 @@ class CTSector extends CTCNC
         $body=$this->getBody();
         if(!isset($body->id))
         return $this->fail(APIException::badRequest,"Missing Data");
-        $dbeSector=new DBESector($this);        
+        $dbeSector=new DBESector($this);
         $dbeSector->getRow($body->id);
         if(!$dbeSector->rowCount())
             return $this->fail(APIException::notFound,"Not Found" );
@@ -186,7 +186,7 @@ class CTSector extends CTCNC
         if(!isset($id))
             return $this->fail(APIException::badRequest,"Missing Data");
 
-        $dbeSector=new DBESector($this);        
+        $dbeSector=new DBESector($this);
         $dbeSector->getRow($id);
         if(!$dbeSector->rowCount())
             return $this->fail(APIException::notFound,"Not Found" );

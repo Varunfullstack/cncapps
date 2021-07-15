@@ -6,11 +6,14 @@
 * @access public
 */
 global $cfg;
+
+use CNCLTD\SortableDBE;
+
 require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBEPasswordService extends DBEntity
 {
-    use \CNCLTD\SortableDBE;
+    use SortableDBE;
 
     const passwordServiceID = "passwordServiceID";
     const description = "description";

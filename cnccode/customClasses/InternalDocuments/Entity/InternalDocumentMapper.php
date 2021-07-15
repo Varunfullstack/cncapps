@@ -4,6 +4,7 @@ namespace CNCLTD\InternalDocuments\Entity;
 
 use CNCLTD\InternalDocuments\InternalDocumentDTO;
 use CNCLTD\InternalDocuments\InternalDocumentMySQLDTO;
+use DateTime;
 
 class InternalDocumentMapper
 {
@@ -15,7 +16,7 @@ class InternalDocumentMapper
             $fromPersistence->originalFileName,
             $fromPersistence->storedFileName,
             $fromPersistence->mimeType,
-            \DateTime::createFromFormat(DATE_MYSQL_DATETIME, $fromPersistence->createdAt)
+            DateTime::createFromFormat(DATE_MYSQL_DATETIME, $fromPersistence->createdAt)
         );
     }
 

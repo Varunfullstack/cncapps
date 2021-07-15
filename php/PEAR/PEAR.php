@@ -827,7 +827,7 @@ class PEAR_Error
     {
         try {
             throw new Exception($error_msg);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             $error_msg .= " stack: " . $exception->getTraceAsString();
         }
         return trigger_error($error_msg, $error_type);

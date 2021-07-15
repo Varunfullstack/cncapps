@@ -1,7 +1,9 @@
 <?php
 
 namespace CNCLTD\Exceptions;
-class SupplierContactNotFoundException extends \Exception
+use Exception;
+
+class SupplierContactNotFoundException extends Exception
 {
 
     /**

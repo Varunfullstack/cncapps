@@ -7,10 +7,14 @@
  * @authors Karim Ahmed - Sweet Code Limited
  */
 
+use CNCLTD\AdditionalChargesRates\Domain\CustomerId;
 use CNCLTD\Business\BUActivity;
 use CNCLTD\Data\DBConnect;
 use CNCLTD\Data\DBEJProblem;
+use CNCLTD\Data\SiteMapper;
 use CNCLTD\Encryption;
+use CNCLTD\Exceptions\APIException;
+use CNCLTD\Exceptions\JsonHttpException;
 use CNCLTD\SupportedCustomerAssets\UnsupportedCustomerAssetService;
 use CNCLTD\Utils;
 
@@ -125,6 +129,7 @@ define(
 class CTCustomer extends CTCNC
 {
     const GET_CUSTOMER_REVIEW_CONTACTS               = "getCustomerReviewContacts";
+    const GET_CUSTOMER_PROJECTS                      = 'getCustomerProjects';
     const DECRYPT                                    = "decrypt";
     const contactFormTitleClass                      = 'TitleClass';
     const contactFormFirstNameClass                  = 'FirstNameClass';                      // Used when searching for an entity by string
@@ -140,6 +145,15 @@ class CTCustomer extends CTCNC
     const customerFormSectorMessage                  = 'SectorMessage';
     const customerFormSpecialAttentionEndDateMessage = 'specialAttentionEndDateMessage';
     const customerFormLastReviewMeetingDateMessage   = 'lastReviewMeetingDateMessage';
+    const GET_PORTAL_CUSTOMER_DOCUMENTS              = 'getPortalCustomerDocuments';
+    const GET_CUSTOMER_SITES                         = "getSites";
+    const GET_CUSTOMER_CONTACTS                      = "getContacts";
+    const UPDATE_SITE                                = "updateSite";
+    const GET_CUSTOMER_ORDERS                        = 'getCustomerOrders';
+    const GET_CUSTOMER_DATA                          = 'getCustomer';
+    const ADD_PORTAL_CUSTOMER_DOCUMENT               = 'addPortalCustomerDocument';
+    const DELETE_PORTAL_DOCUMENT                     = "deletePortalDocument";
+    const ADD_SITE                                   = "addSite";
     const CONTACTS_ACTION                            = "contacts";
     public $customerID;
     public $customerString;
@@ -389,8 +403,6 @@ class CTCustomer extends CTCNC
                     );
                     $validEmail = false;
                 }
-
-
             }
             if ($validEmail) {
                 $this->dsContact->setValue(
@@ -418,10 +430,7 @@ class CTCustomer extends CTCNC
                 DBEContact::fax,
                 @$value['fax']
             );
-            $this->dsContact->setValue(
-                DBEContact::accountsFlag,
-                $this->getYN(@$value['accountsFlag'])
-            );
+           
             $this->dsContact->setValue(
                 DBEContact::supportLevel,
                 @$value['supportLevel']
@@ -435,20 +444,12 @@ class CTCustomer extends CTCNC
                 $this->getYN(@$value['specialAttentionContactFlag'])
             );
             $this->dsContact->setValue(
-                DBEContact::discontinuedFlag,
-                $this->getYN(@$value['discontinuedFlag'])
-            );
-            $this->dsContact->setValue(
                 DBEContact::mailshot2Flag,
                 $this->getYN(@$value['mailshot2Flag'])
             );
             $this->dsContact->setValue(
                 DBEContact::mailshot3Flag,
                 $this->getYN(@$value['mailshot3Flag'])
-            );
-            $this->dsContact->setValue(
-                DBEContact::mailshot4Flag,
-                $this->getYN(@$value['mailshot4Flag'])
             );
             $this->dsContact->setValue(
                 DBEContact::mailshot8Flag,
@@ -463,36 +464,12 @@ class CTCustomer extends CTCNC
                 $this->getYN(@$value['mailshot11Flag'])
             );
             $this->dsContact->setValue(
-                DBEContact::initialLoggingEmailFlag,
-                $this->getYN(@$value['initialLoggingEmailFlag'])
-            );
-            $this->dsContact->setValue(
-                DBEContact::workStartedEmailFlag,
-                $this->getYN(@$value['workStartedEmailFlag'])
-            );
-            $this->dsContact->setValue(
-                DBEContact::workUpdatesEmailFlag,
-                $this->getYN(@$value['workUpdatesEmailFlag'])
-            );
-            $this->dsContact->setValue(
-                DBEContact::fixedEmailFlag,
-                $this->getYN(@$value['fixedEmailFlag'])
-            );
-            $this->dsContact->setValue(
-                DBEContact::pendingClosureEmailFlag,
-                $this->getYN(@$value['pendingClosureEmailFlag'])
-            );
-            $this->dsContact->setValue(
-                DBEContact::closureEmailFlag,
-                $this->getYN(@$value['closureEmailFlag'])
+                DBEContact::initialLoggingEmail,
+                @$value['initialLoggingEmail']
             );
             $this->dsContact->setValue(
                 DBEContact::othersInitialLoggingEmailFlag,
                 $this->getYN(@$value['othersInitialLoggingEmailFlag'])
-            );
-            $this->dsContact->setValue(
-                DBEContact::othersWorkStartedEmailFlag,
-                $this->getYN(@$value['othersWorkStartedEmailFlag'])
             );
             $this->dsContact->setValue(
                 DBEContact::othersWorkUpdatesEmailFlag,
@@ -503,14 +480,6 @@ class CTCustomer extends CTCNC
                 $this->getYN(@$value['othersFixedEmailFlag'])
             );
             $this->dsContact->setValue(
-                DBEContact::othersPendingClosureEmailFlag,
-                $this->getYN(@$value['othersPendingClosureEmailFlag'])
-            );
-            $this->dsContact->setValue(
-                DBEContact::othersClosureEmailFlag,
-                $this->getYN(@$value['othersClosureEmailFlag'])
-            );
-            $this->dsContact->setValue(
                 DBEContact::reviewUser,
                 $this->getYN(@$value['reviewUser'])
             );
@@ -519,8 +488,8 @@ class CTCustomer extends CTCNC
                 $this->getYN(@$value['hrUser'])
             );
             $this->dsContact->setValue(
-                DBEContact::sendMailshotFlag,
-                $this->getYN(@$value['sendMailshotFlag'])
+                DBEContact::mailshot,
+                @$value['mailshot']
             );
             $this->dsContact->setValue(
                 DBEContact::failedLoginCount,
@@ -670,270 +639,8 @@ class CTCustomer extends CTCNC
         if (!is_array($customerArray)) {
             return;
         }
-        foreach ($customerArray as $key => $value) {
-            $this->dsCustomer->setUpdateModeInsert();
-            $this->dsCustomer->setValue(
-                self::customerFormNameClass,
-                CTCUSTOMER_CLS_TABLE_EDIT_HEADER
-            );
-            $this->dsCustomer->setValue(
-                self::customerFormInvoiceSiteMessage,
-                CTCUSTOMER_CLS_TABLE_EDIT_HEADER
-            );
-            $this->dsCustomer->setValue(
-                self::customerFormDeliverSiteMessage,
-                CTCUSTOMER_CLS_TABLE_EDIT_HEADER
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::customerID,
-                @$value['customerID']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::name,
-                @$value['name']
-            );
-            if (!$this->dsCustomer->getValue(DBECustomer::name)) {
-                $this->setFormErrorOn();
-                $this->dsCustomer->setValue(
-                    self::customerFormNameClass,
-                    CTCUSTOMER_CLS_FORM_ERROR
-                );
-            }
-            $this->dsCustomer->setValue(
-                DBECustomer::reviewMeetingBooked,
-                !!@$value['reviewMeetingBooked']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::inclusiveOOHCallOuts,
-                @$value['inclusiveOOHCallOuts']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::regNo,
-                @$value['regNo']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::invoiceSiteNo,
-                @$value['invoiceSiteNo']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::websiteURL,
-                @$value['websiteURL']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::deliverSiteNo,
-                @$value['deliverSiteNo']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::mailshotFlag,
-                $this->getYN(@$value['mailshotFlag'])
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::referredFlag,
-                $this->getYN(@$value['referredFlag'])
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::specialAttentionFlag,
-                $this->getYN(@$value['specialAttentionFlag'])
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::specialAttentionEndDate,
-                @$value['specialAttentionEndDate']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::slaP1PenaltiesAgreed,
-                @$value['slaP1PenaltiesAgreed']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::slaP2PenaltiesAgreed,
-                @$value['slaP2PenaltiesAgreed']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::slaP3PenaltiesAgreed,
-                @$value['slaP3PenaltiesAgreed']
-            );
-            if ($this->dsCustomer->getValue(DBECustomer::specialAttentionFlag) == 'Y' && !$this->dsCustomer->getValue(
-                    DBECustomer::specialAttentionEndDate
-                )) {
-                $this->dsCustomer->setValue(
-                    self::customerFormSpecialAttentionEndDateMessage,
-                    'You must enter a date'
-                );
-                $this->setFormErrorOn();
-            }
-            $this->dsCustomer->setValue(
-                DBECustomer::primaryMainContactID,
-                @$value[DBECustomer::primaryMainContactID]
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::customerTypeID,
-                @$value['customerTypeID']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::support24HourFlag,
-                $this->getYN(@$value['support24HourFlag'])
-            );
-            $this->dsCustomer->setValue(
-                self::customerFormSectorMessage,
-                null
-            );
-            if (!@$value['sectorID']) {
-                $this->setFormErrorOn();
-                $this->dsCustomer->setValue(
-                    self::customerFormSectorMessage,
-                    'Required'
-                );
-            }
-            $this->dsCustomer->setValue(
-                DBECustomer::sectorID,
-                @$value['sectorID']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::leadStatusId,
-                @$value['leadStatusId']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::createDate,
-                @$value['createDate']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::gscTopUpAmount,
-                @$value['gscTopUpAmount']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::becameCustomerDate,
-                @$value['becameCustomerDate']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::droppedCustomerDate,
-                @$value['droppedCustomerDate']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::lastReviewMeetingDate,
-                @$value['lastReviewMeetingDate']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::reviewMeetingFrequencyMonths,
-                @$value['reviewMeetingFrequencyMonths']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::reviewDate,
-                @$value['reviewDate']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::reviewMeetingEmailSentFlag,
-                $this->getYN(@$value['reviewMeetingEmailSentFlag'])
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::reviewAction,
-                @$value['reviewAction']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::reviewUserID,
-                @$value['reviewUserID']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::accountManagerUserID,
-                @$value['accountManagerUserID']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::reviewTime,
-                @$value['reviewTime']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::noOfServers,
-                @$value['noOfServers']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::activeDirectoryName,
-                @$value['activeDirectoryName']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::noOfPCs,
-                @$value['noOfPCs']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::noOfSites,
-                @$value['noOfSites']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::comments,
-                @$value['comments']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::techNotes,
-                @$value['techNotes']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::slaP1,
-                @$value['slaP1']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::slaP2,
-                @$value['slaP2']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::slaP3,
-                @$value['slaP3']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::slaP4,
-                @$value['slaP4']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::slaP5,
-                @$value['slaP5']
-            );
-            $this->dsCustomer->setValue(DBECustomer::slaFixHoursP1, @$value['slaFixHoursP1']);
-            $this->dsCustomer->setValue(DBECustomer::slaFixHoursP2, @$value['slaFixHoursP2']);
-            $this->dsCustomer->setValue(DBECustomer::slaFixHoursP3, @$value['slaFixHoursP3']);
-            $this->dsCustomer->setValue(DBECustomer::slaFixHoursP4, @$value['slaFixHoursP4']);
-            $this->dsCustomer->setValue(
-                DBECustomer::pcxFlag,
-                $this->getYN(@$value['pcxFlag'])
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::sortCode,
-                @$value['sortCode']
-            );
-            if (isset($value['newSortCode'])) {
-                $sortCode = null;
-                if ($value['newSortCode']) {
-                    $sortCode = Encryption::encrypt(
-                        CUSTOMERS_ENCRYPTION_PUBLIC_KEY,
-                        $value['newSortCode']
-                    );
-                }
-                $this->dsCustomer->setValue(
-                    DBECustomer::sortCode,
-                    $sortCode
-                );
-            }
-            $this->dsCustomer->setValue(
-                DBECustomer::accountName,
-                @$value['accountName']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::streamOneEmail,
-                @$value['streamOneEmail']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::accountNumber,
-                @$value['accountNumber']
-            );
-            if (isset($value['newAccountNumber'])) {
-                $accountNumber = null;
-                if ($value['newAccountNumber']) {
-                    $accountNumber = Encryption::encrypt(
-                        CUSTOMERS_ENCRYPTION_PUBLIC_KEY,
-                        $value['newAccountNumber']
-                    );
-                }
-                $this->dsCustomer->setValue(
-                    DBECustomer::accountNumber,
-                    $accountNumber
-                );
-            }
-            $this->dsCustomer->post();
+        foreach ($customerArray as $customerID => $customer) {
+
         }
     }
 
@@ -945,7 +652,85 @@ class CTCustomer extends CTCNC
     {
         $this->setParentFormFields();
         switch ($this->getAction()) {
-
+            case 'encrypt':
+            {
+                $this->getEncrypt();
+                exit;
+            }
+            case self::GET_CUSTOMER_ORDERS:
+            {
+                $this->getCustomerOrdersController();
+                exit;
+            }
+            case self::GET_CUSTOMER_DATA:
+            {
+                $this->getCustomerData();
+                break;
+            }
+            case 'getMainContacts':
+            {
+                $this->_getMainContacts(@$_REQUEST['customerID']);
+                break;
+            }
+            case 'getLeadStatuses':
+            {
+                $this->getLeadStatuses();
+                break;
+            }
+            case 'updateCustomer':
+            {
+                echo json_encode($this->updateCustomer(),JSON_NUMERIC_CHECK);
+                break;
+            }
+            case self::UPDATE_SITE:
+            {
+                $this->updateSite($this->getJSONData()); 
+                exit;
+            }
+            case 'addContact':
+                {
+                     $this->addContact($this->getJSONData()); 
+                    exit;
+                }
+            case 'updateContact':
+            {
+                 $this->updateContact($this->getJSONData()); 
+                exit;
+            }
+            case self::DELETE_PORTAL_DOCUMENT:
+            {
+                $this->deletePortalDocument($this->getJSONData());               
+                exit;
+            }
+            case self::ADD_PORTAL_CUSTOMER_DOCUMENT:
+            {
+                $this->addPortalCustomerDocument($this->getJSONData());
+                exit;
+            }
+            case
+            'getSectors':
+            {
+                $this->getSectors();
+                break;
+            }
+            case 'getCustomerTypes':
+            {
+                $this->getCustomerTypes();
+                break;
+            }
+            case 'getAccountManagers':
+            {
+                $this->getAccountManagers();
+                break;
+            }
+            case 'getReviewEngineers':
+                return $this->getReviewEngineersController();
+            case 'getCustomerReviewData':
+                return $this->getCustomerReviewDataController();
+            case 'updateCustomerReview':
+                return $this->updateCustomerReviewController();
+            case self::GET_PORTAL_CUSTOMER_DOCUMENTS:
+                return $this->getPortalCustomerDocumentsController($_REQUEST['customerID']);
             case 'createCustomerFolder':
                 $this->createCustomerFolder();
                 break;
@@ -955,15 +740,22 @@ class CTCustomer extends CTCNC
             case 'displayReviewList':
                 $this->displayReviewList();
                 break;
+            case self::GET_CUSTOMER_SITES:
+                return $this->getCustomerSitesController();
+            case self::GET_CUSTOMER_CONTACTS:
+                return $this->getCustomerContactsController();
+            case self::ADD_SITE:
+                $this->addSite($this->getJSONData());
+                exit;
             case CTCUSTOMER_ACT_SEARCH:
                 $this->search();
                 break;
             case CTCUSTOMER_ACT_ADDCUSTOMER:
-            case CTCUSTOMER_ACT_ADDSITE:
             case CTCUSTOMER_ACT_ADDCONTACT:
             case CTCUSTOMER_ACT_DISP_SUCCESS:
             case CTCNC_ACT_DISP_EDIT:
-                $this->displayEditForm();
+                //$this->displayEditForm();
+                $this->displayForm();
                 break;
             case CTCUSTOMER_ACT_DELETECONTACT:
                 $this->deleteContact();
@@ -978,94 +770,24 @@ class CTCustomer extends CTCNC
                 $this->displayCustomerSelectPopup();
                 break;
             case 'saveContactPassword':
-                $response = [];
-                try {
-                    $this->saveContactPassword();
-                    $response["status"] = "ok";
-                } catch (Exception $exception) {
-                    http_response_code(400);
-                    $response["status"] = "error";
-                    $response["error"]  = $exception->getMessage();
-                }
-                echo json_encode($response);
+                $this->_saveContactPassword();
                 break;
             case 'archiveContact':
-                $response = [];
-                try {
-                    $this->clearContact();
-                    $response["status"] = "ok";
-                } catch (Exception $exception) {
-                    http_response_code(400);
-                    $response["status"] = "error";
-                    $response["error"]  = $exception->getMessage();
-                }
-                echo json_encode($response);
+                $this->archiveContact();
                 break;
             case self::GET_CUSTOMER_REVIEW_CONTACTS:
-                $response = [];
-                try {
-                    $response['data']   = $this->getCustomerReviewContacts();
-                    $response["status"] = "ok";
-                } catch (Exception $exception) {
-                    http_response_code(400);
-                    $response["status"] = "error";
-                    $response["error"]  = $exception->getMessage();
-                }
-                echo json_encode($response);
+                $this->_getCustomerReviewContacts();
                 break;
+            case self::GET_CUSTOMER_PROJECTS:
+                return $this->getCustomerProjectsController();
             case self::DECRYPT:
-                $response = ["status" => "ok"];
-                try {
-                    $response['decryptedData'] = Encryption::decrypt(
-                        CUSTOMERS_ENCRYPTION_PRIVATE_KEY,
-                        @$this->getParam('passphrase'),
-                        @$this->getParam('encryptedData')
-                    );
-                } catch (Exception $exception) {
-                    $response['status'] = "error";
-                    $response['error']  = $exception->getMessage();
-                    http_response_code(400);
-                }
-                echo json_encode($response);
+                $this->decrypt();
                 break;
             case "removeSupportAndRefer":
-                $customerID = @$this->getParam('customerID');
-                $response   = ['status' => 'ok'];
-                try {
-                    $this->removeSupportForAllUsersAndReferCustomer($customerID);
-                } catch (Exception $exception) {
-                    $response['status'] = "error";
-                    $response['error']  = $exception->getMessage();
-                    http_response_code(400);
-                }
-                echo json_encode($response);
+                $this->removeSupportAndRefer(@$this->getParam('customerID'));
                 break;
             case 'searchName':
-                $itemsPerPage = 20;
-                $page         = 1;
-                $term         = '';
-                if (isset($_REQUEST['term'])) {
-                    $term = $_REQUEST['term'];
-                }
-                if (isset($_REQUEST['itemsPerPage'])) {
-                    $itemsPerPage = $_REQUEST['itemsPerPage'];
-                }
-                if (isset($_REQUEST['page'])) {
-                    $page = $_REQUEST['page'];
-                }
-                $dsResult   = new DataSet($this);
-                $buCustomer = new BUCustomer($this);
-                $buCustomer->getActiveCustomers($dsResult);
-                $customers = [];
-                $buCustomer->getCustomersByNameMatch($dsResult, null, null, $term);
-                while ($dsResult->fetchNext()) {
-                    $customers[] = [
-                        "id"             => $dsResult->getValue(DBECustomer::customerID),
-                        "name"           => $dsResult->getValue(DBECustomer::name),
-                        "streamOneEmail" => $dsResult->getValue(DBECustomer::streamOneEmail),
-                    ];
-                }
-                echo json_encode($customers);
+                $this->searchName();
                 break;
             case "getCurrentUser":
                 echo $this->getCurrentUser();
@@ -1090,14 +812,27 @@ class CTCustomer extends CTCNC
                 exit;
                 break;
             case "projects":
-                echo json_encode($this->getCustomerProjects());
+                echo json_encode($this->getCustomerProjects(@$_REQUEST['customerID']));
                 exit;
                 break;
             case "contracts":
-                echo json_encode($this->getCustomerContracts());
+                echo json_encode($this->getCustomerContracts(@$_REQUEST['customerID']));
                 exit;
             case "getCustomersHaveOpenSR":
                 echo json_encode($this->getCustomersHaveOpenSR());
+                exit;
+            case "letters":
+                echo json_encode($this->getCustomeLetters(),JSON_NUMERIC_CHECK);
+                exit;
+            case "CRM":
+                switch ($this->requestMethod) {
+                    case 'POST':
+                        echo $this->response($this->updateCRM());                        
+                        break;                    
+                    default:
+                        # code...
+                        break;
+                }
                 exit;
             default:
                 $this->displaySearchForm();
@@ -1117,6 +852,173 @@ class CTCustomer extends CTCNC
         if ($this->getParam('parentDescField')) {
             $this->setSessionParam('parentDescField', $this->getParam('parentDescField'));
         }
+    }
+
+    function getCustomerOrdersController()
+    {
+        $customerId  = $this->getParam('customerId');
+        $dbeCustomer = new DBECustomer($this);
+        $orders      = [];
+        if ($dbeCustomer->getRow($customerId) && $dbeCustomer->getValue(DBECustomer::referredFlag) != 'Y') {
+            $dbeJOrdhead = new DBEJOrdhead($this);
+            $dbeJOrdhead->getRowsBySearchCriteria(
+                $customerId,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false
+            );
+            while ($dbeJOrdhead->fetchNext()) {
+
+                $ordheadID = $dbeJOrdhead->getPKValue();
+                $orderURL  = Controller::buildLink(
+                    'SalesOrder.php',
+                    array(
+                        'action'    => CTCNC_ACT_DISP_SALESORDER,
+                        'ordheadID' => $ordheadID
+                    )
+                );
+                $orders[]  = [
+                    'url'       => $orderURL,
+                    'id'        => $ordheadID,
+                    'type'      => $this->getOrderTypeDescription($dbeJOrdhead->getValue(DBEJOrdhead::type)),
+                    'date'      => strftime(
+                        "%d/%m/%Y",
+                        strtotime($dbeJOrdhead->getValue(DBEJOrdhead::date))
+                    ),
+                    'custPORef' => $dbeJOrdhead->getValue(DBEJOrdhead::custPORef)
+                ];
+
+            }
+        }
+        echo json_encode(["status" => "ok", "data" => $orders]);
+    }
+
+    function getOrderTypeDescription($type)
+    {
+        return $this->orderTypeArray[$type];
+    }
+
+    private function getMainContacts($customerID)
+    {
+        $dbeContact = new DBEContact($this);
+        $dbeContact->getMainContacts($customerID);
+        return $dbeContact->fetchArray();
+    }
+
+    private function getFileDecodedAndMimeTypeFromBase64EncodedFile($encodedFile)
+    {
+        $data     = base64_decode($encodedFile);
+        $f        = finfo_open();
+        $mimeType = finfo_buffer($f, $data, FILEINFO_MIME_TYPE);
+        return (object)["file" => $data, "mimeType" => $mimeType];
+    }
+
+    function getReviewEngineersController()
+    {
+        $dbeUser = new DBEUser($this);
+        $dbeUser->getRows();
+        echo json_encode(["status" => "ok", "data" => $dbeUser->fetchArray()]);
+    }
+
+    function getCustomerReviewDataController()
+    {
+        if (!isset($_REQUEST['customerID'])) {
+            http_response_code(400);
+            echo json_encode(["status" => "error", "message" => "Customer ID is mandatory"]);
+            exit;
+        }
+        $dbeCustomer = new DBECustomer($this);
+        if (!$dbeCustomer->getRow($_REQUEST['customerID'])) {
+            http_response_code(404);
+            echo json_encode(["status" => "error", "message" => "Customer does not exist"]);
+            exit;
+        }
+        echo json_encode(
+            [
+                "status" => "ok",
+                "data"   => [
+                    "toBeReviewedOnDate"         => $dbeCustomer->getValue(DBECustomer::reviewDate),
+                    "toBeReviewedOnTime"         => $dbeCustomer->getValue(DBECustomer::reviewTime),
+                    "toBeReviewedOnByEngineerId" => $dbeCustomer->getValue(DBECustomer::reviewUserID),
+                    "toBeReviewedOnAction"       => $dbeCustomer->getValue(DBECustomer::reviewAction)
+                ]
+            ]
+        );
+    }
+
+    function updateCustomerReviewController()
+    {
+        $data = json_decode(file_get_contents('php://input'), true);
+        if (!isset($data['customerId'])) {
+            http_response_code(400);
+            echo json_encode(["status" => "error", "message" => "Customer ID is mandatory"]);
+            exit;
+        }
+        $dbeCustomer = new DBECustomer($this);
+        if (!$dbeCustomer->getRow($data['customerId'])) {
+            http_response_code(404);
+            echo json_encode(["status" => "error", "message" => "Customer does not exist"]);
+            exit;
+        }
+        $dbeCustomer->setValue(DBECustomer::reviewDate, $data["toBeReviewedOnDate"]);
+        $dbeCustomer->setValue(DBECustomer::reviewTime, $data["toBeReviewedOnTime"]);
+        $dbeCustomer->setValue(DBECustomer::reviewUserID, $data["toBeReviewedOnByEngineerId"]);
+        $dbeCustomer->setValue(DBECustomer::reviewAction, $data["toBeReviewedOnAction"]);
+        $dbeCustomer->updateRow();
+        echo json_encode(
+            ["status" => "ok",]
+        );
+    }
+
+    function getPortalCustomerDocumentsController($customerID)
+    {
+        if (!isset($customerID)) {
+            http_response_code(400);
+            echo json_encode(["status" => "error", "message" => "Customer ID is mandatory"]);
+            exit;
+        }
+        echo json_encode(
+            ["status" => "ok", "data" => $this->getPortalDocuments($customerID)]
+        );
+    }
+
+    /**
+     * @param $customerID
+     * @return array
+     * @throws Exception
+     */
+    function getPortalDocuments($customerID)
+    {
+        $portalDocuments = new DBEPortalCustomerDocumentWithoutFile($customerID);
+        $portalDocuments->setValue(DBEPortalCustomerDocumentWithoutFile::customerID, $customerID);
+        $portalDocuments->getRowsByColumn(
+            DBEPortalCustomerDocument::customerID,
+            DBEPortalCustomerDocumentWithoutFile::description
+        );
+        $documents = [];
+        while ($portalDocuments->fetchNext()) {
+            $documents[] = [
+                'id'                  => $portalDocuments->getValue(
+                    DBEPortalCustomerDocument::portalCustomerDocumentID
+                ),
+                'description'         => $portalDocuments->getValue(
+                    DBEPortalCustomerDocumentWithoutFile::description
+                ),
+                'filename'            => $portalDocuments->getValue(
+                    DBEPortalCustomerDocumentWithoutFile::filename
+                ),
+                'customerContract'    => $portalDocuments->getValue(
+                    DBEPortalCustomerDocumentWithoutFile::customerContract
+                ),
+                'mainContactOnlyFlag' => $portalDocuments->getValue(
+                        DBEPortalCustomerDocument::mainContactOnlyFlag
+                    ) === 'Y',
+            ];
+        }
+        return $documents;
     }
 
     /**
@@ -1146,7 +1048,7 @@ class CTCustomer extends CTCNC
 
     function getCustomerID()
     {
-        return $this->customerID;
+        return $_REQUEST['customerID'];
     }
 
     function setCustomerID($customerID)
@@ -1257,6 +1159,97 @@ class CTCustomer extends CTCNC
         exit;
 
 
+    }
+
+    function getCustomerSitesController()
+    {
+        if (!isset($_REQUEST['customerId'])) {
+            http_response_code(400);
+            echo json_encode(["status" => "error", "message" => "Customer Id is required"]);
+            exit;
+        }
+        $dbeSite    = new DBESite($this);
+        $customerId = $_REQUEST['customerId'];
+        $dbeSite->setValue(DBESite::customerID, $customerId);
+        $dbeSite->getRowsByCustomerID(false);
+        $sites = [];
+        while ($dbeSite->fetchNext()) {
+            $sites[] = [
+                "customerID"          => $dbeSite->getValue(DBESite::customerID),
+                "siteNo"              => $dbeSite->getValue(DBESite::siteNo),
+                "address1"            => $dbeSite->getValue(DBESite::add1),
+                "address2"            => $dbeSite->getValue(DBESite::add2),
+                "address3"            => $dbeSite->getValue(DBESite::add3),
+                "town"                => $dbeSite->getValue(DBESite::town),
+                "county"              => $dbeSite->getValue(DBESite::county),
+                "postcode"            => $dbeSite->getValue(DBESite::postcode),
+                "invoiceContact"      => $dbeSite->getValue(DBESite::invoiceContactID),
+                "deliverContact"      => $dbeSite->getValue(DBESite::deliverContactID),
+                "debtorCode"          => $dbeSite->getValue(DBESite::debtorCode),
+                "sageRef"             => $dbeSite->getValue(DBESite::sageRef),
+                "phone"               => $dbeSite->getValue(DBESite::phone),
+                "maxTravelHours"      => $dbeSite->getValue(DBESite::maxTravelHours),
+                "active"              => $dbeSite->getValue(DBESite::activeFlag) == 'Y',
+                "nonUKFlag"           => $dbeSite->getValue(DBESite::nonUKFlag) == 'Y',
+                "what3Words"          => $dbeSite->getValue(DBESite::what3Words),
+                "lastUpdatedDateTime" => $dbeSite->getValue(DBESite::lastUpdatedDateTime),
+                "canDelete"           => $this->buCustomer->canDeleteSite(
+                    $customerId,
+                    $dbeSite->getValue(DBESite::siteNo)
+                )
+            ];
+        }
+        echo json_encode(["status" => "ok", "data" => $sites]);
+    }
+
+    function getCustomerContactsController()
+    {
+        if (!isset($_REQUEST['customerId'])) {
+            http_response_code(400);
+            echo json_encode(["status" => "error", "message" => "Customer Id is required"]);
+            exit;
+        }
+        $contact = new DBEContact($this);
+        $contact->getRowsByCustomerID($_REQUEST['customerId']);
+        $contacts = [];
+        while ($contact->fetchNext()) {
+            $contacts[] = [
+                "id"                            => $contact->getValue(DBEContact::contactID),
+                "siteNo"                        => $contact->getValue(DBEContact::siteNo),
+                "customerID"                    => $contact->getValue(DBEContact::customerID),
+                "supplierID"                    => $contact->getValue(DBEContact::supplierID),
+                "title"                         => $contact->getValue(DBEContact::title),
+                "position"                      => $contact->getValue(DBEContact::position),
+                "lastName"                      => $contact->getValue(DBEContact::lastName),
+                "firstName"                     => $contact->getValue(DBEContact::firstName),
+                "email"                         => $contact->getValue(DBEContact::email),
+                "phone"                         => $contact->getValue(DBEContact::phone),
+                "mobilePhone"                   => $contact->getValue(DBEContact::mobilePhone),
+                "fax"                           => $contact->getValue(DBEContact::fax),
+                "portalPassword"                => $contact->getValue(DBEContact::portalPassword),
+                "mailshot"                      => $contact->getValue(DBEContact::mailshot),
+                "mailshot2Flag"                 => $contact->getValue(DBEContact::mailshot2Flag),
+                "mailshot3Flag"                 => $contact->getValue(DBEContact::mailshot3Flag),
+                "mailshot8Flag"                 => $contact->getValue(DBEContact::mailshot8Flag),
+                "mailshot9Flag"                 => $contact->getValue(DBEContact::mailshot9Flag),
+                "mailshot11Flag"                => $contact->getValue(DBEContact::mailshot11Flag),
+                "notes"                         => $contact->getValue(DBEContact::notes),
+                "failedLoginCount"              => $contact->getValue(DBEContact::failedLoginCount),
+                "reviewUser"                    => $contact->getValue(DBEContact::reviewUser),
+                "hrUser"                        => $contact->getValue(DBEContact::hrUser),
+                "supportLevel"                  => $contact->getValue(DBEContact::supportLevel),
+                "initialLoggingEmail"           => $contact->getValue(DBEContact::initialLoggingEmail),
+                "othersInitialLoggingEmailFlag" => $contact->getValue(DBEContact::othersInitialLoggingEmailFlag),
+                "othersWorkUpdatesEmailFlag"    => $contact->getValue(DBEContact::othersWorkUpdatesEmailFlag),
+                "othersFixedEmailFlag"          => $contact->getValue(DBEContact::othersFixedEmailFlag),
+                "pendingLeaverFlag"             => $contact->getValue(DBEContact::pendingLeaverFlag),
+                "pendingLeaverDate"             => $contact->getValue(DBEContact::pendingLeaverDate),
+                "specialAttentionContactFlag"   => $contact->getValue(DBEContact::specialAttentionContactFlag),
+                "linkedInURL"                   => $contact->getValue(DBEContact::linkedInURL),
+                "active"                        => $contact->getValue(DBEContact::active),
+            ];
+        }
+        echo json_encode(["status" => "ok", "data" => $contacts]);
     }
 
     /**
@@ -1515,6 +1508,7 @@ class CTCustomer extends CTCNC
             'CustomerEdit',
             'CustomerEditSimple.inc'
         );
+        $this->loadReactScript('CustomerEditComponent.js');
 // Parameters
         $title = "Customer - " . $this->dsCustomer->getValue(DBECustomer::name);
         $color = "red";
@@ -1630,7 +1624,6 @@ class CTCustomer extends CTCNC
                 'showInactiveSites' => '1'
             )
         );
-        $bodyTagExtras           = 'onLoad="loadNote(\'last\')"';
         $urlContactPopup         = Controller::buildLink(
             CTCNC_PAGE_CONTACT,
             array(
@@ -1674,15 +1667,15 @@ class CTCustomer extends CTCNC
             array(
                 'lastContractSent'                        => $this->dsCustomer->getValue(DBECustomer::lastContractSent),
                 'urlContactPopup'                         => $urlContactPopup,
-                'bodyTagExtras'                           => $bodyTagExtras,
                 /* hidden */ 'reviewMeetingEmailSentFlag' => $this->dsCustomer->getValue(
                 DBECustomer::reviewMeetingEmailSentFlag
             ),
-                'customerNotePopupLink'                   => $this->getCustomerNotePopupLink($this->getCustomerID()),
                 'showInactiveContactsURL'                 => $showInactiveContactsURL,
                 'showInactiveSitesURL'                    => $showInactiveSitesURL,
                 'customerID'                              => $this->getCustomerID() ? $this->getCustomerID() : 'null',
                 'customerName'                            => $this->dsCustomer->getValue(DBECustomer::name),
+                'deliverSiteNo'                           => $this->dsCustomer->getValue(DBECustomer::deliverSiteNo),
+                'invoiceSiteNo'                           => $this->dsCustomer->getValue(DBECustomer::invoiceSiteNo),
                 'reviewCount'                             => $this->buCustomer->getReviewCount(),
                 'customerFolderLink'                      => $customerFolderLink,
                 'websiteURL'                              => $this->dsCustomer->getValue(DBECustomer::websiteURL),
@@ -1724,18 +1717,13 @@ class CTCustomer extends CTCNC
                 'support24HourFlagChecked'                => $this->getChecked(
                     $this->dsCustomer->getValue(DBECustomer::support24HourFlag)
                 ),
-                'pcxFlagChecked'                          => $this->getChecked(
-                    $this->dsCustomer->getValue(DBECustomer::pcxFlag)
-                ),
+
                 'createDate'                              => $this->dsCustomer->getValue(DBECustomer::createDate),
                 'mailshot2FlagDesc'                       => $this->buCustomer->dsHeader->getValue(
                     DBEHeader::mailshot2FlagDesc
                 ),
                 'mailshot3FlagDesc'                       => $this->buCustomer->dsHeader->getValue(
                     DBEHeader::mailshot3FlagDesc
-                ),
-                'mailshot4FlagDesc'                       => $this->buCustomer->dsHeader->getValue(
-                    DBEHeader::mailshot4FlagDesc
                 ),
                 'mailshot8FlagDesc'                       => $this->buCustomer->dsHeader->getValue(
                     DBEHeader::mailshot8FlagDesc
@@ -1760,7 +1748,7 @@ class CTCustomer extends CTCNC
                 'activeDirectoryName'                     => $this->dsCustomer->getValue(
                     DBECustomer::activeDirectoryName
                 ),
-                'noOfSites'                               => $this->dsCustomer->getValue(DBECustomer::noOfSites),
+
                 'noOfPCs'                                 => $this->dsCustomer->getValue(DBECustomer::noOfPCs),
                 'patchManagementEligibleComputers'        => $this->dsCustomer->getValue(
                     DBECustomer::eligiblePatchManagement
@@ -1956,7 +1944,9 @@ class CTCustomer extends CTCNC
                 array(
                     'accountManagerUserID'       => $dsUser->getValue(DBEUser::userID),
                     'accountManagerUserName'     => $dsUser->getValue(DBEUser::name),
-                    'accountManagerUserSelected' => ($dsUser->getValue(DBEUser::userID) == $this->dsCustomer->getValue(
+                    'accountManagerUserSelected' => ($dsUser->getValue(
+                            DBEUser::userID
+                        ) == $this->dsCustomer->getValue(
                             DBECustomer::accountManagerUserID
                         )) ? CT_SELECTED : null
                 )
@@ -1983,68 +1973,6 @@ class CTCustomer extends CTCNC
                 'addProjectURL'  => $addProjectURL
             )
         );
-        $this->template->set_block(
-            'CustomerEdit',
-            'projectBlock',
-            'projects'
-        );      // have to declare innermost block first
-        if ($this->getAction() != CTCUSTOMER_ACT_ADDCUSTOMER) {
-
-            $buProject = new BUProject($this);
-            $dsProject = new DataSet($this);
-            $buProject->getProjectsByCustomerID(
-                $this->getCustomerID(),
-                $dsProject
-            );
-            while ($dsProject->fetchNext()) {
-                $deleteProjectLink = null;
-                $deleteProjectText = null;
-                if ($buProject->canDelete($dsProject->getValue(DBEProject::projectID))) {
-                    $deleteProjectLink = Controller::buildLink(
-                        'Project.php',
-                        array(
-                            'action'    => 'delete',
-                            'projectID' => $dsProject->getValue(DBEProject::projectID)
-                        )
-                    );
-                    $deleteProjectText = 'delete';
-                }
-                $editProjectLink = Controller::buildLink(
-                    'Projects.php',
-                    array(
-                        'action'    => 'edit',
-                        'projectID' => $dsProject->getValue(DBEProject::projectID)
-                    )
-                );
-                $this->template->set_var(
-                    array(
-                        'projectID'         => $dsProject->getValue(DBEProject::projectID),
-                        'projectName'       => $dsProject->getValue(DBEProject::description),
-                        'notes'             => substr(
-                            $dsProject->getValue(DBEProject::notes),
-                            0,
-                            50
-                        ),
-                        'startDate'         => strftime(
-                            "%d/%m/%Y",
-                            strtotime($dsProject->getValue(DBEProject::openedDate))
-                        ),
-                        'expiryDate'        => strftime(
-                            "%d/%m/%Y",
-                            strtotime($dsProject->getValue(DBEProject::completedDate))
-                        ),
-                        'editProjectLink'   => $editProjectLink,
-                        'deleteProjectLink' => $deleteProjectLink,
-                        'deleteProjectText' => $deleteProjectText
-                    )
-                );
-                $this->template->parse(
-                    'projects',
-                    'projectBlock',
-                    true
-                );
-            }
-        }
         $this->template->set_block(
             'CustomerEdit',
             'selectInvoiceContactBlock',
@@ -2081,131 +2009,8 @@ class CTCustomer extends CTCNC
                 );
             }
             if ($this->getAction() == CTCUSTOMER_ACT_ADDSITE) {
-                $this->buCustomer->addNewSiteRow(
-                    $this->dsSite,
-                    $this->getCustomerID()
-                );
+                $this->buCustomer->addNewSiteRow($this->getCustomerID());
             }
-        }
-        $this->dsSite->initialise();
-        while ($this->dsSite->fetchNext()) {
-            if (!$this->formError) {                                                      // Only get from DB if not displaying form error(s)
-                $this->dsSite->setValue(
-                    self::siteFormAdd1Class,
-                    CTCUSTOMER_CLS_TABLE_EDIT_HEADER
-                );
-                $this->dsSite->setValue(
-                    self::siteFormTownClass,
-                    CTCUSTOMER_CLS_TABLE_EDIT_HEADER_UC
-                );
-                $this->dsSite->setValue(
-                    self::siteFormPostcodeClass,
-                    CTCUSTOMER_CLS_TABLE_EDIT_HEADER_UC
-                );
-            }
-            $addContactURL  = Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action'     => CTCUSTOMER_ACT_ADDCONTACT,
-                    'customerID' => $this->dsSite->getValue(DBESite::customerID),
-                    'siteNo'     => $this->dsSite->getValue(DBESite::siteNo)
-                )
-            );
-            $deleteSiteURL  = null;
-            $deleteSiteText = null;
-            // If we can delete this site set the link
-            if ($this->buCustomer->canDeleteSite(
-                $this->dsSite->getValue(DBESite::customerID),
-                $this->dsSite->getValue(DBESite::siteNo)
-            )) {
-                $deleteSiteURL  = Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action'     => CTCUSTOMER_ACT_DELETESITE,
-                        'customerID' => $this->dsSite->getValue(DBESite::customerID),
-                        'siteNo'     => $this->dsSite->getValue(DBESite::siteNo)
-                    )
-                );
-                $deleteSiteText = 'Delete Site';
-            }
-            //Horrible hack cause I don't understand why these are empty strings when they should be zero values!
-            if (!$this->dsCustomer->getValue(DBECustomer::invoiceSiteNo)) $this->dsCustomer->setValue(
-                DBECustomer::invoiceSiteNo,
-                0
-            );
-            if (!$this->dsCustomer->getValue(DBECustomer::deliverSiteNo)) $this->dsCustomer->setValue(
-                DBECustomer::deliverSiteNo,
-                0
-            );
-            $this->template->set_var(
-                array(
-                    'add1Class'              => $this->dsSite->getValue(self::siteFormAdd1Class),
-                    'add1'                   => $this->dsSite->getValue(DBESite::add1),
-                    'add2'                   => $this->dsSite->getValue(DBESite::add2),
-                    'add3'                   => $this->dsSite->getValue(DBESite::add3),
-                    'townClass'              => $this->dsSite->getValue(self::siteFormTownClass),
-                    'town'                   => $this->dsSite->getValue(DBESite::town),
-                    'county'                 => $this->dsSite->getValue(DBESite::county),
-                    'postcodeClass'          => $this->dsSite->getValue(self::siteFormPostcodeClass),
-                    'postcode'               => $this->dsSite->getValue(DBESite::postcode),
-                    'what3Words'             => $this->dsSite->getValue(DBESite::what3Words),
-                    'sitePhone'              => $this->dsSite->getValue(DBESite::phone),
-                    'siteNo'                 => $this->dsSite->getValue(DBESite::siteNo),
-                    'customerID'             => $this->dsSite->getValue(DBESite::customerID),
-                    'sageRef'                => $this->dsSite->getValue(DBESite::sageRef),
-                    'debtorCode'             => $this->dsSite->getValue(DBESite::debtorCode),
-                    'maxTravelHours'         => $this->dsSite->getValue(DBESite::maxTravelHours),
-                    'invoiceSiteFlagChecked' => ($this->dsCustomer->getValue(
-                            DBECustomer::invoiceSiteNo
-                        ) == $this->dsSite->getValue(DBESite::siteNo)) ? CT_CHECKED : null,
-                    'deliverSiteFlagChecked' => ($this->dsCustomer->getValue(
-                            DBECustomer::deliverSiteNo
-                        ) == $this->dsSite->getValue(DBESite::siteNo)) ? CT_CHECKED : null,
-                    'activeFlagChecked'      => ($this->dsSite->getValue(
-                            DBESite::activeFlag
-                        ) == 'Y') ? CT_CHECKED : null,
-                    'nonUKFlagChecked'       => ($this->dsSite->getValue(
-                            DBESite::nonUKFlag
-                        ) == 'Y') ? CT_CHECKED : null,
-                    'deleteSiteText'         => $deleteSiteText,
-                    'deleteSiteURL'          => $deleteSiteURL
-                )
-            );
-            $this->template->set_block(
-                'CustomerEdit',
-                'invoiceContacts',
-                null
-            );
-            $this->parseContactSelector(
-                $this->dsSite->getValue(DBESite::invoiceContactID),
-                $this->dsContact,
-                'invoiceContacts',
-                'selectInvoiceContactBlock'
-            );
-            $this->template->set_block(
-                'CustomerEdit',
-                'deliverContacts',
-                null
-            );
-            $this->parseContactSelector(
-                $this->dsSite->getValue(DBESite::deliverContactID),
-                $this->dsContact,
-                'deliverContacts',
-                'selectDeliverContactBlock'
-            );
-            if ((!$this->formError) & ($this->getAction() != CTCUSTOMER_ACT_ADDCUSTOMER)) {
-                $this->template->set_var(
-                    array(
-                        'addContactText' => CTCUSTOMER_TXT_ADD_CONTACT,
-                        'addContactURL'  => $addContactURL
-                    )
-                );
-            }
-            $this->template->parse(
-                'sites',
-                'siteBlock',
-                true
-            );
         }
         $this->template->set_block(
             'CustomerEdit',
@@ -2374,130 +2179,6 @@ class CTCustomer extends CTCNC
                 );
             }
             $this->template->set_var(
-                array(
-                    'contactID'                            => $this->dsContact->getValue(DBEContact::contactID),
-                    'siteNo'                               => $this->dsContact->getValue(DBEContact::siteNo),
-                    'customerID'                           => $this->dsContact->getValue(DBEContact::customerID),
-                    'title'                                => $this->dsContact->getValue(DBEContact::title),
-                    'titleClass'                           => $this->dsContact->getValue(self::contactFormTitleClass),
-                    'firstName'                            => $this->dsContact->getValue(DBEContact::firstName),
-                    'lastName'                             => $this->dsContact->getValue(DBEContact::lastName),
-                    'firstNameClass'                       => $this->dsContact->getValue(
-                        self::contactFormFirstNameClass
-                    ),
-                    'lastNameClass'                        => $this->dsContact->getValue(
-                        self::contactFormLastNameClass
-                    ),
-                    'phone'                                => $this->dsContact->getValue(DBEContact::phone),
-                    'mobilePhone'                          => $this->dsContact->getValue(DBEContact::mobilePhone),
-                    'position'                             => $this->dsContact->getValue(DBEContact::position),
-                    'fax'                                  => $this->dsContact->getValue(DBEContact::fax),
-                    'portalPasswordButtonClass'            => $this->dsContact->getValue(
-                        DBEContact::portalPassword
-                    ) ? 'lockedIcon' : 'unlockedIcon',
-                    'pendingLeaverFlagChecked'             => ($this->dsContact->getValue(
-                            DBEContact::pendingLeaverFlag
-                        ) == 'Y') ? CT_CHECKED : null,
-                    'pendingLeaverDate'                    => $this->dsContact->getValue(DBEContact::pendingLeaverDate),
-                    'failedLoginCount'                     => $this->dsContact->getValue(DBEContact::failedLoginCount),
-                    'email'                                => $this->dsContact->getValue(DBEContact::email),
-                    'emailClass'                           => $this->dsContact->getValue(self::contactFormEmailClass),
-                    'notes'                                => $this->dsContact->getValue(DBEContact::notes),
-                    'discontinuedFlag'                     => $this->dsContact->getValue(DBEContact::discontinuedFlag),
-                    'specialAttentionContactFlagChecked'   => $this->getChecked(
-                        $this->dsContact->getValue(
-                            DBEContact::specialAttentionContactFlag
-                        )
-                    ),
-                    'invoiceContactFlagChecked'            => ($this->dsContact->getValue(
-                            DBEContact::contactID
-                        ) == $this->dsSite->getValue(
-                            DBESite::invoiceContactID
-                        )) ? CT_CHECKED : null,
-                    'deliverContactFlagChecked'            => ($this->dsContact->getValue(
-                            DBEContact::contactID
-                        ) == $this->dsSite->getValue(
-                            DBESite::deliverContactID
-                        )) ? CT_CHECKED : null,
-                    'sendMailshotFlagChecked'              => $this->getChecked(
-                        $this->dsContact->getValue(DBEContact::sendMailshotFlag)
-                    ),
-                    'accountsFlagChecked'                  => $this->getChecked(
-                        $this->dsContact->getValue(DBEContact::accountsFlag)
-                    ),
-                    'mailshot2FlagChecked'                 => $this->getChecked(
-                        $this->dsContact->getValue(DBEContact::mailshot2Flag)
-                    ),
-                    'mailshot3FlagChecked'                 => $this->getChecked(
-                        $this->dsContact->getValue(DBEContact::mailshot3Flag)
-                    ),
-                    'mailshot4FlagChecked'                 => $this->getChecked(
-                        $this->dsContact->getValue(DBEContact::mailshot4Flag)
-                    ),
-                    'mailshot8FlagChecked'                 => $this->getChecked(
-                        $this->dsContact->getValue(DBEContact::mailshot8Flag)
-                    ),
-                    'mailshot9FlagChecked'                 => $this->getChecked(
-                        $this->dsContact->getValue(DBEContact::mailshot9Flag)
-                    ),
-                    'mailshot11FlagChecked'                => $this->getChecked(
-                        $this->dsContact->getValue(DBEContact::mailshot11Flag)
-                    ),
-                    'reviewUserFlagChecked'                => $this->getChecked(
-                        $this->dsContact->getValue(DBEContact::reviewUser)
-                    ),
-                    'initialLoggingEmailFlagChecked'       => $this->getChecked(
-                        $this->dsContact->getValue(DBEContact::initialLoggingEmailFlag)
-                    ),
-                    'workStartedEmailFlagChecked'          => $this->getChecked(
-                        $this->dsContact->getValue(DBEContact::workStartedEmailFlag)
-                    ),
-                    'workUpdatesEmailFlagChecked'          => $this->getChecked(
-                        $this->dsContact->getValue(DBEContact::workUpdatesEmailFlag)
-                    ),
-                    'fixedEmailFlagChecked'                => $this->getChecked(
-                        $this->dsContact->getValue(DBEContact::fixedEmailFlag)
-                    ),
-                    'pendingClosureEmailFlagChecked'       => $this->getChecked(
-                        $this->dsContact->getValue(DBEContact::pendingClosureEmailFlag)
-                    ),
-                    'closureEmailFlagChecked'              => $this->getChecked(
-                        $this->dsContact->getValue(DBEContact::closureEmailFlag)
-                    ),
-                    'othersInitialLoggingEmailFlagChecked' => $this->getChecked(
-                        $this->dsContact->getValue(DBEContact::othersInitialLoggingEmailFlag)
-                    ),
-                    'othersWorkStartedEmailFlagChecked'    => $this->getChecked(
-                        $this->dsContact->getValue(DBEContact::othersWorkStartedEmailFlag)
-                    ),
-                    'othersWorkUpdatesEmailFlagChecked'    => $this->getChecked(
-                        $this->dsContact->getValue(DBEContact::othersWorkUpdatesEmailFlag)
-                    ),
-                    'othersFixedEmailFlagChecked'          => $this->getChecked(
-                        $this->dsContact->getValue(DBEContact::othersFixedEmailFlag)
-                    ),
-                    'othersPendingClosureEmailFlagChecked' => $this->getChecked(
-                        $this->dsContact->getValue(DBEContact::othersPendingClosureEmailFlag)
-                    ),
-                    'othersClosureEmailFlagChecked'        => $this->getChecked(
-                        $this->dsContact->getValue(DBEContact::othersClosureEmailFlag)
-                    ),
-                    'hrUserFlagChecked'                    => $this->getChecked(
-                        $this->dsContact->getValue(DBEContact::hrUser)
-                    ),
-                    'topUpValidation'                      => $this->buCustomer->hasPrepayContract(
-                        DBEContact::customerID
-                    ) ? 'data-validation="atLeastOne"' : null,
-                    'dearJohnURL'                          => $dearJohnURL,
-                    'dmLetterURL'                          => $dmLetterURL,
-                    'deleteContactLink'                    => $deleteContactLink,
-                    'linkedInURL'                          => $this->dsContact->getValue(DBEContact::linkedInURL),
-                    'linkedInColor'                        => $this->dsContact->getValue(
-                        DBEContact::linkedInURL
-                    ) ? 'green' : 'red'
-                )
-            );
-            $this->template->set_var(
                 [
                     "mainCount"       => $mainCount,
                     "supervisorCount" => $supervisorCount,
@@ -2610,39 +2291,12 @@ class CTCustomer extends CTCNC
             );
 
         }
-        if ($this->dsCustomer->getValue(DBECustomer::customerID)) {
-            $this->documents(
-                $this->dsCustomer->getValue(DBECustomer::customerID),
-                'CustomerEdit'
-            );
-        }
         $this->template->parse(
             'CONTENTS',
             'CustomerEdit',
             true
         );
         $this->parsePage();
-    }
-
-    /**
-     * @param $customerID
-     * @return string
-     * @throws Exception
-     */
-    function getCustomerNotePopupLink($customerID)
-    {
-        if (!$customerID) {
-            return null;
-        }
-        $url = Controller::buildLink(
-            'CustomerNote.php',
-            array(
-                'action'     => 'customerNoteHistoryPopup',
-                'customerID' => $customerID,
-                'htmlFmt'    => CT_HTML_FMT_POPUP
-            )
-        );
-        return '<A HREF="' . $url . ' " target="_blank" >Notes History</A>';
     }
 
     function getChecked($flag)
@@ -2661,39 +2315,6 @@ class CTCustomer extends CTCNC
             'siteNo',
             $siteNo
         );
-    }
-
-    /**
-     * Get and parse contact drop-down selector
-     * @access private
-     * @param $contactID
-     * @param DataSet $dsContact
-     * @param $blockVar
-     * @param $blockName
-     */
-    function parseContactSelector($contactID,
-                                  &$dsContact,
-                                  $blockVar,
-                                  $blockName
-    )
-    {
-        $dsContact->initialise();
-        while ($dsContact->fetchNext()) {
-            $contactSelected = ($dsContact->getValue(DBEContact::contactID) == $contactID) ? CT_SELECTED : null;
-            $this->template->set_var(
-                array(
-                    $blockName . 'Selected'  => $contactSelected,
-                    $blockName . 'ContactID' => $dsContact->getValue(DBEContact::contactID),
-                    $blockName . 'FirstName' => $dsContact->getValue(DBEContact::firstName),
-                    $blockName . 'LastName'  => $dsContact->getValue(DBEContact::lastName)
-                )
-            );
-            $this->template->parse(
-                $blockVar,
-                $blockName,
-                true
-            );
-        }
     }
 
     function siteDropdown($customerID,
@@ -2728,104 +2349,6 @@ class CTCustomer extends CTCNC
                 true
             );
         }
-
-    }
-
-    function getOrderTypeDescription($type)
-    {
-        return $this->orderTypeArray[$type];
-    }
-
-    /**
-     * @param $customerID
-     * @param $templateName
-     * @throws Exception
-     */
-    function documents($customerID,
-                       $templateName
-    )
-    {
-        $this->template->set_block(
-            $templateName,
-            'portalDocumentBlock',
-            'portalDocuments'
-        );
-        if ($this->getAction() != CTCUSTOMER_ACT_ADDCUSTOMER) {
-
-            $buPortalCustomerDocument = new BUPortalCustomerDocument($this);
-            $dsPortalCustomerDocument = new DataSet($this);
-            $buPortalCustomerDocument->getDocumentsByCustomerID(
-                $customerID,
-                $dsPortalCustomerDocument
-            );
-            $urlAddDocument = Controller::buildLink(
-                'PortalCustomerDocument.php',
-                array(
-                    'action'     => 'add',
-                    'customerID' => $customerID
-                )
-            );
-            $this->template->set_var(
-                array(
-                    'txtAddDocument' => 'Add document',
-                    'urlAddDocument' => $urlAddDocument
-                )
-            );
-            while ($dsPortalCustomerDocument->fetchNext()) {
-
-                $urlEditDocument   = Controller::buildLink(
-                    'PortalCustomerDocument.php',
-                    array(
-                        'action'                   => 'edit',
-                        'portalCustomerDocumentID' => $dsPortalCustomerDocument->getValue(
-                            DBEPortalCustomerDocument::portalCustomerDocumentID
-                        )
-                    )
-                );
-                $urlViewFile       = Controller::buildLink(
-                    'PortalCustomerDocument.php',
-                    array(
-                        'action'                   => 'viewFile',
-                        'portalCustomerDocumentID' => $dsPortalCustomerDocument->getValue(
-                            DBEPortalCustomerDocument::portalCustomerDocumentID
-                        )
-                    )
-                );
-                $urlDeleteDocument = Controller::buildLink(
-                    'PortalCustomerDocument.php',
-                    array(
-                        'action'                   => 'delete',
-                        'portalCustomerDocumentID' => $dsPortalCustomerDocument->getValue(
-                            DBEPortalCustomerDocument::portalCustomerDocumentID
-                        )
-                    )
-                );
-                $this->template->set_var(
-                    array(
-                        'description'         => $dsPortalCustomerDocument->getValue(
-                            DBEPortalCustomerDocument::description
-                        ),
-                        'filename'            => $dsPortalCustomerDocument->getValue(
-                            DBEPortalCustomerDocument::filename
-                        ),
-                        'customerContract'    => $dsPortalCustomerDocument->getValue(
-                            DBEPortalCustomerDocument::customerContract
-                        ) ? 'Y' : 'N',
-                        'mainContactOnlyFlag' => $dsPortalCustomerDocument->getValue(
-                            DBEPortalCustomerDocument::mainContactOnlyFlag
-                        ),
-                        'urlViewFile'         => $urlViewFile,
-                        'urlEditDocument'     => $urlEditDocument,
-                        'urlDeleteDocument'   => $urlDeleteDocument
-                    )
-                );
-                $this->template->parse(
-                    'portalDocuments',
-                    'portalDocumentBlock',
-                    true
-                );
-            } // end while
-        } // end if
     }
 
     /**
@@ -2901,33 +2424,25 @@ class CTCustomer extends CTCNC
      */
     function deleteSite()
     {
+        $data = $this->getJSONData();
         $this->setMethodName('deleteSite');
-        if (!$this->getCustomerID()) {
-            $this->displayFatalError('CustomerID not passed');
+        if (empty($data['customerId'])) {
+            throw new JsonHttpException(400, 'Customer Id Required');
         }
-        if (!$this->getSiteNo()) {
-            $this->displayFatalError('SiteNo not passed');
+        if (empty($data['siteNo'])) {
+            throw new JsonHttpException(400, 'Site Number Required');
         }
-        if ($this->buCustomer->canDeleteSite(
-            $this->getCustomerID(),
-            $this->getSiteNo()
+        if (!$this->buCustomer->canDeleteSite(
+            $data['customerId'],
+            $data['siteNo']
         )) {
-            $this->buCustomer->deleteSite(
-                $this->getCustomerID(),
-                $this->getSiteNo()
-            );
-        } else {
-            throw new Exception('Cannot delete this site - dependencies exist');
+            throw new JsonHttpException(403, 'Cannot delete Site because is in use');
         }
-        $nextURL = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            array(
-                'action'     => CTCNC_ACT_DISP_EDIT,
-                'customerID' => $this->getCustomerID()
-            )
+        $this->buCustomer->deleteSite(
+            $data['customerId'],
+            $data['siteNo']
         );
-        header('Location: ' . $nextURL);
-        exit;
+        echo json_encode(["status" => "ok"]);
     }
 
     /**
@@ -3109,6 +2624,39 @@ class CTCustomer extends CTCNC
         return $contacts;
     }
 
+    function getCustomerProjectsController()
+    {
+        $response = [];
+        try {
+            $response['data']   = $this->getCustomerProjects($_REQUEST['customerId']);
+            $response["status"] = "ok";
+        } catch (Exception $exception) {
+            http_response_code(400);
+            $response["status"] = "error";
+            $response["error"]  = $exception->getMessage();
+        }
+        echo json_encode($response);
+    }
+
+    function getCustomerProjects($customerId)
+    {
+        $buProject = new BUProject($this);
+        $dsResults = new DataSet($this);
+        $buProject->getProjectsByCustomerID($customerId, $dsResults);
+        $projects = [];
+        while ($dsResults->fetchNext()) {
+            $projects[] = [
+                "id"          => $dsResults->getValue(DBEProject::projectID),
+                "name"        => $dsResults->getValue(DBEProject::description),
+                "notes"       => $dsResults->getValue(DBEProject::notes),
+                "startDate"   => $dsResults->getValue(DBEProject::commenceDate),
+                "expiryDate"  => $dsResults->getValue(DBEProject::completedDate),
+                "isDeletable" => $buProject->canDelete($dsResults->getValue(DBEProject::projectID)),
+            ];
+        }
+        return $projects;
+    }
+
     function removeSupportForAllUsersAndReferCustomer($customerID)
     {
         if (!$customerID) {
@@ -3128,6 +2676,39 @@ class CTCustomer extends CTCNC
                 'isSdManager' => $this->isSdManager(),
             ]
         );
+    }
+
+    /**
+     * Get and parse contact drop-down selector
+     * @access private
+     * @param $contactID
+     * @param DataSet $dsContact
+     * @param $blockVar
+     * @param $blockName
+     */
+    function parseContactSelector($contactID,
+                                  &$dsContact,
+                                  $blockVar,
+                                  $blockName
+    )
+    {
+        $dsContact->initialise();
+        while ($dsContact->fetchNext()) {
+            $contactSelected = ($dsContact->getValue(DBEContact::contactID) == $contactID) ? CT_SELECTED : null;
+            $this->template->set_var(
+                array(
+                    $blockName . 'Selected'  => $contactSelected,
+                    $blockName . 'ContactID' => $dsContact->getValue(DBEContact::contactID),
+                    $blockName . 'FirstName' => $dsContact->getValue(DBEContact::firstName),
+                    $blockName . 'LastName'  => $dsContact->getValue(DBEContact::lastName)
+                )
+            );
+            $this->template->parse(
+                $blockVar,
+                $blockName,
+                true
+            );
+        }
     }
 
     /**
@@ -3263,20 +2844,58 @@ class CTCustomer extends CTCNC
     function getCustomerSites()
     {
         $customerId = $_GET["customerId"];
+        $showInActive= $_GET["showInActive"]??"N";
         if (!$customerId) return [];
         $dbeSite = new DBESite($this);
         $dbeSite->setValue(
             DBESite::customerID,
             $customerId
-        );
-        $dbeSite->getRowsByCustomerID();
+        );        
+        $dbeSite->getRowsByCustomerID($showInActive=='N');
         $sites = array();
         while ($dbeSite->fetchNext()) {
             $siteDesc = $dbeSite->getValue(DBESite::add1) . ' ' . $dbeSite->getValue(
                     DBESite::town
                 ) . ' ' . $dbeSite->getValue(DBESite::postcode);
+            $customerID = $dbeSite->getValue(DBESite::customerID);
             $siteNo   = $dbeSite->getValue(DBESite::siteNo);
-            array_push($sites, ["id" => $siteNo, "title" => $siteDesc]);
+            $add1     = $dbeSite->getValue(DBESite::add1);
+            $add2     = $dbeSite->getValue(DBESite::add2);
+            $add3     = $dbeSite->getValue(DBESite::add3);
+            $town     = $dbeSite->getValue(DBESite::town);
+            $county   = $dbeSite->getValue(DBESite::county);
+            $postcode = $dbeSite->getValue(DBESite::postcode);
+            $invoiceContactID = $dbeSite->getValue(DBESite::invoiceContactID);
+            $deliverContactID = $dbeSite->getValue(DBESite::deliverContactID);
+            $debtorCode       = $dbeSite->getValue(DBESite::debtorCode);
+            $sageRef          = $dbeSite->getValue(DBESite::sageRef);
+            $phone            = $dbeSite->getValue(DBESite::phone);
+            $maxTravelHours   = $dbeSite->getValue(DBESite::maxTravelHours);
+            $activeFlag       = $dbeSite->getValue(DBESite::activeFlag);
+            $nonUKFlag        = $dbeSite->getValue(DBESite::nonUKFlag);
+            $what3Words       = $dbeSite->getValue(DBESite::what3Words);
+            $lastUpdatedDateTime   = $dbeSite->getValue(DBESite::lastUpdatedDateTime);
+            array_push($sites, [
+                "id"     => $siteNo, 
+                "customerID" => $customerID, 
+                "title"  => $siteDesc,
+                "siteNo" => $siteNo,
+                "add1"   => $add1,
+                "add2"   => $add2,
+                "add3"   => $add3,
+                "town"   => $town,
+                "county" => $county,
+                "postcode" => $postcode,
+                "invoiceContactID" => $invoiceContactID,
+                "deliverContactID" => $deliverContactID,
+                "debtorCode" => $debtorCode,
+                "sageRef"    => $sageRef,
+                "phone"      => $phone,
+                "maxTravelHours"      => $maxTravelHours,
+                "activeFlag"          => $activeFlag,
+                "what3Words"          => $what3Words,
+                "lastUpdatedDateTime" => $lastUpdatedDateTime,
+            ]);
         }
         return $sites;
     }
@@ -3356,20 +2975,50 @@ ORDER BY NAME,
                 $contacts,
                 array(
                     'id'           => $dbeContact->getValue(DBEContact::contactID),
+                    'customerID'   => $dbeContact->getValue(DBEContact::customerID),
+                    'title'        => $dbeContact->getValue(DBEContact::title),
                     'position'     => $dbeContact->getValue(DBEContact::position),
                     'firstName'    => $dbeContact->getValue(DBEContact::firstName),
                     'lastName'     => $dbeContact->getValue(DBEContact::lastName),
+                    "email"        => $dbeContact->getValue(DBEContact::email),
+                    "phone"        => $dbeContact->getValue(DBEContact::phone),
+                    "mobilePhone"  => $dbeContact->getValue(DBEContact::mobilePhone),
+                    "fax"          => $dbeContact->getValue(DBEContact::fax),
+                    "portalPassword"    => $dbeContact->getValue(DBEContact::portalPassword),
+                    "mailshot"          => $dbeContact->getValue(DBEContact::mailshot),
+                    //"discontinuedFlag"  => $dbeContact->getValue(DBEContact::discontinuedFlag),
+                    "mailshot2Flag"     => $dbeContact->getValue(DBEContact::mailshot2Flag),
+                    "mailshot3Flag"     => $dbeContact->getValue(DBEContact::mailshot3Flag),
+                    "mailshot8Flag"     => $dbeContact->getValue(DBEContact::mailshot8Flag),
+                    "mailshot9Flag"     => $dbeContact->getValue(DBEContact::mailshot9Flag),
+                    "mailshot11Flag"    => $dbeContact->getValue(DBEContact::mailshot11Flag),
+                    "failedLoginCount"  => $dbeContact->getValue(DBEContact::failedLoginCount),
+                    "reviewUser"        => $dbeContact->getValue(DBEContact::reviewUser),
+                    "hrUser"            => $dbeContact->getValue(DBEContact::hrUser),
+                    "notes"             => $dbeContact->getValue(DBEContact::notes),
+                    'supportLevel'      => $dbeContact->getValue(DBEContact::supportLevel),
+                    //'main'              => $dbeContact->getValue(DBEContact::supportLevelMain),
+                    //'supervisor'        => $dbeContact->getValue(DBEContact::supportLevelSupervisor),
+                    //'support'           => $dbeContact->getValue(DBEContact::supportLevelSupport),
+                    //'delegate'          => $dbeContact->getValue(DBEContact::supportLevelDelegate),
+                    //'furlough'          => $dbeContact->getValue(DBEContact::supportLevelFurlough),
+                    'initialLoggingEmail' => $dbeContact->getValue(DBEContact::initialLoggingEmail),
+                    'othersInitialLoggingEmailFlag' => $dbeContact->getValue(DBEContact::othersInitialLoggingEmailFlag),
+                    'othersWorkUpdatesEmailFlag'    => $dbeContact->getValue(DBEContact::othersWorkUpdatesEmailFlag),
+                    'othersFixedEmailFlag'          => $dbeContact->getValue(DBEContact::othersFixedEmailFlag),
+                    'pendingLeaverFlag'             => $dbeContact->getValue(DBEContact::pendingLeaverFlag),
+                    'pendingLeaverDate'             => $dbeContact->getValue(DBEContact::pendingLeaverDate),
+                    'specialAttentionContactFlag'   => $dbeContact->getValue(DBEContact::specialAttentionContactFlag),
+                    'linkedInURL'                   => $dbeContact->getValue(DBEContact::linkedInURL),
+                    'pendingFurloughAction'         => $dbeContact->getValue(DBEContact::pendingFurloughAction),
+                    'pendingFurloughActionDate'     => $dbeContact->getValue(DBEContact::pendingFurloughActionDate),
+                    'pendingFurloughActionLevel'    => $dbeContact->getValue(DBEContact::pendingFurloughActionLevel),
                     'siteNo'       => $dbeSite->getValue(DBESite::siteNo),
                     'active'       => $dbeContact->getValue(DBEContact::active),
                     'siteTitle'    => $dbeSite->getValue(DBESite::add1) . ' ' . $dbeSite->getValue(
                             DBESite::town
                         ) . ' ' . $dbeSite->getValue(DBESite::postcode),
                     "sitePhone"    => $dbeSite->getValue(DBESite::phone),
-                    "phone"        => $dbeContact->getValue(DBEContact::phone),
-                    "mobilePhone"  => $dbeContact->getValue(DBEContact::mobilePhone),
-                    "email"        => $dbeContact->getValue(DBEContact::email),
-                    'supportLevel' => $dbeContact->getValue(DBEContact::supportLevel),
-                    "notes"        => $dbeContact->getValue(DBEContact::notes),
                     "isPrimary"    => $primaryContact && $primaryContact->getValue(
                             DBEContact::contactID
                         ) === $dbeContact->getValue(DBEContact::contactID)
@@ -3379,15 +3028,9 @@ ORDER BY NAME,
         return $contacts;
     }
 
-    function getCustomerProjects()
+    function getCustomerContracts($customerID)
     {
-        $customerID = $_REQUEST["customerID"];
-        return BUProject::getCustomerProjects($customerID);
-    }
-
-    function getCustomerContracts()
-    {
-        $customerID         = $_REQUEST["customerId"];
+        $customerID         = $customerID;
         $linkedToSalesOrder = $_REQUEST["linkedToSalesOrder"];
         $contracts          = array();
         $buCustomerItem     = new BUCustomerItem($this);
@@ -3456,8 +3099,14 @@ ORDER BY NAME,
                 $this->dsCustomer->fetchNext();
                 $this->setCustomerID($this->dsCustomer->getValue(DBECustomer::customerID));
             } else {                // Updates to customer and updates/inserts to sites and contacts
-                $this->buCustomer->updateCustomer($this->dsCustomer);
-                $this->buCustomer->updateSite($this->dsSite);
+                $dbeCustomer = new DBECustomer($this);
+                $dbeCustomer->getRow($this->getCustomerID());
+                $customerData = $_REQUEST['form']['customer'];
+                $dbeCustomer->setValue(DBECustomer::reviewDate, $customerData['reviewDate']);
+                $dbeCustomer->setValue(DBECustomer::reviewTime, $customerData['reviewTime']);
+                $dbeCustomer->setValue(DBECustomer::reviewUserID, $customerData['reviewUserID']);
+                $dbeCustomer->setValue(DBECustomer::reviewAction, $customerData['reviewAction']);
+                $dbeCustomer->updateRow();
                 if (isset($this->postVars["form"]["contact"])) {
                     $this->buCustomer->updateContact($this->dsContact);
                 }
@@ -3480,5 +3129,604 @@ ORDER BY NAME,
         } else {
             $this->displayEditForm();
         }
+    }
+    
+    //--------------------------------new
+    function displayForm(){
+        $customerName="";
+        if(@$_REQUEST["customerID"])
+        {
+            $dbeCustomer=new DBECustomer($this);
+            $dbeCustomer->getRow($_REQUEST["customerID"]);
+            $customerName=$dbeCustomer->getValue(DBECustomer::name);
+        }
+        $this->setPageTitle('Customer '.$customerName);
+        $this->setTemplateFiles(
+            'CustomerEdit',
+            'CustomerEditSimple.inc'
+        );
+        $this->loadReactScript('CustomerEditComponent.js');
+        $this->loadReactCSS('CustomerEditComponent.css');
+        $this->template->parse(
+            'CONTENTS',
+            'CustomerEdit',
+            true
+        );
+        $this->parsePage();
+    }
+    function getEncrypt()
+    {
+        $value     = @$_REQUEST['value'];
+        $encrypted = Encryption::encrypt(
+            CUSTOMERS_ENCRYPTION_PUBLIC_KEY,
+            $value
+        );
+        echo json_encode(["status" => "ok", "data" => $encrypted]);
+    }
+
+    function getCustomerData()
+    {
+        $customerID = @$_REQUEST['customerID'];
+                if (!$customerID) {
+                    http_response_code(400);
+                    echo json_encode(["status" => "error", "description" => "Customer ID Not provided"]);
+                    exit;
+                }
+                $dbeCustomer = new DBECustomer($this);
+                if (!$dbeCustomer->getRow($customerID)) {
+                    http_response_code(404);
+                    echo json_encode(["status" => "error", "description" => "Customer not found"]);
+                    exit;
+                }
+                echo json_encode(
+                    [
+                        "status" => "ok",
+                        "data"   => [
+                            "accountManagerUserID"         => $dbeCustomer->getValue(DBECustomer::accountManagerUserID),
+                            "accountName"                  => $dbeCustomer->getValue(DBECustomer::accountName),
+                            "accountNumber"                => $dbeCustomer->getValue(DBECustomer::accountNumber),
+                            "activeDirectoryName"          => $dbeCustomer->getValue(DBECustomer::activeDirectoryName),
+                            "becameCustomerDate"           => $dbeCustomer->getValue(DBECustomer::becameCustomerDate),
+                            "customerID"                   => $dbeCustomer->getValue(DBECustomer::customerID),
+                            "customerTypeID"               => $dbeCustomer->getValue(DBECustomer::customerTypeID),
+                            "droppedCustomerDate"          => $dbeCustomer->getValue(DBECustomer::droppedCustomerDate),
+                            "gscTopUpAmount"               => $dbeCustomer->getValue(DBECustomer::gscTopUpAmount),
+                            "lastReviewMeetingDate"        => $dbeCustomer->getValue(
+                                DBECustomer::lastReviewMeetingDate
+                            ),
+                            "leadStatusId"                 => $dbeCustomer->getValue(DBECustomer::leadStatusId),
+                            "mailshotFlag"                 => $dbeCustomer->getValue(DBECustomer::mailshotFlag),
+                            "modifyDate"                   => $dbeCustomer->getValue(DBECustomer::modifyDate),
+                            "name"                         => $dbeCustomer->getValue(DBECustomer::name),
+                            "noOfPCs"                      => $dbeCustomer->getValue(DBECustomer::noOfPCs),
+                            "noOfServers"                  => $dbeCustomer->getValue(DBECustomer::noOfServers),
+                            "primaryMainContactID"         => $dbeCustomer->getValue(DBECustomer::primaryMainContactID),
+                            "referredFlag"                 => $dbeCustomer->getValue(DBECustomer::referredFlag),
+                            "regNo"                        => $dbeCustomer->getValue(DBECustomer::regNo),
+                            "reviewMeetingBooked"          => $dbeCustomer->getValue(DBECustomer::reviewMeetingBooked),
+                            "reviewMeetingFrequencyMonths" => $dbeCustomer->getValue(
+                                DBECustomer::reviewMeetingFrequencyMonths
+                            ),
+                            "sectorID"                     => $dbeCustomer->getValue(DBECustomer::sectorID),
+                            "slaP1"                        => $dbeCustomer->getValue(DBECustomer::slaP1),
+                            "slaP2"                        => $dbeCustomer->getValue(DBECustomer::slaP2),
+                            "slaP3"                        => $dbeCustomer->getValue(DBECustomer::slaP3),
+                            "slaP4"                        => $dbeCustomer->getValue(DBECustomer::slaP4),
+                            "slaP5"                        => $dbeCustomer->getValue(DBECustomer::slaP5),
+                            "slaFixHoursP1"                => $dbeCustomer->getValue(DBECustomer::slaFixHoursP1),
+                            "slaFixHoursP2"                => $dbeCustomer->getValue(DBECustomer::slaFixHoursP2),
+                            "slaFixHoursP3"                => $dbeCustomer->getValue(DBECustomer::slaFixHoursP3),
+                            "slaFixHoursP4"                => $dbeCustomer->getValue(DBECustomer::slaFixHoursP4),
+                            "slaP1PenaltiesAgreed"         => $dbeCustomer->getValue(DBECustomer::slaP1PenaltiesAgreed),
+                            "slaP2PenaltiesAgreed"         => $dbeCustomer->getValue(DBECustomer::slaP2PenaltiesAgreed),
+                            "slaP3PenaltiesAgreed"         => $dbeCustomer->getValue(DBECustomer::slaP3PenaltiesAgreed),
+                            "sortCode"                     => $dbeCustomer->getValue(DBECustomer::sortCode),
+                            "specialAttentionEndDate"      => $dbeCustomer->getValue(
+                                DBECustomer::specialAttentionEndDate
+                            ),
+                            "specialAttentionFlag"         => $dbeCustomer->getValue(DBECustomer::specialAttentionFlag),
+                            "support24HourFlag"            => $dbeCustomer->getValue(DBECustomer::support24HourFlag),
+                            "techNotes"                    => $dbeCustomer->getValue(DBECustomer::techNotes),
+                            "websiteURL"                   => $dbeCustomer->getValue(DBECustomer::websiteURL),
+                            "reviewDate"                   => $dbeCustomer->getValue(DBECustomer::reviewDate),
+                            "reviewTime"                   => $dbeCustomer->getValue(DBECustomer::reviewTime),
+                            "dateMeetingConfirmed"         => $dbeCustomer->getValue(DBECustomer::dateMeetingConfirmed),
+                            "invoiceSiteNo"                => $dbeCustomer->getValue(DBECustomer::invoiceSiteNo),
+                            "deliverSiteNo"                => $dbeCustomer->getValue(DBECustomer::deliverSiteNo),
+                            "lastUpdatedDateTime"          => $dbeCustomer->getValue(DBECustomer::lastUpdatedDateTime),
+                            "opportunityDeal"              => $dbeCustomer->getValue(DBECustomer::opportunityDeal),
+                            "reviewAction"                 => $dbeCustomer->getValue(DBECustomer::reviewAction),
+                            "lastContractSent"             => $dbeCustomer->getValue(DBECustomer::lastContractSent),
+                            "statementContactId"           => $dbeCustomer->getValue(DBECustomer::statementContactId),
+                            "inclusiveOOHCallOuts"         => $dbeCustomer->getValue(DBECustomer::inclusiveOOHCallOuts),
+                            "eligiblePatchManagement"      => $dbeCustomer->getValue(DBECustomer::eligiblePatchManagement ),
+                            "excludeFromWebrootChecks"     => $dbeCustomer->getValue(DBECustomer::excludeFromWebrootChecks),  
+                            "inviteSent"                   => $dbeCustomer->getValue(DBECustomer::inviteSent),  
+                            "reportProcessed"              => $dbeCustomer->getValue(DBECustomer::reportProcessed),  
+                            "reportSent"                   => $dbeCustomer->getValue(DBECustomer::reportSent),  
+                            "rating"                       => $dbeCustomer->getValue(DBECustomer::rating),  
+                            "meeting_datetime"             => $dbeCustomer->getValue(DBECustomer::meetingDateTime),  
+                        ]
+                    ]
+                );
+    }
+
+    function _getMainContacts($customerID)
+    {
+        if (!$customerID) {
+            http_response_code(400);
+            echo json_encode(["status" => "error", "description" => "Customer ID Not provided"]);
+            exit;
+        }
+        echo json_encode(["status" => "ok", "data" => $this->getMainContacts($customerID)]);
+    }
+
+    function getLeadStatuses()
+    {
+        $dbeLeadStatus = new DBECustomerLeadStatus($this);
+        $dbeLeadStatus->getRows(DBECustomerLeadStatus::sortOrder);
+        echo json_encode(["status" => "ok", "data" => $dbeLeadStatus->fetchArray()]);
+    }
+
+    function updateCustomer()
+    {
+        $json        = file_get_contents('php://input');
+                $data        = json_decode($json, true);
+                $dbeCustomer = new DBECustomer($this);
+                $dbeCustomer->getRow($data['customerID']);
+                if (empty($data['lastUpdatedDateTime']) || $data['lastUpdatedDateTime'] < $dbeCustomer->getValue(
+                        DBECustomer::lastUpdatedDateTime
+                    )) {
+                    throw new JsonHttpException(
+                        400, "Updated by another user", [
+                               "errorCode"           => 1002,
+                               "lastUpdatedDateTime" => $dbeCustomer->getValue(DBECustomer::lastUpdatedDateTime)
+                           ]
+                    );
+                }
+                foreach ($data as $key => $value) {
+                    $dbeCustomer->setValue($key, $value);
+                }
+                $dbeCustomer->updateRow();
+                return $this->success(["lastUpdatedDateTime" => $dbeCustomer->getValue(DBECustomer::lastUpdatedDateTime)]);                
+    }
+
+    function updateSite($data)
+    {
+                $dbeSite = new DBESite($this);
+                if (!isset($data['customerID'])) {
+                    throw new JsonHttpException(400, "Customer ID is mandatory");
+                }
+                if (!isset($data['siteNo'])) {
+                    throw new JsonHttpException(400, "siteNo is mandatory");
+                }
+                $dbeSite->setValue(DBESite::customerID, $data['customerID']);
+                $dbeSite->setValue(DBESite::siteNo, $data['siteNo']);
+                $dbeSite->getRow($data['siteNo']);
+                //$dbeSite->getRowByCustomerIDSiteNo();
+                /*if (empty($data['lastUpdatedDateTime']) || $data['lastUpdatedDateTime'] < $dbeSite->getValue(
+                        DBESite::lastUpdatedDateTime
+                    )) {
+                    throw new \CNCLTD\Exceptions\JsonHttpException(
+                        400, "Updated by another user", [
+                               "errorCode"           => 1002,
+                               "lastUpdatedDateTime" => $dbeSite->getValue(DBESite::lastUpdatedDateTime)
+                           ]
+                    );
+                }*/
+                if(isset($data['fieldValueMap'])) {
+                    if (isset($data['fieldValueMap']['active']) && $data['siteNo'] == 0) {
+                        throw new JsonHttpException(400, "Cannot deactivate Site 0");
+                    }
+                    $dbeSite = SiteMapper::fromDTOToDB($data['fieldValueMap'], $dbeSite);
+                }
+                $dbeSite->setValue(DBESite::add1, $data['add1']);
+                $dbeSite->setValue(DBESite::add2, $data['add2']);
+                $dbeSite->setValue(DBESite::add3, $data['add3']);
+                $dbeSite->setValue(DBESite::town, $data['town']);
+                $dbeSite->setValue(DBESite::postcode, $data['postcode']);
+                $dbeSite->setValue(DBESite::phone, $data['phone']);
+                $dbeSite->setValue(DBESite::county, $data['county']);
+                $dbeSite->setValue(DBESite::what3Words, $data['what3Words']);
+                $dbeSite->setValue(DBESite::maxTravelHours, $data['maxTravelHours']);
+                $dbeSite->setValue(DBESite::activeFlag, $data['activeFlag']);
+                $dbeSite->updateRow();
+                echo json_encode(
+                    [
+                        "status"              => "ok",
+                        "lastUpdatedDateTime" => $dbeSite->getValue(DBECustomer::lastUpdatedDateTime)
+                    ]
+                );
+    }
+
+    function deletePortalDocument($data)
+    {
+                if (!isset($data['portalDocumentId'])) {
+                    throw new JsonHttpException(400, "portal document Id is required");
+                }
+                $dbePortalCustomerDocumentWithoutFile = new DBEPortalCustomerDocumentWithoutFile($this);
+                $dbePortalCustomerDocumentWithoutFile->deleteRow($data['portalDocumentId']);
+                echo json_encode(["status" => "ok"]);
+    }
+
+    function addPortalCustomerDocument($data)
+    {
+        if (!isset($data['customerId'])) {
+            throw new JsonHttpException(400, "customerId is required");
+        }
+        if (!isset($data['description'])) {
+            throw new JsonHttpException(400, "description is required");
+        }
+        if (!isset($data['fileName'])) {
+            throw new JsonHttpException(400, "fileName is required");
+        }
+        if (!isset($data['encodedFile'])) {
+            throw new JsonHttpException(400, "encodedFile is required");
+        }
+        if (!isset($data['customerContract'])) {
+            throw new JsonHttpException(400, "customerContract is required");
+        }
+        if (!isset($data['mainContractOnly'])) {
+            throw new JsonHttpException(400, "mainContractOnly is required");
+        }
+        $fileAndMimeType           = $this->getFileDecodedAndMimeTypeFromBase64EncodedFile(
+            $data['encodedFile']
+        );
+        $dbePortalCustomerDocument = new DBEPortalCustomerDocument($this);
+        $dbePortalCustomerDocument->setValue(DBEPortalCustomerDocument::customerID, $data['customerId']);
+        $dbePortalCustomerDocument->setValue(DBEPortalCustomerDocument::description, $data['description']);
+        $dbePortalCustomerDocument->setValue(DBEPortalCustomerDocument::file, $fileAndMimeType->file);
+        $dbePortalCustomerDocument->setValue(
+            DBEPortalCustomerDocument::fileMimeType,
+            $fileAndMimeType->mimeType
+        );
+        $dbePortalCustomerDocument->setValue(DBEPortalCustomerDocument::filename, $data['fileName']);
+        $dbePortalCustomerDocument->setValue(
+            DBEPortalCustomerDocument::customerContract,
+            $data['customerContract']
+        );
+        $dbePortalCustomerDocument->setValue(
+            DBEPortalCustomerDocument::mainContactOnlyFlag,
+            $data['mainContractOnly'] ? 'Y' : 'N'
+        );
+        $dbePortalCustomerDocument->insertRow();
+        $document = [
+            'id'                  => $dbePortalCustomerDocument->getValue(
+                DBEPortalCustomerDocument::portalCustomerDocumentID
+            ),
+            'description'         => $dbePortalCustomerDocument->getValue(
+                DBEPortalCustomerDocumentWithoutFile::description
+            ),
+            'filename'            => $dbePortalCustomerDocument->getValue(
+                DBEPortalCustomerDocumentWithoutFile::filename
+            ),
+            'customerContract'    => $dbePortalCustomerDocument->getValue(
+                DBEPortalCustomerDocumentWithoutFile::customerContract
+            ),
+            'mainContactOnlyFlag' => $dbePortalCustomerDocument->getValue(
+                    DBEPortalCustomerDocument::mainContactOnlyFlag
+                ) === 'Y',
+        ];
+        echo json_encode(["status" => "ok", "data" => $document]);
+    }
+
+    function getSectors()
+    {
+        $dbeSector = new DBESector($this);
+                $dbeSector->getRows(DBESector::description);
+                echo json_encode(["status" => "ok", "data" => $dbeSector->fetchArray()]);
+    }
+
+    function getCustomerTypes()
+    {
+        $dbeCustomerTypes = new DBECustomerType($this);
+        $dbeCustomerTypes->getRows(DBECustomerType::description);
+        echo json_encode(["status" => "ok", "data" => $dbeCustomerTypes->fetchArray()]);
+    }
+
+    function getAccountManagers()
+    {
+        $dbeUser = new DBEUser($this);
+        $dbeUser->getRows();
+        echo json_encode(["status" => "ok", "data" => $dbeUser->fetchArray()]);
+    }
+
+    function _saveContactPassword()
+    {
+        $response = [];
+        try {
+            $this->saveContactPassword();
+            $response["status"] = "ok";
+        } catch (Exception $exception) {
+            http_response_code(400);
+            $response["status"] = "error";
+            $response["error"]  = $exception->getMessage();
+        }
+        echo json_encode($response);
+    }
+
+    function archiveContact()
+    {
+        $response = [];
+        try {
+            $this->clearContact();
+            $response["status"] = "ok";
+        } catch (Exception $exception) {
+            http_response_code(400);
+            $response["status"] = "error";
+            $response["error"]  = $exception->getMessage();
+        }
+        echo json_encode($response);
+    }
+
+    function _getCustomerReviewContacts()
+    {
+        $response = [];
+                try {
+                    $response['data']   = $this->getCustomerReviewContacts();
+                    $response["status"] = "ok";
+                } catch (Exception $exception) {
+                    http_response_code(400);
+                    $response["status"] = "error";
+                    $response["error"]  = $exception->getMessage();
+                }
+                echo json_encode($response);
+    }
+
+    function decrypt()
+    {
+        $response = ["status" => "ok"];
+        try {
+            $response['decryptedData'] = Encryption::decrypt(
+                CUSTOMERS_ENCRYPTION_PRIVATE_KEY,
+                @$this->getParam('passphrase'),
+                @$this->getParam('encryptedData')
+            );
+        } catch (Exception $exception) {
+            $response['status'] = "error";
+            $response['error']  = $exception->getMessage();
+            http_response_code(400);
+        }
+        echo json_encode($response);
+    }
+
+    function removeSupportAndRefer($customerID)
+    {
+        $response   = ['status' => 'ok'];
+                try {
+                    $this->removeSupportForAllUsersAndReferCustomer($customerID);
+                } catch (Exception $exception) {
+                    $response['status'] = "error";
+                    $response['error']  = $exception->getMessage();
+                    http_response_code(400);
+                }
+                echo json_encode($response);
+    }
+
+    function searchName()
+    {
+        $itemsPerPage = 20;
+        $page         = 1;
+        $term         = '';
+        if (isset($_REQUEST['term'])) {
+            $term = $_REQUEST['term'];
+        }
+        if (isset($_REQUEST['itemsPerPage'])) {
+            $itemsPerPage = $_REQUEST['itemsPerPage'];
+        }
+        if (isset($_REQUEST['page'])) {
+            $page = $_REQUEST['page'];
+        }
+        $dsResult   = new DataSet($this);
+        $buCustomer = new BUCustomer($this);
+        $buCustomer->getActiveCustomers($dsResult);
+        $customers = [];
+        $buCustomer->getCustomersByNameMatch($dsResult, null, null, $term);
+        while ($dsResult->fetchNext()) {
+            $customers[] = [
+                "id"             => $dsResult->getValue(DBECustomer::customerID),
+                "name"           => $dsResult->getValue(DBECustomer::name),
+                "streamOneEmail" => $dsResult->getValue(DBECustomer::streamOneEmail),
+            ];
+        }
+        echo json_encode($customers);
+    }
+
+    function addSite($data)
+    {
+                if (!isset($data['customerID'])) {
+                    throw new JsonHttpException(400, 'customerID is required');
+                }
+                if (!isset($data['add1'])) {
+                    throw new JsonHttpException(400, 'addressLine is required');
+                }
+                if (!isset($data['town'])) {
+                    throw new JsonHttpException(400, 'town is required');
+                }
+                if (!isset($data['postcode'])) {
+                    throw new JsonHttpException(400, 'postcode is required');
+                }
+                if (!isset($data['phone'])) {
+                    throw new JsonHttpException(400, 'phone is required');
+                }
+                if (!isset($data['maxTravelHours'])) {
+                    throw new JsonHttpException(400, 'maxTravelHours is required');
+                }
+                $dbeSite = new DBESite($this);
+                $dbeSite->setValue(DBESite::customerID, $data['customerID']);
+                $dbeSite->setValue(DBESite::add1, $data['add1']);
+                $dbeSite->setValue(DBESite::add2, $data['add2']);
+                $dbeSite->setValue(DBESite::add3, $data['add3']);
+                $dbeSite->setValue(DBESite::town, $data['town']);
+                $dbeSite->setValue(DBESite::postcode, $data['postcode']);
+                $dbeSite->setValue(DBESite::phone, $data['phone']);
+                $dbeSite->setValue(DBESite::county, $data['county']);
+                $dbeSite->setValue(DBESite::what3Words, $data['what3Words']);
+                $dbeSite->setValue(DBESite::maxTravelHours, $data['maxTravelHours']);
+                $dbeSite->setValue(DBESite::activeFlag, 'Y');
+                $dbeSite->insertRow();
+                $site = [
+                    "customerID"     => $dbeSite->getValue(DBESite::customerID),
+                    "siteNo"         => $dbeSite->getValue(DBESite::siteNo),
+                    "address1"       => $dbeSite->getValue(DBESite::add1),
+                    "address2"       => $dbeSite->getValue(DBESite::add2),
+                    "address3"       => $dbeSite->getValue(DBESite::add3),
+                    "town"           => $dbeSite->getValue(DBESite::town),
+                    "county"         => $dbeSite->getValue(DBESite::county),
+                    "postcode"       => $dbeSite->getValue(DBESite::postcode),
+                    "invoiceContact" => $dbeSite->getValue(DBESite::invoiceContactID),
+                    "deliverContact" => $dbeSite->getValue(DBESite::deliverContactID),
+                    "debtorCode"     => $dbeSite->getValue(DBESite::debtorCode),
+                    "sageRef"        => $dbeSite->getValue(DBESite::sageRef),
+                    "phone"          => $dbeSite->getValue(DBESite::phone),
+                    "maxTravelHours" => $dbeSite->getValue(DBESite::maxTravelHours),
+                    "active"         => $dbeSite->getValue(DBESite::activeFlag) == 'Y',
+                    "nonUKFlag"      => $dbeSite->getValue(DBESite::nonUKFlag) == 'Y',
+                    "what3Words"     => $dbeSite->getValue(DBESite::what3Words),
+                    "canDelete"      => true
+                ];
+                echo json_encode(["status" => "ok", "data" => $site]);
+                
+    }
+
+
+    function addContact($data)
+    {
+        $dbeContact = new DBEContact($this);
+        if (!isset($data['customerID'])) {
+            throw new JsonHttpException(400, "Customer ID is mandatory");
+        }
+        $dbeContact->setValue(DBEContact::siteNo, $data['siteNo']);   
+        $dbeContact->setValue(DBEContact::customerID, $data['customerID']);   
+       // $dbeContact->setValue(DBEContact::supplierID, $data['supplierID']);   
+        $dbeContact->setValue(DBEContact::title, $data['title']);   
+        $dbeContact->setValue(DBEContact::position, $data['position']);   
+        $dbeContact->setValue(DBEContact::firstName, $data['firstName']);   
+        $dbeContact->setValue(DBEContact::lastName, $data['lastName']);   
+        $dbeContact->setValue(DBEContact::email, $data['email']);   
+        $dbeContact->setValue(DBEContact::phone, $data['phone']);   
+        $dbeContact->setValue(DBEContact::mobilePhone, $data['mobilePhone']);   
+        $dbeContact->setValue(DBEContact::fax, $data['fax']);   
+        //$dbeContact->setValue(DBEContact::portalPassword, $data['portalPassword']);   
+        $dbeContact->setValue(DBEContact::mailshot, $data['mailshot']);   
+        $dbeContact->setValue(DBEContact::mailshot2Flag, $data['mailshot2Flag']);   
+        $dbeContact->setValue(DBEContact::mailshot3Flag, $data['mailshot3Flag']);   
+        $dbeContact->setValue(DBEContact::mailshot8Flag, $data['mailshot8Flag']);   
+        $dbeContact->setValue(DBEContact::mailshot9Flag, $data['mailshot9Flag']);   
+        $dbeContact->setValue(DBEContact::mailshot11Flag, $data['mailshot11Flag']);   
+        $dbeContact->setValue(DBEContact::notes, $data['notes']);   
+        $dbeContact->setValue(DBEContact::failedLoginCount, $data['failedLoginCount']);   
+        $dbeContact->setValue(DBEContact::reviewUser, $data['reviewUser']);   
+        $dbeContact->setValue(DBEContact::hrUser, $data['hrUser']);   
+        $dbeContact->setValue(DBEContact::supportLevel, $data['supportLevel']);   
+        $dbeContact->setValue(DBEContact::initialLoggingEmail, $data['initialLoggingEmail']);   
+        $dbeContact->setValue(DBEContact::othersInitialLoggingEmailFlag, $data['othersInitialLoggingEmailFlag']);   
+        $dbeContact->setValue(DBEContact::othersWorkUpdatesEmailFlag, $data['othersWorkUpdatesEmailFlag']);   
+        $dbeContact->setValue(DBEContact::othersFixedEmailFlag, $data['othersFixedEmailFlag']);   
+        $dbeContact->setValue(DBEContact::pendingLeaverFlag, $data['pendingLeaverFlag']);   
+        $dbeContact->setValue(DBEContact::pendingLeaverDate, $data['pendingLeaverDate']);   
+        $dbeContact->setValue(DBEContact::specialAttentionContactFlag, $data['specialAttentionContactFlag']);   
+        $dbeContact->setValue(DBEContact::linkedInURL, $data['linkedInURL']);   
+        $dbeContact->setValue(DBEContact::active, $data['active']);   
+        $dbeContact->insertRow();
+        echo json_encode(
+            [
+                "status" => "ok",
+            ]
+        );
+    }
+
+    function updateContact($data)
+    {
+        $dbeContact = new DBEContact($this);
+        if (!isset($data['customerID'])) {
+            throw new JsonHttpException(400, "Customer ID is mandatory");
+        }
+        if (!isset($data['id'])) {
+            throw new JsonHttpException(400, "Contact ID is mandatory");
+        }
+        $dbeContact->getRow($data['id']);
+        $dbeContact->setValue(DBEContact::siteNo, $data['siteNo']);   
+        $dbeContact->setValue(DBEContact::customerID, $data['customerID']);   
+       // $dbeContact->setValue(DBEContact::supplierID, $data['supplierID']);   
+        $dbeContact->setValue(DBEContact::title, $data['title']);   
+        $dbeContact->setValue(DBEContact::position, $data['position']);   
+        $dbeContact->setValue(DBEContact::firstName, $data['firstName']);   
+        $dbeContact->setValue(DBEContact::lastName, $data['lastName']);   
+        $dbeContact->setValue(DBEContact::email, $data['email']);   
+        $dbeContact->setValue(DBEContact::phone, $data['phone']);   
+        $dbeContact->setValue(DBEContact::mobilePhone, $data['mobilePhone']);   
+        $dbeContact->setValue(DBEContact::fax, $data['fax']);   
+        //$dbeContact->setValue(DBEContact::portalPassword, $data['portalPassword']);   
+        $dbeContact->setValue(DBEContact::mailshot, $data['mailshot']);   
+        $dbeContact->setValue(DBEContact::mailshot2Flag, $data['mailshot2Flag']);   
+        $dbeContact->setValue(DBEContact::mailshot3Flag, $data['mailshot3Flag']);   
+        $dbeContact->setValue(DBEContact::mailshot8Flag, $data['mailshot8Flag']);   
+        $dbeContact->setValue(DBEContact::mailshot9Flag, $data['mailshot9Flag']);   
+        $dbeContact->setValue(DBEContact::mailshot11Flag, $data['mailshot11Flag']);   
+        $dbeContact->setValue(DBEContact::notes, $data['notes']);   
+        $dbeContact->setValue(DBEContact::failedLoginCount, $data['failedLoginCount']);   
+        $dbeContact->setValue(DBEContact::reviewUser, $data['reviewUser']);   
+        $dbeContact->setValue(DBEContact::hrUser, $data['hrUser']);   
+        $dbeContact->setValue(DBEContact::supportLevel, $data['supportLevel']);   
+        $dbeContact->setValue(DBEContact::initialLoggingEmail, $data['initialLoggingEmail']);   
+        $dbeContact->setValue(DBEContact::othersInitialLoggingEmailFlag, $data['othersInitialLoggingEmailFlag']);   
+        $dbeContact->setValue(DBEContact::othersWorkUpdatesEmailFlag, $data['othersWorkUpdatesEmailFlag']);   
+        $dbeContact->setValue(DBEContact::othersFixedEmailFlag, $data['othersFixedEmailFlag']);   
+        $dbeContact->setValue(DBEContact::pendingLeaverFlag, $data['pendingLeaverFlag']);   
+        $dbeContact->setValue(DBEContact::pendingLeaverDate, $data['pendingLeaverDate']);   
+        $dbeContact->setValue(DBEContact::specialAttentionContactFlag, $data['specialAttentionContactFlag']);   
+        $dbeContact->setValue(DBEContact::linkedInURL, $data['linkedInURL']);   
+        $dbeContact->setValue(DBEContact::active, $data['active']);   
+        $dbeContact->updateRow();
+        echo json_encode(
+            [
+                "status" => "ok",
+            ]
+        );
+    }
+    function getCustomeLetters(){
+        /*
+        Get the list of custom letter template file names from the custom letter directory
+        */
+        $dir                   = LETTER_TEMPLATE_DIR . "/custom/";
+        $customLetterTemplates = [];
+        if (is_dir($dir)) {
+
+            $dh = opendir($dir);
+            while (false !== ($filename = readdir($dh))) {
+
+                $ext = explode(
+                    '.',
+                    $filename
+                );
+                $ext = $ext[count($ext) - 1];
+                if ($ext == 'htm') {
+                    $customLetterTemplates[] = $filename;
+                }
+            }
+        }
+        return $this->success( $customLetterTemplates);
+    }
+    /*
+    update customer CRM Info
+    */
+    function updateCRM(){
+        $body=$this->getBody();
+        $dbeCustomer=new DBECustomer($this);
+        $dbeCustomer->getRow($body->customerID);
+        if(!$dbeCustomer->rowCount())
+            return $this->fail(APIException::notFound,"Customer Not Found");
+        $dbeCustomer->setValue(DBECustomer::leadStatusId,$body->leadStatusId);
+        $dbeCustomer->setValue(DBECustomer::mailshotFlag,$body->mailshotFlag);
+        $dbeCustomer->setValue(DBECustomer::dateMeetingConfirmed,$body->dateMeetingConfirmed);
+        $dbeCustomer->setValue(DBECustomer::meetingDateTime,$body->meeting_datetime);
+        $dbeCustomer->setValue(DBECustomer::inviteSent,$body->inviteSent);
+        $dbeCustomer->setValue(DBECustomer::reportProcessed,$body->reportProcessed);
+        $dbeCustomer->setValue(DBECustomer::reportSent,$body->reportSent);
+        $dbeCustomer->setValue(DBECustomer::rating,$body->rating);
+        $dbeCustomer->setValue(DBECustomer::opportunityDeal,$body->opportunityDeal);
+        $dbeCustomer->updateRow();
+        return $this->success( );
     }
 }

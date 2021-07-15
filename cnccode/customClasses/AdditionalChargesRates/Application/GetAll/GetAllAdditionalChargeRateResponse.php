@@ -5,9 +5,10 @@ namespace CNCLTD\AdditionalChargesRates\Application\GetAll;
 use CNCLTD\AdditionalChargesRates\Application\GetOne\SpecificCustomerPriceResponse;
 use CNCLTD\AdditionalChargesRates\Domain\AdditionalChargeRate;
 use CNCLTD\AdditionalChargesRates\Domain\SpecificCustomerPrice;
+use JsonSerializable;
 use function Lambdish\Phunctional\map;
 
-class GetAllAdditionalChargeRateResponse implements \JsonSerializable
+class GetAllAdditionalChargeRateResponse implements JsonSerializable
 {
     /**
      * @var string

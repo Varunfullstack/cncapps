@@ -1,7 +1,9 @@
 <?php
 
 namespace CNCLTD\Exceptions;
-class EmptyStringException extends \Exception
+use Exception;
+
+class EmptyStringException extends Exception
 {
 
     /**

@@ -28,8 +28,6 @@ abstract class OrderItems
     const HOURLY_OOH_LABOUR_CHARGE = 16865;
 }
 
-;
-
 class CTProjects extends CTCNC
 {
     const DOWNLOAD_PROJECT_PLAN                        = "downloadProjectPlan";

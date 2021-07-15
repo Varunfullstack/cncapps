@@ -5,8 +5,9 @@ namespace CNCLTD\DUOApi\AuthLog;
 use Karriere\JsonDecoder\Bindings\AliasBinding;
 use Karriere\JsonDecoder\Bindings\FieldBinding;
 use Karriere\JsonDecoder\ClassBindings;
+use Karriere\JsonDecoder\Transformer;
 
-class AuthLogTransformer implements \Karriere\JsonDecoder\Transformer
+class AuthLogTransformer implements Transformer
 {
 
     /**

@@ -4,7 +4,9 @@
 namespace CNCLTD\Exceptions;
 
 
-class JsonHttpException extends \Exception
+use Exception;
+
+class JsonHttpException extends Exception
 {
     private $responseCode;
 

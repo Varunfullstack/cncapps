@@ -1,7 +1,9 @@
 <?php
 
 namespace CNCLTD\Exceptions;
-class InvalidIdException extends \Exception
+use Exception;
+
+class InvalidIdException extends Exception
 {
 
     /**

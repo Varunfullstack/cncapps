@@ -179,7 +179,7 @@ class BUPurchaseInv extends Business
                     $dsPurchaseInv->setValue(self::purchaseInvoiceSerialNo, '');
                     $dsPurchaseInv->setValue(self::purchaseInvoiceRequireSerialNo, TRUE); // Prompt for SN and warranty
                     $dsPurchaseInv->setValue(self::purchaseInvoiceRenew, FALSE);
-                    $dsPurchaseInv->setValue(self::purchaseInvoiceWarrantyID, $dbeItem->getValue(DBEItem::warrantyID));;
+                    $dsPurchaseInv->setValue(self::purchaseInvoiceWarrantyID, $dbeItem->getValue(DBEItem::warrantyID));
                     $dsPurchaseInv->post();
                 }
             } else { // no serial no and warranty so lump all together on one line

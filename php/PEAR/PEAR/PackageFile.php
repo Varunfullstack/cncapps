@@ -207,7 +207,7 @@ class PEAR_PackageFile
                 return $pf;
             }
 
-            if (!$pf->validate($state)) {;
+            if (!$pf->validate($state)) {
                 if ($this->_config->get('verbose') > 0
                     && $this->_logger && $pf->getValidationWarnings(false)
                 ) {

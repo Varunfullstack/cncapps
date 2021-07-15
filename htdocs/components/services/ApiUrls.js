@@ -48,4 +48,7 @@ export default class ApiUrls {
     static PaymentTerms="/PaymentTerms.php?action=";
     static ItemBillingCategory="/ItemBillingCategory.php?action=";
     static ReviewList="/ReviewList.php?action=";
+    static PortalCustomerDocument="/PortalCustomerDocument.php?action=";
+    static CustomerNote="/CustomerNote.php?action=";
+
 }

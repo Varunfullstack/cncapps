@@ -1,7 +1,9 @@
 <?php
 
 namespace CNCLTD\AdditionalChargesRates\Application\GetOne;
-class SpecificCustomerPriceResponse implements \JsonSerializable
+use JsonSerializable;
+
+class SpecificCustomerPriceResponse implements JsonSerializable
 {
     private $customerId;
     private $salePrice;

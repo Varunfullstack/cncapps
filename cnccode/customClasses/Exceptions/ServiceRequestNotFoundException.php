@@ -1,7 +1,9 @@
 <?php
 
 namespace CNCLTD\Exceptions;
-class ServiceRequestNotFoundException extends \Exception
+use Exception;
+
+class ServiceRequestNotFoundException extends Exception
 {
 
     /**

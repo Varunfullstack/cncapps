@@ -1621,5 +1621,6 @@ class metabase_manager_class
             return(1);
         }
     }
-};
+}
+
 ?>

@@ -374,7 +374,7 @@ class CTDespatch extends CTCNC
             $_REQUEST[$key] = trim($value);
         }
         if (($this->getParam('ordheadID') != '') and (!is_numeric($this->getParam('ordheadID')))) {
-            $this->setFormErrorMessage('Order no must be numeric');;
+            $this->setFormErrorMessage('Order no must be numeric');
         }
         if ($this->getFormError() == 0) {
             $buDespatch = new BUDespatch($this);

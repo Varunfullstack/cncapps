@@ -6,6 +6,7 @@
  */
 global $cfg;
 
+use CNCLTD\Email\AttachmentCollection;
 use CNCLTD\TwigDTOs\DirectDebitInvoiceDTO;
 use CNCLTD\TwigDTOs\SalesInvoiceEmailDTO;
 
@@ -1191,7 +1192,7 @@ class BUInvoice extends Business
                 $dateToUse
             );
             $fileName                 = "{$invoiceWithAllDirectDebitServicesPerCustomer->getValue(DBEInvhead::invheadID)}.pdf";
-            $attachments              = new \CNCLTD\Email\AttachmentCollection();
+            $attachments              = new AttachmentCollection();
             $attachments->add(
                 $generatedInvoiceFilePath,
                 'Application/pdf',
@@ -1542,7 +1543,7 @@ class BUInvoice extends Business
         $buMail = new BUMail($this);
         $this->buSageExport->generateSageSalesDataByInvoiceNumbers($invoiceNumbers);
         $subject     = 'Sage Import Files';
-        $attachments = new \CNCLTD\Email\AttachmentCollection();
+        $attachments = new AttachmentCollection();
         $fileName    = SAGE_EXPORT_DIR . '/sales.csv';
         $attachments->add(
             $fileName,

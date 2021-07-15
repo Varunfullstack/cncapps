@@ -21,7 +21,7 @@ class BUCustomerReviewMeetingDocuments extends Business
      * BUCustomerReviewMeetingDocuments constructor.
      * @param CTCustomerReviewMeetingDocuments $param
      */
-    public function __construct(\CTCustomerReviewMeetingDocuments $param)
+    public function __construct(CTCustomerReviewMeetingDocuments $param)
     {
         parent::__construct($owner);
     }

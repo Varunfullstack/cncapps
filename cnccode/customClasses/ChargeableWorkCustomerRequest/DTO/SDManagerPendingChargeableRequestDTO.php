@@ -1,7 +1,9 @@
 <?php
 
 namespace CNCLTD\ChargeableWorkCustomerRequest\DTO;
-class SDManagerPendingChargeableRequestDTO implements \JsonSerializable
+use JsonSerializable;
+
+class SDManagerPendingChargeableRequestDTO implements JsonSerializable
 {
     private $id;
     private $serviceRequestId;

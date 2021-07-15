@@ -614,7 +614,7 @@ class PEAR_Downloader_Package
 
         $options = $this->_downloader->getOptions();
         if (isset($dep['uri'])) {
-            return array('uri' => $dep['uri'], 'dep' => $dep);;
+            return array('uri' => $dep['uri'], 'dep' => $dep);
         }
 
         $testdep = $dep;

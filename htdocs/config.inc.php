@@ -454,6 +454,7 @@ if (isset($_SERVER['HTTP_HOST'])) {                // not set for command line c
             break;
         case 'cncdesign.cnc-ltd.co.uk':
             $server_type = MAIN_CONFIG_SERVER_TYPE_DESIGN;
+            break;
         case 'cncdev2.cnc-ltd.co.uk':
             $server_type = MAIN_CONFIG_SERVER_TYPE_DEV2;
     }
@@ -472,6 +473,7 @@ define(
     "DB_HOST",
     "localhost"
 );
+
 switch ($server_type) {
 
     case MAIN_CONFIG_SERVER_TYPE_DEVELOPMENT:

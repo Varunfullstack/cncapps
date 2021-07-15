@@ -103,4 +103,7 @@ export default class APIProjects extends APIMain {
     getProjectsWithoutClousureMeeting(consID = '') {
         return this.get(`${ApiUrls.Projects}projectsWithoutClousureMeeting&consID=${consID}`);
     }
+    deleteProject(projectId){
+        return this.delete('Project.php?action=delete&projectID=' + projectId,true);
+    }
 }

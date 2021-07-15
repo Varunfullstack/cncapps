@@ -455,7 +455,7 @@ class MDB_Manager extends PEAR
                         break;
                 }
             }
-        };
+        }
         if(!MDB::isError($result) && isset($table['INDEXES']) && is_array($table['INDEXES'])) {
             if(!$this->database->support('Indexes')) {
                 return($this->raiseError(MDB_ERROR_UNSUPPORTED, NULL, NULL,
@@ -1449,11 +1449,11 @@ class MDB_Manager extends PEAR
         $result = $parser->setInputFile($input_file);
         if(MDB::isError($result)) {
             return($result);
-        };
+        }
         $result = $parser->parse();
         if(MDB::isError($result)) {
             return($result);
-        };
+        }
         if(MDB::isError($parser->error)) {
             return($parser->error);
         }

@@ -6,7 +6,11 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
-global $cfg;
+global
+
+use CNCLTD\QuestionnaireReportGenerator;
+
+$cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BUQuestionnaire.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
@@ -124,7 +128,7 @@ class CTQuestionnaire extends CTCNC
                 throw new UnexpectedValueException('End date must be in YYYY-MM-DD format');
             }
         }
-        $questionnaireReportGenerator = new \CNCLTD\QuestionnaireReportGenerator(
+        $questionnaireReportGenerator = new QuestionnaireReportGenerator(
             $this->getParam(self::QUESTIONNAIRE_ID),
             $startDate,
             $endDate

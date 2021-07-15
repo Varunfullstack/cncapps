@@ -9,6 +9,10 @@
 use CNCLTD\Business\BUActivity;
 use CNCLTD\LoggerCLI;
 use CNCLTD\SolarwindsAccountItem;
+use CNCLTD\SolarwindsBackupAPI;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
 
 require_once(__DIR__ . "/../htdocs/config.inc.php");
 global $cfg;
@@ -34,7 +38,7 @@ $buHeader  = new BUHeader($thing);
 $dsHeader  = new DataSet($thing);
 $buHeader->getHeader($dsHeader);
 // we are going to see if we can log in
-$solarwindsAPI        = new \CNCLTD\SolarwindsBackupAPI(
+$solarwindsAPI        = new SolarwindsBackupAPI(
     $dsHeader->getValue(DBEHeader::solarwindsPartnerName),
     $dsHeader->getValue(DBEHeader::solarwindsUsername),
     $dsHeader->getValue(DBEHeader::solarwindsPassword)
@@ -76,7 +80,7 @@ function updateContract(SolarwindsAccountItem $accountInfo,
                 ) * 12 * $accountInfo->protectedUsers
             );
             $updateCustomerItem->updateRow();
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             createFailedToUpdateContractSR($accountInfo);
         }
     }
@@ -121,14 +125,14 @@ try {
         sendNoContractIdWarningEmail($missingContractItems);
     }
 
-} catch (\Exception $exception) {
+} catch (Exception $exception) {
     $logger->error('Failed to retrieve accounts info: ' . $exception->getMessage());
 }
 /**
  * @param SolarwindsAccountItem[] $accountItems
- * @throws \Twig\Error\LoaderError
- * @throws \Twig\Error\RuntimeError
- * @throws \Twig\Error\SyntaxError
+ * @throws LoaderError
+ * @throws RuntimeError
+ * @throws SyntaxError
  */
 function sendNoContractIdWarningEmail(array $accountItems)
 {

@@ -4,6 +4,9 @@ namespace CNCLTD\ServiceRequestInternalNote\UseCases;
 
 use CNCLTD\ServiceRequestInternalNote\ServiceRequestInternalNote;
 use CNCLTD\ServiceRequestInternalNote\ServiceRequestInternalNoteRepository;
+use DateTimeImmutable;
+use DBEProblem;
+use DBEUser;
 
 class AddServiceRequestInternalNote
 {
@@ -18,14 +21,14 @@ class AddServiceRequestInternalNote
         $this->internalNotePDORepository = $internalNotePDORepository;
     }
 
-    public function __invoke(\DBEProblem $serviceRequest, \DBEUser $currentUser, $content)
+    public function __invoke(DBEProblem $serviceRequest, DBEUser $currentUser, $content)
     {
-        $dateTime  = new \DateTimeImmutable();
-        $userId    = $currentUser->getValue(\DBEUser::userID);
+        $dateTime  = new DateTimeImmutable();
+        $userId    = $currentUser->getValue(DBEUser::userID);
         $newNoteId = $this->internalNotePDORepository->newIdentity();
         $newNote   = ServiceRequestInternalNote::create(
             $newNoteId,
-            $serviceRequest->getValue(\DBEProblem::problemID),
+            $serviceRequest->getValue(DBEProblem::problemID),
             $userId,
             $dateTime,
             $userId,
