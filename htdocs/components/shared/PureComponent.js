@@ -194,7 +194,6 @@ export default class PureComponent extends React.PureComponent {
     //-----------------end alert
     setValue = (property, value) => {
         const {data} = this.state;
-        console.log(property, value)
         data[property] = value;
         this.setState({data});
     }
@@ -266,15 +265,13 @@ export default class PureComponent extends React.PureComponent {
     getTableStyle() {
         return "table table-striped";
     }
-    
-    isFormValid=(id)=>{
-        const elements=$(`#${id} :input`);  
-        //console.log(elements);
-        for(let i=0;i<elements.length;i++)
-        {
-            if($(elements[i]).prop('required')&&elements[i].value=="")
+
+    isFormValid = (id) => {
+        const elements = $(`#${id} :input`);
+        for (let i = 0; i < elements.length; i++) {
+            if ($(elements[i]).prop('required') && elements[i].value == "")
                 return false;
         }
         return true;
-      }
+    }
 }

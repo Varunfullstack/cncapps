@@ -265,7 +265,6 @@ class ActivityEditComponent extends MainComponent {
             "completeDate",
             "Inbound"
         ]);
-        console.log(finalData);
         this.api
             .updateActivity(finalData)
             .then((response) => {

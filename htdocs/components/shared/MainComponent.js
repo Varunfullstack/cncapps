@@ -70,11 +70,13 @@ export default class MainComponent extends React.Component {
             "scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0"
         );
     }
+
     openTab(url) {
         window.open(
-            url,          
+            url,
         );
     }
+
     //----------------alert
     alert = (message, width = 500, title = "Alert", isHTML = false, autoClose = true) => {
         const {alert} = this.state;
@@ -241,21 +243,21 @@ export default class MainComponent extends React.Component {
         return variable == null || variable == '';
     }
 
-    getEditElement(obj, callBack, display = true,title=null) {
+    getEditElement(obj, callBack, display = true, title = null) {
         if (!display)
             return null;
-        return <ToolTip title={title||"Edit"}>
-         <i className="fal fa-2x fa-edit color-gray pointer"
-                  onClick={() => callBack(obj)}
-        ></i>
+        return <ToolTip title={title || "Edit"}>
+            <i className="fal fa-2x fa-edit color-gray pointer"
+               onClick={() => callBack(obj)}
+            ></i>
         </ToolTip>
     }
 
-    getSearchElement(callBack) {     
+    getSearchElement(callBack) {
         return <ToolTip title="Search" width={30}>
-        <i className="fal fa-2x fa-search color-gray pointer"
-                  onClick={() => callBack()}
-        ></i>
+            <i className="fal fa-2x fa-search color-gray pointer"
+               onClick={() => callBack()}
+            ></i>
         </ToolTip>
     }
 
@@ -278,15 +280,13 @@ export default class MainComponent extends React.Component {
     getTableStyle() {
         return "table table-striped";
     }
-    
-    isFormValid=(id)=>{
-        const elements=$(`#${id} :input`);  
-        //console.log(elements);
-        for(let i=0;i<elements.length;i++)
-        {
-            if($(elements[i]).prop('required')&&elements[i].value=="")
+
+    isFormValid = (id) => {
+        const elements = $(`#${id} :input`);
+        for (let i = 0; i < elements.length; i++) {
+            if ($(elements[i]).prop('required') && elements[i].value == "")
                 return false;
         }
         return true;
-      }
+    }
 }

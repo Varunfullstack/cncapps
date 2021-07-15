@@ -14,7 +14,6 @@ class ContactsComponent extends React.PureComponent {
     }
 
     onContactChanged = $event => {
-        console.log($event);
     };
 
     renderContacts() {

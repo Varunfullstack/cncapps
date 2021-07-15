@@ -32,7 +32,6 @@ class StarterLeaverManagementComponent extends MainComponent {
         </CustomerSearch>         
     }
     handleOnSelect=(customer)=>{
-        //console.log(customer);       
         this.setState({activCustomer:customer});
 
     }

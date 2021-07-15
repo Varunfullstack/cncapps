@@ -51,7 +51,6 @@ export default class OrderDetailsComponent extends MainComponent {
         (res) => {
           const lines= res.lines;
           lines.map((line,index)=>line.id=index+1);
-          //console.log("lines",lines);
           this.setState({ lines });
         },
         (error) => this.alert("Error in loading data")
@@ -192,8 +191,7 @@ export default class OrderDetailsComponent extends MainComponent {
       clearTimeout(this.tableTimeChange);
       this.tableTimeChange=setTimeout(()=>{
         const temp=lines.find(o=>o.id==item.id);
-        //console.log(temp);
-        temp[prop]=value;  
+        temp[prop]=value;
         this.setState(lines);
        },500)
      
@@ -225,8 +223,7 @@ export default class OrderDetailsComponent extends MainComponent {
       return;
     }   
     this.setState({lines});
-    //console.log('lines',lines);
-    
+
     this.api.receive(porheadID,lines).then(res=>{   
       window.location=`PurchaseOrder.php?action=display&porheadID=${porheadID}`;     
     }).catch(res=>{      

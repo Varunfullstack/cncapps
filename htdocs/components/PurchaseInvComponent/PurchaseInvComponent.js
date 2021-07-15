@@ -36,7 +36,6 @@ class PurchaseInvComponent extends MainComponent {
     const { porheadID, supplierID } = this.state.filter;
     this.api.getSearchResult().then(
       (res) => {
-        //console.log(res);
         this.setState({ orders: res.data });
       },
       (error) => this.alert("Error in loading data")

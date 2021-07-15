@@ -26,7 +26,7 @@ export default class DailyContactComponent extends MainComponent {
             Outbound: {
                 background: "rgb(69, 115, 195)",
                 border: "rgb(69, 115, 195)",
-            },            
+            },
         };
     }
 
@@ -56,7 +56,7 @@ export default class DailyContactComponent extends MainComponent {
                 borderColor: this.colors.Outbound.border,
                 borderWidth,
                 fill,
-            },            
+            },
         ];
     }
 
@@ -76,7 +76,6 @@ export default class DailyContactComponent extends MainComponent {
             filterData = this.getMonthlyData(data);
             dataLabels = this.getMonthlyLabels(data);
         }
-        console.log(filterData, dataLabels);
         return {filterData, dataLabels};
     };
 
@@ -103,7 +102,7 @@ export default class DailyContactComponent extends MainComponent {
                 borderColor: this.colors.Outbound.border,
                 borderWidth,
                 fill,
-            },            
+            },
         ];
     }
 
@@ -126,7 +125,7 @@ export default class DailyContactComponent extends MainComponent {
                 borderColor: this.colors.Outbound.border,
                 borderWidth,
                 fill,
-            },            
+            },
         ];
     }
 

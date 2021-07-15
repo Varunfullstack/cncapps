@@ -216,9 +216,7 @@ class SRSourceComponent extends React.Component {
     const { resultSummary } = this.state.search;
     if (resultSummary && resultSummary.length) {
       let tableWidth = 100 * resultSummary.length;
-      console.log(resultSummary);
       const total = resultSummary[resultSummary.length - 1][1];
-      console.log(total);
       return (
         <table
           key="summaryTable"

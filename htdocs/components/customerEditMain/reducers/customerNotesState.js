@@ -72,7 +72,6 @@ export default function (state = initialState, action) {
             } else {
                 newEditingNote = newByIds[newAllIds[nextIndex]];
             }
-            console.log(action.id, state.byIds, newByIds);
             return {
                 ...state,
                 allIds: newAllIds,
