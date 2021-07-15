@@ -80,7 +80,7 @@ class BUSector extends Business
         customer
       WHERE
         ( cus_sectorno IS NULL OR cus_sectorno = 0 )
-        AND ( cus_mailshot = 'Y' OR cus_referred = 'Y' OR cus_pcx = 'Y' )
+        AND ( cus_mailshot = 'Y' OR isReferred  OR cus_pcx = 'Y' )
       ORDER BY
         RAND()
       LIMIT 1,1

@@ -2739,7 +2739,7 @@ class CTCustomer extends CTCNC
                 concat(address.add_phone,' ') as add_phone,
                 supportLevel,
                 con_position,
-                cus_referred,
+                isReferred,
                 specialAttentionContactFlag = 'Y' as specialAttentionContact,
                 (
                 SELECT
@@ -2778,7 +2778,7 @@ class CTCustomer extends CTCNC
                 ) . "%' ";
             $query .= " ) ";
         }
-        $query .= " and active and cus_referred <> 'Y'
+        $query .= " and active and not isReferred
                     ORDER BY cus_name, con_last_name, con_first_name 
                     ";
         // echo $query;

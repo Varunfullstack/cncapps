@@ -235,9 +235,9 @@ class DBEJProblem extends DBEProblem
         );
         $this->addColumn(
             self::referredFlag,
-            DA_STRING,
+            DA_BOOLEAN,
             DA_ALLOW_NULL,
-            'customer.cus_referred'
+            'customer.isReferred'
         );
         $this->addColumn(
             self::alarmDateTime,

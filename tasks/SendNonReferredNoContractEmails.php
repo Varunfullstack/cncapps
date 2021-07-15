@@ -36,7 +36,7 @@ $db->query(
   customer.`cus_create_date` as creationDate 
 FROM
   customer 
-WHERE customer.`cus_referred` = 'N'
+WHERE not customer.isReferred
 AND
 (SELECT 
     COUNT(*) 

@@ -202,7 +202,7 @@ class CTItem extends CTCNC
 WHERE custitem.`cui_itemno` = ?
   AND renewalStatus <> 'D'
   AND declinedFlag <> 'Y'
-  AND customer.`cus_referred` <> 'Y'";
+  AND not customer.`isReferred` ";
                 $saleQuery = "UPDATE
   custitem
   LEFT JOIN customer
@@ -210,7 +210,7 @@ WHERE custitem.`cui_itemno` = ?
 WHERE custitem.`cui_itemno` = ?
   AND renewalStatus <> 'D'
   AND declinedFlag <> 'Y'
-  AND customer.`cus_referred` <> 'Y'";
+  AND not customer.`isReferred`";
                 $query     = $costQuery;
                 $item      = new DBEItem($this);
                 $item->getRow($itemId);

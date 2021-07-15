@@ -116,7 +116,7 @@ FROM
     AND address.add_custno = contact.`con_custno` 
   LEFT JOIN customer 
     ON contact.`con_custno` = customer.`cus_custno` 
-WHERE customer.`cus_referred` <> 'Y' 
+WHERE not customer.`isReferred` 
   AND (
     address.`add_phone` 
     OR contact.`con_phone` 
