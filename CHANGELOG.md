@@ -4,6 +4,7 @@ This project changes will be shown here.
 ## [unreleased]
 ### Changed
 - Issue 1366 - rewrite GoodsIn.php,QuoteTemplates.php, ContractAndNumbersReport.php,  PurchaseInv.php, PaymentTerms.php, ItemBillingCategory.php, update table default align 
+- Issue 1417 - Left align table headings.
 
 ## [v5.14.0] - 2021-07-13
 ### Changed
