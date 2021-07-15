@@ -44,7 +44,7 @@ class CTReviewList extends CTCNC
         }
     }
 
-        /**
+    /**
      * Export expenses that have not previously been exported
      * @access private
      * @throws Exception
@@ -66,8 +66,8 @@ class CTReviewList extends CTCNC
             true
         );
         $this->loadReactScript('ReviewListComponent.js');
-        $this->loadReactCSS('ReviewListComponent.css'); 
-        $this->parsePage();       
+        $this->loadReactCSS('ReviewListComponent.css');
+        $this->parsePage();
     }
 
     private function getData()
@@ -76,20 +76,16 @@ class CTReviewList extends CTCNC
         $limit  = @$_REQUEST["limit"] ?? 50;
         $page   = @$_REQUEST["page"] ?? 1;
         $offset = $limit * ($page - 1);
-
-        $orderColumns       = [
-            "customerName"  => "cus_name",
-            "reviewDate"    => "reviewDate",
-            "customerId"    => "cus_custno",
-            "contactEmail"  => "con_email",
+        $orderColumns = [
+            "customerName" => "cus_name",
+            "reviewDate"   => "reviewDate",
+            "customerId"   => "cus_custno",
+            "contactEmail" => "con_email",
         ];
-
         $orderBy  = $orderColumns[(@$_REQUEST["orderBy"] ?? "customerName")];
         $orderDir = @$_REQUEST["orderDir"] ?? 'asc';
         $q        = '%' . (@$_REQUEST["q"] ?? "") . '%';
-
-        $query =
-        "select cus_name                              as customerName,
+        $query = "select cus_name                              as customerName,
         reviewAction                                  as reviewAction,
         reviewDate,
         reviewTime,
@@ -123,15 +119,10 @@ class CTReviewList extends CTCNC
         and reviewDate <= CURDATE() 
         ORDER BY $orderBy $orderDir
         LIMIT $limit OFFSET $offset";
-
-        $data  = DBConnect::fetchAll($query, ['q' => $q]);
+        $data = DBConnect::fetchAll($query, ['q' => $q]);
         echo json_encode($this->success($data), JSON_NUMERIC_CHECK);
-
         // $offset = $_REQUEST['start'];
-        // $limit = $_REQUEST['length'];
-
-        /** @var dbSweetcode $db */
-        // global $db;
+        // $limit = $_REQUEST['length']; /** @var dbSweetcode $db */ // global $db;
         // $countResult = $db->query($baseQuery);
         // $totalCount = $countResult->num_rows;
         // $filteredCount = $totalCount;
@@ -174,12 +165,8 @@ class CTReviewList extends CTCNC
     {
 
         $this->setMethodName('displayReviewList');
-
         $this->setTemplateFiles('CustomerReviewList', 'CustomerReviewList.inc');
-
-
         $this->template->parse('CONTENTS', 'CustomerReviewList', true);
-
         $this->parsePage();
     }
 }
