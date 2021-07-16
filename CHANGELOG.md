@@ -1,6 +1,11 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.14.1] - 2021-07-16
+### Fixed
+- Fixed issue with Starter Leaver management losing all the options for multichoice questions when reordered.
+- Fixed issue with Kingswood new process to prevent it from processing automated requests not coming from the right
+
 ## [v5.14.0] - 2021-07-13
 ### Changed
 - Issue 1455 - Change the way Kingswood Automated Requests are processed.
