@@ -6892,7 +6892,7 @@ class BUActivity extends Business
             );
             return true;
         }
-        $contactName = $automatedRequest->getSenderEmailAddress();
+        $contactName = $automatedRequest->getMonitorName();
         $dbeContact  = new DBEContact($this);
         $dbeContact->getCustomerRowsByContactFullNameMatch(self::KINGSWOOD_CUSTOMER_ID, $contactName);
         if (!$dbeContact->fetchNext()) {
@@ -7089,7 +7089,7 @@ class BUActivity extends Business
                 $prependMessage
             );
         }
-        if ($automatedRequest->getCustomerID() == self::KINGSWOOD_CUSTOMER_ID) {
+        if ($automatedRequest->getCustomerID() == self::KINGSWOOD_CUSTOMER_ID && $automatedRequest->getSenderEmailAddress() === 'ITsupport@inspiring-learning.com' ) {
             return $this->processKingsWoodAutomatedRequest($automatedRequest);
         }
         echo "<div>We do have a customer ID, we can continue: " . $automatedRequest->getCustomerID() . "</div>";
@@ -7256,7 +7256,7 @@ class BUActivity extends Business
             ],
             [
                 'type'  => 'i',
-                'value' => $contact['contactID']
+                'value' => @$contact['contactID']
             ],
             [
                 'type'  => 'i',
@@ -7272,7 +7272,7 @@ class BUActivity extends Business
             ],
             [
                 'type'  => 'i',
-                'value' => $contact['siteNo']
+                'value' => @$contact['siteNo']
             ],
             [
                 'type'  => 's',
