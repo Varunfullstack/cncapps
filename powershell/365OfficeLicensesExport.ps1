@@ -86,6 +86,7 @@ try
             $TotalItemSize = $MailboxStat.TotalItemSize.ToString().Split("(")[1].Split(" ")[0].Replace(",", "")/1MB
             $totalEmailStorageUsed = $totalEmailStorageUsed + $TotalItemSize
             $RecipientTypeDetails = $mailbox.RecipientTypeDetails
+            $Archive = $mailbox.ArchiveStatus
             $MSOLUSER = Get-MsolUser -UserPrincipalName $UserPrincipalName -ErrorAction Stop
             $CASMailBox = Get-EXOCASMailbox -Identity $UserPrincipalName -ErrorAction Stop
             if ($CASMailBox.OWAEnabled)
@@ -109,7 +110,7 @@ try
             {
                 $licenses += $license.AccountSkuId
             }
-            $Information = $MSOLUSER | Select-Object @{ Name = 'DisplayName'; Expression = { $DisplayName + " (" + $UserPrincipalName + ")" } }, @{ Name = 'TotalItemSize'; Expression = { $TotalItemSize } }, @{ Name = 'RecipientTypeDetails'; Expression = { [String]::join(";", $RecipientTypeDetails) } }, islicensed, @{ Name = "Licenses"; Expression = { $licenses.SyncRoot } }, @{ Name = 'OWAEnabled'; Expression = { $OWA } }, @{ Name = '2FA'; Expression = { $2FA } }, @{ Name = 'OneDriveStorageUsed'; Expression = { $oneDriveStorageUsage } }
+            $Information = $MSOLUSER | Select-Object @{ Name = 'DisplayName'; Expression = { $DisplayName + " (" + $UserPrincipalName + ")" } }, @{ Name = 'TotalItemSize'; Expression = { $TotalItemSize } }, @{ Name = 'RecipientTypeDetails'; Expression = { [String]::join(";", $RecipientTypeDetails) } }, islicensed, @{ Name = "Licenses"; Expression = { $licenses.SyncRoot } }, @{ Name = 'OWAEnabled'; Expression = { $OWA } }, @{ Name = '2FA'; Expression = { $2FA } }, @{ Name = 'OneDriveStorageUsed'; Expression = { $oneDriveStorageUsage } },  @{ Name = 'Archive'; Expression = { $Archive } }
             $MailboxesReport += $Information
         }
         catch
@@ -135,7 +136,9 @@ try
                 }
                 $PermissionsReport.Add($ReportLine)
             }
-        } else {
+        }
+        else
+        {
             Write-Host "we have no permissions!!"
         }
 
