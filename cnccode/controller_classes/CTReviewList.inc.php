@@ -75,7 +75,7 @@ class CTReviewList extends CTCNC
 
         $limit  = @$_REQUEST["limit"] ?? 50;
         $page   = @$_REQUEST["page"] ?? 1;
-        $offset = $limit * ($page - 1);
+        $offset = $limit * ($page - 1);        
         $orderColumns = [
             "customerName" => "cus_name",
             "reviewDate"   => "reviewDate",
@@ -85,7 +85,8 @@ class CTReviewList extends CTCNC
         $orderBy  = $orderColumns[(@$_REQUEST["orderBy"] ?? "customerName")];
         $orderDir = @$_REQUEST["orderDir"] ?? 'asc';
         $q        = '%' . (@$_REQUEST["q"] ?? "") . '%';
-        $query = "select cus_name                              as customerName,
+        $query = "SELECT 
+        cus_name                              as customerName,
         reviewAction                                  as reviewAction,
         reviewDate,
         reviewTime,
@@ -116,10 +117,19 @@ class CTReviewList extends CTCNC
         left join address on add_custno = cus_custno and add_siteno = con_siteno
         left join customerleadstatus c on customer.leadStatusId = c.id
         where reviewDate IS NOT NULL
-        and reviewDate <= CURDATE() 
+        and (:from is null or reviewDate >=:from )
+        and (:to is null or reviewDate <=:to )
+        and (cus_name like :q 
+        or reviewAction like :q         
+        or consultant.cns_name like :q 
+        or con_email like :q 
+        or c.name like :q
+        or DATE_FORMAT(reviewDate, '%d/%m/%Y' )  like :q 
+        or concat_ws(' ', con_first_name, con_last_name) like :q 
+        )
         ORDER BY $orderBy $orderDir
         LIMIT $limit OFFSET $offset";
-        $data = DBConnect::fetchAll($query, ['q' => $q]);
+        $data = DBConnect::fetchAll($query, ['q' => $q,"from"=>@$_REQUEST["from"]??null,"to"=>@$_REQUEST["to"]??null]);
         echo json_encode($this->success($data), JSON_NUMERIC_CHECK);
         // $offset = $_REQUEST['start'];
         // $limit = $_REQUEST['length']; /** @var dbSweetcode $db */ // global $db;

@@ -223,7 +223,9 @@ export default class OrderDetailsComponent extends MainComponent {
       return;
     }   
     this.setState({lines});
-
+    lines.map(l=>{
+      l.qtyToReceive=parseInt(l.qtyToReceive);
+    })
     this.api.receive(porheadID,lines).then(res=>{   
       window.location=`PurchaseOrder.php?action=display&porheadID=${porheadID}`;     
     }).catch(res=>{      

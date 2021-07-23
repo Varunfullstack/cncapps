@@ -31,8 +31,7 @@ export default class CustomerContactsComponent extends MainComponent {
                 hrUser: false,
 
                 mailshot8Flag: false,
-                mailshot2Flag: false,
-                // mailshot4Flag:false,
+                mailshot2Flag: false,                
                 mailshot9Flag: false
             },
             showSpinner: true,
@@ -87,6 +86,7 @@ export default class CustomerContactsComponent extends MainComponent {
 
         if (filter.mailshot9Flag)
             contactsFiltered = contactsFiltered.filter((c) => c.mailshot9Flag == 'Y');
+        
         this.setState({contactsFiltered});
 
 
@@ -540,6 +540,7 @@ export default class CustomerContactsComponent extends MainComponent {
                             "othersFixedEmailFlag",
                             data.supportLevel == "support" || data.supportLevel == "delegate"
                         )}
+                        
 
                     </tr>
                     <tr>
@@ -552,7 +553,6 @@ export default class CustomerContactsComponent extends MainComponent {
                     </tr>
                     <tr>
                         {this.getYNFlag("HR User to edit contacts", "hrUser")}
-                        {/* {this.getYNFlag("Receive Statements", "mailshot4Flag")} */}
                     </tr>
                     <tr>
                         {this.getYNFlag("Active", "activeFlag")}

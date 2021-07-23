@@ -9,6 +9,7 @@ import Toggle from "../shared/Toggle.js";
 import APIQuoteTemplates from "./services/APIQuoteTemplates.js";
 import "../style.css";
 import "./QuoteTemplatesComponent.css";
+import { replaceQuotes } from "../utils/utils.js";
 
 class QuoteTemplatesComponent extends MainComponent {
   api = new APIQuoteTemplates();
@@ -120,14 +121,16 @@ class QuoteTemplatesComponent extends MainComponent {
       });
   };
   handleOrderChange = async (current, next) => {
-    const { types } = this.state;
+    const { templates } = this.state;
+    current=templates.find(t=>t.id==current.id);
+    next=templates.find(t=>t.id==next.id);
     if (next) {
       current.sortOrder = next.sortOrder;
       next.sortOrder = current.sortOrder + 0.001;
       await this.api.updateTemplate(next);
     }
     if (!next) {
-      current.sortOrder = Math.max(...types.map((i) => i.sortOrder)) + 0.001;
+      current.sortOrder = Math.max(...templates.map((i) => i.sortOrder)) + 0.001;
     }
 
     await this.api.updateTemplate(current);
@@ -157,7 +160,7 @@ class QuoteTemplatesComponent extends MainComponent {
               <label>Description</label>
               <input
                 required
-                value={data.description}
+                value={replaceQuotes(data.description)}
                 type="text"
                 name=""
                 id=""

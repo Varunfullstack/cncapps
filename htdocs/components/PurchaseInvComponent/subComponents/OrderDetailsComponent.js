@@ -154,6 +154,7 @@ export default class OrderDetailsComponent extends MainComponent {
                             className="form-control"
                             style={{width: 100}}
                             defaultValue={order.curVAT}
+                            readOnly
                             onChange={(event) =>
                                 this.handleOrderChange(
                                     order,

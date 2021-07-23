@@ -9,6 +9,7 @@
 
 use CNCLTD\AdditionalChargesRates\Domain\CustomerId;
 use CNCLTD\Business\BUActivity;
+use CNCLTD\Customer\Domain\Model\Customer\Customer;
 use CNCLTD\Data\DBConnect;
 use CNCLTD\Data\DBEJProblem;
 use CNCLTD\Data\SiteMapper;
@@ -2959,7 +2960,7 @@ ORDER BY NAME,
         $dbeSite    = new DBESite($this);
         $dbeContact->getRowsByCustomerID($customerID, true);
         $buCustomer     = new BUCustomer($this);
-        $primaryContact = $buCustomer->getPrimaryContact($customerID);
+        $primaryContact = $buCustomer->getPrimaryContact($customerID);        
         $contacts       = array();
         while ($dbeContact->fetchNext()) {
             $dbeSite->setValue(
@@ -3021,7 +3022,8 @@ ORDER BY NAME,
                     "sitePhone"    => $dbeSite->getValue(DBESite::phone),
                     "isPrimary"    => $primaryContact && $primaryContact->getValue(
                             DBEContact::contactID
-                        ) === $dbeContact->getValue(DBEContact::contactID)
+                        ) === $dbeContact->getValue(DBEContact::contactID),
+                    
                 )
             );
         }

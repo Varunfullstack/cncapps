@@ -7,6 +7,7 @@ import './ReviewListComponent.css';
 import APIReviewList from "./services/APIReviewList.js";
 import Table from "../shared/table/table.js";
 import Modal from "../shared/Modal/modal.js";
+import moment from "moment";
 
 
 class ReviewListComponent extends MainComponent {
@@ -22,7 +23,10 @@ class ReviewListComponent extends MainComponent {
                 orderBy: 'customerName',
                 orderDir: 'asc',
                 q: '',
-                discontinued: false
+                discontinued: false,
+                interval:3,
+                from:null,
+                to:null
             },
             reset: false,
             reviews: [],
@@ -61,12 +65,45 @@ class ReviewListComponent extends MainComponent {
         const {filter, reset, reviews} = this.state;
         if (!noSpinner)
             this.setState({showSpinner: true});
-        this.api.getReviews(filter.limit, filter.page, filter.orderBy, filter.orderDir, filter.q, filter.discontinued)
+        let from=null,to=null;
+        switch (parseInt(filter.interval)) {
+          case 1: //this week
+            from=moment().startOf("W").format("YYYY-MM-DD");
+            to=moment().endOf("W").format("YYYY-MM-DD");
+            break;
+          case 2: //Next week
+            from=moment().startOf("W").add(7,"d").format("YYYY-MM-DD");
+            to=moment().endOf("W").add(7,"d").format("YYYY-MM-DD");
+            break;
+          case 3: //This month
+            from=moment().startOf("M").format("YYYY-MM-DD");
+            to=moment().endOf("M").format("YYYY-MM-DD");
+            break;
+          case 4: //Next month
+            from=moment().startOf("M").add(1,"M").format("YYYY-MM-DD");
+            to=moment().endOf("M").add(1,"M").format("YYYY-MM-DD");
+            break;
+          case 5: //This Year
+            from=moment().startOf("Y").format("YYYY-MM-DD");
+            to=moment().endOf("Y").format("YYYY-MM-DD");
+            break;
+          case 6: //All records
+            from=null;
+            to=null;
+            break;
+        }
+        console.log(filter.interval,from,to);
+        this.api.getReviews(filter.limit, filter.page, filter.orderBy, 
+            filter.orderDir, filter.q, filter.discontinued,from,to)
             .then(res => {
                 if (!reset)
                     this.setState({reviews: [...reviews, ...res.data], showSpinner: false});
                 else
                     this.setState({reviews: res.data, showSpinner: false});
+
+            },error=>{
+                this.alert("Error in loading data");
+                this.setState({  showSpinner: false});
 
             })
     }
@@ -96,7 +133,7 @@ class ReviewListComponent extends MainComponent {
                 hdClassName: "text-center",
                 sortable: true,
                 content: (review) => <a
-                    href={`/CustomerCRM.php?action=displayEditForm&customerID=${review.customerId}`}>{review.customerName}</a>
+                    href={`/Customer.php?action=dispEdit&customerID=${review.customerId}`}>{review.customerName}</a>
 
             },
             {
@@ -166,9 +203,15 @@ class ReviewListComponent extends MainComponent {
             pk="customerId"
             columns={columns}
             data={this.state.reviews || []}
-            search={true}
+            search={false}
+            onSearch={this.handleSearch}
         >
         </Table>
+    }
+    handleSearch=(q)=>{
+        const {filter}=this.state;
+        filter.q=q;
+        this.setState({filter,reset:true},()=>this.getData())
     }
     showEditModal = (data) => {
         this.setState({showModal: true, data, mode: 'edit'});
@@ -246,10 +289,38 @@ class ReviewListComponent extends MainComponent {
             });
         }
     }
-
+    handleFilterChange=(field,value)=>{
+        if(this.searchTimer)
+            clearTimeout(this.searchTimer);
+        this.searchTimer=setTimeout(()=>{
+            const {filter}=this.state;
+            filter[field]=value;
+            this.setState({filter,reset:true},()=>this.getData());
+        },500)
+        
+    }
+    getFilterElement=()=>{
+        const {filter}=this.state;
+        return <div style={{display:"flex",flexDirection:"row",alignItems:"center",maxWidth:400}}>
+            <label>Search</label>
+            <input className="from-control mr-3"
+            
+             onChange={($event)=>this.handleFilterChange("q",$event.target.value)}></input>
+            <select className="form-control" value={filter.interval} 
+            onChange={($event)=>this.handleFilterChange("interval",$event.target.value)}>
+                <option value={1}>This week</option>
+                <option value={2}>Next week</option>
+                <option value={3}>This month</option>
+                <option value={4}>Next month</option>
+                <option value={5}>This Year</option>
+                <option value={6}>All records</option>
+            </select>
+        </div>
+    }
     render() {
         return <div>
             <Spinner show={this.state.showSpinner}/>
+            {this.getFilterElement()}
             {this.getConfirm()}
             {this.getAlert()}
             {this.getModalElement()}
