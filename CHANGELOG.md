@@ -6,6 +6,7 @@ This project changes will be shown here.
 - Issue 1398 - Include M635 mailbox archive status in Mailbox Report.
 ### Changed
 - Issue 1448 - Ignore spelling mistakes in Internal Notes with logging a new SR
+- Issue 1465 - Request Dashboard to show for Queue Manager permissions as well
 ### Fixed
 - Issue 1394 - Asset List Export - date formatting of full list.
 
