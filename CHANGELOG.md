@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Fixed
+- Issue 1394 - Asset List Export - date formatting of full list.
+
 ## [v5.14.1] - 2021-07-16
 ### Fixed
 - Fixed issue with Starter Leaver management losing all the options for multichoice questions when reordered.

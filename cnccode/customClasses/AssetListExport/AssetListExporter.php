@@ -6,6 +6,7 @@ use BUCustomer;
 use BUHeader;
 use BUPassword;
 use CNCLTD\Business\BURenContract;
+use CNCLTD\Utils;
 use DataSet;
 use DateInterval;
 use DateTime;
@@ -169,7 +170,7 @@ class AssetListExporter
     {
 
 
-        $summarySpreadSheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $summarySpreadSheet = new Spreadsheet();
         $summarySpreadSheet->getDefaultStyle()->getFont()->setName('Arial');
         $summarySpreadSheet->getDefaultStyle()->getFont()->setSize(10);
         $summarySheet = $summarySpreadSheet->getActiveSheet();
@@ -201,15 +202,15 @@ class AssetListExporter
             }
         }
         $this->addLegend($summarySheet);
-        $tempFileName = null;
+        $this->setDateFormats($summarySheet, true);
         echo '<h1>Generating Summary</h1>';
         $summarySheet->setAutoFilter($summarySheet->calculateWorksheetDimension());
         $summarySheet->getStyle($summarySheet->calculateWorksheetDimension())->getAlignment()->setHorizontal('center');
         foreach (range('A', $summarySheet->getHighestDataColumn()) as $col) {
             $summarySheet->getColumnDimension($col)->setAutoSize(true);
         }
-        $password   = \CNCLTD\Utils::generateStrongPassword(16);
-        $writer     = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($summarySpreadSheet);
+        $password   = Utils::generateStrongPassword(16);
+        $writer     = new Xlsx($summarySpreadSheet);
         $folderName = TECHNICAL_DIR;
         if (!file_exists($folderName)) {
             mkdir(
@@ -366,7 +367,7 @@ class AssetListExporter
         if (!$warrantyExpiryDate || $warrantyExpiryDate == "Unknown" || $warrantyExpiryDate == "Not Applicable") {
             return null;
         }
-        $date = Date::excelToDateTimeObject($warrantyExpiryDate);
+        $date  = Date::excelToDateTimeObject($warrantyExpiryDate);
         $today = new DateTime();
         if ($date > $today) {
             return null;
@@ -544,16 +545,26 @@ class AssetListExporter
 
     /**
      * @param Worksheet $sheet
+     * @param bool $isSummary
      */
-    private function setDateFormats(Worksheet $sheet): void
+    private function setDateFormats(Worksheet $sheet, $isSummary = false): void
     {
-        $range = Coordinate::stringFromColumnIndex(6) . ":" . Coordinate::stringFromColumnIndex(7);
+        $additionalRow = (int)$isSummary;
+        $range         = Coordinate::stringFromColumnIndex(
+                6 + $additionalRow
+            ) . ":" . Coordinate::stringFromColumnIndex(7 + $additionalRow);
         $sheet->getStyle($range)->getNumberFormat()->setFormatCode('dd/mm/yyyy');
-        $range = Coordinate::stringFromColumnIndex(4) . ":" . Coordinate::stringFromColumnIndex(4);
+        $range = Coordinate::stringFromColumnIndex(4 + $additionalRow) . ":" . Coordinate::stringFromColumnIndex(
+                4 + $additionalRow
+            );
         $sheet->getStyle($range)->getNumberFormat()->setFormatCode('dd/mm/yyyy h:mm:ss');
-        $range = Coordinate::stringFromColumnIndex(16) . ":" . Coordinate::stringFromColumnIndex(16);
+        $range = Coordinate::stringFromColumnIndex(16 + $additionalRow) . ":" . Coordinate::stringFromColumnIndex(
+                16 + $additionalRow
+            );
         $sheet->getStyle($range)->getNumberFormat()->setFormatCode('dd/mm/yyyy');
-        $range = Coordinate::stringFromColumnIndex(20) . ":" . Coordinate::stringFromColumnIndex(20);
+        $range = Coordinate::stringFromColumnIndex(20 + $additionalRow) . ":" . Coordinate::stringFromColumnIndex(
+                20 + $additionalRow
+            );
         $sheet->getStyle($range)->getNumberFormat()->setFormatCode('dd/mm/yyyy');
     }
 
