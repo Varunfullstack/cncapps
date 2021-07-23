@@ -540,10 +540,11 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
             "Total"         => "Total",
             "TotalMailBox"  => 0,
             "Empty"         => null,
-            "LicensedUsers" => 0,
             1               => null,
+            "LicensedUsers" => null,
             2               => null,
-            3               => "Total",
+            3               => null,
+            4               => "Total",
             "TotalOneDrive" => 0
         ];
         foreach ($mailboxes as $key => $datum) {
@@ -625,11 +626,12 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
                     $otherLicenses++;
                 }
             }
-            $mailboxes[$key]['Licenses']      = $licenseValue;
-            $mailboxes[$key]['IsLicensed']    = $mailboxes[$key]['IsLicensed'] ? 'Yes' : 'No';
-            $totalizationRow['TotalMailBox']  += $datum['TotalItemSize'];
-            $mailboxes[$key]['TotalItemSize'] = $datum['TotalItemSize'];
-            $totalizationRow['TotalOneDrive'] += $datum['OneDriveStorageUsed'];
+            $mailboxes[$key]['Licenses']         = $licenseValue;
+            $mailboxes[$key]['IsLicensed']       = $mailboxes[$key]['IsLicensed'] ? 'Yes' : 'No';
+            $mailboxes[$key]['IsArchiveEnabled'] = $mailboxes[$key]['IsArchiveEnabled'] ? 'Yes' : 'No';
+            $totalizationRow['TotalMailBox']     += $datum['TotalItemSize'];
+            $mailboxes[$key]['TotalItemSize']    = $datum['TotalItemSize'];
+            $totalizationRow['TotalOneDrive']    += $datum['OneDriveStorageUsed'];
             if ($this->debugMode) {
                 $mailboxes[$key][] = $mailboxLimit;
             }
@@ -642,11 +644,12 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
                 "Display Name",
                 "Mailbox Size (MB)",
                 "Mailbox Type",
+                "Archive Enabled",
                 "Is Licensed",
                 "Licenses",
                 "Webmail Enabled",
                 "MFA Enabled",
-                "OneDrive Size(MB)"
+                "OneDrive Size(MB)",
             ],
             null,
             'A1'
@@ -681,9 +684,9 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
             "B$highestRow",
             '=sum(B2:B' . ($highestRow - 1) . ')'
         );
-        $formula = '=countifs(D2:D' . ($highestRow - 1) . ', "yes",C2:C' . ($highestRow - 1) . ',"User" ) & " Licensed Users | " & countifs(D2:D' . ($highestRow - 1) . ', "yes",C2:C' . ($highestRow - 1) . ',"Shared" ) & " Other Licenses"';
+        $formula = '=countifs(E2:E' . ($highestRow - 1) . ', "yes",C2:C' . ($highestRow - 1) . ',"User" ) & " Licensed Users | " & countifs(E2:E' . ($highestRow - 1) . ', "yes",C2:C' . ($highestRow - 1) . ',"Shared" ) & " Other Licenses"';
         $mailboxesSheet->setCellValue(
-            "D$highestRow",
+            "E$highestRow",
             $formula
         );
         $legendRowStart = $highestRow + 2;
@@ -702,9 +705,9 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
         $mailboxesSheet->getStyle("A" . ($legendRowStart + 1) . ":A" . ($legendRowStart + 1))->getFill()->setFillType(
             Fill::FILL_SOLID
         )->getStartColor()->setARGB("FFFFEB9C");
-        $mailboxesSheet->getStyle("A$highestRow:H$highestRow")->getFont()->setBold(true);
-        $mailboxesSheet->getStyle("A1:H1")->getFont()->setBold(true);
-        $mailboxesSheet->getStyle("A1:H$highestRow")->getAlignment()->setHorizontal('center');
+        $mailboxesSheet->getStyle("A$highestRow:I$highestRow")->getFont()->setBold(true);
+        $mailboxesSheet->getStyle("A1:I1")->getFont()->setBold(true);
+        $mailboxesSheet->getStyle("A1:I$highestRow")->getAlignment()->setHorizontal('center');
         for ($i = 0; $i < count($mailboxes); $i++) {
             $currentRow = 2 + $i;
             if ($mailboxLimits[$i] && !$this->isLeaver($mailboxes[$i]['DisplayName'])) {
@@ -731,7 +734,7 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
         $mailboxColumn = $mailboxesSheet->getStyle("B2:B$highestRow");
         $mailboxColumn->getNumberFormat()->setFormatCode("#,##0");
         $mailboxColumn->getAlignment()->setHorizontal('right');
-        $oneDriveSizeColumn = $mailboxesSheet->getStyle("H2:H$highestRow");
+        $oneDriveSizeColumn = $mailboxesSheet->getStyle("I2:I$highestRow");
         $oneDriveSizeColumn->getNumberFormat()->setFormatCode("#,##0");
         $oneDriveSizeColumn->getAlignment()->setHorizontal('right');
         foreach (range('A', $mailboxesSheet->getHighestDataColumn()) as $col) {
