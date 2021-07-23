@@ -2,9 +2,12 @@
 This project changes will be shown here.
 
 ## [unreleased]
+### Added
+- Issue 1398 - Include M635 mailbox archive status in Mailbox Report.
+### Changed
+- Issue 1448 - Ignore spelling mistakes in Internal Notes with logging a new SR
 ### Fixed
 - Issue 1394 - Asset List Export - date formatting of full list.
-- Issue 1398 - Include M635 mailbox archive status in Mailbox Report. 
 
 ## [v5.14.1] - 2021-07-16
 ### Fixed

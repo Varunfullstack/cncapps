@@ -179,6 +179,7 @@ class CustomerSiteComponent extends MainComponent {
                         Internal Notes
                     </label>
                     <EditorFieldComponent name="internalNotes"
+                                          excludeFromErrorCount={true}
                                           value={this.state.data.internalNotes}
                                           onChange={(value) => this.setValue("internalNotesTemplate", value)}
                     />
