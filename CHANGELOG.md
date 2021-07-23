@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 1465 - Request Dashboard to show for Queue Manager permissions as well
+
 ## [v5.14.1] - 2021-07-16
 ### Fixed
 - Fixed issue with Starter Leaver management losing all the options for multichoice questions when reordered.
