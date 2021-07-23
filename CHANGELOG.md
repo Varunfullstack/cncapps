@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [v5.15.0]
+## [v5.15.0] - 2021-07-23
 ### Added
 - Issue 1398 - Include M635 mailbox archive status in Mailbox Report.
 ### Changed
