@@ -6863,7 +6863,7 @@ class BUActivity extends Business
         $emailSubjectSummary = "Incident #{$automatedRequest->getServiceRequestID()}";
         $dbeProblem          = new DBEProblem($this);
         $dbeProblem->getServiceRequestForCustomerByEmailSubjectMatch(
-            $automatedRequest->getCustomerID(),
+            self::KINGSWOOD_CUSTOMER_ID,
             $emailSubjectSummary
         );
         if ($dbeProblem->rowCount()) {
@@ -7089,7 +7089,7 @@ class BUActivity extends Business
                 $prependMessage
             );
         }
-        if ($automatedRequest->getCustomerID() == self::KINGSWOOD_CUSTOMER_ID && $automatedRequest->getSenderEmailAddress() === 'ITsupport@inspiring-learning.com' ) {
+        if ( $automatedRequest->getSenderEmailAddress() === 'ITsupport@inspiring-learning.com' ) {
             return $this->processKingsWoodAutomatedRequest($automatedRequest);
         }
         echo "<div>We do have a customer ID, we can continue: " . $automatedRequest->getCustomerID() . "</div>";
