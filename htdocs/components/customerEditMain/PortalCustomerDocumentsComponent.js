@@ -208,7 +208,7 @@ export default class PortalCustomerDocumentsComponent extends MainComponent {
                 content={this.getModalContent()}
                 footer={
                     <div key="footer">
-                        <button onClick={this.handleClose} className="btn btn-secodary">
+                        <button onClick={this.handleClose}  >
                             Cancel
                         </button>
                         <button onClick={this.handleSave}>Save</button>

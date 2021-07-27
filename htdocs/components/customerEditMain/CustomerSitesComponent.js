@@ -76,6 +76,7 @@ export default class CustomerSitesComponent extends MainComponent {
                 icon: "pointer",
                 sortable: true,
                 width: 150,
+                content:(site)=><a name="what3words" target="_blank" href={`https://what3words.com/${site.what3Words}`}>{site.what3Words}</a>
             },
             {
                 path: "activeFlag",

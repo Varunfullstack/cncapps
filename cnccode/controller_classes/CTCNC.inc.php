@@ -1289,4 +1289,13 @@ class CTCNC extends Controller
         return new APIException($code, $message);
 
     }
+
+    public function only($data,$array)
+    {
+        $result=[];
+        foreach ($array as   $item) {            
+            $result[$item]=((array)$data)[$item];
+        }
+        return $result;
+    }
 }

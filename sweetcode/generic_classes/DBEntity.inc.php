@@ -894,6 +894,8 @@ class DBEntity extends DataAccess
                 "UPDATE " . $this->getTableName() . " SET " . $this->getUpdateString() . " WHERE " . $this->getPKWhere()
             );
         }
+        // echo  "UPDATE " . $this->getTableName() . " SET " . $this->getUpdateString() . " WHERE " . $this->getPKWhere(); 
+        // exit;
         $ret = $this->runQuery();
         $this->resetQueryString();
         return $ret;

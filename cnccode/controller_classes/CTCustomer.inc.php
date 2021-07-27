@@ -828,7 +828,7 @@ class CTCustomer extends CTCNC
             case "CRM":
                 switch ($this->requestMethod) {
                     case 'POST':
-                        echo $this->response($this->updateCRM());                        
+                        echo json_encode($this->updateCRM(),JSON_NUMERIC_CHECK);                       
                         break;                    
                     default:
                         # code...
@@ -3247,7 +3247,7 @@ ORDER BY NAME,
                             "reportProcessed"              => $dbeCustomer->getValue(DBECustomer::reportProcessed),  
                             "reportSent"                   => $dbeCustomer->getValue(DBECustomer::reportSent),  
                             "rating"                       => $dbeCustomer->getValue(DBECustomer::rating),  
-                            "meeting_datetime"             => $dbeCustomer->getValue(DBECustomer::meetingDateTime),  
+                            "meetingDateTime"             => $dbeCustomer->getValue(DBECustomer::meetingDateTime),  
                         ]
                     ]
                 );
@@ -3272,25 +3272,89 @@ ORDER BY NAME,
 
     function updateCustomer()
     {
-        $json        = file_get_contents('php://input');
-                $data        = json_decode($json, true);
-                $dbeCustomer = new DBECustomer($this);
-                $dbeCustomer->getRow($data['customerID']);
-                if (empty($data['lastUpdatedDateTime']) || $data['lastUpdatedDateTime'] < $dbeCustomer->getValue(
-                        DBECustomer::lastUpdatedDateTime
-                    )) {
-                    throw new JsonHttpException(
-                        400, "Updated by another user", [
-                               "errorCode"           => 1002,
-                               "lastUpdatedDateTime" => $dbeCustomer->getValue(DBECustomer::lastUpdatedDateTime)
-                           ]
-                    );
-                }
-                foreach ($data as $key => $value) {
-                    $dbeCustomer->setValue($key, $value);
-                }
-                $dbeCustomer->updateRow();
-                return $this->success(["lastUpdatedDateTime" => $dbeCustomer->getValue(DBECustomer::lastUpdatedDateTime)]);                
+        try {
+            $data        = $this->getBody(true);
+            
+            $updatedData=$this->only($data,["accountManagerUserID",
+            "accountName",
+            "accountNumber",
+            "activeDirectoryName",
+            "becameCustomerDate",
+            "customerID",
+            "customerTypeID",
+            "dateMeetingConfirmed",
+            "deliverSiteNo",
+            "droppedCustomerDate",
+            "eligiblePatchManagement",
+            "excludeFromWebrootChecks",
+            "gscTopUpAmount",
+            "inclusiveOOHCallOuts",
+            "inviteSent",
+            "invoiceSiteNo",
+            "lastContractSent",
+            "lastReviewMeetingDate",
+            "lastUpdatedDateTime",
+            "leadStatusId",
+            "mailshotFlag",
+            "meetingDateTime",
+            "modifyDate",
+            "name",
+            "noOfPCs",
+            "noOfServers",
+            "opportunityDeal",
+            "primaryMainContactID",
+            "rating",
+            'referredFlag',
+            "regNo",
+            'reportProcessed',
+            'reportSent',
+            'reviewAction',
+            'reviewDate',
+            'reviewMeetingBooked',
+            'reviewMeetingFrequencyMonths',
+            'reviewTime',
+            'sectorID',
+            'slaFixHoursP1',
+            'slaFixHoursP2',
+            'slaFixHoursP3',
+            'slaFixHoursP4',
+            'slaP1',
+            'slaP1PenaltiesAgreed',
+            'slaP2',
+            'slaP2PenaltiesAgreed',
+            'slaP3',
+            'slaP3PenaltiesAgreed',
+            'slaP4',
+            'slaP5',
+            'sortCode',
+            'specialAttentionEndDate',
+            'specialAttentionFlag',
+            'statementContactId',
+            'support24HourFlag',
+            'techNotes',
+            'websiteURL']);
+            
+            $dbeCustomer = new DBECustomer($this);
+            $dbeCustomer->getRow($data['customerID']);
+            if (empty($data['lastUpdatedDateTime']) || $data['lastUpdatedDateTime'] < $dbeCustomer->getValue(
+                DBECustomer::lastUpdatedDateTime
+            )) {
+                return $this->fail(400, "Updated by another user");
+                // throw new JsonHttpException(
+                //     400, "Updated by another user", [
+                //            "errorCode"           => 1002,
+                //            "lastUpdatedDateTime" => $dbeCustomer->getValue(DBECustomer::lastUpdatedDateTime)
+                //        ]
+                // );
+            }
+            foreach (  $updatedData as $key => $value) {
+                $dbeCustomer->setValue($key, $value);
+            }
+            $dbeCustomer->updateRow();
+            return $this->success(["lastUpdatedDateTime" => $dbeCustomer->getValue(DBECustomer::lastUpdatedDateTime)]);
+        } catch (Exception $ex) {
+            return $this->fail(["error"]);
+        }
     }
 
     function updateSite($data)
@@ -3722,7 +3786,7 @@ ORDER BY NAME,
         $dbeCustomer->setValue(DBECustomer::leadStatusId,$body->leadStatusId);
         $dbeCustomer->setValue(DBECustomer::mailshotFlag,$body->mailshotFlag);
         $dbeCustomer->setValue(DBECustomer::dateMeetingConfirmed,$body->dateMeetingConfirmed);
-        $dbeCustomer->setValue(DBECustomer::meetingDateTime,$body->meeting_datetime);
+        $dbeCustomer->setValue(DBECustomer::meetingDateTime,$body->meetingDateTime);
         $dbeCustomer->setValue(DBECustomer::inviteSent,$body->inviteSent);
         $dbeCustomer->setValue(DBECustomer::reportProcessed,$body->reportProcessed);
         $dbeCustomer->setValue(DBECustomer::reportSent,$body->reportSent);

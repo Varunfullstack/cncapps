@@ -649,19 +649,23 @@ class CTGoodsIn extends CTCNC
                     $lineDisabled =true;
                 }  
                 $disabled=false;
+                $warrantyID="";
                 if ($this->dsGoodsIn->getValue(BUGoodsIn::receiveDataSetRequireSerialNo)) {                    
                     // There is a warranty drop-down for each line
                     $dsWarranty->initialise();
                     $thisWarrantyID = $this->dsGoodsIn->getValue(BUGoodsIn::receiveDataSetWarrantyID);
                     while ($dsWarranty->fetchNext()) {
+                        if($thisWarrantyID == $dsWarranty->getValue(
+                            DBEWarranty::warrantyID
+                        ))
+                        $warrantyID=$thisWarrantyID;
                         $warranties []=
                             array(
                                 'warrantyDescription' => $dsWarranty->getValue(DBEWarranty::description),
                                 'warrantyID'          => $dsWarranty->getValue(DBEWarranty::warrantyID),
-                                'warrantySelected'    => ($thisWarrantyID == $dsWarranty->getValue(
-                                        DBEWarranty::warrantyID
-                                    )) ? CT_SELECTED : null
+                                
                                 );
+                                
                     } // while ($dsWarranty->fetchNext()
                 } 
                 else
@@ -699,7 +703,8 @@ class CTGoodsIn extends CTCNC
                         ) ? CT_CHECKED : null,
                         'customerItemID'  => $this->dsGoodsIn->getValue(BUGoodsIn::receiveDataSetCustomerItemID),
                         "warranties" => $warranties ,
-                        "disabled"=>$disabled
+                        "disabled"=>$disabled,
+                        "warrantyID"=>$warrantyID
                         ];                
             }
         }      

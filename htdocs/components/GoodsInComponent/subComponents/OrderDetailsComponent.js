@@ -150,8 +150,10 @@ export default class OrderDetailsComponent extends MainComponent {
         sortable: true,
         //className: "text-center",
         content: (order) => (
-          <select disabled={order.lineDisabled||order.disabled}
-          className="form-control" value={order.warrantyID}   onChange={(event)=>this.handleOrderChange(order,"warrantyID",event.target.value)}
+          <select 
+          disabled={order.lineDisabled||order.disabled}
+          className="form-control" value={order.warrantyID}   
+          onChange={(event)=>this.handleOrderChange(order,"warrantyID",event.target.value)}
           >
             <option>N/A</option>
             {order.warranties.map((w,indx) => (
@@ -171,8 +173,7 @@ export default class OrderDetailsComponent extends MainComponent {
         content: (order) => <Toggle disabled={order.lineDisabled||order.disabled}
         checked={order.renew}  onChange={(event)=>this.handleOrderChange(order,"renew",!order.renew)}></Toggle>,
       },
-    ];
-
+    ];    
     return (
       <Table
         style={{ marginTop: 20 }}

@@ -148,7 +148,7 @@ export default class CustomerEditMain extends MainComponent {
                                             )
                                         }
                                     >
-                                        {this.state.contacts.map((contact) => (
+                                        {this.state.contacts.filter(c=>c.active==1).map((contact) => (
                                             <option key={contact.id} value={contact.id}>
                                                 {contact.firstName + " " + contact.lastName}
                                             </option>
@@ -699,6 +699,7 @@ export default class CustomerEditMain extends MainComponent {
     }
     handleSave = () => {
         const {data} = this.state;
+        
         this.api.updateCustomer(data).then(res => {
             if (res.status) {
                 this.alert("Data saved successfully");

@@ -52,7 +52,7 @@ export default class CustomerCRMComponent extends MainComponent {
             leadStatusId: "",
             mailshotFlag: "",
             dateMeetingConfirmed: "",
-            meeting_datetime: "",
+            meetingDateTime: "",
             inviteSent: "",
             reportProcessed: "",
             reportSent: "",
@@ -164,14 +164,14 @@ export default class CustomerCRMComponent extends MainComponent {
                         <td>
                             <input
                                 type="datetime-local"
-                                value={data.meeting_datetime || ""}
+                                value={data.meetingDateTime || ""}
                                 onChange={($event) =>
                                     this.handleUpdateGenericField($event)
                                 }
                                 size="10"
                                 maxLength="10"
                                 className="form-control input-sm"
-                                name="meeting_datetime"
+                                name="meetingDateTime"
                                 style={{maxWidth: 170}}
                             />
                         </td>

@@ -154,11 +154,11 @@ export default class OrderDetailsComponent extends MainComponent {
                             className="form-control"
                             style={{width: 100}}
                             defaultValue={order.curVAT}
-                            readOnly
+                            name="curVAT"
+                            id={order.itemID}
                             onChange={(event) =>
-                                this.handleOrderChange(
-                                    order,
-                                    "curVAT",
+                                this.handleVatChange(
+                                    order, 
                                     parseInt(event.target.value)
                                 )
                             }
@@ -264,7 +264,7 @@ export default class OrderDetailsComponent extends MainComponent {
             (total, cur) => (parseFloat(total ?? 0) + parseFloat(cur[field] ?? 0)).toFixed(2),
             0
         );
-        return <div style={{textAlign: "center"}}>{total}</div>;
+        return <div style={{textAlign: "center"}} id={field+"Total"}>{total}</div>;
     };
     handleOrderChange = (item, prop, value) => {
         const {lines} = this.state;
@@ -275,7 +275,18 @@ export default class OrderDetailsComponent extends MainComponent {
             this.calcTotal();
         }, 1000);
     };
-
+    handleVatChange=(order,vat)=>{
+        console.log(order,vat);
+        //curVATTotal
+        //update curVAT
+        let total=0.00;
+        const elements=document.getElementsByName("curVAT");        
+        elements.forEach(element=>{            
+            total +=parseFloat(element.value);
+        })   
+        const curVATTotal=document.getElementById("curVATTotal");        
+        curVATTotal.innerText=total.toFixed(4);
+    }
     handleSupplierChange = (supplier) => {
         this.setFilter("supplierID", supplier?.id || "");
     };
@@ -295,6 +306,12 @@ export default class OrderDetailsComponent extends MainComponent {
             this.alert("Please enter at least one value to invoice");
             return;
         }
+        //update curVAT
+        const elements=document.getElementsByName("curVAT");        
+        elements.forEach(element=>{
+            const order=lines.find(line=>line.itemID==element.id);
+            order.curVAT=parseFloat(element.value);
+        })       
         const items = lines.map(line => {
             return {
                 description: line.description,
