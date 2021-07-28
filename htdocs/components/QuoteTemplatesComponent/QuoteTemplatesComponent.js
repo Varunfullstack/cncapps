@@ -39,6 +39,7 @@ class QuoteTemplatesComponent extends MainComponent {
   getData = () => {
     this.api.getAllTemplates().then((res) => {
       this.setState({ templates: res.data });
+      console.log(res.data);
     });
   };
 
@@ -52,6 +53,7 @@ class QuoteTemplatesComponent extends MainComponent {
         icon: "fal fa-2x fa-text color-gray2 pointer",
         sortable: true,
         //className: "text-center",
+        content:(item)=><div dangerouslySetInnerHTML={{__html: item.description}}></div>
       },
       {
         path: "linkedSalesOrderId",
@@ -108,7 +110,7 @@ class QuoteTemplatesComponent extends MainComponent {
     );
   };
   showEditModal = (data) => {
-    this.setState({ showModal: true, data, mode: "edit" });
+    this.setState({ showModal: true, data:{...data}, mode: "edit" });
   };
   handleDelete = async (type) => {
     const conf = await this.confirm(
@@ -124,6 +126,8 @@ class QuoteTemplatesComponent extends MainComponent {
     const { templates } = this.state;
     current=templates.find(t=>t.id==current.id);
     next=templates.find(t=>t.id==next.id);
+    current.description=replaceQuotes(current.description);
+    next.description=replaceQuotes(next.description);
     if (next) {
       current.sortOrder = next.sortOrder;
       next.sortOrder = current.sortOrder + 0.001;

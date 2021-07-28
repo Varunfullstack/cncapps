@@ -423,5 +423,6 @@ export function isNumeric(str) {
     str= str.replaceAll('&#39;', '\'');        
     str= str.replaceAll('&#039;', '\'');
     str= str.replaceAll('&quot;', '\"');   
+    str= str.replaceAll('&amp;', '\&');   
     return str;
   }
