@@ -5,11 +5,14 @@ import Prompt from "./Prompt.js";
 import React from 'react';
 import APIHeader from '../services/APIHeader';
 import ToolTip from "./ToolTip.js";
+import { getUpdatedColumns } from './../utils/utils';
+import APIAudit, { AuditActionType } from "../services/APIAudit.js";
 
 export default class MainComponent extends React.Component {
 
     promptCallback;
     api;
+    apiLog=new APIAudit();
 
     constructor(props) {
         super(props);
@@ -288,5 +291,28 @@ export default class MainComponent extends React.Component {
                 return false;
         }
         return true;
+    }
+    logData(data,originData,customerID=null,problemID=null,pageID=null,action=AuditActionType.UPDATE,pkName=null){
+        let oldValues=getUpdatedColumns(data,originData);
+        let newValues=getUpdatedColumns(originData,data);  
+        if(pkName!=null)
+        {
+            oldValues[pkName]=data[pkName];
+            newValues[pkName]=data[pkName];
+        }
+        if(Object.keys(oldValues)==0)  
+            oldValues=null;
+        if(Object.keys(newValues)==0)  
+            newValues=null;
+        this.apiLog.addLog({
+            customerID,
+            problemID,
+            pageID,
+            oldValues,
+            newValues,
+            action
+        }).then(res=>{
+          
+        });        
     }
 }

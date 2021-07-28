@@ -50,5 +50,5 @@ export default class ApiUrls {
     static ReviewList="/ReviewList.php?action=";
     static PortalCustomerDocument="/PortalCustomerDocument.php?action=";
     static CustomerNote="/CustomerNote.php?action=";
-
+    static Audit="/Log.php?action=";
 }

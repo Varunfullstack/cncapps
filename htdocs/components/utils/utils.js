@@ -426,3 +426,24 @@ export function isNumeric(str) {
     str= str.replaceAll('&amp;', '\&');   
     return str;
   }
+
+export function getUpdatedColumns(source,target)
+  {
+    if(source==null)
+      return target;
+    let updated={};
+    for(var i in target){
+      //console.log(typeof target[i]);
+      if(typeof target[i]!="object" && target[i]!=source[i])
+        updated[i]=target[i];
+      else if(typeof target[i]=="object"&&source[i]!=undefined&&
+      Object.keys(getUpdatedColumns(target[i],source[i])).length>0)
+        updated[i]=target[i];
+    }
+    return updated;
+  }
+export const Pages={
+    Customer:1,
+    Sites:2,
+    PortalDocuments:3
+}

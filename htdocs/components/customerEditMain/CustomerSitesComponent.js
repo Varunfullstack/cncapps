@@ -1,5 +1,5 @@
 import React from "react";
-import {params} from "../utils/utils";
+import {Pages, params} from "../utils/utils";
 import APICustomers from "../services/APICustomers";
 import MainComponent from "../shared/MainComponent";
 import Table from "../shared/table/table";
@@ -7,10 +7,11 @@ import ToolTip from "../shared/ToolTip";
 import Spinner from "../shared/Spinner/Spinner";
 import Modal from "../shared/Modal/modal.js";
 import Toggle from "../shared/Toggle";
+import { AuditActionType } from "../services/APIAudit";
 
 export default class CustomerSitesComponent extends MainComponent {
     api = new APICustomers();
-
+    customerID=params.get("customerID");
     constructor(props) {
         super(props);
         this.state = {
@@ -24,7 +25,8 @@ export default class CustomerSitesComponent extends MainComponent {
             data: {...this.getInitData()},
             filter: {
                 showInActive: false
-            }
+            },
+            originData:null
         };
     }
 
@@ -34,7 +36,7 @@ export default class CustomerSitesComponent extends MainComponent {
 
     getData = () => {
         this.setState({showSpinner: true});
-        const customerId = params.get("customerID");
+        const customerId = this.customerID;
         this.api.getCustomerSites(customerId, this.state.filter.showInActive).then((sites) => {
             this.setState({sites, customerId, showSpinner: false});
         });
@@ -125,7 +127,7 @@ export default class CustomerSitesComponent extends MainComponent {
     getInitData() {
         return {
             id: "",
-            customerID: params.get("customerID"),
+            customerID: this.customerID,
             add1: "",
             add2: "",
             add3: "",
@@ -144,13 +146,14 @@ export default class CustomerSitesComponent extends MainComponent {
     }
 
     handleEdit = (site) => {
-        this.setState({data: site, showModal: true, isNew: false});
+        this.setState({data: {...site},originData:{...site}, showModal: true, isNew: false});
     };
 
     handleDelete = async (site) => {
         if (await this.confirm("Are you sure you want to delete this site?")) {
             this.APICustomers.deleteCustomerSite(site.id).then((res) => {
                 this.getData();
+                this.logData(site,null,this.customerID,null,Pages.Sites,AuditActionType.DELETE);
             });
         }
     };
@@ -187,7 +190,7 @@ export default class CustomerSitesComponent extends MainComponent {
     };
 
     handleSave = () => {
-        const {data, isNew} = this.state;
+        const {data, isNew,originData} = this.state;
         if (!this.isFormValid("siteformdata")) {
             this.alert("Please enter required data");
             return;
@@ -198,6 +201,8 @@ export default class CustomerSitesComponent extends MainComponent {
                     this.setState({showModal: false, reset: true}, () =>
                         this.getData()
                     );
+                    this.logData(data,originData,this.customerID,null,Pages.Sites,AuditActionType.UPDATE,"id");
+
                 }
             });
         } else {
@@ -207,6 +212,7 @@ export default class CustomerSitesComponent extends MainComponent {
                     this.setState({showModal: false, reset: true}, () =>
                         this.getData()
                     );
+                    this.logData(data,null,this.customerID,null,Pages.Sites,AuditActionType.NEW);
                 }
             });
         }

@@ -1,0 +1,188 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="Mustafa" id="issue1468-0">
+        <tagDatabase tag="issue1468"/>
+    </changeSet>
+    <changeSet author="Mustafa" id="issue1468-1">
+
+        <preConditions>
+            <not>                
+                <tableExists tableName="pages" />
+            </not>
+        </preConditions>
+
+        <createTable  tableName="pages">
+
+            <column name="id" type="int(11)" >
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="name" type="varchar(100)" >
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="parentPageId" type="int(11)" >
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey 
+            columnNames="id"  
+            constraintName="pk_pages"              
+            tableName="pages"               
+        />  
+        <addAutoIncrement 
+            columnDataType="int"
+            columnName="id"                         
+            incrementBy="1"  		
+            startWith="1"  
+            tableName="pages"
+        /> 
+
+          <addForeignKeyConstraint  
+            baseColumnNames="parentPageId"  
+            baseTableName="pages"  
+            constraintName="fk_pages_parent"                             
+            onDelete="CASCADE"  
+            onUpdate="RESTRICT"  
+            referencedColumnNames="id"  
+            referencedTableName="pages"  
+        />  
+
+        <rollback>
+            <dropTable tableName="pages"/>
+        </rollback>
+
+    </changeSet>
+
+    <changeSet author="Mustafa" id="issue1468-2">
+
+        <preConditions>
+            <not>                
+                <tableExists tableName="audit" />
+            </not>
+        </preConditions>
+
+        <createTable  tableName="audit">
+
+            <column name="id" type="int(11)" >
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="userID" type="int(11)" >
+                <constraints nullable="true"/>
+            </column>
+
+            <column name="customerID" type="int(11)" >
+                <constraints nullable="true"/>
+            </column>
+
+            <column name="problemID" type="int unsigned" >
+                <constraints nullable="true"/>
+            </column>
+
+            <column name="pageID" type="int(11)" >
+                <constraints nullable="true"/>
+            </column>
+
+            <column name="createAt" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP" >
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="oldValues" type="text" >
+                <constraints nullable="true"/>
+            </column>
+
+            <column name="newValues" type="text" >
+                <constraints nullable="true"/>
+            </column>
+
+            <column name="pcIp" type="varchar(100)" >
+                <constraints nullable="true"/>
+            </column>
+
+            <column name="pcMac" type="varchar(100)" >
+                <constraints nullable="true"/>
+            </column>
+
+        </createTable>
+       <addPrimaryKey 
+            columnNames="id"  
+            constraintName="pk_audit"              
+            tableName="audit"               
+        />  
+
+        <addAutoIncrement 
+            columnDataType="int"
+            columnName="id"             
+            incrementBy="1"  		
+            startWith="1"  
+            tableName="audit"
+        /> 
+         
+        <addForeignKeyConstraint  
+            baseColumnNames="userID"  
+            baseTableName="audit"  
+            constraintName="fk_audit_user"                             
+            onDelete="RESTRICT"  
+            onUpdate="RESTRICT"  
+            referencedColumnNames="cns_consno"  
+            referencedTableName="consultant"  
+        />  
+
+        <addForeignKeyConstraint  
+            baseColumnNames="customerID"  
+            baseTableName="audit"  
+            constraintName="fk_audit_customer"                             
+            onDelete="RESTRICT"  
+            onUpdate="RESTRICT"  
+            referencedColumnNames="cus_custno"  
+            referencedTableName="customer"  
+        />  
+
+        <addForeignKeyConstraint  
+            baseColumnNames="problemID"  
+            baseTableName="audit"  
+            constraintName="fk_audit_problem"                             
+            onDelete="RESTRICT"  
+            onUpdate="RESTRICT"  
+            referencedColumnNames="pro_problemno"  
+            referencedTableName="problem"  
+        />
+
+        <addForeignKeyConstraint  
+            baseColumnNames="pageID"  
+            baseTableName="audit"  
+            constraintName="fk_pages"                             
+            onDelete="RESTRICT"  
+            onUpdate="RESTRICT"  
+            referencedColumnNames="id"  
+            referencedTableName="pages"  
+        />
+        <rollback>
+            <dropTable tableName="audit"/>
+        </rollback>
+    </changeSet>
+    <changeSet author="Mustafa" id="issue1468-3">
+        <preConditions>               
+                <tableExists tableName="pages" />            
+        </preConditions>
+        <sql>
+        INSERT INTO pages (name,parentPageId) VALUES('Customer', null); 
+        INSERT INTO pages (name,parentPageId) VALUES('Sites', 1); 
+        INSERT INTO pages (name,parentPageId) VALUES('Portal Documents', 1); 
+        </sql>
+   </changeSet>
+    <changeSet author="Mustafa" id="issue1468-4">
+        <preConditions>               
+                <tableExists tableName="audit" />            
+        </preConditions>
+         <addColumn tableName="audit"   >
+            <column name="action" type="varchar(50)" >
+                <constraints nullable="true"/>
+            </column>
+          </addColumn>
+   </changeSet>
+</databaseChangeLog>

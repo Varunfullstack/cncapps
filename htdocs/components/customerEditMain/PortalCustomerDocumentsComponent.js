@@ -1,5 +1,5 @@
 import React from "react";
-import {params} from "../utils/utils";
+import {Pages, params} from "../utils/utils";
 import APICustomers from "../services/APICustomers";
 import MainComponent from "../shared/MainComponent";
 import DragAndDropUploaderComponent from "../shared/DragAndDropUploaderComponent/DragAndDropUploaderComponent";
@@ -9,6 +9,7 @@ import ToolTip from "../shared/ToolTip";
 import Spinner from "../shared/Spinner/Spinner";
 import Modal from "../shared/Modal/modal.js";
 import Toggle from "../shared/Toggle";
+import { AuditActionType } from "../services/APIAudit";
 
 export default class PortalCustomerDocumentsComponent extends MainComponent {
     api = new APICustomers();
@@ -24,6 +25,7 @@ export default class PortalCustomerDocumentsComponent extends MainComponent {
             showModal: false,
             isNew: true,
             data: {...this.getInitData()},
+            originData:null,
             showSpinner: true
         };
     }
@@ -145,13 +147,15 @@ export default class PortalCustomerDocumentsComponent extends MainComponent {
     }
 
     handleEdit = (document) => {
-        this.setState({data: {...document}, showModal: true, isNew: false});
+        this.setState({data: {...document},originData:{...document}, showModal: true, isNew: false});
     };
 
     handleDelete = async (document) => {
         if (await this.confirm("Are you sure you want to delete this document?")) {
             this.apiPortalDocument.deletePortalDocument(document.id).then((res) => {
                 this.getData();
+                this.logData(null,document,this.state.customerId,null,Pages.PortalDocuments,AuditActionType.DELETE);
+
             }, error => {
                 this.alert(error)
             });
@@ -171,7 +175,7 @@ export default class PortalCustomerDocumentsComponent extends MainComponent {
     };
 
     handleSave = async () => {
-        const {data, isNew, customerId} = this.state;
+        const {data, isNew, customerId,originData} = this.state;
         if (!data.description) {
             this.alert("Please enter description");
             return;
@@ -184,6 +188,8 @@ export default class PortalCustomerDocumentsComponent extends MainComponent {
                 this.setState({showModal: false, reset: true}, () =>
                     this.getData()
                 );
+                this.logData(data,originData,customerId,null,Pages.PortalDocuments,AuditActionType.UPDATE,"id");
+
             }
         } else {
             data.id = null;
@@ -193,6 +199,9 @@ export default class PortalCustomerDocumentsComponent extends MainComponent {
                 if (data.file)
                     await this.apiPortalDocument.uploadDocument(res.data.documentID, data.file);
                 this.setState({showModal: false, reset: true}, () => this.getData());
+                data.filename=data.file.name;
+                this.logData(data,null,customerId,null,Pages.PortalDocuments,AuditActionType.NEW);
+
             }
         }
     };
