@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.15.2] - 2021-07-28
+### Changed
+- Changed design environment to use a "cncdesign" database
+
 ## [v5.15.1] - 2021-07-27
 ### Changed
 - Changed Kingswood importing to use hardcoded customer Id instead of relying on email2db to set it correctly.
