@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## Unreleased
+### Added
+- Added Sales Order Id for the Sales Requests tab.
+  
 ## [v5.15.2] - 2021-07-28
 ### Changed
 - Changed design environment to use a "cncdesign" database
