@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.15.3] - 2021-07-29
+### Changed
+- Force recalculation of holiday hours in user time log when half holiday is registered. 
+
 ## [v5.15.2] - 2021-07-28
 ### Changed
 - Changed design environment to use a "cncdesign" database
