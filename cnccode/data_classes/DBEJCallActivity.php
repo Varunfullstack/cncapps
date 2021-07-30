@@ -622,6 +622,7 @@ class DBEJCallActivity extends DBECallActivity
         $query = "SELECT
             customer.cus_name AS customerName,
             callactivity.`caa_problemno` AS problemID,
+            problem.`pro_linked_ordno` AS linkedSalesOrderId, 
             callactivity.`reason` AS requestBody,
             consultant.cns_name AS requestedBy,
             CONCAT(callactivity.`caa_date`,' ',callactivity.`caa_starttime`,':00') AS requestedDateTime,
