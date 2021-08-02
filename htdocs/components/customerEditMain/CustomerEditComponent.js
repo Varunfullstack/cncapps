@@ -29,6 +29,7 @@ import ContactsComponent from "./contacts/ContactsComponent";
 import './../style.css';
 import { params } from "../utils/utils";
 import ToolTip from "../shared/ToolTip";
+import APICustomers from "../services/APICustomers";
 class CustomerEditComponent extends MainComponent {
     tabs = [];
     TAB_CUSTOMER='customer';    
@@ -39,7 +40,7 @@ class CustomerEditComponent extends MainComponent {
     TAB_CONTACTS='contacts';
     TAB_CRM='crm';
     TAB_NOTES='notes';
-
+    api=new APICustomers();
     constructor(props) {
         super(props);
          this.state = {
@@ -48,6 +49,7 @@ class CustomerEditComponent extends MainComponent {
             filter: {                
                 activeTab: this.TAB_CUSTOMER,                 
             },
+            hasFolder:true
         }
         this.tabs = [
             {id: this.TAB_CUSTOMER, title: "Customer", icon: null},
@@ -64,6 +66,7 @@ class CustomerEditComponent extends MainComponent {
     componentDidMount() {
         const customerId=params.get("customerID");
         this.setState({customerId});
+        this.checkCustomerFolderExist();
     }
     getTabsElement = () => {
         const {   tabs} = this;        
@@ -125,7 +128,32 @@ class CustomerEditComponent extends MainComponent {
             <ToolTip title="Third Party Contacts" width={35}>
             <i className="fal fa-users fa-2x m-5 pointer icon" onClick={()=>window.open(`ThirdPartyContact.php?action=list&customerID=${this.state.customerId}`,"_blank")}></i>
             </ToolTip>
+            {!this.state.hasFolder?
+            <ToolTip title="Create Customer Folder" width={35}>
+                <i className="fal fa-folder-plus fa-2x m-5 pointer icon" onClick={this.handleCreateFolder}></i>
+            </ToolTip>:null}
          </div>
+    }
+    checkCustomerFolderExist=()=>{
+        this.api.customerHasFolder(params.get("customerID"))
+        .then(res=>{
+            if(res.state)
+                this.setState({hasFolder:true})
+            else
+            this.setState({hasFolder:false})
+
+        },error=>{
+            this.setState({hasFolder:false})
+
+        })
+    }
+    handleCreateFolder=()=>{
+        this.api.createCustomerFolder(this.state.customerId)
+        .then(res=>{
+            this.setState({hasFolder:true})
+        },error=>{
+            console.log(error)
+        })
     }
     render() {
         //const {customerId} = this.props;

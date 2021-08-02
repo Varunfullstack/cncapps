@@ -733,7 +733,7 @@ class CTCustomer extends CTCNC
             case self::GET_PORTAL_CUSTOMER_DOCUMENTS:
                 return $this->getPortalCustomerDocumentsController($_REQUEST['customerID']);
             case 'createCustomerFolder':
-                $this->createCustomerFolder();
+               echo json_encode($this->createCustomerFolder(),JSON_NUMERIC_CHECK);
                 break;
             case 'displayNextReviewProspect':
                 $this->displayNextReviewProspect();
@@ -834,6 +834,9 @@ class CTCustomer extends CTCNC
                         # code...
                         break;
                 }
+                exit;
+            case "customerHasFolder":
+                echo json_encode($this->customerHasFolder(),JSON_NUMERIC_CHECK);
                 exit;
             default:
                 $this->displaySearchForm();
@@ -1032,19 +1035,10 @@ class CTCustomer extends CTCNC
     {
         $this->setMethodName('createCustomerFolder');
         if (!$this->getCustomerID()) {
-            $this->displayFatalError('CustomerID not passed');
+             return $this->fail(APIException::badRequest,'CustomerID not passed');
         }
         $this->buCustomer->createCustomerFolder($this->getCustomerID());
-        $nextURL = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            array(
-                'action'     => CTCNC_ACT_DISP_EDIT,
-                'customerID' => $this->getCustomerID()
-            )
-        );
-        header('Location: ' . $nextURL);
-        exit;
-
+        return $this->success();
     }
 
     function getCustomerID()
@@ -3794,5 +3788,19 @@ ORDER BY NAME,
         $dbeCustomer->setValue(DBECustomer::opportunityDeal,$body->opportunityDeal);
         $dbeCustomer->updateRow();
         return $this->success( );
+    }
+    function customerHasFolder()
+    {
+        $customerID=@$_REQUEST["customerID"];
+        if(!isset($customerID))
+        {
+            return $this->fail(APIException::badRequest,"CustomerID not found");
+        }
+        if ($this->buCustomer->customerFolderExists($customerID)) 
+        {
+            return $this->success();
+        }
+        else
+            return $this->fail(APIException::notFound);
     }
 }

@@ -144,6 +144,13 @@ class APICustomers extends APIMain {
     saveCustomerNote(body){
         return this.postJson(`${ApiUrls.CustomerNote}updateNote`,body);
     }
+    createCustomerFolder(customerID){
+        return this.postJson(`${ApiUrls.Customer}createCustomerFolder&customerID=${customerID}`,null);
+    }
+
+    customerHasFolder(customerID){
+        return this.postJson(`${ApiUrls.Customer}customerHasFolder&customerID=${customerID}`,null);
+    }
 }
 
 export default APICustomers;
