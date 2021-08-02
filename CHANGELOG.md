@@ -1,6 +1,11 @@
 # Changelog
 This project changes will be shown here.
 
+## Unreleased - 2021-08-02
+### Changed
+- Changed condition for solve issue send email for 85
+
+
 ## [v5.15.2] - 2021-07-28
 ### Changed
 - Changed design environment to use a "cncdesign" database
