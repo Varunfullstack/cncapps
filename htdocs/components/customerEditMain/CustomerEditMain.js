@@ -706,7 +706,7 @@ export default class CustomerEditMain extends MainComponent {
             if (res.status) {
                 this.alert("Data saved successfully");
                 this.getCustomerData();
-                this.logData(data,originData,this.props.customerID,null,Pages.Customer);
+                this.logData(data,originData,data.customerID,null,Pages.Customer);
             } else
                 this.alert("Data not saved successfully");
 

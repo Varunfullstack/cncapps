@@ -100,9 +100,16 @@ class CTLog extends CTCNC
                 from audit
                 left join consultant c on userID=c.cns_consno
                 left join pages on pageID=pages.id
+                where 1=1 
                 ";
+        $params = [];
+        if(isset($_REQUEST["customerID"]))
+        {
+            $query .=" and customerID=:customerID";
+            $params["customerID"]=$_REQUEST["customerID"];
+        }
          $query .=" order by createAt desc";
-        $result=DBConnect::fetchAll($query);
+        $result=DBConnect::fetchAll($query,$params);
         return $this->success($result);
     }
 
@@ -110,6 +117,7 @@ class CTLog extends CTCNC
     {
         $data = $this->only($this->getBody(), 
         [ "customerID", "problemID", "pageID", "oldValues", "newValues","action" ]);       
+        $data["createAt"]= date("Y-m-d H:i:s");
         if ($data) {
             $data["userID"]=$this->userID;
             $data["pcIp"]= $_SERVER['REMOTE_ADDR'];
@@ -122,7 +130,8 @@ class CTLog extends CTCNC
             oldValues,
             newValues,
             pcIp ,
-            action       
+            action,
+            createAt       
           )
           VALUES
             (              
@@ -133,7 +142,8 @@ class CTLog extends CTCNC
               :oldValues,
               :newValues,
               :pcIp,
-              :action
+              :action,
+              :createAt
             )",
                 $data
             );

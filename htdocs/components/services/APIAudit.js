@@ -18,9 +18,9 @@ class APIAudit extends APIMain{
         body.action=AuditActionType.UPDATE;
         return this.postJson(`${ApiUrls.Audit}log`,body);
     }
-    getLogs(filter)
+    getLogs(customerID)
     {
-        return this.get(`${ApiUrls.Audit}log`);
+        return this.get(`${ApiUrls.Audit}log&customerID=${customerID}`);
     }
     
 }

@@ -2,6 +2,7 @@
 import React from 'react';
 import APIAudit from '../services/APIAudit';
 import Table from '../shared/table/table';
+import { params } from '../utils/utils';
 import MainComponent from './../shared/MainComponent';
  
 
@@ -15,7 +16,7 @@ class CustomerLog extends MainComponent {
         }
     }
     componentDidMount() {
-        this.api.getLogs().then(res=>{
+        this.api.getLogs(params.get("customerID")).then(res=>{
             console.log(res);
             if(res.state)
             this.setState({logs:res.data})
