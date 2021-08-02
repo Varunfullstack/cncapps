@@ -1090,6 +1090,6 @@ table.sticky-header thead th {
     cursor: pointer;
 }
 .salesSizeBox{
-    width: 50px;
+    width: 55px !important;
     text-align: right;
 }
