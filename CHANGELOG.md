@@ -1,6 +1,11 @@
 # Changelog
 This project changes will be shown here.
 
+## Unreleased - 2021-08-02
+### Changed
+- SR Call Back Tweaks Add Message - The Service Request must be reopened before a call back can be logged.
+
+
 ## [v5.15.2] - 2021-07-28
 ### Changed
 - Changed design environment to use a "cncdesign" database
