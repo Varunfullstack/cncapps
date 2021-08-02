@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## Unreleased - 2021-08-02
+### Changed
+- Undo all Changes and add css for Expand Sales Order,Purchase Order Cost & Sales size boxes
+
 ## [v5.15.2] - 2021-07-28
 ### Changed
 - Changed design environment to use a "cncdesign" database

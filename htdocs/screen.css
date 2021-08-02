@@ -1089,3 +1089,7 @@ table.sticky-header thead th {
 .pointer {
     cursor: pointer;
 }
+.salesSizeBox{
+    width: 50px;
+    text-align: right;
+}
