@@ -1,6 +1,11 @@
 # Changelog
 This project changes will be shown here.
 
+
+## Unreleased - 2021-08-02
+### Changed
+ -  Changes in sales order for view SR
+
 ## [v5.15.3] - 2021-07-29
 ### Changed
 - Force recalculation of holiday hours in user time log when half holiday is registered. 
