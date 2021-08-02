@@ -172,7 +172,7 @@ class DBEDirectDebitContracts extends DBECustomerItem
       JOIN address ON  add_custno = cui_custno AND add_siteno = cui_siteno
 		 WHERE CURDATE() >= ( DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` + 1 MONTH ) )
      AND (renewalTypeID = 1 or renewalTypeID = 2 or renewalTypeID = 5 )
-		 AND declinedFlag = 'N' and directDebitFlag = 'Y' ORDER BY cui_custno, autoGenerateContractInvoice asc;";
+		 AND declinedFlag = 'N' and directDebitFlag = 'Y' ORDER BY cui_custno, autoGenerateContractInvoice asc,  ity_desc ASC;";
         $this->setQueryString($statement);
         $ret = (parent::getRows());
     }
