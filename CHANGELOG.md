@@ -1,6 +1,11 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.15.4] - 2021-08-02
+### Changed
+- Changed the way information is fetched to generate sales orders from contracts to try and get it always sorted the same way.
+- Changed Invoice Notification email to show invoices totals with VAT included
+
 ## [v5.15.3] - 2021-07-29
 ### Changed
 - Force recalculation of holiday hours in user time log when half holiday is registered. 
