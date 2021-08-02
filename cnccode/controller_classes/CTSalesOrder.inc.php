@@ -5041,7 +5041,7 @@ class CTSalesOrder extends CTCNC
     private function areAllLinkedSRsFixed(DBEProblem $linkedServiceRequests): bool
     {
         do {
-            $isFixed = in_array($linkedServiceRequests->getValue(DBEProblem::status),"C"]);
+            $isFixed = in_array($linkedServiceRequests->getValue(DBEProblem::status),["C"]);
             if (!$isFixed) {
                 return false;
             }
