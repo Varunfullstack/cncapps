@@ -25,17 +25,17 @@
         <tbody>
         <tr>
             <td>Invoice</td>
-            <td>Amount £(ex VAT)</td>
+            <td>Amount £(inc VAT)</td>
         </tr>
         {% for invoice in data.invoices %}
             <tr>
                 <td>{{ invoice.id }}</td>
-                <td>{{ invoice.amount | format_currency('GBP',{fraction_digit:2}) }}</td>
+                <td style="text-align: right">{{ invoice.amount | format_currency('GBP',{fraction_digit:2}) }}</td>
             </tr>
         {% endfor %}
         <tr>
-            <td>Total</td>
-            <td>{{ data.totalAmount | format_currency('GBP',{fraction_digit:2}) }}</td>
+            <td style="text-align: right">Total</td>
+            <td style="text-align: right">{{ data.totalAmount | format_currency('GBP',{fraction_digit:2}) }}</td>
         </tr>
         </tbody>
     </table>
