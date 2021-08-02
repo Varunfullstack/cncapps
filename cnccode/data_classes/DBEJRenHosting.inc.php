@@ -170,7 +170,7 @@ class DBEJRenHosting extends DBECustomerItem
       JOIN address ON  add_custno = cui_custno AND add_siteno = cui_siteno
 WHERE CURDATE() >= ( DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` - 1 MONTH ) )
 		 AND declinedFlag = 'N' AND renewalTypeID = 5 and directDebitFlag <> 'Y' and item.itm_itemtypeno <> 57";
-        $statement .= " ORDER BY cui_custno, autoGenerateContractInvoice asc";
+        $statement .= " ORDER BY cui_custno, autoGenerateContractInvoice asc,  ity_desc ASC";
         $this->setQueryString($statement);
         return parent::getRows();
     }

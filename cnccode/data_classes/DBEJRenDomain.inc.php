@@ -164,7 +164,7 @@ class DBEJRenDomain extends DBECustomerItem
 				DATE_FORMAT( DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` MONTH ), '%Y%m' )
 			 	AND declinedFlag = 'N'
         AND renewalTypeID = 4 and directDebitFlag <> 'Y' and item.itm_itemtypeno <> 57";
-        $statement .= " ORDER BY cui_custno, autoGenerateContractInvoice asc";
+        $statement .= " ORDER BY cui_custno, autoGenerateContractInvoice asc,  ity_desc ASC";
         $this->setQueryString($statement);
         return parent::getRows();
     }
