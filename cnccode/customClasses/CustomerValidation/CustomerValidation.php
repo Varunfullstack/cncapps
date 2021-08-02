@@ -42,8 +42,7 @@ class CustomerValidation
         $statmentContact=$dbeCustomer->getValue(DBECustomer::statementContactId);
         $referred=$dbeCustomer->getValue(DBECustomer::referredFlag);
         if( $referred)
-        {
-            echo $this->customerId." ".$referred;
+        {            
             return;
         }
         if ( $statmentContact==null) {            
