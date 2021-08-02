@@ -618,10 +618,10 @@ class BUCustomer extends Business
             DBEContact::mailshot,
             'Y'
         );
-        $dsContact->setValue(
-            DBEContact::accountsFlag,
-            'N'
-        );
+        // $dsContact->setValue(
+        //     DBEContact::accountsFlag,
+        //     'N'
+        // );
         $dsContact->setValue(
             DBEContact::mailshot2Flag,
             $this->dsHeader->getValue(DBEHeader::mailshot2FlagDef)
@@ -1708,5 +1708,10 @@ WHERE problem.`pro_custno` <> 282
             "SELECT assetName serverName FROM  unsupportedcustomerasset WHERE customerId=:customerId",
             ["customerId" => $customerID]
         );
+    }
+    public function getStatementContact($customerID){
+        $dbeCustomer = new DBECustomer($this);        
+        return DBConnect::fetchOne("select statementContactId as id from ". $dbeCustomer->getTableName()." where ". $dbeCustomer->getDBColumnName(DBECustomer::customerID) ."=:customerID",
+        ["customerID"=>$customerID])["id"];
     }
 }

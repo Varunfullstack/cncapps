@@ -7,6 +7,7 @@ namespace CNCLTD\CustomerValidation;
 use BUCustomer;
 use DataSet;
 use DBEContact;
+use DBECustomer;
 use DBESite;
 
 class CustomerValidation
@@ -35,13 +36,22 @@ class CustomerValidation
         $atLeastOneMain = false;
         $atLeastOneReview = false;
         $atLeastOneTopUp = !$buCustomer->hasPrepayContract($this->customerId);
-        $atLeastOneReport = false;
+        $atLeastOneReport = false;         
+        $dbeCustomer=new DBECustomer($this);
+        $dbeCustomer->getRow($this->customerId);
+        $statmentContact=$dbeCustomer->getValue(DBECustomer::statementContactId);
+        $referred=$dbeCustomer->getValue(DBECustomer::referredFlag);
+        if( $referred)
+        {
+            echo $this->customerId." ".$referred;
+            return;
+        }
+        if ( $statmentContact==null) {            
+            $atLeastOneAccount = true;
+        }
 
         while ($dsContacts->fetchNext()) {
-            $contactValidation = new ContactValidation($dsContacts->getValue(DBEContact::contactID));
-            if ($dsContacts->getValue(DBEContact::accountsFlag) == 'Y' && !$atLeastOneAccount) {
-                $atLeastOneAccount = true;
-            }
+            $contactValidation = new ContactValidation($dsContacts->getValue(DBEContact::contactID));           
 
             if ($dsContacts->getValue(DBEContact::mailshot2Flag) == 'Y' && !$atLeastOneInvoice) {
                 $atLeastOneInvoice = true;
