@@ -77,10 +77,7 @@ class CTCurrentActivityReport extends CTCNC
             $roles = [
                 "technical"
             ];
-            if(!self::hasPermissions($roles)) {
-                //Header("Location: /NotAllowed.php");
-               // exit;
-            }
+            
         }
     }
 
