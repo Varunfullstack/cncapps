@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## Unreleased - 2021-08-03
+### Changed
+-  1445 - remove permission condition from CurrentActivityReport 
+
 ## [v5.15.2] - 2021-07-28
 ### Changed
 - Changed design environment to use a "cncdesign" database
