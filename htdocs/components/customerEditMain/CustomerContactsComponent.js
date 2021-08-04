@@ -42,6 +42,8 @@ export default class CustomerContactsComponent extends MainComponent {
                 "delegate",
                 "furlough",
             ],
+            showPasswordModal:false,
+           
         };
     }
 
@@ -179,7 +181,23 @@ export default class CustomerContactsComponent extends MainComponent {
                     <Toggle checked={contact.active} onChange={() => null}></Toggle>
                 ),
             },
-
+            {
+                path: "linkedInURL",
+                label: "",
+                hdToolTip: "LinkdIn",               
+                icon: "fab fa-linkedin-in    color-gray2  ",
+                sortable: true,
+                content: (contact) =><a style={{display:contact.linkedInURL?"block":"none"}} href={contact.linkedInURL} target="_blank"><i className="fab fa-linkedin-in pointer icon"></i></a> ,
+            },
+            {
+                path: "portalPassword",
+                //label: "",
+                hdToolTip: "Portal Password",
+                icon: "fal fa-2x  fa-user-secret color-gray2  ",
+                sortable: true,
+                content:(contact)=>this.getPassword(contact)
+            },
+            
             {
                 path: "edit",
                 label: "",
@@ -214,6 +232,72 @@ export default class CustomerContactsComponent extends MainComponent {
         );
     };
 
+    handlePassword=(contact)=>{
+        this.setState({data:{...contact},showPasswordModal:true})
+    }
+
+    getPassword=(contact)=>{
+        if (contact.portalPassword)
+          return (
+            <ToolTip title="Password set">
+              <i className="fas fa-key pointer" onClick={()=>this.handlePassword(contact)}> </i>
+            </ToolTip>
+          );
+        else
+          return (
+            <ToolTip title="Password not set">
+              <i className="fal fa-key pointer" onClick={()=>this.handlePassword(contact)}> </i>
+            </ToolTip>
+          );
+    }
+
+    getPasswordModal=()=>{
+        const {data}=this.state;
+        if(!data)
+        return null;
+        return <Modal 
+        width={400}
+        show={this.state.showPasswordModal}
+        title={`Set ${data.firstName+" "+data.lastName} Portal Password`}
+        onClose={()=>this.setState({showPasswordModal:false})}
+        content={
+            <div>
+                <div className="form-group">
+                <label>Password</label>
+                    <input   onChange={($event)=>this.setValue("portalPassword",$event.target.value)} className="form-control" ></input>
+                </div>
+                
+            </div>
+        }
+        footer={<div key="passwordActions">
+            <button onClick={this.handlePasswordSave}>Save</button>
+            <button onClick={()=>this.setState({showPasswordModal:false})}>Cancel</button>
+        </div>}
+        >
+
+        </Modal>
+    }
+    handlePasswordSave=()=>{
+        const {data}=this.state;
+        if(!data.portalPassword)
+        {
+            this.alert("Please enter password");
+            return;
+        }
+        this.api.setContactPassword(data.id,data.portalPassword).then(res=>{
+         
+           if(res.status=="error")
+           {
+            this.alert(res.error)
+           }
+           else{
+            this.setState({showPasswordModal:false});
+            this.getData();
+           }
+        },error=>{
+            
+        })
+    }
     capitalizeFirstLetter(string) {
         if (string != null) {
             return string.charAt(0).toUpperCase() + string.slice(1);
@@ -257,7 +341,7 @@ export default class CustomerContactsComponent extends MainComponent {
             pendingFurloughActionDate: "",
             pendingFurloughActionLevel: "",
             siteNo: "",
-            active: "",
+            active: "",             
         };
     }
 
@@ -650,7 +734,7 @@ export default class CustomerContactsComponent extends MainComponent {
                 </div>
                 {this.getConfirm()}
                 {this.getAlert()}
-
+                {this.getPasswordModal()}
                 {this.getSummaryElement()}
                 {this.getTable()}
                 <div className="modal-style">{this.getModal()}</div>

@@ -1,6 +1,6 @@
 import React from 'react';
 import './modal.css';
-
+//show, width, title, content, footer, draggable, children
 export class Modal extends React.Component {
     el = React.createElement;
 

@@ -151,6 +151,11 @@ class APICustomers extends APIMain {
     customerHasFolder(customerID){
         return this.postJson(`${ApiUrls.Customer}customerHasFolder&customerID=${customerID}`,null);
     }
+
+    setContactPassword(contactID,password){
+        return this.postJson(`${ApiUrls.Customer}saveContactPassword&contactID=${contactID}&&password=${password}`,null);
+
+    }
 }
 
 export default APICustomers;

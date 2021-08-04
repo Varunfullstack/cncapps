@@ -47,7 +47,7 @@ class CustomerEditComponent extends MainComponent {
             customerId:null,
             loaded: true,
             filter: {                
-                activeTab: this.TAB_CUSTOMER,                 
+                activeTab: this.TAB_CONTACTS,                 
             },
             hasFolder:true
         }
