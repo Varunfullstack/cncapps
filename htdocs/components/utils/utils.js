@@ -426,3 +426,20 @@ export function isNumeric(str) {
     str= str.replaceAll('&amp;', '\&');   
     return str;
   }
+  export function getFileExt(fileName="")
+  {
+    const indx=fileName.lastIndexOf(".");    
+    return fileName.substr(indx+1);
+  }
+  /**
+   * @param fileSize in bytes
+   */
+  export function getFileSize(fileSize)
+  {
+    if(fileSize<1024)
+    return `${fileSize} B`;
+    else if(fileSize>=1024 && fileSize<1024*1024)
+    return `${(fileSize/1024).toFixed(2)} KB`;
+    else if(fileSize>=1024*1024 && fileSize<1024*1024*1024)
+    return `${(fileSize/(1024*1024)).toFixed(2)} MB`;
+  }

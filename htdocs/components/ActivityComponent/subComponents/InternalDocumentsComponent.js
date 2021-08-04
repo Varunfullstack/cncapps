@@ -5,6 +5,8 @@ import Table from "../../shared/table/table";
 import APIActivity from "../../services/APIActivity";
 import MainComponent from "../../shared/MainComponent";
 import './InternalDocumentsComponent.css';
+import CNCFileViewer from './../../shared/CNCFileViewer';
+import { getFileExt } from './../../utils/utils';
 
 export class InternalDocumentsComponent extends MainComponent {
     api = new APIActivity();
@@ -66,10 +68,18 @@ export class InternalDocumentsComponent extends MainComponent {
                 sortable: false,
                 class: 'align-left',
                 hdClassName: 'align-left',
-                content: (document) => (
-                    <a target="_blank"
+                content: (document) =>(
+                        <CNCFileViewer     
+                        key={document.id}
+                        style={{maxWidth:700,maxHeight: 500}}          
+                        type={getFileExt(document.storedFileName)}
+                        filePath={`SRActivity.php?action=viewInternalDocument&documentId=${document.id}&viewer`}
+                         >
+                        <a target="_blank"
                        href={`SRActivity.php?action=viewInternalDocument&documentId=${document.id}`}
-                    >{document.originalFileName}</a>)
+                    >{document.originalFileName}</a>
+                         </CNCFileViewer>
+                        )
             },
             {
                 path: "createdAt",

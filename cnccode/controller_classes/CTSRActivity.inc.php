@@ -656,6 +656,7 @@ class CTSRActivity extends CTCNC
                     'filename'       => $dbeJCallDocument->getValue(DBEJCallDocument::filename),
                     'createUserName' => $dbeJCallDocument->getValue(DBEJCallDocument::createUserName),
                     'createDate'     => $dbeJCallDocument->getValue(DBEJCallDocument::createDate),
+                    'fileLength'     => $dbeJCallDocument->getValue(DBEJCallDocument::fileLength),
                 )
             );
         }
@@ -1586,7 +1587,8 @@ FROM
         try {
             $internalDocument = $this->internalDocumentRepository->getById($documentId);
             header('Content-type: ' . $internalDocument->mimeType());
-            header('Content-Disposition: attachment; filename="' . $internalDocument->originalFileName() . '"');
+            if(!isset($_REQUEST["viewer"]))
+                header('Content-Disposition: attachment; filename="' . $internalDocument->originalFileName() . '"');
             echo $internalDocument->getFileContents();
         } catch (Exception $exception) {
             throw new JsonHttpException(400, "Document not found");

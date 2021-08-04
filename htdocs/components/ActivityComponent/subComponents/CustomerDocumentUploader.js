@@ -6,8 +6,9 @@ import APIActivity from "../../services/APIActivity";
 
 import './CustomerDocumentUploader.css';
 import moment from "moment";
-import {dateFormatExcludeNull} from "../../utils/utils";
-
+import {dateFormatExcludeNull, getFileSize} from "../../utils/utils";
+ import { getFileExt } from './../../utils/utils';
+import CNCFileViewer from "../../shared/CNCFileViewer"
 export default class CustomerDocumentUploader extends React.PureComponent {
     api = new APIActivity();
 
@@ -66,18 +67,35 @@ export default class CustomerDocumentUploader extends React.PureComponent {
                 label: "Description",
                 sortable: false,
                 content: (document) => (
+                    <CNCFileViewer      
+                    key={document.id}
+                    style={{maxWidth:700,maxHeight: 500}}          
+                    type={getFileExt(document.filename)}
+                    filePath={`Activity.php?action=getFileBinary&callDocumentID=${document.id}`}
+                     >
                     <a href={`Activity.php?action=viewFile&callDocumentID=${document.id}`}
                        target="_blank"
-                    >{document.description}</a>)
+                    >{document.description}</a>
+                     </CNCFileViewer>
+                    )
             },
             {
                 path: "File",
                 label: "File",
                 sortable: false,
-                content: (document) => (
+                content: (document) =>(
+                    <CNCFileViewer      
+                    key={document.id}
+                    style={{maxWidth:700,maxHeight: 500}}          
+                    type={getFileExt(document.filename)}
+                    filePath={`Activity.php?action=getFileBinary&callDocumentID=${document.id}`}
+                     >
                     <a href={`Activity.php?action=viewFile&callDocumentID=${document.id}`}
                        target="_blank"
-                    >{document.filename}</a>)
+                    >{document.filename}</a>
+                     </CNCFileViewer>
+                    )
+                     
             },
             {
                 path: "createDate",
@@ -86,6 +104,13 @@ export default class CustomerDocumentUploader extends React.PureComponent {
                 content: document => {
                     return dateFormatExcludeNull(document.createDate, 'YYYY-MM-DD HH:mm:ss')
                 }
+            },
+            {
+                path: "fileLength",
+                label: "Size",
+                sortable: false,
+                content: document => getFileSize(document.fileLength)
+                
             },
             {
                 path: "delete",
@@ -97,6 +122,7 @@ export default class CustomerDocumentUploader extends React.PureComponent {
                     />
                 )
             },
+             
         ]
 
         return (

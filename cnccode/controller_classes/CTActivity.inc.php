@@ -13,6 +13,7 @@
 use CNCLTD\Business\BUActivity;
 use CNCLTD\Business\StandardTextNotFoundException;
 use CNCLTD\core\domain\usecases\AssignToBeLoggedToServiceRequest;
+use CNCLTD\Data\DBConnect;
 use CNCLTD\Data\DBEJProblem;
 use CNCLTD\Exceptions\JsonHttpException;
 use CNCLTD\ServiceRequestInternalNote\infra\ServiceRequestInternalNotePDORepository;
@@ -461,6 +462,9 @@ class CTActivity extends CTCNC
                 }
                 echo json_encode(["status" => "ok"]);
                 exit;
+            case "getFileBinary":
+                echo $this->getFileBinary();
+                break;
             case CTCNC_ACT_DISPLAY_SEARCH_FORM:
             default:
                 $roles = [
@@ -4688,4 +4692,26 @@ WHERE caa_problemno = ?
             echo $exception->getMessage();
         }
     }
+    /**
+     * return document base64
+     *
+     * @access private
+     * @authors Mustafa Taha
+     */
+    function getFileBinary()
+    {
+        
+        // Validation and setting of variables
+        $this->setMethodName('getFileBinary');
+        $documentId=@$_REQUEST["callDocumentID"];
+        if(!isset($documentId))
+            return null;
+        //fileMIMEType,filename
+        $document=DBConnect::fetchOne("select * from calldocument where callDocumentID=:id"
+        ,["id"=>$documentId]);
+        header('Content-type: ' . $document['fileMIMEType']);
+        return $document["file"];
+        //return base64_encode($document["file"]);         
+    }
+
 }

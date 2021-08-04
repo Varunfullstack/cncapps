@@ -6,7 +6,10 @@ import APIRequestDashboard from "../services/APIRequestDashboard";
 import Modal from "../../shared/Modal/modal";
 import CNCCKEditor from "../../shared/CNCCKEditor";
 import APIUser from "../../services/APIUser";
+import CNCFileViewer from './../../shared/CNCFileViewer';
+import { getFileExt } from './../../utils/utils';
 //import './../../style.css';
+
 const APPROVED_STATUS = "Approve";
 
 const DENY_STATUS = "Deny";
@@ -146,13 +149,7 @@ class SalesRequestComponent extends MainComponent {
                 sortable: false,
                 hdClassName: "text-center",
                 className: " text-center text-top",
-                content: (problem) => {
-                    return <div style={{display: "flex", flexDirection: "column"}}>
-                        {problem.attachments.map(file => <a key={file.documentId}
-                                                            href={"Activity.php?action=viewFile&callDocumentID=" + file.documentId}
-                        >{file.filename}</a>)}
-                    </div>
-                }
+                content: (problem) => this.getAttachment(problem)
             },
             {
                 path: "type",
@@ -200,7 +197,23 @@ class SalesRequestComponent extends MainComponent {
             search="true"
         />
     }
-
+    getAttachment=(problem)=>{
+        return <div style={{display: "flex", flexDirection: "column"}}>
+        {problem.attachments.map(document =><div style={{display:"flex",borderRadius:10,backgroundColor:"#bdbec1",margin:2,justifyContent:"center",alignItems:"center"}}>
+        <CNCFileViewer      
+        key={document.id}
+        style={{maxWidth:700,maxHeight: 500}}          
+        type={getFileExt(document.filename)}
+        filePath={`Activity.php?action=getFileBinary&callDocumentID=${document.documentId}`}
+         >
+         <a style={{whiteSpace:"nowrap",padding:4}} key={document.documentId}
+                                            href={"Activity.php?action=viewFile&callDocumentID=" + document.documentId}
+        >{document.filename}</a>
+         </CNCFileViewer>
+         </div>
+       )}
+    </div>
+    }
     processSalesRequest(activity) {
         this.setState({showProcessTimeModal: true, currentActivity: activity});
         this.setValue("callActivityID", activity.callActivityID);
