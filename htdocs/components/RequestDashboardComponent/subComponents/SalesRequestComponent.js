@@ -199,7 +199,7 @@ class SalesRequestComponent extends MainComponent {
     }
     getAttachment=(problem)=>{
         return <div style={{display: "flex", flexDirection: "column"}}>
-        {problem.attachments.map(document =><div style={{display:"flex",borderRadius:10,backgroundColor:"#bdbec1",margin:2,justifyContent:"center",alignItems:"center"}}>
+        {problem.attachments.map(document =><div style={{display:"flex", justifyContent:"center",alignItems:"center"}}>
         <CNCFileViewer      
         key={document.id}
         style={{maxWidth:700,maxHeight: 500}}          

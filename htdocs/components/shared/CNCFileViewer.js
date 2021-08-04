@@ -31,7 +31,7 @@ class CNCFileViewer extends React.Component {
   };
   getFileElement = () => {
     const { type, filePath, style } = this.props;
-    console.log(type);
+    
     const fType = type && type.toLocaleLowerCase();
     if (this.fileType(fType) == "image")
       return (
@@ -64,7 +64,6 @@ class CNCFileViewer extends React.Component {
     this.setState({maxHeight:img.offsetHeight})
   }
   getMaxHeight=()=>{
-    console.log("getMaxHeight")
     const { type } = this.props;
     const fType = type && type.toLocaleLowerCase();
     const {maxHeight}=this.state;
@@ -75,7 +74,6 @@ class CNCFileViewer extends React.Component {
   render() {     
     const { showFile,maxHeight } = this.state;
     const {style}=this.props;
-    console.log("height",this.getMaxHeight())
     return (
       <div
       

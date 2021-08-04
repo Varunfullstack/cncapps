@@ -9,12 +9,14 @@ import moment from "moment";
 import {dateFormatExcludeNull, getFileSize} from "../../utils/utils";
  import { getFileExt } from './../../utils/utils';
 import CNCFileViewer from "../../shared/CNCFileViewer"
-export default class CustomerDocumentUploader extends React.PureComponent {
+import MainComponent from '../../shared/MainComponent';
+export default class CustomerDocumentUploader extends MainComponent {
     api = new APIActivity();
 
     constructor(props, context) {
         super(props, context);
         this.state = {
+            ...this.state,
             uploadFiles: [],
             documents: []
         }
@@ -129,6 +131,7 @@ export default class CustomerDocumentUploader extends React.PureComponent {
             <div className="round-container customer-documents-uploader"
                  style={{position: "relative"}}
             >
+                {this.getConfirm()}
                 <div className="flex-row">
                     <label className="label  mt-5 mr-3 ml-1 mb-5"
                            style={{display: "block"}}
