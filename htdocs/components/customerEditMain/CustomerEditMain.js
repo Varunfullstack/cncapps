@@ -11,19 +11,21 @@ import Toggle from '../shared/Toggle';
 import MainComponent from '../shared/MainComponent';
 import APIUser from '../services/APIUser';
 import APILeadStatusTypes from '../LeadStatusTypes/services/APILeadStatusTypes';
+import APIAudit from './../services/APIAudit';
+import { getUpdatedColumns, Pages } from '../utils/utils';
 
 export default class CustomerEditMain extends MainComponent {
 
     api = new APICustomers();
     apiUsers = new APIUser()
     apiLeadStatusTypes = new APILeadStatusTypes();
-
     constructor(props) {
         super(props);
         this.state = {
             ...this.state,
             loaded: false,
             data: null,
+            originData:null,
             contacts: [],
             users: [],
             customerTypes: [],
@@ -49,11 +51,12 @@ export default class CustomerEditMain extends MainComponent {
         this.apiLeadStatusTypes.getAllTypes().then(leadStatus => {
             this.setState({leadStatus})
         })
+       
     }
 
     getCustomerData = () => {
         this.api.getCustomerData(this.props.customerId).then(data => {
-            this.setState({data})
+            this.setState({data,originData:{...data}})
         }, error => {
             this.alert("Error in get customer data");
             console.log(error);
@@ -698,12 +701,12 @@ export default class CustomerEditMain extends MainComponent {
         </div>
     }
     handleSave = () => {
-        const {data} = this.state;
-        
+        const {data,originData} = this.state;        
         this.api.updateCustomer(data).then(res => {
             if (res.status) {
                 this.alert("Data saved successfully");
                 this.getCustomerData();
+                this.logData(data,originData,data.customerID,null,Pages.Customer);
             } else
                 this.alert("Data not saved successfully");
 
@@ -711,9 +714,13 @@ export default class CustomerEditMain extends MainComponent {
             console.log(error);
             this.alert("Data not saved successfully");
         })
-        console.log(data);
+        //console.log(data);
     }
 
+    
+    isProspect() {
+        return !(this.props.data.becameCustomerDate && !this.props.data.droppedCustomerDate);
+    }
     render() {
         const {data} = this.state;
         if (!data) return null;
@@ -723,86 +730,7 @@ export default class CustomerEditMain extends MainComponent {
                 {this.getCards()}
                 <button onClick={this.handleSave} className="ml-5">Save</button>
             </div>
-        );
-        /*
-                const {
-
-                    customerTypes,
-                    sectors,
-                    accountManagers,
-                    mainContacts,
-                    allContacts
-                } = this.props;
-
-
-                if (!customer) {
-                    return null;
-                }
-
-                const {customerId} = customer;
-                return (
-                    <div className="mt-3">
-                        <div className="row">
-                            <div className="col-md-6 mb-3">
-                                <h2>Customer - {data.name}
-                                    <a href="#">
-                                        <i className="fal fa-globe"/>
-                                    </a>
-                                </h2>
-                            </div>
-                            <div className="col-md-6 mb-3">
-                                <ul className="list-style-none float-right">
-                                    <li>
-                                        <button type="button"
-                                                className="btn btn-sm btn-outline-secondary"
-                                        >Set all
-                                            users to no support (not implemented)
-                                        </button>
-                                        <button type="button"
-                                                className="btn btn-sm btn-outline-secondary"
-                                        >
-                                            <i className="fal fa-filter"/>
-                                        </button>
-                                        <button type="button"
-                                                className="btn btn-sm btn-outline-secondary"
-                                        >
-                                            <i className="fal fa-ellipsis-v"/>
-                                        </button>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-
-                    </div>
-                    // </React.Profiler>
-                )*/
+        );       
     }
-
-    isProspect() {
-        return !(this.props.data.becameCustomerDate && !this.props.data.droppedCustomerDate);
-    }
+    
 }
-/*
-function mapStateToProps(state) {
-    const {customerEdit} = state;
-    return {
-        customer: customerEdit.customer,
-        customerTypes: customerEdit.customerTypes,
-        leadStatuses: customerEdit.leadStatuses,
-        sectors: customerEdit.sectors,
-        accountManagers: customerEdit.accountManagers,
-        reviewEngineers: customerEdit.reviewEngineers,
-        mainContacts: getMainContacts(state),
-        allContacts : getAllContacts(state)
-    }
-}
-
-function mapDispatchToProps(dispatch) {
-    return {
-        customerValueUpdate: (field, value) => {
-            dispatch(updateCustomerField(field, value))
-        }
-    }
-}*/
-
-//export default connect(mapStateToProps, mapDispatchToProps)(CustomerEditMain)

@@ -111,4 +111,6 @@
     <include file="db.changelog-issue1366.xml"/>
     <include file="db.changelog-issue909.xml"/>
     <include file="db.changelog-issue916.xml"/>
+    <include file="db.changelog-issue1468.xml"/>
+    
 </databaseChangeLog>

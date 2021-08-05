@@ -30,6 +30,7 @@ import './../style.css';
 import { params } from "../utils/utils";
 import ToolTip from "../shared/ToolTip";
 import APICustomers from "../services/APICustomers";
+import CustomerLog from "./CustomerLog";
 class CustomerEditComponent extends MainComponent {
     tabs = [];
     TAB_CUSTOMER='customer';    
@@ -41,13 +42,14 @@ class CustomerEditComponent extends MainComponent {
     TAB_CRM='crm';
     TAB_NOTES='notes';
     api=new APICustomers();
+    TAB_LOG="log";
     constructor(props) {
         super(props);
          this.state = {
             customerId:null,
             loaded: true,
             filter: {                
-                activeTab: this.TAB_CUSTOMER,                 
+                activeTab: this.TAB_LOG,
             },
             hasFolder:true
         }
@@ -59,7 +61,9 @@ class CustomerEditComponent extends MainComponent {
             {id: this.TAB_PORTAL_DOCUMENT, title: "Portal Documents", icon: null},
             {id: this.TAB_CRM, title: "CRM", icon: null},      
             {id: this.TAB_NOTES, title: "Notes", icon: null},    
-            {id: this.TAB_ORDERS, title: "Orders", icon: null},         
+            {id: this.TAB_ORDERS, title: "Orders", icon: null},
+            {id: this.TAB_LOG, title: "Audit", icon: null},
+
         ];
        // store.dispatch(fetchAllData(customerId));
     }
@@ -118,6 +122,8 @@ class CustomerEditComponent extends MainComponent {
             return <CustomerSitesComponent customerId={customerId}></CustomerSitesComponent>;
           case this.TAB_NOTES:
             return <CustomerNotesComponent customerId={customerId}></CustomerNotesComponent>;
+        case this.TAB_LOG:
+            return <CustomerLog customerId={customerId}></CustomerLog>
         }
     }
     getActions=()=>{
