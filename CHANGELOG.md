@@ -12,6 +12,7 @@ This project changes will be shown here.
 - Issue 915  - Customer Page Sites Rewrite
 - Issue 916  - Customer Page  Rewrite
 - Issue 1407 - Preview attached documents in Activities.
+- Issue 1467 - Update Customer Validation to deal with contact changes.
 
 ## [v5.14.0] - 2021-07-13
 ### Changed
