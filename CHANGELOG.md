@@ -6,11 +6,12 @@ This project changes will be shown here.
 - Issue 1366 - rewrite GoodsIn.php,QuoteTemplates.php, ContractAndNumbersReport.php,  PurchaseInv.php, PaymentTerms.php, ItemBillingCategory.php, update table default align
 - Issue 1417 - Left align table headings.
 - Issue 981  - My Daily Call List visual tweaks.
-- Issue 909 - Update GUI on Customer Page
-- Issue 913 - Customer Page Main Section Rewrite
-- Issue 914 - Customer Page Customer Notes, Projects, Portal Documents Rewrite
-- Issue 915 - Customer Page Sites Rewrite
-- Issue 916 - Customer Page  Rewrite
+- Issue 909  - Update GUI on Customer Page
+- Issue 913  - Customer Page Main Section Rewrite
+- Issue 914  - Customer Page Customer Notes, Projects, Portal Documents Rewrite
+- Issue 915  - Customer Page Sites Rewrite
+- Issue 916  - Customer Page  Rewrite
+- Issue 1407 - Preview attached documents in Activities.
 
 ## [v5.14.0] - 2021-07-13
 ### Changed
