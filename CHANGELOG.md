@@ -3,8 +3,8 @@ This project changes will be shown here.
 
 ## [unreleased] 
 ### Changed
-- Issue 1445 - remove permission condition from CurrentActivityReport
-- Issue 1366 - rewrite GoodsIn.php,QuoteTemplates.php, ContractAndNumbersReport.php,  PurchaseInv.php, PaymentTerms.php, ItemBillingCategory.php, update table default align
+- Issue 1445 - Remove permission condition from CurrentActivityReport
+- Issue 1366 - Rewrite GoodsIn.php,QuoteTemplates.php, ContractAndNumbersReport.php,  PurchaseInv.php, PaymentTerms.php, ItemBillingCategory.php, update table default align
 - Issue 1417 - Left align table headings.
 - Issue 981  - My Daily Call List visual tweaks.
 - Issue 909  - Update GUI on Customer Page
@@ -20,6 +20,10 @@ This project changes will be shown here.
 ## [v5.15.3] - 2021-07-29
 ### Changed
 - Force recalculation of holiday hours in user time log when half holiday is registered. 
+
+## Unreleased - 2021-08-02
+### Changed
+- SR Call Back Tweaks Add Message - The Service Request must be reopened before a call back can be logged.
 
 ## [v5.15.2] - 2021-07-28
 ### Changed

@@ -228,7 +228,7 @@ class ActivityDisplayComponent extends MainComponent {
                     title="Call Back"
                     content={<a
                         className="fal fa-phone fa-2x m-5 pointer icon"
-                        onClick={this.showCallbackModal}
+                        onClick={data?.problemStatus === 'F' ? this.showAlertModal : this.showCallbackModal}
                     />
                     }
                 /> : null
@@ -1259,6 +1259,9 @@ class ActivityDisplayComponent extends MainComponent {
         }
         this.hideAdditionalTimeRequestModal();
     };
+    showAlertModal = () => {
+        this.alert('The Service Request must be reopened before a call back can be logged.');
+    }
 
     showCallbackModal = () => {
         this.setState({showCallbackModal: true});
