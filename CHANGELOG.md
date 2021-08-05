@@ -1,6 +1,11 @@
 # Changelog
 This project changes will be shown here.
 
+## Unreleased - 2021-08-05
+## Changed
+- Changed in mysql query for select EmailSubjectSummary 
+- Changed in SRSourceComponent for add new column for EmailSubjectSummary
+
 ## [v5.15.2] - 2021-07-28
 ### Changed
 - Changed design environment to use a "cncdesign" database
