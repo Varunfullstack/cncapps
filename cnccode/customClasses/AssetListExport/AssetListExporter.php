@@ -202,7 +202,7 @@ class AssetListExporter
             }
         }
         $this->addLegend($summarySheet);
-        $tempFileName = null;
+        $this->setDateFormats($summarySheet, true);
         echo '<h1>Generating Summary</h1>';
         $summarySheet->setAutoFilter($summarySheet->calculateWorksheetDimension());
         $summarySheet->getStyle($summarySheet->calculateWorksheetDimension())->getAlignment()->setHorizontal('center');
@@ -367,7 +367,7 @@ class AssetListExporter
         if (!$warrantyExpiryDate || $warrantyExpiryDate == "Unknown" || $warrantyExpiryDate == "Not Applicable") {
             return null;
         }
-        $date = Date::excelToDateTimeObject($warrantyExpiryDate);
+        $date  = Date::excelToDateTimeObject($warrantyExpiryDate);
         $today = new DateTime();
         if ($date > $today) {
             return null;
@@ -545,16 +545,26 @@ class AssetListExporter
 
     /**
      * @param Worksheet $sheet
+     * @param bool $isSummary
      */
-    private function setDateFormats(Worksheet $sheet): void
+    private function setDateFormats(Worksheet $sheet, $isSummary = false): void
     {
-        $range = Coordinate::stringFromColumnIndex(6) . ":" . Coordinate::stringFromColumnIndex(7);
+        $additionalRow = (int)$isSummary;
+        $range         = Coordinate::stringFromColumnIndex(
+                6 + $additionalRow
+            ) . ":" . Coordinate::stringFromColumnIndex(7 + $additionalRow);
         $sheet->getStyle($range)->getNumberFormat()->setFormatCode('dd/mm/yyyy');
-        $range = Coordinate::stringFromColumnIndex(4) . ":" . Coordinate::stringFromColumnIndex(4);
+        $range = Coordinate::stringFromColumnIndex(4 + $additionalRow) . ":" . Coordinate::stringFromColumnIndex(
+                4 + $additionalRow
+            );
         $sheet->getStyle($range)->getNumberFormat()->setFormatCode('dd/mm/yyyy h:mm:ss');
-        $range = Coordinate::stringFromColumnIndex(16) . ":" . Coordinate::stringFromColumnIndex(16);
+        $range = Coordinate::stringFromColumnIndex(16 + $additionalRow) . ":" . Coordinate::stringFromColumnIndex(
+                16 + $additionalRow
+            );
         $sheet->getStyle($range)->getNumberFormat()->setFormatCode('dd/mm/yyyy');
-        $range = Coordinate::stringFromColumnIndex(20) . ":" . Coordinate::stringFromColumnIndex(20);
+        $range = Coordinate::stringFromColumnIndex(20 + $additionalRow) . ":" . Coordinate::stringFromColumnIndex(
+                20 + $additionalRow
+            );
         $sheet->getStyle($range)->getNumberFormat()->setFormatCode('dd/mm/yyyy');
     }
 

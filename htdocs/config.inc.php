@@ -801,8 +801,9 @@ switch ($server_type) {
     case MAIN_CONFIG_SERVER_TYPE_DESIGN:
         define(
             "DB_NAME",
-            "cnctest"
+            "cncdesign"
         );
+
         define(
             "TECHNICAL_DIR",
             "\\\\cncltd\\cnc\\Customer\\dev\\Computer & Network Consultants Ltd"

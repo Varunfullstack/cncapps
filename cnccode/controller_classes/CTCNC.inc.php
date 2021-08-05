@@ -388,6 +388,17 @@ class CTCNC extends Controller
             "SDManagerDashboard.php",
             $SDManagerSection['label']
         );
+
+        $this->addConditionalMenu(
+            $menu,
+            $SDManagerSection['icon'],
+            $SDManagerSection['key'],
+            $this->isSdManager() || $this->isSRQueueManager(),
+            202,
+            "Request Dashboard",
+            "RequestDashBoard.php",
+            $SDManagerSection['label']
+        );
         $this->addConditionalMenu(
             $menu,
             $SDManagerSection["icon"],
@@ -616,26 +627,6 @@ class CTCNC extends Controller
     {
 
         return [
-            // [
-            //     "id"    => 202,
-            //     "label" => "Time Requests",
-            //     "href"  => "TimeRequestDashboard.php"
-            // ],
-            // [
-            //     "id"    => 203,
-            //     "label" => "Change Requests",
-            //     "href"  => "ChangeRequestDashboard.php?HD=null&ES=null&SP=null&P=null"
-            // ],
-            // [
-            //     "id"    => 204,
-            //     "label" => "Sales Requests",
-            //     "href"  => "SalesRequestDashboard.php"
-            // ],
-            [
-                "id"    => 202,
-                "label" => "Request Dashboard",
-                "href"  => "RequestDashBoard.php"
-            ],
             [
                 "id"    => 205,
                 "label" => "Schedule SR",

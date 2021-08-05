@@ -40,7 +40,7 @@ class CTRequestDashboard extends CTCNC
             $cookieVars,
             $cfg,
         );
-        if (!self::isSdManager()) {
+        if (!(self::isSdManager() || self::isSRQueueManager())) {
             Header("Location: /NotAllowed.php");
             exit;
         }

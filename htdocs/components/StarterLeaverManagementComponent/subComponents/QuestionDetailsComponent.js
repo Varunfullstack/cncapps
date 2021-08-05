@@ -57,8 +57,10 @@ export default class QuestionDetailsComponent extends MainComponent {
         data.multi = data.multi ? 1 : 0;
 
         if (data.options)
+    {
             data.options = JSON.stringify(data.options);
-        if (data.questionID != null)
+        console.log('options error',data)
+    }if (data.questionID != null)
         {
             this.api.updateQuestion(data).then(res => {
                 if (this.props.onClose) this.props.onClose(true);

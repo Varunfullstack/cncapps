@@ -1,8 +1,9 @@
 # Changelog
 This project changes will be shown here.
 
-## [unreleased]
+## [unreleased] 
 ### Changed
+- Issue 1445 - remove permission condition from CurrentActivityReport
 - Issue 1366 - rewrite GoodsIn.php,QuoteTemplates.php, ContractAndNumbersReport.php,  PurchaseInv.php, PaymentTerms.php, ItemBillingCategory.php, update table default align
 - Issue 1417 - Left align table headings.
 - Issue 981  - My Daily Call List visual tweaks.
@@ -13,6 +14,28 @@ This project changes will be shown here.
 - Issue 916  - Customer Page  Rewrite
 - Issue 1407 - Preview attached documents in Activities.
 - Issue 1467 - Update Customer Validation to deal with contact changes.
+
+## [v5.15.2] - 2021-07-28
+### Changed
+- Changed design environment to use a "cncdesign" database
+
+## [v5.15.1] - 2021-07-27
+### Changed
+- Changed Kingswood importing to use hardcoded customer Id instead of relying on email2db to set it correctly.
+
+## [v5.15.0] - 2021-07-23
+### Added
+- Issue 1398 - Include M635 mailbox archive status in Mailbox Report.
+### Changed
+- Issue 1448 - Ignore spelling mistakes in Internal Notes with logging a new SR
+- Issue 1465 - Request Dashboard to show for Queue Manager permissions as well
+### Fixed
+- Issue 1394 - Asset List Export - date formatting of full list.
+
+## [v5.14.1] - 2021-07-16
+### Fixed
+- Fixed issue with Starter Leaver management losing all the options for multichoice questions when reordered.
+- Fixed issue with Kingswood new process to prevent it from processing automated requests not coming from the right
 
 ## [v5.14.0] - 2021-07-13
 ### Changed

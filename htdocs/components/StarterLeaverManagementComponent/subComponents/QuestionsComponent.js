@@ -38,7 +38,7 @@ export default class QuestionsComponent extends MainComponent {
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        if (!equal(prevProps.customer, this.state.customer)) {
+            if (!equal(prevProps.customer, this.state.customer)) {
             this.getCustomerQuestions();
         }
     }
@@ -172,11 +172,16 @@ export default class QuestionsComponent extends MainComponent {
         if (next) {
             current.sortOrder = next.sortOrder;
             next.sortOrder = current.sortOrder + 0.001;
+            if (next.options)
+                next.options = JSON.stringify(next.options);
             await this.api.updateQuestion(next);
         }
         if (!next) {
             current.sortOrder = Math.max(...questions.map(i => i.sortOrder)) + 0.001;
         }
+
+        if (current.options)
+            current.options = JSON.stringify(current.options);
 
         await this.api.updateQuestion(current);
         this.getCustomerQuestions();

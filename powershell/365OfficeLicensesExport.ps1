@@ -24,7 +24,7 @@ try
     $MailboxesReport = @()
     $DevicesReport = @()
     $PermissionsReport = [System.Collections.Generic.List[Object]]::new()
-    $Mailboxes = Get-EXOMailbox -ResultSize Unlimited | Where-Object { $_.RecipientTypeDetails -ne "DiscoveryMailbox" }
+    $Mailboxes = Get-EXOMailbox -ResultSize Unlimited -Properties DisplayName,UserPrincipalName,RecipientTypeDetails,ArchiveStatus | Where-Object { $_.RecipientTypeDetails -ne "DiscoveryMailbox" }
     [array]$LicensesData = Get-MsolAccountSku | Select-Object  AccountSkuId, ActiveUnits, @{ Name = 'Unallocated'; Expression = { $_.ActiveUnits - $_.ConsumedUnits } }
     $TenantDomainName = (Get-AcceptedDomain | Where-Object { $_.DomainName -like "*onmicrosoft.com" -and $_.DomainName -notlike "*mail.onmicrosoft.com" }).DomainName
     $SharePointName = $TenantDomainName.split('.')[0]
@@ -50,6 +50,7 @@ try
     Remove-TypeData System.Array
     foreach ($mailbox in $Mailboxes)
     {
+
         $DisplayName = $mailbox.DisplayName
         $UserPrincipalName = $mailbox.UserPrincipalName
         $devices = Get-EXOMobileDeviceStatistics -UserPrincipalName $UserPrincipalName
@@ -86,8 +87,10 @@ try
             $TotalItemSize = $MailboxStat.TotalItemSize.ToString().Split("(")[1].Split(" ")[0].Replace(",", "")/1MB
             $totalEmailStorageUsed = $totalEmailStorageUsed + $TotalItemSize
             $RecipientTypeDetails = $mailbox.RecipientTypeDetails
+            $IsArchiveEnabled = $mailbox.ArchiveStatus -eq "Active"
             $MSOLUSER = Get-MsolUser -UserPrincipalName $UserPrincipalName -ErrorAction Stop
             $CASMailBox = Get-EXOCASMailbox -Identity $UserPrincipalName -ErrorAction Stop
+
             if ($CASMailBox.OWAEnabled)
             {
                 $OWA = 'Yes'
@@ -109,7 +112,7 @@ try
             {
                 $licenses += $license.AccountSkuId
             }
-            $Information = $MSOLUSER | Select-Object @{ Name = 'DisplayName'; Expression = { $DisplayName + " (" + $UserPrincipalName + ")" } }, @{ Name = 'TotalItemSize'; Expression = { $TotalItemSize } }, @{ Name = 'RecipientTypeDetails'; Expression = { [String]::join(";", $RecipientTypeDetails) } }, islicensed, @{ Name = "Licenses"; Expression = { $licenses.SyncRoot } }, @{ Name = 'OWAEnabled'; Expression = { $OWA } }, @{ Name = '2FA'; Expression = { $2FA } }, @{ Name = 'OneDriveStorageUsed'; Expression = { $oneDriveStorageUsage } }
+            $Information = $MSOLUSER | Select-Object @{ Name = 'DisplayName'; Expression = { $DisplayName + " (" + $UserPrincipalName + ")" } }, @{ Name = 'TotalItemSize'; Expression = { $TotalItemSize } }, @{ Name = 'RecipientTypeDetails'; Expression = { [String]::join(";", $RecipientTypeDetails) } },@{ Name = 'IsArchiveEnabled'; Expression = { $IsArchiveEnabled } }, islicensed, @{ Name = "Licenses"; Expression = { $licenses.SyncRoot } }, @{ Name = 'OWAEnabled'; Expression = { $OWA } }, @{ Name = '2FA'; Expression = { $2FA } },  @{ Name = 'OneDriveStorageUsed'; Expression = { $oneDriveStorageUsage } }
             $MailboxesReport += $Information
         }
         catch
@@ -121,11 +124,9 @@ try
 
         If ($Null -ne $Permissions)
         {
-            Write-Host "we have permissions!!"
             # Grab each permission and output it into the report
             ForEach ($Permission in $Permissions)
             {
-                Write-Host $Permission | Select-Object -ExpandProperty AccessRights
                 $ReportLine = [PSCustomObject]@{
                     "Mailbox Name" = $DisplayName
                     "Email Address" = $UserPrincipalName
@@ -135,10 +136,7 @@ try
                 }
                 $PermissionsReport.Add($ReportLine)
             }
-        } else {
-            Write-Host "we have no permissions!!"
         }
-
 
         $mailboxIndex++
         $progressPCT = 0

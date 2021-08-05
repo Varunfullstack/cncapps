@@ -72,15 +72,13 @@ class CTCurrentActivityReport extends CTCNC
         $this->buActivity     = new BUActivity($this);
         $this->buCustomerItem = new BUCustomerItem($this);
         $checkPermissions     = !in_array($this->getAction(), [self::CONST_CALLBACK]);
+
         if ($checkPermissions) {
 
             $roles = [
-                "technical",
+                "technical"
             ];
-            if (!self::hasPermissions($roles)) {
-                Header("Location: /NotAllowed.php");
-                exit;
-            }
+            
         }
     }
 
