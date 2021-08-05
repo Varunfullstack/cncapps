@@ -2,6 +2,8 @@
 This project changes will be shown here.
 
 ## [unreleased] 
+### Added
+- Issue 1460 - Added Sales Order Id for the Sales Requests tab.
 ### Changed
 - Issue 1445 - Remove permission condition from CurrentActivityReport
 - Issue 1366 - Rewrite GoodsIn.php,QuoteTemplates.php, ContractAndNumbersReport.php,  PurchaseInv.php, PaymentTerms.php, ItemBillingCategory.php, update table default align
@@ -17,18 +19,11 @@ This project changes will be shown here.
 - Issue 1468 - Create Customer Edit Audit Log.
 - Issue 1459 - Changes in sales order for view SR.
 - Issue 1469 - Changed parameter for getCustomerList  => only active
+- Issue 1470 - SR Call Back Tweaks Add Message - The Service Request must be reopened before a call back can be logged.
 
 ## [v5.15.3] - 2021-07-29
 ### Changed
 - Force recalculation of holiday hours in user time log when half holiday is registered. 
-
-## Unreleased - 2021-08-02
-### Changed
-- SR Call Back Tweaks Add Message - The Service Request must be reopened before a call back can be logged.
-
-
- 
-
 
 ## [v5.15.2] - 2021-07-28
 ### Changed

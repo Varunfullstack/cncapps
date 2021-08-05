@@ -83,6 +83,7 @@ class SalesRequestComponent extends MainComponent {
     getDataElement = () => {
         const {el} = this;
         const {activities} = this.state;
+        //console.log(activities);
         const columns = [
             {
                 path: "customerName",
@@ -107,6 +108,20 @@ class SalesRequestComponent extends MainComponent {
                     href: `SRActivity.php?action=displayActivity&serviceRequestId=${problem.problemID}`,
                     target: '_blank'
                 }, problem.problemID)
+            },
+            {
+                path: "linkedSalesOrderId",
+                label: "",
+                hdToolTip: "Sales Order",
+                hdClassName: "text-center",
+                icon: "fal fa-2x fa-tag color-gray2 pointer",
+                className: "text-center text-top",
+                classNameColumn: "",
+                sortable: false,
+                content: (problem) => el('a', {
+                    href: `SalesOrder.php?action=displaySalesOrder&ordheadID=${problem.linkedSalesOrderId}`,
+                    target: '_blank'
+                }, problem.linkedSalesOrderId)
             },
             {
                 path: "requestBody",
@@ -305,4 +320,3 @@ class SalesRequestComponent extends MainComponent {
 
 export default SalesRequestComponent;
 
- 
