@@ -15,6 +15,11 @@ This project changes will be shown here.
 - Issue 1407 - Preview attached documents in Activities.
 - Issue 1467 - Update Customer Validation to deal with contact changes.
 - Issue 1468 - Create Customer Edit Audit Log.
+- Issue 1459 - Changes in sales order for view SR.
+
+## [v5.15.3] - 2021-07-29
+### Changed
+- Force recalculation of holiday hours in user time log when half holiday is registered. 
 
 ## [v5.15.2] - 2021-07-28
 ### Changed

@@ -5,6 +5,7 @@
  * @authors Karim Ahmed - Sweet Code Limited
  */
 
+use CNCLTD\Business\BUActivity;
 use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
@@ -198,18 +199,22 @@ class BUUser extends Business
         $dbeUser = new DBEUser($this);
         $dbeUser->getRow($userID);
         $subject = 'Staff Member ' . $dbeUser->getValue(DBEUser::name) . ' has been reported as sick';
-        $body    = $twig->render(
-            '@internal/userReportedSickEmail.html.twig',
-            [
-                "staffName"      => $dbeUser->getValue(DBEUser::name),
-                "reporterName"   => $reporter->getValue(DBEUser::name),
-                "sickStartDate"  => DateTime::createFromFormat(DATE_MYSQL_DATE, $startDate)->format('d-m-Y'),
-                "days"           => $days,
-                "moreThanOneDay" => $days > 1,
-                "isHalfDay"      => $sickTime !== 'F',
-                "sickTime"       => $sickTime == 'A' ? 'morning' : 'afternoon'
-            ]
-        );
+        $body    = $twig->render('@internal/userReportedSickEmail.html.twig', [
+            "staffName"      => $dbeUser->getValue(
+                DBEUser::name
+            ),
+            "reporterName"   => $reporter->getValue(
+                DBEUser::name
+            ),
+            "sickStartDate"  => DateTime::createFromFormat(
+                DATE_MYSQL_DATE,
+                $startDate
+            )->format('d-m-Y'),
+            "days"           => $days,
+            "moreThanOneDay" => $days > 1,
+            "isHalfDay"      => $sickTime !== 'F',
+            "sickTime"       => $sickTime == 'A' ? 'morning' : 'afternoon'
+        ]);
         $emailTo = "sicknessalert@" . CONFIG_PUBLIC_DOMAIN;
         $hdrs    = array(
             'From'         => CONFIG_SUPPORT_EMAIL,
@@ -259,34 +264,30 @@ class BUUser extends Business
         (
           ?,?,?,0,?,'00:00:00',?
         )";
-        return $db->preparedQuery(
-            $sql,
-            [
-                ["value" => $userID, "type" => "i"],
-                ["value" => $teamLevel, "type" => "i"],
-                ["value" => $date, "type" => "s"],
-                ["value" => $standardDayHours, "type" => "d"],
-                ["value" => $sickTime, "type" => "s"],
-            ]
-        );
+        return $db->preparedQuery($sql, [
+            ["value" => $userID, "type" => "i"],
+            ["value" => $teamLevel, "type" => "i"],
+            ["value" => $date, "type" => "s"],
+            ["value" => $standardDayHours, "type" => "d"],
+            ["value" => $sickTime, "type" => "s"],
+        ]);
     }
 
     function logHalfHoliday($userID, $date)
     {
         global $db;
-        $db->preparedQuery(
-            "insert ignore into userHalfHolidays values(?,?)",
+        $db->preparedQuery("insert into userHalfHolidays values(?,?)", [
             [
-                [
-                    "type"  => "i",
-                    "value" => $userID,
-                ],
-                [
-                    "type"  => "s",
-                    "value" => $date,
-                ]
+                "type"  => "i",
+                "value" => $userID,
+            ],
+            [
+                "type"  => "s",
+                "value" => $date,
             ]
-        );
+        ]);
+        $buActivity = new BUActivity($this);
+        $buActivity->updateTotalUserLoggedHours($userID, $date);
     }
 
     function userTimeHasBeenLogged($ID)
@@ -481,8 +482,7 @@ ORDER BY user_time_log.`loggedDate` DESC
     function getUserPerformanceByUserBetweenDates($userId, DateTimeInterface $startDate, DateTimeInterface $endDate)
     {
         global $db;
-        $statement = $db->preparedQuery(
-            "SELECT 
+        $statement = $db->preparedQuery("SELECT 
         cns_name,
         teamLevel,
         SUM( loggedHours + cncLoggedHours ) AS loggedHours,
@@ -498,22 +498,22 @@ ORDER BY user_time_log.`loggedDate` DESC
           loggedDate >= ? and loggedDate <= ?
           AND userID = ?    
           AND not isBankHoliday(loggedDate)
-      GROUP BY cns_consno",
-            [
-                [
-                    "type"  => 's',
-                    "value" => $startDate->format(DATE_MYSQL_DATE),
-                ],
-                [
-                    "type"  => 's',
-                    "value" => $endDate->format(DATE_MYSQL_DATE),
-                ],
-                [
-                    "type"  => 'i',
-                    "value" => $userId,
-                ],
-            ]
-        );
+      GROUP BY cns_consno", [
+                                                                      [
+                                                                          "type"  => 's',
+                                                                          "value" => $startDate->format(
+                                                                              DATE_MYSQL_DATE
+                                                                          ),
+                                                                      ],
+                                                                      [
+                                                                          "type"  => 's',
+                                                                          "value" => $endDate->format(DATE_MYSQL_DATE),
+                                                                      ],
+                                                                      [
+                                                                          "type"  => 'i',
+                                                                          "value" => $userId,
+                                                                      ],
+                                                                  ]);
         return $statement->fetch_array(MYSQLI_ASSOC);
     }
 
