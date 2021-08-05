@@ -14,6 +14,7 @@ This project changes will be shown here.
 - Issue 916  - Customer Page  Rewrite
 - Issue 1407 - Preview attached documents in Activities.
 - Issue 1467 - Update Customer Validation to deal with contact changes.
+- Issue 1468 - Create Customer Edit Audit Log.
 
 ## [v5.15.2] - 2021-07-28
 ### Changed
