@@ -20,7 +20,8 @@ This project changes will be shown here.
 - Issue 1459 - Changes in sales order for view SR.
 - Issue 1469 - Changed parameter for getCustomerList  => only active
 - Issue 1470 - SR Call Back Tweaks Add Message - The Service Request must be reopened before a call back can be logged.
-- Issue 1449 - Undo all Changes and add css for Expand Sales Order,Purchase Order Cost & Sales size boxes 
+- Issue 1449 - Undo all Changes and add css for Expand Sales Order,Purchase Order Cost & Sales size boxes
+- Issue 1446 - Changed condition for solve issue send email for 85
 
 ## [v5.15.3] - 2021-07-29
 ### Changed

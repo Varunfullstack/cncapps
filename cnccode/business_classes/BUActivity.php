@@ -6017,9 +6017,7 @@ class BUActivity extends Business
         /*
     Send an email to the new person new user is not "unallocated" user
     */
-        if ($userID && $this->dbeUser->getValue(
-                DBEJUser::sendEmailWhenAssignedService
-            ) == 1) { // not de-allocating
+        if ($userID ) { // not de-allocating
             $this->sendServiceReallocatedEmail(
                 $problemID,
                 $userID,
