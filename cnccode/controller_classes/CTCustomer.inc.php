@@ -2952,7 +2952,7 @@ ORDER BY NAME,
         $customerID = $_REQUEST["customerID"];
         $dbeContact = new DBEContact($this);
         $dbeSite    = new DBESite($this);
-        $dbeContact->getRowsByCustomerID($customerID, true);
+        $dbeContact->getRowsByCustomerID($customerID, false);
         $buCustomer     = new BUCustomer($this);
         $primaryContact = $buCustomer->getPrimaryContact($customerID);        
         $contacts       = array();

@@ -16,6 +16,7 @@ This project changes will be shown here.
 - Issue 1467 - Update Customer Validation to deal with contact changes.
 - Issue 1468 - Create Customer Edit Audit Log.
 - Issue 1459 - Changes in sales order for view SR.
+- Issue 1469 - Changed parameter for getCustomerList  => only active
 
 ## [v5.15.3] - 2021-07-29
 ### Changed
@@ -24,6 +25,10 @@ This project changes will be shown here.
 ## Unreleased - 2021-08-02
 ### Changed
 - SR Call Back Tweaks Add Message - The Service Request must be reopened before a call back can be logged.
+
+
+ 
+
 
 ## [v5.15.2] - 2021-07-28
 ### Changed
