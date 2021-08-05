@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [unreleased] 
+## [v5.16.0] 
 ### Added
 - Issue 1460 - Added Sales Order Id for the Sales Requests tab.
 ### Changed
