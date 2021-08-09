@@ -363,6 +363,14 @@ class SRSourceComponent extends React.Component {
         icon: "fal fa-2x fa-id-card-alt color-gray2 pointer",
       },
       {
+        path: "emailSummary",
+        label: "",
+        sortable: true,
+        hdToolTip: "Service Request Source",
+        hdClassName: "text-center",
+        icon: "fal fa-2x fa-file-alt color-gray2 pointer",
+      },
+      {
         path: "Contract",
         label: "",
         sortable: true,

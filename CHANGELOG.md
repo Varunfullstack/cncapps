@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [unreleased] 
+## [v5.16.0] 
 ### Added
 - Issue 1460 - Added Sales Order Id for the Sales Requests tab.
 ### Changed
@@ -22,6 +22,7 @@ This project changes will be shown here.
 - Issue 1470 - SR Call Back Tweaks Add Message - The Service Request must be reopened before a call back can be logged.
 - Issue 1449 - Undo all Changes and add css for Expand Sales Order,Purchase Order Cost & Sales size boxes
 - Issue 1446 - Changed condition for solve issue send email for 85
+- Issue 1478 - Add column for Email Subject summary at SRSourceComponent
 
 ## [v5.15.3] - 2021-07-29
 ### Changed
