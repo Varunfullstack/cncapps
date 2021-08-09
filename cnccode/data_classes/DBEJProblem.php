@@ -1192,7 +1192,7 @@ class DBEJProblem extends DBEProblem
 
     public function isWorkHidden()
     {
-        return $this->getValue(DBECustomer::referredFlag) == 1;
+        return $this->getValue(DBECustomer::referredFlag);
     }
 
     public function getNearSLA(): bool

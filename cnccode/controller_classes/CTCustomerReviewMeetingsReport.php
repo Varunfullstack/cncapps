@@ -22,13 +22,13 @@ class CTCustomerReviewMeetingsReport extends CTCNC
     /** @var BUCustomerReviewMeeting */
     private $buCustomerReviewMeetings;
 
-    function __construct($requestMethod,
-                         $postVars,
-                         $getVars,
-                         $cookieVars,
-                         $cfg
-    )
-    {
+    function __construct(
+        $requestMethod,
+        $postVars,
+        $getVars,
+        $cookieVars,
+        $cfg
+    ) {
         parent::__construct(
             $requestMethod,
             $postVars,
@@ -52,7 +52,6 @@ class CTCustomerReviewMeetingsReport extends CTCNC
     function defaultAction()
     {
         switch ($this->getAction()) {
-
             default:
                 $this->display();
                 break;
@@ -64,7 +63,6 @@ class CTCustomerReviewMeetingsReport extends CTCNC
      */
     function display()
     {
-
         $this->setPageTitle("Customer Review Meetings");
         $this->setTemplateFiles(
             'CustomerReviewMeetings',
@@ -73,17 +71,13 @@ class CTCustomerReviewMeetingsReport extends CTCNC
 
         $dbeCustomer = new DBECustomer($this);
 
-        $dbeCustomer->setValue(
-            DBECustomer::referredFlag,
-            0
-        );
+        $dbeCustomer->setValue(DBECustomer::referredFlag, false);
 
         $dbeCustomer->getReviewMeetingCustomers();
 
         $customerReviewMeetings = [];
 
         while ($dbeCustomer->fetchNext()) {
-
             $BUSite = new BUSite($this);
             $activeCustomerSites = new DataSet($this);
             $BUSite->getActiveSitesByCustomer($dbeCustomer->getValue(DBECustomer::customerID), $activeCustomerSites);
@@ -105,10 +99,10 @@ class CTCustomerReviewMeetingsReport extends CTCNC
 
             $reviewContactsString = array_reduce(
                 $reviewContacts,
-                function ($acc,
-                          $item
+                function (
+                    $acc,
+                    $item
                 ) {
-
                     if (strlen($acc)) {
                         $acc .= ", ";
                     }
@@ -121,8 +115,8 @@ class CTCustomerReviewMeetingsReport extends CTCNC
             $now = new DateTime();
             $style = null;
             if ($dbeCustomer->getValue(
-                    DBECustomer::reviewMeetingBooked
-                )) {
+                DBECustomer::reviewMeetingBooked
+            )) {
                 $style = 'style="background-color: #B2FFB2"';
             } elseif ($nextReviewMeetingDate < $now) {
                 $style = 'style="background-color: #F5AEBD"';
@@ -153,7 +147,6 @@ class CTCustomerReviewMeetingsReport extends CTCNC
                 "frequency"         => $dbeCustomer->getValue(DBECustomer::reviewMeetingFrequencyMonths),
                 "contact"           => $reviewContactsString,
             ];
-
         }
 
 
@@ -164,8 +157,6 @@ class CTCustomerReviewMeetingsReport extends CTCNC
         );
 
         foreach ($customerReviewMeetings as $item) {
-
-
             $this->template->set_var(
                 $item
             );

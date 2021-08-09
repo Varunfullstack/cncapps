@@ -211,7 +211,7 @@ class BUContactExport extends Business
                 $possibleOrQueries .= $searchCriteria;
             }
             $dbeCustomer = new DBECustomer($this);
-            $condition   = "   {$dbeCustomer->getDBColumnName(DBECustomer::referredFlag)} = 1 ";
+            $condition   = "   {$dbeCustomer->getDBColumnName(DBECustomer::referredFlag)}  ";
             if ($dsSearchForm->getValue(CTContactExport::searchFormReferredFlag) != 'Y') {
                 $possibleOrQueries .= "  not {$condition}";
             } else {

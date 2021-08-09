@@ -716,7 +716,7 @@ class BUCustomer extends Business
         );
         $dsCustomer->setValue(
             DBECustomer::referredFlag,
-            1
+            true
         );
         $dsCustomer->setValue(
             DBECustomer::createDate,
@@ -1552,7 +1552,7 @@ class BUCustomer extends Business
     {
         $dbeCustomer = new DBECustomer($this);
         $dbeCustomer->getRow($customerID);
-        $dbeCustomer->setValue(DBECustomer::referredFlag, 1);
+        $dbeCustomer->setValue(DBECustomer::referredFlag, true);
         $dbeCustomer->updateRow();
         $dsContacts = new DataSet($this);
         $this->getContactsByCustomerID($customerID, $dsContacts);

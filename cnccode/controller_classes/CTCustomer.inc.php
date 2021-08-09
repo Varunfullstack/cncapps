@@ -866,7 +866,7 @@ class CTCustomer extends CTCNC
         $customerId  = $this->getParam('customerId');
         $dbeCustomer = new DBECustomer($this);
         $orders      = [];
-        if ($dbeCustomer->getRow($customerId) && $dbeCustomer->getValue(DBECustomer::referredFlag) != 1) {
+        if ($dbeCustomer->getRow($customerId) && !$dbeCustomer->getValue(DBECustomer::referredFlag)) {
             $dbeJOrdhead = new DBEJOrdhead($this);
             $dbeJOrdhead->getRowsBySearchCriteria(
                 $customerId,
@@ -1688,9 +1688,8 @@ class CTCustomer extends CTCNC
                 'excludeFromWebrootChecksChecked'         => $this->dsCustomer->getValue(
                     DBECustomer::excludeFromWebrootChecks
                 ) ? 'checked' : '',
-                'referredFlagChecked'                     => $this->getChecked(
-                    $this->dsCustomer->getValue(DBECustomer::referredFlag)
-                ),
+                'referredFlagChecked'                     =>
+                    $this->dsCustomer->getValue(DBECustomer::referredFlag) ? 'checked' : null,
                 'specialAttentionFlagChecked'             => $this->getChecked(
                     $this->dsCustomer->getValue(DBECustomer::specialAttentionFlag)
                 ),
@@ -2233,7 +2232,7 @@ class CTCustomer extends CTCNC
         */
         if ($this->getAction() != CTCUSTOMER_ACT_ADDCUSTOMER && $this->dsCustomer->getValue(
                 DBECustomer::referredFlag
-            ) == 1) {
+            )) {
 
             $ordersTemplate = new Template ($GLOBALS ["cfg"] ["path_templates"], "remove");
             $ordersTemplate->setFile('OrdersTemplate', 'CustomerEditOrders.html');
