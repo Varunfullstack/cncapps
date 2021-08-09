@@ -631,7 +631,7 @@ class DBECustomer extends DBCNCEntity
         $name        = mysqli_real_escape_string($this->db->link_id(), $name);        
         $queryString = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName() . " where 
         cus_name like '{$name}'
-        and {$this->getDBColumnName(DBECustomer::referredFlag)} <> 'Y' 
+        and {$this->getDBColumnName(DBECustomer::referredFlag)} <> 1 
         and {$this->getDBColumnName(DBECustomer::becameCustomerDate)} is not null and {$this->getDBColumnName(DBECustomer::droppedCustomerDate)} is null
         LIMIT 1";
         $this->setQueryString($queryString);
@@ -687,7 +687,7 @@ class DBECustomer extends DBCNCEntity
     function getActiveCustomers($ignoreProspects = false)
     {
         $this->setMethodName("getSpecialAttentionCustomers");
-        $queryString = "SELECT {$this->getDBColumnNamesAsString()} FROM {$this->getTableName()} where {$this->getDBColumnName(DBECustomer::referredFlag)} <> 'Y'";
+        $queryString = "SELECT {$this->getDBColumnNamesAsString()} FROM {$this->getTableName()} where {$this->getDBColumnName(DBECustomer::referredFlag)} <> 1";
         if ($ignoreProspects) {
             $queryString .= " and {$this->getDBColumnName(DBECustomer::becameCustomerDate)} is not null and {$this->getDBColumnName(DBECustomer::droppedCustomerDate)} is null ";
         }

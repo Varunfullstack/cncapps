@@ -482,15 +482,7 @@ class HeaderComponent extends MainComponent {
                         {this.getInputElement("mailshot3FlagDef", this.inputType.CheckBox)}
                     </td>
                 </tr>
-                <tr>
-                    <td className="text-center" style={{width: 40}}>4</td>
-                    <td>
-                        {this.getInputElement("mailshot4FlagDesc", this.inputType.Text, true, "", "", 50, 50)}
-                    </td>
-                    <td className="text-center">
-                        {this.getInputElement("mailshot4FlagDef", this.inputType.CheckBox)}
-                    </td>
-                </tr>
+                 
                 <tr>
                     <td className="text-center" style={{width: 40}}>8</td>
                     <td>
@@ -566,8 +558,7 @@ class HeaderComponent extends MainComponent {
         const {data} = this.state;
         data.mailshot11FlagDef = data.mailshot11FlagDef ? "Y" : "N";
         data.mailshot9FlagDef = data.mailshot9FlagDef ? "Y" : "N";
-        data.mailshot8FlagDef = data.mailshot8FlagDef ? "Y" : "N";
-        data.mailshot4FlagDef = data.mailshot4FlagDef ? "Y" : "N";
+        data.mailshot8FlagDef = data.mailshot8FlagDef ? "Y" : "N";        
         data.mailshot3FlagDef = data.mailshot3FlagDef ? "Y" : "N";
         data.mailshot2FlagDef = data.mailshot2FlagDef ? "Y" : "N";
         this.api.updateHeaderData(data).then(res => {

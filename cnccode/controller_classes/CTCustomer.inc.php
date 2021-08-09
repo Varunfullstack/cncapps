@@ -838,6 +838,9 @@ class CTCustomer extends CTCNC
             case "customerHasFolder":
                 echo json_encode($this->customerHasFolder(),JSON_NUMERIC_CHECK);
                 exit;
+            case "searchByLeadStatus":
+                echo json_encode($this->customersByLeadStatus());
+                exit;
             default:
                 $this->displaySearchForm();
                 break;
@@ -863,7 +866,7 @@ class CTCustomer extends CTCNC
         $customerId  = $this->getParam('customerId');
         $dbeCustomer = new DBECustomer($this);
         $orders      = [];
-        if ($dbeCustomer->getRow($customerId) && $dbeCustomer->getValue(DBECustomer::referredFlag) != 'Y') {
+        if ($dbeCustomer->getRow($customerId) && $dbeCustomer->getValue(DBECustomer::referredFlag) != 1) {
             $dbeJOrdhead = new DBEJOrdhead($this);
             $dbeJOrdhead->getRowsBySearchCriteria(
                 $customerId,
@@ -2230,7 +2233,7 @@ class CTCustomer extends CTCNC
         */
         if ($this->getAction() != CTCUSTOMER_ACT_ADDCUSTOMER && $this->dsCustomer->getValue(
                 DBECustomer::referredFlag
-            ) == 'Y') {
+            ) == 1) {
 
             $ordersTemplate = new Template ($GLOBALS ["cfg"] ["path_templates"], "remove");
             $ordersTemplate->setFile('OrdersTemplate', 'CustomerEditOrders.html');
@@ -3805,4 +3808,74 @@ ORDER BY NAME,
         else
             return $this->fail(APIException::notFound);
     }
+
+    function customersByLeadStatus()
+    {
+        $customerLeadID =@$_REQUEST['leadStatusID'];
+        // in the post we should find the id of the status we are searching for
+        /** @var DBEContact $results */
+        $results = $this->buCustomer->getContactsByLeadStatus($customerLeadID);
+        $data = [];
+        $customers              = [];
+        $dsCustomerLeadStatuses = new DataSet($this);
+        $this->buCustomer->getCustomerLeadStatuses($dsCustomerLeadStatuses);
+        $leadStatuses = [];
+        while ($dsCustomerLeadStatuses->fetchNext()) {
+            $leadStatuses[$dsCustomerLeadStatuses->getValue(
+                DBECustomerLeadStatus::id
+            )] = $dsCustomerLeadStatuses->getValue(DBECustomerLeadStatus::name);
+        }
+        while ($results->fetchNext()) {
+            $customerID = $results->getValue(DBEContact::customerID);
+            if (!isset($customers[$customerID])) {
+                $dbeCustomer = new DBECustomer($this);
+                $dbeCustomer->getRow($results->getValue(DBEContact::customerID));
+                $link                   = Controller::buildLink(
+                    $_SERVER['PHP_SELF'],
+                    array(
+                        'action'     => 'displayEditForm',
+                        'customerID' => $customerID
+                    )
+                );
+                $customers[$customerID] = [
+                    "customerName"        => $dbeCustomer->getValue(DBECustomer::name),
+                    "customerLink"        => $link,
+                    "customerReviewDate"  => $dbeCustomer->getValue(DBECustomer::reviewDate),
+                    "bluestoneLeadStatus" => $leadStatuses[+$dbeCustomer->getValue(DBECustomer::leadStatusId)],
+                    "customerID"          =>$customerID
+                ];
+
+            }
+            $phone = $results->getValue(DBEContact::phone);
+            if (!$phone) {
+                $site = new DBESite($this);
+                $site->setValue(
+                    DBESite::customerID,
+                    $customerID
+                );
+                $site->setValue(
+                    DBESite::siteNo,
+                    $results->getValue(DBEContact::siteNo)
+                );
+                $site->getRow();
+                $phone = $site->getValue(DBESite::phone);
+            }
+            $contactData = [
+                "contactName"  => $results->getValue(DBEContact::firstName) . " " . $results->getValue(
+                        DBEContact::lastName
+                    ),
+                "jobTitle"     => $results->getValue(DBEContact::position),
+                'contactPhone' => $phone
+            ];
+            $data[]      = array_merge(
+                $contactData,
+                $customers[$customerID]
+            );
+
+
+        }
+        header('Content-Type: application/json;charset=utf-8');
+        return $data;
+    }
+
 }

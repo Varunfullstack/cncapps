@@ -376,11 +376,7 @@ class CTHeader extends CTCNC
             "mailshot3FlagDesc"                              => $dbeHeader->getValue(DBEHeader::mailshot3FlagDesc),
             "mailshot3FlagDef"                               => $dbeHeader->getValue(
                 DBEHeader::mailshot3FlagDef
-            ) == 'Y' ? true : false,
-            "mailshot4FlagDesc"                              => $dbeHeader->getValue(DBEHeader::mailshot4FlagDesc),
-            "mailshot4FlagDef"                               => $dbeHeader->getValue(
-                DBEHeader::mailshot4FlagDef
-            ) == 'Y' ? true : false,
+            ) == 'Y' ? true : false,            
             "mailshot8FlagDesc"                              => $dbeHeader->getValue(DBEHeader::mailshot8FlagDesc),
             "mailshot8FlagDef"                               => $dbeHeader->getValue(
                 DBEHeader::mailshot8FlagDef

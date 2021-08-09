@@ -6,11 +6,9 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
-global
+global $cfg;
 
 use CNCLTD\Exceptions\JsonHttpException;
-
-$cfg;
 require_once($cfg['path_bu'] . '/BUInvoice.inc.php');
 require_once($cfg['path_bu'] . '/BUPDFInvoice.inc.php');
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');

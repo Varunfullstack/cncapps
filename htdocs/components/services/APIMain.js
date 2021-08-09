@@ -109,6 +109,10 @@ class APIMain {
         })
 
     }
+    getCustomersByLeadStatus(leadStatusId) {
+        return fetch(`Customer.php?action=searchByLeadStatus&leadStatusID=${leadStatusId}`)
+            .then((res) => res.json());
+    }
 }
 
 export default APIMain;

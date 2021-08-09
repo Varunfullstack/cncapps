@@ -75,7 +75,7 @@ class CTCustomerReviewMeetingsReport extends CTCNC
 
         $dbeCustomer->setValue(
             DBECustomer::referredFlag,
-            'N'
+            0
         );
 
         $dbeCustomer->getReviewMeetingCustomers();

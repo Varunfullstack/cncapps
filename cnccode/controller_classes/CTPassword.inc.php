@@ -139,7 +139,7 @@ class CTPassword extends CTCNC
         if (!$customerId) return $this->fail(APIException::badRequest, "Missing paramters");
         $dbeCustomer = new DBECustomer($this);
         $dbeCustomer->getRow($customerId);
-        if ($dbeCustomer->getValue(DBECustomer::referredFlag) == 'Y') {
+        if ($dbeCustomer->getValue(DBECustomer::referredFlag) == 1) {
             return $this->fail(
                 APIException::unAuthorized,
                 "This customer is referred and access to passwords has been removed, please direct the customer to Sales if they require any further information."

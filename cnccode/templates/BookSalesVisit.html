@@ -43,15 +43,19 @@
         }
 
     }
-
+    function vaildate(){
+        const contactID=document.getElementById("contactID")
+        if(!contactID.value)
+        {
+            alert("Please select customer contact");
+            return false;
+        }
+        
+        return true;
+    }
 </script>
 <style type="text/css">
-    <!--
-    .style2 {
-        span-size: x-small
-    }
-
-    -->
+   
 </style>
 
 <!--<P class="formErrorMessage">{formError} test</P>-->
@@ -59,6 +63,7 @@
 <form name="searchForm"
       id="searchForm"
       method="get"
+      onsubmit="return vaildate()"
 >
     <input hidden
            name="action"
