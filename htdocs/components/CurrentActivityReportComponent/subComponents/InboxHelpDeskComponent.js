@@ -69,14 +69,8 @@ class InboxHelpDeskComponent extends React.Component {
                 sortable: false,
                 width: "55",
                 hdClassName: "text-center",
-                className: "text-center",
-                content: (problem) => [
-                    el(
-                        "label",
-                        {key: "label", style: {verticalAlign: "middle"}},
-                        problem.hoursRemainingForSLA
-                    ),
-                ],
+                //className: "text-center",
+              
             },
             {
                 hide: false,

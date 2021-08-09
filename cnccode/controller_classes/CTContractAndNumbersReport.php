@@ -78,7 +78,10 @@ class CTContractAndNumbersReport extends CTCNC
                   COALESCE(physicalServers,0) AS physicalServers,
                   COALESCE(serverCareContract,0) AS serverCareContract,
                   concat('M ',coalesce(mainCount, 0),', SV ',coalesce(supervisorCount,0),', S ', coalesce(supportCount, 0),', D ', coalesce(delegateCount, 0),', N ', coalesce(noLevelCount, 0),', T ', coalesce(totalCount, 0) ) as supportedUsers,
-                  actualSupportedUsersCount > serviceDeskUsers as moreUsersThanExpected 
+                  -- actualSupportedUsersCount > serviceDeskUsers as moreUsersThanExpected ,
+                  (coalesce(mainCount, 0)+coalesce(supervisorCount,0)+coalesce(supportCount, 0)+coalesce(delegateCount, 0)) > serviceDeskUsers as moreUsersThanExpected ,
+                  (coalesce(mainCount, 0)+coalesce(supervisorCount,0)+coalesce(supportCount, 0)+coalesce(delegateCount, 0)) = serviceDeskUsers as supportAllUsers ,
+                  actualSupportedUsersCount
                 FROM
                   customer
                   LEFT JOIN
@@ -185,7 +188,8 @@ class CTContractAndNumbersReport extends CTCNC
           'physicalServers'             => $row['physicalServers'],
           'serverCareContract'          => $row['serverCareContract'],
           'supportedUsers'              => $row['supportedUsers'],
-          'moreThanExpectedClass'       => $row['moreUsersThanExpected'] ? "red" : null
+          'moreThanExpectedClass'       => $row["supportAllUsers"]?null:($row['moreUsersThanExpected'] ? "red" : "green"),          
+          'actualSupportedUsersCount'   => $row["actualSupportedUsersCount"]
         );
     }
     $query = "SELECT

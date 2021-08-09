@@ -273,7 +273,7 @@ export default class OrderDetailsComponent extends MainComponent {
         {this.getAlert()}
         {this.getOrderDetails()}
         <div style={{display:"flex","justifyContent":"center","marginBottom":-40,alignItems:"center"}}>
-          <label className="mr-2" style={{marginLeft:200}}>Recevive All</label>
+          <label className="mr-2" style={{marginLeft:200}}>Receive All</label>
           <Toggle checked={this.state.recieveAll} width={30} onChange={this.handleRecieveAll}>
 
           </Toggle>

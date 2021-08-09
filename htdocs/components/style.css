@@ -1078,3 +1078,6 @@ select:required:valid { border: 1px solid black; }
 input:disabled{
     background-color: #cccccc;
 }
+.label{
+    font-weight: 400 !important;
+}

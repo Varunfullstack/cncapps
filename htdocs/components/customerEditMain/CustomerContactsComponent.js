@@ -72,7 +72,7 @@ export default class CustomerContactsComponent extends MainComponent {
     applyFilter = () => {
         const {filter, contacts} = this.state;
         let contactsFiltered = [...contacts];
-        contactsFiltered = filter.showInActive ? contactsFiltered : contactsFiltered.filter((c) => c.active == 1);
+        contactsFiltered = filter.showInActive ? contactsFiltered.filter((c) => c.active == 0) : contactsFiltered.filter((c) => c.active == 1);
 
         if (filter.reviewUser)
             contactsFiltered = contactsFiltered.filter((c) => c.reviewUser == 'Y');

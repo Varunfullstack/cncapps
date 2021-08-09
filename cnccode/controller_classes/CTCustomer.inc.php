@@ -2949,10 +2949,12 @@ ORDER BY NAME,
      */
     function getCustomerContacts()
     {
+        
         $customerID = $_REQUEST["customerID"];
         $dbeContact = new DBEContact($this);
         $dbeSite    = new DBESite($this);
-        $dbeContact->getRowsByCustomerID($customerID, false);
+        $dbeContact->getRowsByCustomerID($customerID, true);
+    
         $buCustomer     = new BUCustomer($this);
         $primaryContact = $buCustomer->getPrimaryContact($customerID);        
         $contacts       = array();
@@ -3020,7 +3022,7 @@ ORDER BY NAME,
                     
                 )
             );
-        }
+        }        
         return $contacts;
     }
 
