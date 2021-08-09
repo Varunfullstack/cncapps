@@ -385,7 +385,7 @@ export default class CustomerSitesComponent extends MainComponent {
     getFilter = () => {
         const {filter} = this.state;
         return <div className="flex-row flex-center" style={{marginTop: -20}}>
-            <label className="mr-3">Show InActive Sites</label>
+            <label className="mr-3">Show Inactive Sites</label>
             <Toggle checked={filter.showInActive}
                     onChange={() => this.handleFilterChange("showInActive", !filter.showInActive)}></Toggle>
         </div>
