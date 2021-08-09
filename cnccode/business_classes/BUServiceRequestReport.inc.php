@@ -93,7 +93,8 @@ class BUServiceRequestReport extends Business
           ) AS `Contract`,
           prt.description AS raiseType,
           pro_status AS status,
-          pro_contract_cuino
+          pro_contract_cuino,
+          emailSubjectSummary As emailSummary    
           $inialActivity
         FROM
           problem 
@@ -131,6 +132,7 @@ class BUServiceRequestReport extends Business
         $query .= " ORDER BY pro_date_raised";
 
         $result = $this->db->query($query);
+
 
         return $result;
     }
