@@ -322,7 +322,7 @@ class ItemsComponent extends MainComponent {
                                onChange={(event) => this.setValue("description", event.target.value)}
                                className="form-control"
                     /></td>
-                    <td className="text-right">Type</td>
+                    <td className="text-right">Category</td>
                     <td><select className="form-control"
                                 value={data.itemTypeID}
                                 onChange={(event) => this.setValue("itemTypeID", event.target.value)}
