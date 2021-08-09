@@ -30,15 +30,15 @@ export class RenContractComponent extends MainComponent {
                 sortable: true,
             },
             {
-                path: "notes",
+                path: "itemCategory",
                 label: "",
-                hdToolTip: "Notes",
+                hdToolTip: "Item Category",
                 hdClassName: "text-center",
-                icon: "fal fa-2x fa-file color-gray2 pointer",
+                icon: "fal fa-2x fa-ballot-check color-gray2 pointer",
                 sortable: true,
                 className: "text-center",
                 content: order => {
-                    return order.notes ? order.notes.substr(0, 200) : ""
+                    return order.itemCategory ? order.itemCategory.substr(0, 200) : ""
                 }
             },
             {
@@ -121,6 +121,7 @@ export class RenContractComponent extends MainComponent {
             return {
                 'Customer': d.customerName,
                 'Type': d.itemDescription,
+                'Item Category':d.itemCategory,
                 'Invoice From': d.invoiceFromDate,
                 'To': d.invoiceToDate,
                 'Quantity': d.quantity,
