@@ -2175,7 +2175,7 @@ class CTSalesOrder extends CTCNC
                 "itemCost"           => $dbeItem->getValue(DBEItem::curUnitCost),
                 "itemSale"           => $dbeItem->getValue(DBEItem::curUnitSale),
                 "showStock"          => $dsOrdline->getValue(DBEJOrdline::showStockLevels),
-                "showStockLink"      =>$dbeItem->getValue(DBEItem::stockInChannelLink),
+               "showStockLink"      => $dbeItem->getValue(DBEItem::stockInChannelLink),
                 "amountInStock"      => $dsOrdline->getValue(DBEJOrdline::qtyInStock)
             )
         );
@@ -2206,13 +2206,18 @@ class CTSalesOrder extends CTCNC
                 $supplierName = Controller::htmlDisplayText($dsOrdline->getValue(DBEJOrdline::supplierName));
             }
             $showStockLevels = "";
+            $stockInChannelLink ="";
             $stockInChannelLink = $dbeItem->getValue(DBEItem::stockInChannelLink);
 
             if ($dsOrdline->getValue(DBEJOrdline::showStockLevels) && $dsOrdline->getValue(
                     DBEOrdline::curUnitCost) > 0 && $dsOrdline->getValue(DBEJOrdline::qtyInStock) >=
-                  $dsOrdline->getValue(DBEOrdline::qtyOrdered) && $stockInChannelLink!='' ){
+                  $dsOrdline->getValue(DBEOrdline::qtyOrdered) ){
 
-                $showStockLevels = "<a href='".$stockInChannelLink."'><i class=\"fal fa-2x fa-boxes color-gray icon\"></i></a>";
+                $showStockLevels = "<i class=\"fal fa-2x fa-boxes color-gray icon\"></i>";
+            }else if($dsOrdline->getValue(DBEJOrdline::showStockLevels) && $dsOrdline->getValue(
+                    DBEOrdline::curUnitCost) > 0 && $dsOrdline->getValue(DBEJOrdline::qtyInStock) <
+                $dsOrdline->getValue(DBEOrdline::qtyOrdered) && $stockInChannelLink !=''){
+                $showStockLevels = "<a href='".$dbeItem->getValue(DBEItem::stockInChannelLink)."'><i class=\"fal fa-2x fal fa-search color-gray icon\"></i></a>";
             }
 
 
@@ -2264,7 +2269,8 @@ class CTSalesOrder extends CTCNC
                             'ordheadID'   => $this->getOrdheadID(),
                             'itemID'      => $dsOrdline->getValue(DBEOrdline::itemID),
                             'curUnitCost' => $dsOrdline->getValue(DBEOrdline::curUnitCost),
-                            'curUnitSale' => $dsOrdline->getValue(DBEOrdline::curUnitSale)
+                            'curUnitSale' => $dsOrdline->getValue(DBEOrdline::curUnitSale),
+                            'showStockLevels'=> $stockInChannelLink,
                         )
                     );
                     $this->template->set_var(

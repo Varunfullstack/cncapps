@@ -152,9 +152,9 @@ class DBEItem extends DBCNCEntity
             DA_ALLOW_NULL
         );
         $this->addColumn(
-              self::stockInChannelLink,
-                    DA_STRING,
-                  DA_ALLOW_NULL,
+            self::stockInChannelLink,
+            DA_STRING,
+            DA_ALLOW_NULL,
             'itm_stock_in_link'
         );
         $this->addColumn(

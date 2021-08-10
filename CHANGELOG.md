@@ -3,7 +3,6 @@ This project changes will be shown here.
 
 ## Unreleased - 2021-08-10
 ### Changed
-- Added new db.changelog-issue1482  for Issue 1482
 - Add new field in ItemComponent
 
 ## Unreleased - 2021-08-09
