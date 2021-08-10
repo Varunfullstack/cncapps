@@ -162,7 +162,7 @@ class CTRenewalsDashboard extends CTCNC
                 'notes'           => $dsRenContract->getValue(DBEJRenContract::notes),
                 'costAnnum'       => $dsRenContract->getValue(DBEJContract::curUnitCost),
                 'saleAnnum'       => $dsRenContract->getValue(DBEJContract::curUnitSale),
-                'itemCategory'    => $itemCategory,
+                'itemCategory'    => trim($itemCategory),
 
                 );
 

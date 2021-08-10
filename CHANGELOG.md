@@ -1,9 +1,9 @@
 # Changelog
 This project changes will be shown here.
 
-## Unreleased - 2021-08-09
+## Unreleased - 2021-08-10
 ### Changed
-- Added new itemCategory in RenContractComponent for Issue 1481
+- Added trim function for itemCategory CSV for Issue 1481
 
 ## [v5.15.4] - 2021-08-02
 ### Changed
