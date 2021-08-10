@@ -3498,6 +3498,14 @@ class CTActivity extends CTCNC
         if ($dsSite->getValue(DBESite::what3Words)) {
             $what3WordsLink = "https://what3words.com/{$dsSite->getValue(DBESite::what3Words)}\n\n";
         }
+        $activity =  SITE_URL . '/' . Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action'         => 'displayActivity',
+                'callActivityID' =>   $callRef
+            )
+        );
+
         $notes             = 'Details:\n\n' . CTActivity::prepareForICS(
                 $dsCallActivity->getValue(DBEJCallActivity::reason)
             );
@@ -3555,7 +3563,8 @@ class CTActivity extends CTCNC
                 'town'           => $dsSite->getValue(DBESite::town),
                 'county'         => $dsSite->getValue(DBESite::county),
                 'postcode'       => $dsSite->getValue(DBESite::postcode),
-                'urlActivity'    => $urlActivity
+                'urlActivity'    => $urlActivity,
+                'activity'       => $activity
             )
         );
         $this->template->parse(

@@ -1,6 +1,11 @@
 # Changelog
 This project changes will be shown here.
 
+## Unreleased - 2021-08-10
+### Changed
+-  Changes in CTActivity for  add Activity link.
+-  Change in AddToCalander for Activity link. 
+
 ## [v5.15.4] - 2021-08-02
 ### Changed
 - Changed the way information is fetched to generate sales orders from contracts to try and get it always sorted the same way.
