@@ -8,7 +8,7 @@
 
     <changeSet id="issue1482-1" author="varun">
        <sql>
-           select * from contact;
+           select * from contract;
        </sql>
         <rollback>
 
