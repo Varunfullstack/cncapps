@@ -3499,7 +3499,7 @@ class CTActivity extends CTCNC
             $what3WordsLink = "https://what3words.com/{$dsSite->getValue(DBESite::what3Words)}\n\n";
         }
         $activity =  SITE_URL . Controller::buildLink(
-            $_SERVER['PHP_SELF'],
+            'SRActivity.php',
             array(
                 'action'         => 'displayActivity',
                 'callActivityID' =>   $callRef
