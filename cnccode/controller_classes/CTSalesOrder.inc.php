@@ -1195,6 +1195,7 @@ class CTSalesOrder extends CTCNC
             $txtDeleteOrder = null;
             // Allow delete if quote or initial order and no purchase orders exist yet
             if ($orderType == 'Q' || ($orderType == 'I' && !$purchaseOrderCount)) {
+
                 $urlCallback    = Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
@@ -2147,6 +2148,8 @@ class CTSalesOrder extends CTCNC
         $ordline->getRow($dsOrdline->getValue(DBEOrdline::id));
         $dbeItem = new DBEItem($this);
         $dbeItem->getRow($dsOrdline->getValue(DBEOrdline::itemID));
+
+
         $this->template->set_var(
             array(
                 'salesOrderLineDesc' => $salesOrderLineDesc,
@@ -2172,9 +2175,12 @@ class CTSalesOrder extends CTCNC
                 "itemCost"           => $dbeItem->getValue(DBEItem::curUnitCost),
                 "itemSale"           => $dbeItem->getValue(DBEItem::curUnitSale),
                 "showStock"          => $dsOrdline->getValue(DBEJOrdline::showStockLevels),
+                "showStockLink"      =>$dbeItem->getValue(DBEItem::stockInChannelLink),
                 "amountInStock"      => $dsOrdline->getValue(DBEJOrdline::qtyInStock)
             )
         );
+
+
         if ($dsOrdline->getValue(
                 DBEOrdline::lineType
             ) == "I") {                    // Item line needs all these fields
@@ -2200,11 +2206,16 @@ class CTSalesOrder extends CTCNC
                 $supplierName = Controller::htmlDisplayText($dsOrdline->getValue(DBEJOrdline::supplierName));
             }
             $showStockLevels = "";
+            $stockInChannelLink = $dbeItem->getValue(DBEItem::stockInChannelLink);
+
             if ($dsOrdline->getValue(DBEJOrdline::showStockLevels) && $dsOrdline->getValue(
-                    DBEOrdline::curUnitCost
-                ) > 0 && $dsOrdline->getValue(DBEJOrdline::qtyInStock) >= $dsOrdline->getValue(
-                    DBEOrdline::qtyOrdered
-                )) $showStockLevels = "<i class=\"fal fa-2x fa-boxes color-gray icon\"></i>";
+                    DBEOrdline::curUnitCost) > 0 && $dsOrdline->getValue(DBEJOrdline::qtyInStock) >=
+                  $dsOrdline->getValue(DBEOrdline::qtyOrdered) && $stockInChannelLink!='' ){
+
+                $showStockLevels = "<a href='".$stockInChannelLink."'><i class=\"fal fa-2x fa-boxes color-gray icon\"></i></a>";
+            }
+
+
             if (!$restrictedView) {
 
                 $this->template->set_var(
@@ -2273,6 +2284,8 @@ class CTSalesOrder extends CTCNC
 
                 }
             }
+
+
             $this->template->parse(
                 'salesOrderLine',
                 'SalesOrderItemLine'
@@ -4790,6 +4803,7 @@ class CTSalesOrder extends CTCNC
             $salesOrderID = $dbeTemplateQuotation->getValue(DBEQuotationTemplate::linkedSalesOrderId);
             $this->buSalesOrder->pasteLinesFromOrder($salesOrderID, $destinationQuotation);
         }
+
         return $destinationQuotation;
     } // end contractDropdown
 

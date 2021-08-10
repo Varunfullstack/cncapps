@@ -27,6 +27,7 @@ class DBEItem extends DBCNCEntity
     const notes                   = "notes";
     const servercareFlag          = "servercareFlag";
     const contractResponseTime    = "contractResponseTime";
+    const stockInChannelLink      = "stockInChannelLink";
     const renewalTypeID           = "renewalTypeID";
     const allowDirectDebit        = "allowDirectDebit";
     const excludeFromPOCompletion = "excludeFromPOCompletion";
@@ -151,6 +152,12 @@ class DBEItem extends DBCNCEntity
             DA_ALLOW_NULL
         );
         $this->addColumn(
+              self::stockInChannelLink,
+                    DA_STRING,
+                  DA_ALLOW_NULL,
+            'itm_stock_in_link'
+        );
+        $this->addColumn(
             self::renewalTypeID,
             DA_ID,
             DA_ALLOW_NULL
@@ -220,6 +227,7 @@ class DBEItem extends DBCNCEntity
      */
     function getRowsByDescriptionMatch(string $search, $renewalTypeID = false)
     {
+
         $this->setMethodName("getRowsByDescriptionMatch");
         $queryString = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName() . " WHERE 1=1";
         if ($search) {

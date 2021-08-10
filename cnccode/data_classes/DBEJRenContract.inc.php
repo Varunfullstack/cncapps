@@ -20,7 +20,7 @@ class DBEJRenContract extends DBECustomerItem
     const invoiceToDateYMD    = "invoiceToDateYMD";
     const isArrears           = 'isArrears';
     const itemTypeId          = 'itemTypeId';
-
+    const itemCategory        = 'itemCategory';
 
     function __construct(&$owner)
     {
@@ -123,19 +123,23 @@ class DBEJRenContract extends DBECustomerItem
             DA_ALLOW_NULL,
             'itm_itemtypeno'
         );
+
+
         $this->setAddColumnsOff();
     }
 
     function getRow($pkValue = null)
     {
+
         $statement = $this->getBaseQuery() . " WHERE " . $this->getPKWhere() . " AND renewalTypeID = 2";
-        $this->setQueryString($statement);
+         $this->setQueryString($statement);
         $ret = (parent::getRow());
     }
 
     private function getBaseQuery()
     {
-        return "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName() . " JOIN item ON  itm_itemno = cui_itemno
+
+        return "SELECT " . $this->getDBColumnNamesAsString() . " , itemtype.ity_desc as itemCategory  FROM " . $this->getTableName() . " JOIN item ON  itm_itemno = cui_itemno
       JOIN itemtype ON  ity_itemtypeno = itm_itemtypeno
 			JOIN customer ON  cus_custno = cui_custno
       JOIN address ON  add_custno = cui_custno AND add_siteno = cui_siteno
@@ -147,6 +151,8 @@ class DBEJRenContract extends DBECustomerItem
     function getRows($sortColumn = '', $orderDirection = null)
     {
         $statement = $this->getBaseQuery() . " WHERE declinedFlag = 'N' AND renewalTypeID = 2";
+
+
         if ($sortColumn) {
             $statement .= " ORDER BY $sortColumn";
         } else {
@@ -154,6 +160,7 @@ class DBEJRenContract extends DBECustomerItem
         }
         $this->setQueryString($statement);
         $ret = (parent::getRows());
+
     }
 
     function getRowsByCustomerID($customerID)
@@ -217,7 +224,7 @@ class DBEJRenContract extends DBECustomerItem
     {
 
         $statement = "
-      SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName() . " JOIN item ON  itm_itemno = cui_itemno
+      SELECT " . $this->getDBColumnNamesAsString() . " itemtype.ity_desc as itemCategory   FROM " . $this->getTableName() . " JOIN item ON  itm_itemno = cui_itemno
       JOIN itemtype ON  ity_itemtypeno = itm_itemtypeno
       JOIN customer ON  cus_custno = cui_custno
       JOIN address ON  add_custno = cui_custno AND add_siteno = cui_siteno

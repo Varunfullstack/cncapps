@@ -592,6 +592,7 @@ WHERE custitem.`cui_itemno` = ?
          itm_sstk_price as curUnitSale,
          itm_unit_of_sale as partNo,
          renewalTypeID,
+         itm_stock_in_link as stockInChannelLink,
          itm_discontinued as discontinuedFlag,
          ity_desc as itemCategory,
          man_name as manufacturerName,  
@@ -688,6 +689,7 @@ WHERE custitem.`cui_itemno` = ?
 
     function updateItem()
     {
+
         try {
             $body = $this->getBody(true);
             if (!$body) {
@@ -704,12 +706,14 @@ WHERE custitem.`cui_itemno` = ?
             $this->buItem->updateItem($this->dsItem, $this->getDbeUser());
             return $this->success();
         } catch (Exception $ex) {
+            print_r($ex);die;
             return $this->fail($ex->getMessage());
         }
     }
 
     function addItem()
     {
+
         try {
             $body = $this->getBody(true);
             if (!$body) {
