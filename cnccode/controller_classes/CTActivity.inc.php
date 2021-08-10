@@ -3498,7 +3498,7 @@ class CTActivity extends CTCNC
         if ($dsSite->getValue(DBESite::what3Words)) {
             $what3WordsLink = "https://what3words.com/{$dsSite->getValue(DBESite::what3Words)}\n\n";
         }
-        $activity =  SITE_URL . '/' . Controller::buildLink(
+        $activity =  SITE_URL . Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
                 'action'         => 'displayActivity',
@@ -3567,6 +3567,7 @@ class CTActivity extends CTCNC
                 'activity'       => $activity
             )
         );
+
         $this->template->parse(
             'output',
             'page',

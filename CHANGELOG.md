@@ -4,7 +4,7 @@ This project changes will be shown here.
 ## Unreleased - 2021-08-10
 ### Changed
 -  Changes in CTActivity for  add Activity link.
--  Change in AddToCalander for Activity link. 
+ 
 
 ## [v5.15.4] - 2021-08-02
 ### Changed
