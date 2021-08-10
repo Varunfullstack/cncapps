@@ -368,17 +368,22 @@ class BUDirectDebitContracts extends Business
                             DBEOrdline::qtyLastDespatched,
                             0
                         );
+
+                        $users = $dbeJCustomerItem->getValue(DBEJCustomerItem::users);
+                        $curUnitSale = !$users ? 0 :($dbeJCustomerItem->getValue(DBEDirectDebitContracts::curUnitSale) / 12 /$dbeJCustomerItem->getValue(DBEJCustomerItem::users) ) *
+                            $this->dbeDirectDebitContracts->getValue(DBEDirectDebitContracts::invoicePeriodMonths);
+                        $curUnitCost = !$users ? 0 : ($dbeJCustomerItem->getValue(DBEDirectDebitContracts::curUnitCost) / 12 / $dbeJCustomerItem->getValue(DBEJCustomerItem::users)) *
+                            $this->dbeDirectDebitContracts->getValue(
+                                DBEDirectDebitContracts::invoicePeriodMonths
+                            );
+
                         $dbeOrdline->setValue(
                             DBEOrdline::curUnitSale,
-                            ($dbeJCustomerItem->getValue(DBEDirectDebitContracts::curUnitSale) / 12 /$dbeJCustomerItem->getValue(DBEJCustomerItem::users) ) *
-                            $this->dbeDirectDebitContracts->getValue(DBEDirectDebitContracts::invoicePeriodMonths)
+                            $curUnitSale
                         );
                         $dbeOrdline->setValue(
                             DBEOrdline::curUnitCost,
-                            ($dbeJCustomerItem->getValue(DBEDirectDebitContracts::curUnitCost) / 12 / $dbeJCustomerItem->getValue(DBEJCustomerItem::users)) *
-                            $this->dbeDirectDebitContracts->getValue(
-                                DBEDirectDebitContracts::invoicePeriodMonths
-                            )
+                            $curUnitCost
                         );
                         break;
                          case CONFIG_HOSTING_RENEWAL_TYPE_ID:

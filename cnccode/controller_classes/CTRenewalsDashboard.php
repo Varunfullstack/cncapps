@@ -141,12 +141,18 @@ class CTRenewalsDashboard extends CTCNC
         $this->setMethodName('getRenContractData');
         $dsRenContract = new DataSet($this);
         $buRenContract = new BURenContract($this);
+
         $buRenContract->getAll(
             $dsRenContract,
             $this->getParam('orderBy')
         );
+
         $data = [];
+
         while ($dsRenContract->fetchNext()) {
+            global $db;
+            $q="SELECT ity_desc FROM itemtype WHERE ity_itemtypeno = ".$dsRenContract->getValue(DBEJRenContract::itemTypeId);
+            $itemCategory =  $db->query($q)->fetch_assoc()['ity_desc'];
             $data [] = array(
                 'customerItemID'  => $dsRenContract->getValue(DBEJRenContract::customerItemID),
                 'customerName'    => $dsRenContract->getValue(DBEJRenContract::customerName),
@@ -157,8 +163,12 @@ class CTRenewalsDashboard extends CTCNC
                 'notes'           => $dsRenContract->getValue(DBEJRenContract::notes),
                 'costAnnum'       => $dsRenContract->getValue(DBEJContract::curUnitCost),
                 'saleAnnum'       => $dsRenContract->getValue(DBEJContract::curUnitSale),
-            );
+                'itemCategory'    => trim($itemCategory),
+
+                );
+
         }
+
         return $data;
     }
 

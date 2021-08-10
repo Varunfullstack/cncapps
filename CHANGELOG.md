@@ -23,6 +23,12 @@ This project changes will be shown here.
 - Issue 1449 - Undo all Changes and add css for Expand Sales Order,Purchase Order Cost & Sales size boxes
 - Issue 1446 - Changed condition for solve issue send email for 85
 - Issue 1478 - Add column for Email Subject summary at SRSourceComponent
+- Issue 1481 - Added trim function for itemCategory CSV.
+
+## [v5.15.4] - 2021-08-02
+### Changed
+- Changed the way information is fetched to generate sales orders from contracts to try and get it always sorted the same way.
+- Changed Invoice Notification email to show invoices totals with VAT included
 
 ## [v5.15.3] - 2021-07-29
 ### Changed

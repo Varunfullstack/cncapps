@@ -232,7 +232,7 @@ class DBEJRenQuotation extends DBECustomerItem
 			  AND dateGenerated IS NULL
 		    AND declinedFlag = 'N'
         AND renewalTypeID = 3 and directDebitFlag <> 'Y' and item.itm_itemtypeno <> 57";
-        $statement .= " ORDER BY cui_custno,  custitem.renQuotationTypeID";
+        $statement .= " ORDER BY cui_custno,  custitem.renQuotationTypeID,  ity_desc ASC";
 
         $this->setQueryString($statement);
         $ret = (parent::getRows());
