@@ -7,16 +7,12 @@
     </changeSet>
 
     <changeSet id="issue1482-1" author="varun">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <columnExists tableName="someName" columnName="someColumn"/>
-            </not>
-        </preConditions>
-        <addColumn tableName="someName">
-            <column name="someColumn" type="int(32)" afterColumn="someOtherColumn">
-                <constraints nullable="true"/>
-            </column>
-        </addColumn>
+       <sql>
+           select * from contact;
+       </sql>
+        <rollback>
+
+        </rollback>
     </changeSet>
 
 </databaseChangeLog>
