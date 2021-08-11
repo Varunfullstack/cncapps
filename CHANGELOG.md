@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [v5.16.0] 
+## [v5.16.0] - 2021-08-11
 ### Added
 - Issue 1460 - Added Sales Order Id for the Sales Requests tab.
 - Issue 1483 - Added link to SR in SR Calendar
