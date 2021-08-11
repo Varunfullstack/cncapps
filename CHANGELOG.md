@@ -26,6 +26,7 @@ This project changes will be shown here.
 - Issue 1478 - Add column for Email Subject summary at SRSourceComponent
 - Issue 1481 - Added trim function for itemCategory CSV.
 - Issue 1492 - Changed P5 Report without Sales Orders to exclude Sales SRs.
+- Issue 1482 - Show Item Stock in Channel
 
 ## [v5.15.4] - 2021-08-02
 ### Changed

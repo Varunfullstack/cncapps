@@ -104,6 +104,7 @@ class ItemsComponent extends MainComponent {
             renewalTypeID: '',
             allowDirectDebit: 'N',
             itemBillingCategoryID: '',
+            stockInChannelLink:'',
             contractResponseTime: '',
             excludeFromPOCompletion: 'N',
             allowSRLog: 0,
@@ -322,7 +323,7 @@ class ItemsComponent extends MainComponent {
                                onChange={(event) => this.setValue("description", event.target.value)}
                                className="form-control"
                     /></td>
-                    <td className="text-right">Type</td>
+                    <td className="text-right">Category</td>
                     <td><select className="form-control"
                                 value={data.itemTypeID}
                                 onChange={(event) => this.setValue("itemTypeID", event.target.value)}
@@ -436,14 +437,15 @@ class ItemsComponent extends MainComponent {
                     </select></td>
                 </tr>
                 <tr>
+
                     <td className="text-right">Part Number</td>
                     <td><input value={data.partNo}
                                onChange={(event) => this.setValue("partNo", event.target.value)}
                                className="form-control"
                     /></td>
-                    <td className="text-right">Contract Response Time</td>
-                    <td><input value={data.contractResponseTime}
-                               onChange={(event) => this.setValue("contractResponseTime", event.target.value)}
+                    <td className="text-right"> Stock In Channel Link </td>
+                    <td><input value={data.stockInChannelLink}
+                               onChange={(event) => this.setValue("stockInChannelLink", event.target.value)}
                                className="form-control"
                     /></td>
                 </tr>
@@ -453,11 +455,15 @@ class ItemsComponent extends MainComponent {
                                onChange={(event) => this.setValue("partNoOld", event.target.value)}
                                className="form-control"
                     /></td>
-                    <td style={{verticalAlign: "top"}}
-                        className="childs text-right "
-                        colSpan={2}
-                        rowSpan={6}
-                    >{this.getChildItemsElement()}</td>
+
+                    <td className="text-right">Contract Response Time</td>
+                    <td><input value={data.contractResponseTime}
+                               onChange={(event) => this.setValue("contractResponseTime", event.target.value)}
+                               className="form-control"
+                    /></td>
+
+
+
 
                 </tr>
                 <tr>
@@ -468,6 +474,11 @@ class ItemsComponent extends MainComponent {
                                onChange={(event) => this.setValue("notes", event.target.value)}
                                className="form-control"
                     /></td>
+                    <td style={{verticalAlign: "top"}}
+                        className="childs text-right "
+                        colSpan={2}
+                        rowSpan={6}
+                    >{this.getChildItemsElement()}</td>
                 </tr>
                 <tr>
                     <td className="text-right">Discontinued</td>
@@ -637,6 +648,7 @@ class ItemsComponent extends MainComponent {
     }
     handleSave = () => {
         const {data, isNew, childItems} = this.state;
+        console.log(data);
         if (!data.description) {
             this.alert("Please enter description");
             return;

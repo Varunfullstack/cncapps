@@ -12,6 +12,7 @@
     data-item-sale="{itemSale}"
     data-show-stock="{showStock}"
     data-amount-in-stock="{amountInStock}"
+    data-stock-link ="{stockInChannelLink}"
 >
     <td class="orderLineItem handle salesOrderButton">
         <i class="fal fa-sort fa-2x"></i>
@@ -41,7 +42,7 @@
     </td>
     <td class="orderLineItem">{renewalIcon}</td>
     <td class="orderLineItem stock-level-container">
-
+  {showStockLevels}
     </td>
     <td class="orderLineItem">
         <DIV align="left">{salesOrderLineDesc}</DIV>
@@ -60,6 +61,8 @@
                size="3"
                class="lineItemQuantityOrdered salesSizeBox"
         >
+        <input type="hidden" class="showStockLevelslink" value="{showStockLevels}">
+        <input type="hidden" class="ssQuntity" value="{ssQuntity}">
     </td>
     <td class="orderLineItem">
         <INPUT {readOnly}
