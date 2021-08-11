@@ -4,6 +4,7 @@ This project changes will be shown here.
 ## [v5.16.0] 
 ### Added
 - Issue 1460 - Added Sales Order Id for the Sales Requests tab.
+- Issue 1483 - Added link to SR in SR Calendar
 ### Changed
 - Issue 1445 - Remove permission condition from CurrentActivityReport
 - Issue 1366 - Rewrite GoodsIn.php,QuoteTemplates.php, ContractAndNumbersReport.php,  PurchaseInv.php, PaymentTerms.php, ItemBillingCategory.php, update table default align

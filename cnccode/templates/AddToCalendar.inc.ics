@@ -33,7 +33,7 @@ X-MICROSOFT-DISALLOW-COUNTER:FALSE
 X-MS-OLK-AUTOFILLLOCATION:FALSE
 X-MS-OLK-AUTOSTARTCHECK:FALSE
 X-MS-OLK-CONFTYPE:0
-DESCRIPTION:{what3WordsLink} \n\n{notes}\n\n{urlActivity}
+DESCRIPTION:{what3WordsLink} \n\n{activity}  \n\n{notes}\n\n{urlActivity}
 SUMMARY;LANGUAGE=en-gb:{customerName} {contactName} {contactPhone} - Activity Number {scrRef}
 LOCATION:{add1} {add2} {add3} {town} {county} {postcode}
 PRIORITY:5
