@@ -1,9 +1,9 @@
 # Changelog
 This project changes will be shown here.
 
-## Unreleased - 2021-08-10
+## Unreleased - 2021-08-11
 ### Changed
-- Add new field in ItemComponent
+- Change dispaly condition for search icon
 
 ## Unreleased - 2021-08-09
 ### Changed

@@ -2175,7 +2175,7 @@ class CTSalesOrder extends CTCNC
                 "itemCost"           => $dbeItem->getValue(DBEItem::curUnitCost),
                 "itemSale"           => $dbeItem->getValue(DBEItem::curUnitSale),
                 "showStock"          => $dsOrdline->getValue(DBEJOrdline::showStockLevels),
-               "showStockLink"      => $dbeItem->getValue(DBEItem::stockInChannelLink),
+                "showStockLink"      => $dbeItem->getValue(DBEItem::stockInChannelLink),
                 "amountInStock"      => $dsOrdline->getValue(DBEJOrdline::qtyInStock)
             )
         );
@@ -2210,14 +2210,14 @@ class CTSalesOrder extends CTCNC
             $stockInChannelLink = $dbeItem->getValue(DBEItem::stockInChannelLink);
 
             if ($dsOrdline->getValue(DBEJOrdline::showStockLevels) && $dsOrdline->getValue(
-                    DBEOrdline::curUnitCost) > 0 && $dsOrdline->getValue(DBEJOrdline::qtyInStock) >=
+                    DBEOrdline::curUnitCost) > 0 && $dsOrdline->getValue(DBEJOrdline::qtyInStock) >
                   $dsOrdline->getValue(DBEOrdline::qtyOrdered) ){
 
-                $showStockLevels = "<i class=\"fal fa-2x fa-boxes color-gray icon\"></i>";
-            }else if($dsOrdline->getValue(DBEJOrdline::showStockLevels) && $dsOrdline->getValue(
-                    DBEOrdline::curUnitCost) > 0 && $dsOrdline->getValue(DBEJOrdline::qtyInStock) <
-                $dsOrdline->getValue(DBEOrdline::qtyOrdered) && $stockInChannelLink !=''){
-                $showStockLevels = "<a href='".$dbeItem->getValue(DBEItem::stockInChannelLink)."'><i class=\"fal fa-2x fal fa-search color-gray icon\"></i></a>";
+                $showStockLevels = "<i class='fal fa-2x fa-boxes color-gray icon'></i>";
+            }else if($dbeItem->getValue(DBEItem::itemID)==18219){
+
+                $showStockLevels = "<a href='".$dbeItem->getValue(DBEItem::stockInChannelLink)."' target='_blank'><i class='fal fa-2x fal fa-search color-gray icon'></i></a>";
+               
             }
 
 

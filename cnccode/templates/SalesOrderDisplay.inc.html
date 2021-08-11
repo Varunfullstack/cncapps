@@ -287,10 +287,12 @@
         function updateStockLevel(rowElement) {
             const quantity = rowElement.querySelector('input.lineItemQuantityOrdered').value;
             const stockLevelContainer = rowElement.querySelector('td.stock-level-container');
-
+            const link = rowElement.querySelector('.showStockLevelslink').value;
             let htmlContent = '';
             if (rowElement.dataset.showStock && rowElement.dataset.amountInStock >= quantity) {
                 htmlContent = '<i class="fal fa-2x fa-boxes color-gray icon"></i>'
+            }else{
+                htmlContent = link;
             }
             stockLevelContainer.innerHTML = htmlContent;
         }
