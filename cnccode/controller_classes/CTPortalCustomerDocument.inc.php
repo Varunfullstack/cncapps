@@ -17,13 +17,13 @@ class CTPortalCustomerDocument extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
-        $roles = [
-            'sales'
-        ];
-        if (!self::hasPermissions($roles)) {
-            Header("Location: /NotAllowed.php");
-            exit;
-        }
+        // $roles = [
+        //     'sales'
+        // ];
+        // if (!self::hasPermissions($roles)) {
+        //     Header("Location: /NotAllowed.php");
+        //     exit;
+        // }
         $this->buPortalCustomerDocument = new BUPortalCustomerDocument($this);
         $this->dsPortalCustomerDocument = new DSForm($this);
         $this->dsPortalCustomerDocument->copyColumnsFrom($this->buPortalCustomerDocument->dbePortalCustomerDocument);

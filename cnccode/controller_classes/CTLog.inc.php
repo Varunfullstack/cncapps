@@ -30,13 +30,13 @@ class CTLog extends CTCNC
             $cookieVars,
             $cfg
         );
-        $roles = [
-            SALES_PERMISSION
-        ];
-        if (!self::hasPermissions($roles)) {
-            Header("Location: /NotAllowed.php");
-            exit;
-        }
+        // $roles = [
+        //     SALES_PERMISSION
+        // ];
+        // if (!self::hasPermissions($roles)) {
+        //     Header("Location: /NotAllowed.php");
+        //     exit;
+        // }
     }
 
     /**
