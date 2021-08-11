@@ -24,11 +24,11 @@ class CTLeadStatusTypes extends CTCNC
             $cookieVars,
             $cfg
         );
-        $roles = MAINTENANCE_PERMISSION;
+        /*$roles = MAINTENANCE_PERMISSION;
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;
-        }
+        }*/
         $this->setMenuId(811);
 
     }
