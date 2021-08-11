@@ -3,7 +3,7 @@ This project changes will be shown here.
 
 ## Unreleased - 2021-08-11
 ### Changed
-- Change dispaly condition for search icon
+- Change dispaly condition for search icon and page reload for change
 
 ## Unreleased - 2021-08-09
 ### Changed

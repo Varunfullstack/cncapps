@@ -2175,6 +2175,7 @@ class CTSalesOrder extends CTCNC
                 "itemCost"           => $dbeItem->getValue(DBEItem::curUnitCost),
                 "itemSale"           => $dbeItem->getValue(DBEItem::curUnitSale),
                 "showStock"          => $dsOrdline->getValue(DBEJOrdline::showStockLevels),
+                "ssQuntity"          => $dbeItem->getValue(DBEItem::salesStockQty),
                 "showStockLink"      => $dbeItem->getValue(DBEItem::stockInChannelLink),
                 "amountInStock"      => $dsOrdline->getValue(DBEJOrdline::qtyInStock)
             )
@@ -2247,7 +2248,8 @@ class CTSalesOrder extends CTCNC
                         'orderLineProfitClass'    => ($curProfit < 0) ? CTSALESORDER_CLS_ORDER_LINE_LOSS : CTSALESORDER_CLS_ORDER_LINE_ITEM,
                         'orderLineSaleTotalClass' => ($curSaleTotal < 0) ? CTSALESORDER_CLS_ORDER_LINE_LOSS : CTSALESORDER_CLS_ORDER_LINE_ITEM,
                         'orderLineCostTotalClass' => ($curCostTotal < 0) ? CTSALESORDER_CLS_ORDER_LINE_LOSS : CTSALESORDER_CLS_ORDER_LINE_ITEM,
-                        'showStockLevels'         => $showStockLevels
+                        'showStockLevels'         => $showStockLevels,
+                         "ssQuntity"              => $dbeItem->getValue(DBEItem::salesStockQty),
                     )
                 );
                 if (!$dsOrdline->getValue(DBEOrdline::isRecurring)) {

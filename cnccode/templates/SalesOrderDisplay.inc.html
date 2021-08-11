@@ -291,7 +291,7 @@
             let htmlContent = '';
             if (rowElement.dataset.showStock && rowElement.dataset.amountInStock >= quantity) {
                 htmlContent = '<i class="fal fa-2x fa-boxes color-gray icon"></i>'
-            }else{
+            }else if(rowElement.dataset.showStock < quantity){
                 htmlContent = link;
             }
             stockLevelContainer.innerHTML = htmlContent;
@@ -808,6 +808,7 @@
                         alert('Failed trying to save');
                     })
                     .then(() => {
+                        window.location.reload();
                         rowOverlay.parentNode.removeChild(rowOverlay);
                     })
 
