@@ -438,6 +438,7 @@ export default class CustomerContactsComponent extends MainComponent {
 
     getModalContent = () => {
         const {data} = this.state;
+        console.log(data)
         return (
             <div key="content" id="contactformdata">
                 <table className="table">
@@ -639,7 +640,7 @@ export default class CustomerContactsComponent extends MainComponent {
                         {this.getYNFlag("HR User to edit contacts", "hrUser")}
                     </tr>
                     <tr>
-                        {this.getYNFlag("Active", "activeFlag")}
+                        {this.getBooleanFlag("Active", "active")}
                     </tr>
                     </tbody>
                 </table>
@@ -656,6 +657,21 @@ export default class CustomerContactsComponent extends MainComponent {
                         disabled={disabled}
                         checked={data[prop] === "Y"}
                         onChange={() => this.setValue(prop, disabled ? data[prop] : (data[prop] === "Y" ? "N" : "Y"))}
+                    ></Toggle>
+                </td>
+            </Fragment>
+        );
+    };
+    getBooleanFlag = (label, prop, disabled = false) => {
+        const {data} = this.state;
+        return (
+            <Fragment>
+                <td className="text-right">{label}</td>
+                <td>
+                    <Toggle
+                        disabled={disabled}
+                        checked={data[prop] }
+                        onChange={() => this.setValue(prop, disabled ? data[prop] : data[prop]?0:1)}
                     ></Toggle>
                 </td>
             </Fragment>
