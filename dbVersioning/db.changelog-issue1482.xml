@@ -13,7 +13,7 @@
             </not>
         </preConditions>
         <addColumn tableName="item">
-            <column name="itm_stock_in_link" type="varchar(255)" defaultValue="0">
+            <column name="itm_stock_in_link" type="varchar(255)">
                 <constraints nullable="true"/>
             </column>
         </addColumn>
