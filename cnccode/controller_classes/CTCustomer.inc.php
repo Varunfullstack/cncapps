@@ -205,14 +205,14 @@ class CTCustomer extends CTCNC
             $cookieVars,
             $cfg
         );
-        $roles = [
-            "sales",
-            "technical"
-        ];
-        if (!self::hasPermissions($roles)) {
-            Header("Location: /NotAllowed.php");
-            exit;
-        }
+        // $roles = [
+        //     "sales",
+        //     "technical"
+        // ];
+        // if (!self::hasPermissions($roles)) {
+        //     Header("Location: /NotAllowed.php");
+        //     exit;
+        // }
         $this->setMenuId(303);
         $this->buCustomer = new BUCustomer($this);
         $this->dsContact  = new DataSet($this);
