@@ -25,6 +25,7 @@ This project changes will be shown here.
 - Issue 1446 - Changed condition for solve issue send email for 85
 - Issue 1478 - Add column for Email Subject summary at SRSourceComponent
 - Issue 1481 - Added trim function for itemCategory CSV.
+- Issue 1492 - Changed P5 Report without Sales Orders to exclude Sales SRs.
 
 ## [v5.15.4] - 2021-08-02
 ### Changed

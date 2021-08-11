@@ -959,24 +959,26 @@ GROUP BY t.month;
 
     private function getP5IncidentsWithoutSalesOrders()
     {
-        $sql = "SELECT 
-                  cus_name AS `customer`,
-                  pro_problemno AS `requestID`,
-                  cns_name AS `assignedTo`,
-                  reason,
-                  DATEDIFF(NOW(), pro_date_raised) AS `openDays`
+        $sql = "SELECT
+                cus_name AS customer,
+                pro_problemno AS requestID,
+                cns_name AS assignedTo,
+                reason,
+                DATEDIFF(NOW(), pro_date_raised) AS openDays
                 FROM
-                  problem 
-                  LEFT JOIN customer 
-                    ON cus_custno = pro_custno 
-                  LEFT JOIN consultant 
-                    ON pro_consno = cns_consno
-                  LEFT JOIN callactivity
-                   ON caa_problemno = pro_problemno AND caa_callacttypeno = 51
-                  WHERE pro_priority = 5
-                  AND pro_status != 'C' 
-                  AND pro_linked_ordno is null
-                  AND pro_custno != 282";
+                problem
+                LEFT JOIN customer
+                ON cus_custno = pro_custno
+                LEFT JOIN consultant
+                ON pro_consno = cns_consno
+                LEFT JOIN callactivity
+                ON caa_problemno = pro_problemno AND caa_callacttypeno = 51
+                WHERE pro_priority = 5
+                AND pro_status != 'C'
+                AND pro_linked_ordno is null
+                AND pro_custno != 282
+                AND pro_queue_no !=4
+                AND pro_queue_no !=7";
         return $this->db->query($sql);
     }
 
