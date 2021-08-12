@@ -19,7 +19,7 @@ export class ActivityHeaderComponent extends React.Component {
                 <div style={{display: "flex", alignItems: "center"}}>
                     <a
                         className={data?.customerNameDisplayClass}
-                        href={`Customer.php?action=dispEdit&customerId=${data?.customerId}`}
+                        href={`Customer.php?action=dispEdit&customerID=${data?.customerId}`}
                         target="_blank"
                     >
                         {data?.customerName + ", " +
@@ -44,7 +44,7 @@ export class ActivityHeaderComponent extends React.Component {
                 </div>
 
                 <div>
-                    <a href={`Customer.php?action=dispEdit&customerId=${data?.customerId}`}
+                    <a href={`Customer.php?action=dispEdit&customerID=${data?.customerId}`}
                        target="_blank"
                     >
                         {data?.contactName + " "}

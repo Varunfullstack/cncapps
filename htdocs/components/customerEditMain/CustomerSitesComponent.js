@@ -142,7 +142,7 @@ export default class CustomerSitesComponent extends MainComponent {
             sageRef: "",
             phone: "",
             maxTravelHours: "",
-            activeFlag: 1,
+            activeFlag: "Y",
             what3Words: "",
         };
     }
