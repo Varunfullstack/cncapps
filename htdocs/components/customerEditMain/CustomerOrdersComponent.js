@@ -278,13 +278,7 @@ export default class CustomerOrdersComponent extends MainComponent {
     render() {
         return (
             <div>
-                <Spinner show={this.state.showSpinner}/>
-                <ToolTip title="New Order" width={30}>
-                    <i
-                        className="fal fa-2x fa-plus color-gray1 pointer"
-                        onClick={this.handleNewItem}
-                    />
-                </ToolTip>
+                <Spinner show={this.state.showSpinner}/>                
                 {this.getConfirm()}
                 {this.getAlert()}
                 {this.getTable()}

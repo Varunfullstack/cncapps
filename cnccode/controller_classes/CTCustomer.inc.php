@@ -3321,9 +3321,15 @@ ORDER BY NAME,
                 //$dbeCustomer->debug=true;
                 $dbeCustomer->setValue(DBECustomer::modifyDate,date(DATE_MYSQL_DATETIME));   
                 $dbeCustomer->setValue(DBECustomer::lastUpdatedDateTime,date(DATE_MYSQL_DATETIME));                             
-                $dbeCustomer->setValue(DBECustomer::modifyUserID,$this->userID);
-                
+                $dbeCustomer->setValue(DBECustomer::modifyUserID,$this->userID);                
                 $dbeCustomer->insertRow();
+                $buMail = new BUMail($this);
+                $buMail->sendSimpleEmail(
+                    "<p>{$dbeCustomer->getValue(DBECustomer::name)} has been added to CNCAPPS by { $this->dbeUser->getFullName()}.</p><p>Click <a href='" . SITE_URL . "/Customer.php?action=dispEdit&customerID={$dbeCustomer->getValue(DBECustomer::customerID)}'>here</a> to see the details.</p>",
+                    "A new customer has been added to CNCAPPS",
+                    'newcustomercreated@cnc-ltd.co.uk',
+                    'sales@cnc-ltd.co.uk'
+                );
             }         
             return $this->success(["lastUpdatedDateTime" => $dbeCustomer->getValue(DBECustomer::lastUpdatedDateTime),"customerID"=>$dbeCustomer->getValue(DBECustomer::customerID)]);
         } catch (Exception $ex) {
