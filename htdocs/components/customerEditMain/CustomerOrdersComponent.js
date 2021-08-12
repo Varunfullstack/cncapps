@@ -3,7 +3,6 @@ import {params} from "../utils/utils";
 import APICustomers from "../services/APICustomers";
 import MainComponent from "../shared/MainComponent";
 import Table from "../shared/table/table";
-import ToolTip from "../shared/ToolTip";
 import Spinner from "../shared/Spinner/Spinner";
 import Modal from "../shared/Modal/modal.js";
 import Toggle from "../shared/Toggle";
@@ -31,7 +30,6 @@ export default class CustomerOrdersComponent extends MainComponent {
     getData = () => {
         const customerId = params.get("customerID");
         this.api.getCustomerOrders(customerId).then((res) => {
-            console.log("Orders",res.data)
             this.setState({orders: res.data, customerId});
         });
     };
@@ -87,28 +85,6 @@ export default class CustomerOrdersComponent extends MainComponent {
                 sortable: true,
                  
             },
-            // {
-            //     path: "edit",
-            //     label: "",
-            //     hdToolTip: "Edit order",
-            //     //icon: "fal fa-2x fa-signal color-gray2 pointer",
-            //     sortable: false,
-            //     content: (order) =>
-            //         this.getEditElement(order, () => this.handleEdit(order)),
-            // },
-            // {
-            //     path: "delete",
-            //     label: "",
-            //     hdToolTip: "Delete order",
-            //     //icon: "fal fa-2x fa-signal color-gray2 pointer",
-            //     sortable: false,
-            //     content: (order) =>
-            //         this.getDeleteElement(
-            //             order,
-            //             () => this.handleDelete(order),
-            //             order.isDeletable
-            //         ),
-            // },
         ];
         return (
             <Table

@@ -7,7 +7,8 @@ import ToolTip from "../shared/ToolTip";
 import Spinner from "../shared/Spinner/Spinner";
 import Modal from "../shared/Modal/modal.js";
 import Toggle from "../shared/Toggle";
-import {Fragment} from "react";
+
+import {ContactEditModalComponent} from "./ContactEdit/ContactEditModalComponent";
 
 export default class CustomerContactsComponent extends MainComponent {
     api = new APICustomers();
@@ -24,14 +25,13 @@ export default class CustomerContactsComponent extends MainComponent {
             reset: false,
             showModal: false,
             isNew: true,
-            data: {...this.getInitData()},
             filter: {
                 showInActive: false,
                 reviewUser: false,
                 hrUser: false,
 
                 mailshot8Flag: false,
-                mailshot2Flag: false,                
+                mailshot2Flag: false,
                 mailshot9Flag: false
             },
             showSpinner: true,
@@ -42,8 +42,8 @@ export default class CustomerContactsComponent extends MainComponent {
                 "delegate",
                 "furlough",
             ],
-            showPasswordModal:false,
-           
+            showPasswordModal: false,
+
         };
     }
 
@@ -88,7 +88,7 @@ export default class CustomerContactsComponent extends MainComponent {
 
         if (filter.mailshot9Flag)
             contactsFiltered = contactsFiltered.filter((c) => c.mailshot9Flag == 'Y');
-        
+
         this.setState({contactsFiltered});
 
 
@@ -178,16 +178,18 @@ export default class CustomerContactsComponent extends MainComponent {
                 sortable: true,
 
                 content: (contact) => (
-                    <Toggle checked={contact.active} onChange={() => null}></Toggle>
+                    <Toggle checked={contact.active} onChange={() => null}/>
                 ),
             },
             {
                 path: "linkedInURL",
                 label: "",
-                hdToolTip: "LinkdIn",               
+                hdToolTip: "LinkdIn",
                 icon: "fab fa-linkedin-in    color-gray2  ",
                 sortable: true,
-                content: (contact) =><a style={{display:contact.linkedInURL?"block":"none"}} href={contact.linkedInURL} target="_blank"><i className="fab fa-linkedin-in pointer icon"></i></a> ,
+                content: (contact) => <a style={{display: contact.linkedInURL ? "block" : "none"}}
+                                         href={contact.linkedInURL} target="_blank"><i
+                    className="fab fa-linkedin-in pointer icon"/></a>,
             },
             {
                 path: "portalPassword",
@@ -195,9 +197,9 @@ export default class CustomerContactsComponent extends MainComponent {
                 hdToolTip: "Portal Password",
                 icon: "fal fa-2x  fa-user-secret color-gray2  ",
                 sortable: true,
-                content:(contact)=>this.getPassword(contact)
+                content: (contact) => this.getPassword(contact)
             },
-            
+
             {
                 path: "edit",
                 label: "",
@@ -228,76 +230,75 @@ export default class CustomerContactsComponent extends MainComponent {
                 columns={columns}
                 data={this.state.contactsFiltered || []}
                 search={true}
-            ></Table>
+            />
         );
     };
 
-    handlePassword=(contact)=>{
-        this.setState({data:{...contact},showPasswordModal:true})
+    handlePassword = (contact) => {
+        this.setState({data: {...contact}, showPasswordModal: true})
     }
 
-    getPassword=(contact)=>{
+    getPassword = (contact) => {
         if (contact.portalPassword)
-          return (
-            <ToolTip title="Password set">
-              <i className="fas fa-key pointer" onClick={()=>this.handlePassword(contact)}> </i>
-            </ToolTip>
-          );
+            return (
+                <ToolTip title="Password set">
+                    <i className="fas fa-key pointer" onClick={() => this.handlePassword(contact)}> </i>
+                </ToolTip>
+            );
         else
-          return (
-            <ToolTip title="Password not set">
-              <i className="fal fa-key pointer" onClick={()=>this.handlePassword(contact)}> </i>
-            </ToolTip>
-          );
+            return (
+                <ToolTip title="Password not set">
+                    <i className="fal fa-key pointer" onClick={() => this.handlePassword(contact)}> </i>
+                </ToolTip>
+            );
     }
 
-    getPasswordModal=()=>{
-        const {data}=this.state;
-        if(!data)
-        return null;
-        return <Modal 
-        width={400}
-        show={this.state.showPasswordModal}
-        title={`Set ${data.firstName+" "+data.lastName} Portal Password`}
-        onClose={()=>this.setState({showPasswordModal:false})}
-        content={
-            <div>
-                <div className="form-group">
-                <label>Password</label>
-                    <input   onChange={($event)=>this.setValue("portalPassword",$event.target.value)} className="form-control" ></input>
+    getPasswordModal = () => {
+        const {data} = this.state;
+        if (!data)
+            return null;
+        return <Modal
+            width={400}
+            show={this.state.showPasswordModal}
+            title={`Set ${data.firstName + " " + data.lastName} Portal Password`}
+            onClose={() => this.setState({showPasswordModal: false})}
+            content={
+                <div>
+                    <div className="form-group">
+                        <label>Password</label>
+                        <input onChange={($event) => this.setValue("portalPassword", $event.target.value)}
+                               className="form-control"/>
+                    </div>
+
                 </div>
-                
-            </div>
-        }
-        footer={<div key="passwordActions">
-            <button onClick={this.handlePasswordSave}>Save</button>
-            <button onClick={()=>this.setState({showPasswordModal:false})}>Cancel</button>
-        </div>}
+            }
+            footer={<div key="passwordActions">
+                <button onClick={this.handlePasswordSave}>Save</button>
+                <button onClick={() => this.setState({showPasswordModal: false})}>Cancel</button>
+            </div>}
         >
 
         </Modal>
     }
-    handlePasswordSave=()=>{
-        const {data}=this.state;
-        if(!data.portalPassword)
-        {
+    handlePasswordSave = () => {
+        const {data} = this.state;
+        if (!data.portalPassword) {
             this.alert("Please enter password");
             return;
         }
-        this.api.setContactPassword(data.id,data.portalPassword).then(res=>{
-         
-           if(res.status=="error")
-           {
-            this.alert(res.error)
-           }
-           else{
-            this.setState({showPasswordModal:false});
-            this.getData();
-           }
-        },error=>{
-            
+        this.api.setContactPassword(data.id, data.portalPassword).then(res => {
+
+            if (res.status == "error") {
+                this.alert(res.error)
+            } else {
+                this.setState({showPasswordModal: false});
+                this.getData();
+            }
+        }, error => {
+
         })
     }
+
     capitalizeFirstLetter(string) {
         if (string != null) {
             return string.charAt(0).toUpperCase() + string.slice(1);
@@ -305,7 +306,7 @@ export default class CustomerContactsComponent extends MainComponent {
         return "";
     }
 
-    getInitData() {
+    newContact() {
         return {
             id: "",
             customerID: params.get("customerID"),
@@ -341,12 +342,12 @@ export default class CustomerContactsComponent extends MainComponent {
             pendingFurloughActionDate: "",
             pendingFurloughActionLevel: "",
             siteNo: "",
-            active: "",             
+            active: "",
         };
     }
 
     handleEdit = (contact) => {
-        this.setState({data: contact, showModal: true, isNew: false});
+        this.setState({contact: {...contact}, showModal: true, isNew: false});
     };
 
     handleDelete = async (contact) => {
@@ -361,7 +362,7 @@ export default class CustomerContactsComponent extends MainComponent {
         this.setState({
             showModal: true,
             isNew: true,
-            data: {...this.getInitData()},
+            contact: {...this.newContact()},
         });
     };
 
@@ -388,14 +389,14 @@ export default class CustomerContactsComponent extends MainComponent {
         this.setState({showModal: false});
     };
 
-    handleSave = () => {
-        const {data, isNew} = this.state;
+    handleSave = (contactData) => {
+        const {isNew} = this.state;
         if (!this.isFormValid("contactformdata")) {
             this.alert("Please enter required data");
             return;
         }
         if (!isNew) {
-            this.api.updateCustomerContact(data).then((res) => {
+            this.api.updateCustomerContact(contactData).then((res) => {
                 if (res.status == 200) {
                     this.setState({showModal: false, reset: true}, () =>
                         this.getData()
@@ -403,8 +404,8 @@ export default class CustomerContactsComponent extends MainComponent {
                 }
             });
         } else {
-            data.id = null;
-            this.api.addCustomerContact(data).then((res) => {
+            contactData.id = null;
+            this.api.addCustomerContact(contactData).then((res) => {
                 if (res.status == 200) {
                     this.setState({showModal: false, reset: true}, () =>
                         this.getData()
@@ -415,268 +416,22 @@ export default class CustomerContactsComponent extends MainComponent {
     };
 
     getModal = () => {
-        const {isNew, showModal} = this.state;
+        const {isNew, showModal, contact} = this.state;
         if (!showModal) return null;
         return (
-            <Modal
+            <ContactEditModalComponent
                 width={800}
                 title={isNew ? "Create Contact" : "Update Contact"}
                 show={showModal}
-                content={this.getModalContent()}
-                footer={
-                    <div key="footer">
-                        <button onClick={this.handleSave}>Save</button>
-                        <button onClick={this.handleClose}>
-                            Cancel
-                        </button>
-                    </div>
-                }
+                customerId={params.get("customerID")}
+                contact={contact}
+                onSave={this.handleSave}
                 onClose={this.handleClose}
-            ></Modal>
+            />
         );
     };
 
-    getModalContent = () => {
-        const {data} = this.state;
-        console.log(data)
-        return (
-            <div key="content" id="contactformdata">
-                <table className="table">
-                    <tbody>
-                    <tr>
-                        <td className="text-right">Site</td>
-                        <td>
-                            <select
-                                required
-                                value={data.siteNo}
-                                onChange={(event) =>
-                                    this.setValue("siteNo", event.target.value)
-                                }
-                                className="form-control"
-                            >
-                                {this.state.sites.map((site, index) => {
-                                    return (
-                                        <option key={site.id} value={site.id}>
-                                            {site.add1}
-                                        </option>
-                                    );
-                                })}
-                            </select>
-                        </td>
-                        <td className="text-right">Title</td>
-                        <td>
-                            <input
-                                required
-                                value={data.title || ""}
-                                onChange={(event) =>
-                                    this.setValue("title", event.target.value)
-                                }
-                                className="form-control"
-                            />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td className="text-right">First</td>
-                        <td>
-                            <input
-                                required
-                                value={data.firstName || ""}
-                                onChange={(event) =>
-                                    this.setValue("firstName", event.target.value)
-                                }
-                                className="form-control"
-                            />
-                        </td>
-                        <td className="text-right">Last</td>
-                        <td>
-                            <input
-                                required
-                                value={data.lastName || ""}
-                                onChange={(event) =>
-                                    this.setValue("lastName", event.target.value)
-                                }
-                                className="form-control"
-                            />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td className="text-right">Position</td>
-                        <td>
-                            <input
-                                value={data.position || ""}
-                                onChange={(event) =>
-                                    this.setValue("position", event.target.value)
-                                }
-                                className="form-control"
-                            />
-                        </td>
-                        <td className="text-right">Email</td>
-                        <td>
-                            <input
-                                required
-                                value={data.email || ""}
-                                onChange={(event) =>
-                                    this.setValue("email", event.target.value)
-                                }
-                                className="form-control"
-                            />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td className="text-right">Phone</td>
-                        <td>
-                            <input
-                                value={data.phone || ""}
-                                onChange={(event) =>
-                                    this.setValue("phone", event.target.value)
-                                }
-                                className="form-control"
-                            />
-                        </td>
-                        <td className="text-right">Mobile</td>
-                        <td>
-                            <input
-                                value={data.mobilePhone || ""}
-                                onChange={(event) =>
-                                    this.setValue("mobilePhone", event.target.value)
-                                }
-                                className="form-control"
-                            />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td className="text-right">Linkedin</td>
-                        <td>
-                            <input
-                                value={data.linkedInURL || ""}
-                                onChange={(event) =>
-                                    this.setValue("linkedInURL", event.target.value)
-                                }
-                                className="form-control"
-                            />
-                        </td>
-                        <td className="text-right">Notes</td>
-                        <td>
-                            <input
-                                value={data.notes || ""}
-                                onChange={(event) =>
-                                    this.setValue("notes", event.target.value)
-                                }
-                                className="form-control"
-                            />
-                        </td>
-                    </tr>
-                    <tr>
 
-                        <td className="text-right">Support Level</td>
-                        <td>
-                            <select
-                                required
-                                name="supportLevel"
-                                value={data.supportLevel}
-                                onChange={(event) =>
-                                    this.setValue("supportLevel", event.target.value)
-                                }
-                                className="form-control"
-                            >
-                                {this.state.supportLevelOptions.map((level) => {
-                                    return (
-                                        <option key={level} value={level}>
-                                            {level.replace(/^(.)|\s(.)/g, (x) => x.toUpperCase())}
-                                        </option>
-                                    );
-                                })}
-                            </select>
-                        </td>
-                        <td className="text-right"> Pending Leaver Date</td>
-                        <td>
-                            <input
-                                type="date"
-                                value={data.pendingLeaverDate || ""}
-                                onChange={(event) =>
-                                    this.setValue("pendingLeaverDate", event.target.value)
-                                }
-                                className="form-control"
-                            />
-                        </td>
-                    </tr>
-                    <tr>
-                        {this.getYNFlag(
-                            "Special Attention",
-                            "specialAttentionContactFlag"
-                        )}
-                        {this.getYNFlag("Company Information Reports", "mailshot9Flag")}
-                    </tr>
-                    <tr>
-                        {this.getYNFlag("Daily SR Reports", "mailshot11Flag")}
-                        {this.getYNFlag("Newsletter", "mailshot3Flag")}
-                    </tr>
-                    <tr>
-                        {this.getYNFlag(
-                            "Send Others Initial Logging Email",
-                            "othersInitialLoggingEmailFlag",
-                            data.supportLevel == "support" || data.supportLevel == "delegate"
-                        )}
-                        {this.getYNFlag("Mailshot", "sendMailshotFlag")}
-                    </tr>
-                    <tr>
-                        {this.getYNFlag(
-                            "Send Others Fixed Email",
-                            "othersFixedEmailFlag",
-                            data.supportLevel == "support" || data.supportLevel == "delegate"
-                        )}
-                        
-
-                    </tr>
-                    <tr>
-                        {this.getYNFlag("Pending Leaver", "pendingLeaverFlag")}
-                        {this.getYNFlag("PrePay TopUp Notifications", "mailshot8Flag")}
-                    </tr>
-                    <tr>
-                        {this.getYNFlag("Attends Review Meeting", "reviewUser")}
-                        {this.getYNFlag("Receive Invoices", "mailshot2Flag")}
-                    </tr>
-                    <tr>
-                        {this.getYNFlag("HR User to edit contacts", "hrUser")}
-                    </tr>
-                    <tr>
-                        {this.getBooleanFlag("Active", "active")}
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-        );
-    };
-    getYNFlag = (label, prop, disabled = false) => {
-        const {data} = this.state;
-        return (
-            <Fragment>
-                <td className="text-right">{label}</td>
-                <td>
-                    <Toggle
-                        disabled={disabled}
-                        checked={data[prop] === "Y"}
-                        onChange={() => this.setValue(prop, disabled ? data[prop] : (data[prop] === "Y" ? "N" : "Y"))}
-                    ></Toggle>
-                </td>
-            </Fragment>
-        );
-    };
-    getBooleanFlag = (label, prop, disabled = false) => {
-        const {data} = this.state;
-        return (
-            <Fragment>
-                <td className="text-right">{label}</td>
-                <td>
-                    <Toggle
-                        disabled={disabled}
-                        checked={data[prop] }
-                        onChange={() => this.setValue(prop, disabled ? data[prop] : data[prop]?0:1)}
-                    ></Toggle>
-                </td>
-            </Fragment>
-        );
-    };
     getFilterItem = (label, name) => {
         const {filter} = this.state;
         return <div>
@@ -686,7 +441,7 @@ export default class CustomerContactsComponent extends MainComponent {
                 onChange={() =>
                     this.handleFilterChange(name, !filter[name])
                 }
-            ></Toggle>
+            />
         </div>
     }
 
@@ -726,7 +481,6 @@ export default class CustomerContactsComponent extends MainComponent {
     }
     handleClearSupportLevel = async () => {
         if (await this.confirm("This is will change all contacts to the support level of None & refer the customer. Please confirm that you want to continue.")) {
-            // clear support level
             this.api.removeSupportAndRefer(this.state.customerId).then(res => {
                 this.getData();
             })

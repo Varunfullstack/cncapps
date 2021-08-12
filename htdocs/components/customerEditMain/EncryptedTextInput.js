@@ -104,9 +104,6 @@ class EncryptedTextInput extends React.PureComponent {
                 </button>
             );
         }
-
-        // not encrypted ...we need to show the input
-
         return <ReactInputMask
             value={this.state.unencryptedValue}
             onChange={this.handleChange}

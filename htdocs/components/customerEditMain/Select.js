@@ -18,12 +18,7 @@ class Select extends React.Component {
         if (JSON.stringify(this.props.options) !== JSON.stringify(nextProps.options)) {
             return true;
         }
-
-        if (JSON.stringify(this.props.selectedOption !== JSON.stringify(nextProps.selectedOption))) {
-            return true;
-        }
-
-        return false;
+        return !!JSON.stringify(this.props.selectedOption !== JSON.stringify(nextProps.selectedOption));
     }
 
     handleChange(e) {

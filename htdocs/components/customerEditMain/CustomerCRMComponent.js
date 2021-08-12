@@ -36,7 +36,6 @@ export default class CustomerCRMComponent extends MainComponent {
             this.setState({data})
         }, error => {
             this.alert("Error in get customer data");
-            console.log(error);
         });
     }
 
@@ -76,7 +75,6 @@ export default class CustomerCRMComponent extends MainComponent {
             } else
                 this.alert("Data not saved successfully");
         }, error => {
-            console.log(error);
             this.alert("Data not saved successfully");
         })
     }
@@ -86,7 +84,6 @@ export default class CustomerCRMComponent extends MainComponent {
             this.setState({data})
         }, error => {
             this.alert("Error in get customer data");
-            console.log(error);
         });
     }
 

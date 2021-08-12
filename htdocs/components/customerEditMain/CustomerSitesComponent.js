@@ -7,7 +7,7 @@ import ToolTip from "../shared/ToolTip";
 import Spinner from "../shared/Spinner/Spinner";
 import Modal from "../shared/Modal/modal.js";
 import Toggle from "../shared/Toggle";
-import { AuditActionType } from "../services/APIAudit";
+import {AuditActionType} from "../services/APIAudit";
 
 export default class CustomerSitesComponent extends MainComponent {
     api = new APICustomers();

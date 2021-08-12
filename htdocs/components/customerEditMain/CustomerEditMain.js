@@ -6,8 +6,8 @@ import Toggle from '../shared/Toggle';
 import MainComponent from '../shared/MainComponent';
 import APIUser from '../services/APIUser';
 import APILeadStatusTypes from '../LeadStatusTypes/services/APILeadStatusTypes';
-import { Pages } from '../utils/utils';
-import   moment   from 'moment';
+import {Pages} from '../utils/utils';
+import moment from 'moment';
 
 export default class CustomerEditMain extends MainComponent {
 
@@ -122,7 +122,6 @@ export default class CustomerEditMain extends MainComponent {
             this.setState({data,originData:{...data}})
         }, error => {
             this.alert("Error in get customer data");
-            console.log(error);
         });
     }
     updateCustomerField = (field, value) => {
@@ -795,7 +794,6 @@ export default class CustomerEditMain extends MainComponent {
                 this.alert("Data not saved successfully");
 
         }, error => {
-            console.log(error);
             this.alert("Data not saved successfully");
         })
         //console.log(data);

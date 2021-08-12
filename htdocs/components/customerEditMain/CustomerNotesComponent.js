@@ -1,6 +1,5 @@
 import moment from "moment";
-import React, {Fragment} from "react";
-import Skeleton from "react-loading-skeleton";
+import React from "react";
 import APICustomers from "../services/APICustomers";
 import APIUser from "../services/APIUser";
 import MainComponent from "../shared/MainComponent";
@@ -135,7 +134,6 @@ class CustomerNotesComponent extends MainComponent {
                 this.getData();
             })
             .catch((error) => {
-                console.log(error);
                 this.alert("Failed to save note");
             });
     };

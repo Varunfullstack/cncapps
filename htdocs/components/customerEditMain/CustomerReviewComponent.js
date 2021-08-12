@@ -1,6 +1,5 @@
 import React from 'react';
 import Skeleton from "react-loading-skeleton";
-import ReactDOM from 'react-dom';
 import Select from "./Select";
 
 class CustomerReviewComponent extends React.PureComponent {
@@ -155,10 +154,8 @@ class CustomerReviewComponent extends React.PureComponent {
                             title: "Action to be taken",
                             cols: "120",
                             rows: "3",
-                            //     defaultValue: 'test',
                             value: this.state.customerReview.toBeReviewedOnAction || '',
                             onChange: this.handleToBeReviewedOnActionChange,
-                            //     key: 'actionInput'
                         }
                     )
                 ),
