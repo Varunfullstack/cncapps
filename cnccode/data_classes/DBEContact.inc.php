@@ -25,7 +25,6 @@ class DBEContact extends DBCNCEntity
     const fax              = "fax";
     const portalPassword   = "portalPassword";
     const mailshot         = "mailshot";
-    const accountsFlag     = "accountsFlag";
     const mailshot2Flag    = "mailshot2Flag";
     const mailshot3Flag    = "mailshot3Flag";
     const mailshot8Flag    = "mailshot8Flag";

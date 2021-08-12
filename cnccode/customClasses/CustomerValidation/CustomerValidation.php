@@ -30,27 +30,21 @@ class CustomerValidation
         $dsContacts = new DataSet($this);
         $buCustomer = new BUCustomer($this);
         $buCustomer->getContactsByCustomerID($this->customerId, $dsContacts);
-        $atLeastOneAccount = false;
         $atLeastOneInvoice = false;
-        $atLeastOneAtMostOneStatement = false;
         $atLeastOneMain = false;
         $atLeastOneReview = false;
         $atLeastOneTopUp = !$buCustomer->hasPrepayContract($this->customerId);
-        $atLeastOneReport = false;         
-        $dbeCustomer=new DBECustomer($this);
+        $atLeastOneReport = false;
+        $dbeCustomer = new DBECustomer($this);
         $dbeCustomer->getRow($this->customerId);
-        $statmentContact=$dbeCustomer->getValue(DBECustomer::statementContactId);
-        $referred=$dbeCustomer->getValue(DBECustomer::referredFlag);
-        if( $referred)
-        {            
+
+        $referred = $dbeCustomer->getValue(DBECustomer::referredFlag);
+        if ($referred) {
             return;
-        }
-        if ( $statmentContact==null) {            
-            $atLeastOneAccount = true;
         }
 
         while ($dsContacts->fetchNext()) {
-            $contactValidation = new ContactValidation($dsContacts->getValue(DBEContact::contactID));           
+            $contactValidation = new ContactValidation($dsContacts->getValue(DBEContact::contactID));
 
             if ($dsContacts->getValue(DBEContact::mailshot2Flag) == 'Y' && !$atLeastOneInvoice) {
                 $atLeastOneInvoice = true;
@@ -85,13 +79,6 @@ class CustomerValidation
             if ($siteValidation->hasErrors()) {
                 $this->siteValidationErrors[] = $siteValidation;
             }
-
-        }
-
-        if (!$atLeastOneAccount) {
-            $this->globalValidationErrors[] = new ValidationError(
-                "At least one contact must have Account flag checked"
-            );
         }
 
         if (!$atLeastOneInvoice) {
@@ -100,9 +87,10 @@ class CustomerValidation
             );
         }
 
-        if (!$atLeastOneAtMostOneStatement) {
+        $statementContact = $dbeCustomer->getValue(DBECustomer::statementContactId);
+        if (!$statementContact) {
             $this->globalValidationErrors[] = new ValidationError(
-                "At most and at least one contact must have Statement flag checked"
+                "The customer does not have a valid Statement contact assigned"
             );
         }
 
@@ -123,8 +111,6 @@ class CustomerValidation
         if (!$atLeastOneReport) {
             $this->globalValidationErrors[] = new ValidationError("At least one contact must have Report flag checked");
         }
-
-
     }
 
     public function getCustomerURL()

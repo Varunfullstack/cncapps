@@ -319,7 +319,9 @@ class BUSecondsite extends Business
                 }
 
                 $this->logMessage("Should store size {$totalSize} for server {$server['serverName']}");
-                $this->recordServerSize($server['server_cuino'], $totalSize);
+                if(!$testRun){
+                    $this->recordServerSize($server['server_cuino'], $totalSize);
+                }
                 if ($allServerImagesPassed) {
                     $this->resetSuspendedUntilDate($server['server_cuino']);
                 }
