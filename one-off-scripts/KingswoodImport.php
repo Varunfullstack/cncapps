@@ -35,12 +35,6 @@ function handleRow($data, dbSweetcode $db, &$existingContacts): void
         $toInsert->setValue(DBEContact::siteNo, $data[5]);
         $toInsert->setValue(DBEContact::phone, $data[6]);
         $toInsert->setValue(DBEContact::mobilePhone, $data[7]);
-        $toInsert->setValue(DBEContact::initialLoggingEmailFlag, 'Y');
-        $toInsert->setValue(DBEContact::workStartedEmailFlag, 'Y');
-        $toInsert->setValue(DBEContact::workUpdatesEmailFlag, 'Y');
-        $toInsert->setValue(DBEContact::fixedEmailFlag, 'Y');
-        $toInsert->setValue(DBEContact::pendingClosureEmailFlag, 'Y');
-        $toInsert->setValue(DBEContact::closureEmailFlag, 'Y');
         $toInsert->insertRow();
         return;
     }
@@ -51,10 +45,7 @@ function handleRow($data, dbSweetcode $db, &$existingContacts): void
     $toUpdate                     = new DBEContact($that);
     $toUpdate->getRow($contactId);
     if ($contactId === "21442") {
-        $toUpdate->setValue(DBEContact::accountsFlag, 'Y');
         $toUpdate->setValue(DBEContact::mailshot2Flag, 'Y');
-        $toUpdate->setValue(DBEContact::mailshot4Flag, 'Y');
-        $toUpdate->setValue(DBEContact::mailshot4Flag, 'Y');
         $toUpdate->setValue(DBEContact::reviewUser, 'Y');
         $toUpdate->setValue(DBEContact::mailshot9Flag, 'Y');
     }

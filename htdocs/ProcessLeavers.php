@@ -25,10 +25,6 @@ while ($dsContact->fetchNext()) {
         'N'
     );
     $dbeContact->setValue(
-        DBEContact::accountsFlag,
-        'N'
-    );
-    $dbeContact->setValue(
         DBEContact::mailshot2Flag,
         'N'
     );
