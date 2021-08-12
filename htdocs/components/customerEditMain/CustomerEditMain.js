@@ -1,18 +1,13 @@
 "use strict";
 import React from 'react';
-import Select from "./Select";
 import EncryptedTextInput from "./EncryptedTextInput";
-//import {connect} from "react-redux";
-import {getMainContacts, getAllContacts} from "./selectors/selectors";
-import {updateCustomerField} from "./actions";
 import APICustomers from '../services/APICustomers';
-import PureComponent from '../shared/PureComponent';
 import Toggle from '../shared/Toggle';
 import MainComponent from '../shared/MainComponent';
 import APIUser from '../services/APIUser';
 import APILeadStatusTypes from '../LeadStatusTypes/services/APILeadStatusTypes';
-import APIAudit from './../services/APIAudit';
-import { getUpdatedColumns, Pages } from '../utils/utils';
+import { Pages } from '../utils/utils';
+import   moment   from 'moment';
 
 export default class CustomerEditMain extends MainComponent {
 
@@ -24,7 +19,65 @@ export default class CustomerEditMain extends MainComponent {
         this.state = {
             ...this.state,
             loaded: false,
-            data: null,
+            data: {accountManagerUserID: null,
+                accountName: "",
+                accountNumber: "",
+                activeDirectoryName: "",
+                becameCustomerDate: "",
+                customerID: null,
+                customerTypeID: "",
+                dateMeetingConfirmed: null,
+                deliverSiteNo: null,
+                droppedCustomerDate: null,
+                eligiblePatchManagement: null,
+                excludeFromWebrootChecks: 0,
+                gscTopUpAmount: null,
+                inclusiveOOHCallOuts: 0,
+                inviteSent: null,
+                invoiceSiteNo: 0,
+                lastContractSent: null,
+                lastReviewMeetingDate: "",
+                lastUpdatedDateTime: "",
+                leadStatusId: null,
+                mailshotFlag: 0,
+                meetingDateTime: null,
+                modifyDate: moment().format("YYYY-MM-DD"),
+                name: "",
+                noOfPCs: null,
+                noOfServers: null,
+                opportunityDeal: null,
+                primaryMainContactID: null,
+                rating: null,
+                referredFlag: 0,
+                regNo: "",
+                reportProcessed: null,
+                reportSent: null,
+                reviewAction: "",
+                reviewDate: "",
+                reviewMeetingBooked: 0,
+                reviewMeetingFrequencyMonths: null,
+                reviewTime: "",
+                sectorID: null,
+                slaFixHoursP1: null,
+                slaFixHoursP2: null,
+                slaFixHoursP3: null,
+                slaFixHoursP4: null,
+                slaP1: null,
+                slaP1PenaltiesAgreed: 0,
+                slaP2: null,
+                slaP2PenaltiesAgreed: 0,
+                slaP3: null,
+                slaP3PenaltiesAgreed: 0,
+                slaP4: null,
+                slaP5: null,
+                sortCode: "",
+                specialAttentionEndDate: "",
+                specialAttentionFlag: "N",
+                statementContactId: null,
+                support24HourFlag: "N",
+                techNotes: "",
+                websiteURL: ""
+                },
             originData:null,
             contacts: [],
             users: [],
@@ -35,10 +88,20 @@ export default class CustomerEditMain extends MainComponent {
     }
 
     componentDidMount() {
-        this.getCustomerData();
-        this.api.getCustomerContacts(this.props.customerId).then(contacts => {
-            this.setState({contacts})
-        });
+         if(this.props.customerId)
+        {
+            this.getCustomerData();
+            this.api.getCustomerContacts(this.props.customerId).then(contacts => {
+                this.setState({contacts});
+                if(contacts.length==0)
+                {
+                this.alert("Please add contacts");
+                    setTimeout(()=>{
+                        window.location=`Customer.php?action=dispEdit&customerID=${this.props.customerId}&activeTab=contacts`;
+                    },1000)
+                }
+            });
+        }
         this.apiUsers.getActiveUsers().then(users => {
             this.setState({users})
         });
@@ -110,6 +173,7 @@ export default class CustomerEditMain extends MainComponent {
                                         maxLength="50"
                                         name="name"
                                         className="form-control input-sm"
+                                        required
                                     />
                                 </td>
                             </tr>
@@ -119,7 +183,7 @@ export default class CustomerEditMain extends MainComponent {
                                     <select
                                         name="primaryMainContactID"
                                         className="form-control input-sm"
-                                        value={data.primaryMainContactID}
+                                        value={data.primaryMainContactID||""}
                                         onChange={($value) =>
                                             this.setValue(
                                                 "primaryMainContactID",
@@ -143,7 +207,7 @@ export default class CustomerEditMain extends MainComponent {
                                     <select
                                         name="statementContactId"
                                         className="form-control input-sm"
-                                        value={data.statementContactId}
+                                        value={data.statementContactId|""}
                                         onChange={($value) =>
                                             this.setValue(
                                                 "statementContactId",
@@ -371,7 +435,7 @@ export default class CustomerEditMain extends MainComponent {
                         <tr>
                             <td align="right">Lead Status</td>
                             <td>
-                                <select className="form-control" value={data.leadStatusId}
+                                <select required className="form-control input-sm" value={data.leadStatusId||""}
                                         onChange={($event) => this.setValue("leadStatusId", $event.target.value)}>
                                     <option value="">None</option>
                                     {
@@ -403,6 +467,7 @@ export default class CustomerEditMain extends MainComponent {
                             <td align="right">Type</td>
                             <td>
                                 <select
+                                    required
                                     className="form-control input-sm"
                                     value={data.customerTypeID || ""}
                                     onChange={($event) =>
@@ -410,6 +475,7 @@ export default class CustomerEditMain extends MainComponent {
                                     }
                                     name="customerTypeID"
                                 >
+                                    <option></option>
                                     {customerTypes.map((type) => (
                                         <option key={type.id} value={type.id}>
                                             {type.name}
@@ -422,6 +488,7 @@ export default class CustomerEditMain extends MainComponent {
                             <td align="right">Sector</td>
                             <td>
                                 <select
+                                required
                                     className="form-control input-sm"
                                     value={data.sectorID || ""}
                                     onChange={($event) =>
@@ -429,6 +496,7 @@ export default class CustomerEditMain extends MainComponent {
                                     }
                                     name="sectorID"
                                 >
+                                    <option></option>
                                     {sectors.map((type) => (
                                         <option key={type.id} value={type.id}>
                                             {type.name}
@@ -470,7 +538,7 @@ export default class CustomerEditMain extends MainComponent {
                             <td align="right">Sort Code</td>
                             <td>
                                 <EncryptedTextInput
-                                    encryptedValue={data.sortCode}
+                                    encryptedValue={data.sortCode||""}
                                     onChange={this.handleUpdateGenericField}
                                     mask="99-99-99"
                                     name="sortCode"
@@ -492,7 +560,7 @@ export default class CustomerEditMain extends MainComponent {
                             <td align="right">Account Number</td>
                             <td>
                                 <EncryptedTextInput
-                                    encryptedValue={data.accountNumber}
+                                    encryptedValue={data.accountNumber||""}
                                     onChange={this.handleUpdateGenericField}
                                     mask="99999999"
                                     name="accountNumber"
@@ -553,7 +621,7 @@ export default class CustomerEditMain extends MainComponent {
                         <tr>
                             <td align="right">Patch Management Eligible</td>
                             <td>
-                                {data.eligiblePatchManagement}
+                                {data.eligiblePatchManagement||""}
                             </td>
                         </tr>
                         <tr>
@@ -574,7 +642,7 @@ export default class CustomerEditMain extends MainComponent {
         return (
             <div className="flex-row flex-center">
                 <span style={{width: 15, textAlign: "right"}}>{title}</span>
-                <input style={{width: 50}} className="form-control" value={data[field]}
+                <input style={{width: 50}} className="form-control" value={data[field]||''}
                        onChange={($event) => this.setValue(field, $event.target.value)}></input>
             </div>
         );
@@ -687,7 +755,7 @@ export default class CustomerEditMain extends MainComponent {
     }
     getCards = () => {
 
-        return <div className="row" style={{margin: 2}}>
+        return <div className="row" style={{margin: 2}} id="mainForm">
             <div className="col-md-6">
                 {this.getKeyDetailsCard()}
                 {this.getSectorSizeCard()}
@@ -701,12 +769,28 @@ export default class CustomerEditMain extends MainComponent {
         </div>
     }
     handleSave = () => {
-        const {data,originData} = this.state;        
+        const {data,originData} = this.state;      
+        if(!this.isFormValid("mainForm"))  
+        {
+            this.alert("Please enter required inputs");
+            return;
+        }
         this.api.updateCustomer(data).then(res => {
             if (res.status) {
-                this.alert("Data saved successfully");
-                this.getCustomerData();
-                this.logData(data,originData,data.customerID,null,Pages.Customer);
+               
+                 
+                this.logData(data,originData,data.customerID,null,Pages.Customer);                
+                if(this.props.customerId)
+                {
+                    this.alert("Data saved successfully");
+                    this.getCustomerData();
+                }
+                else {
+                    this.alert("Data saved successfully, Please add sites and contacts");
+                    setTimeout(()=>{
+                        window.location=`Customer.php?action=dispEdit&customerID=${res.data.customerID}&activeTab=sites`;
+                    },1000)
+                }
             } else
                 this.alert("Data not saved successfully");
 
@@ -722,8 +806,8 @@ export default class CustomerEditMain extends MainComponent {
         return !(this.props.data.becameCustomerDate && !this.props.data.droppedCustomerDate);
     }
     render() {
-        const {data} = this.state;
-        if (!data) return null;
+        const {data} = this.state;        
+        //if (!data) return null;
         return (
             <div>
                 {this.getAlert()}

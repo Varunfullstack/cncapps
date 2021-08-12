@@ -10,27 +10,11 @@ import CustomerContactsComponent from "./CustomerContactsComponent";
 import CustomerOrdersComponent from "./CustomerOrdersComponent";
 import CustomerCRMComponent from "./CustomerCRMComponent";
 import CustomerNotesComponent from "./CustomerNotesComponent";
-
-//import configureStore from "./configureStore";
-/*
-import './wdyr';
-import {Provider} from "react-redux";
-import {clearEditingSiteAction, fetchAllData, setEditSiteAction} from "./actions";
-import ErrorHandler from "./helpers/ErrorHandlerComponent";
-import {Tab, Tabs} from "react-bootstrap";
-
-
-import SitesList from "./customerSites/SitesList";
-import CustomerOrders from "./CustomerOrders";
-import CustomerCRMComponent from "./CustomerCRMComponent";
-import ContactsComponent from "./contacts/ContactsComponent";
-*/
-//const store = configureStore();
-import './../style.css';
 import { params } from "../utils/utils";
 import ToolTip from "../shared/ToolTip";
 import APICustomers from "../services/APICustomers";
 import CustomerLog from "./CustomerLog";
+import './../style.css';
 class CustomerEditComponent extends MainComponent {
     tabs = [];
     TAB_CUSTOMER='customer';    
@@ -46,42 +30,58 @@ class CustomerEditComponent extends MainComponent {
     constructor(props) {
         super(props);
          this.state = {
-            customerId:null,
+            customerId:params.get("customerID"),
             loaded: true,
             filter: {                
                 activeTab:params.get("activeTab")|| this.TAB_CUSTOMER,                 
             },
-            hasFolder:true
-        }
-        this.tabs = [
-            {id: this.TAB_CUSTOMER, title: "Customer", icon: null},
-            {id: this.TAB_CONTACTS, title: "Contacts", icon: null},
-            {id: this.TAB_SITES, title: "Sites", icon: null},
-            {id: this.TAB_PROJECTS, title: "Projects", icon: null},
-            {id: this.TAB_PORTAL_DOCUMENT, title: "Portal Documents", icon: null},
-            {id: this.TAB_CRM, title: "CRM", icon: null},      
-            {id: this.TAB_NOTES, title: "Notes", icon: null},    
-            {id: this.TAB_ORDERS, title: "Orders", icon: null},
-            {id: this.TAB_LOG, title: "Audit", icon: null},
-
-        ];
-       // store.dispatch(fetchAllData(customerId));
+            hasFolder:true,
+            mode:'new'
+        }       
     }
     componentDidMount() {
         const customerId=params.get("customerID");
-        this.setState({customerId});
-        this.checkCustomerFolderExist();
+        if(!customerId&&params.get("customerId"))
+         window.location=`Customer.php?action=dispEdit&customerID=${params.get("customerId")}`;
+        const action=params.get("action");
+        if(customerId&&action !='addCustomer')
+        {            
+            this.tabs = [
+                {id: this.TAB_CUSTOMER, title: "Customer", icon: null},
+                {id: this.TAB_CONTACTS, title: "Contacts", icon: null},
+                {id: this.TAB_SITES, title: "Sites", icon: null},
+                {id: this.TAB_PROJECTS, title: "Projects", icon: null},
+                {id: this.TAB_PORTAL_DOCUMENT, title: "Portal Documents", icon: null},
+                {id: this.TAB_CRM, title: "CRM", icon: null},      
+                {id: this.TAB_NOTES, title: "Notes", icon: null},    
+                {id: this.TAB_ORDERS, title: "Orders", icon: null},
+                {id: this.TAB_LOG, title: "Audit", icon: null},
+    
+            ];            
+            this.setState({mode:"edit",customerId});            
+            this.checkCustomerFolderExist();
+        }
+        else {
+            this.tabs = [
+                {id: this.TAB_CUSTOMER, title: "Customer", icon: null},
+            ];
+            this.setState({hasFolder:false}); // we must refresh the state so tabs will be update
+              
+        }       
+      
     }
     getTabsElement = () => {
         const {   tabs} = this;        
+        if(!this.state.customerId)
+        return null;
         return (
-            <div key="tab" className="tab-container" style= {{flexWrap: "wrap", justifyContent: "flex-start", maxWidth: 1500}}
+            <div key="tab" className="tab-container" style= {{flexWrap: "wrap", justifyContent: "flex-start", maxWidth: 1600}}
             >
                 {
                     tabs.map((t,indx)=>{
                         return <i key={indx}   className= {this.isActive(t.id) + " nowrap"}
                         onClick={() => this.setActiveTab(t.id)}
-                        style={{width: 150}}>
+                        style={{width: 130}}>
                             {t.title} 
                         </i>
                     })
@@ -103,7 +103,7 @@ class CustomerEditComponent extends MainComponent {
     };
     getActiveTab=()=>{
         const { filter,customerId } = this.state;
-        if(customerId!=null)
+       // if(customerId!=null)
         switch (filter.activeTab) {
           case this.TAB_CUSTOMER:
             return <CustomerEditMain customerId={customerId}/>;
@@ -127,6 +127,9 @@ class CustomerEditComponent extends MainComponent {
         }
     }
     getActions=()=>{
+        const {mode}=this.state;
+        if(mode=='new')
+        return null;
         return <div className="flex-row">
             <ToolTip title="Renewal Information" width={35}>
             <i className="fal fa-tasks fa-2x m-5 pointer icon" onClick={()=>window.open(`RenewalReport.php?action=produceReport&customerID=${this.state.customerId}`,"_blank")}></i>
@@ -168,118 +171,7 @@ class CustomerEditComponent extends MainComponent {
                 {this.getActions()}  
                 {this.getTabsElement()}
                 {this.getActiveTab()}
-               </div>
-       /* if (!this.state.loaded) {
-            return '';
-
-        }
-
-        return (
-            <Provider store={store}>
-                <ErrorHandler/>
-                <div className="container-fluid py-3">
-                    <div className="row">
-                        <div className="col-md-12">
-
-                            <nav>
-                                <Tabs defaultActiveKey="customer"
-                                      onSelect={(eventKey, $event) => {
-                                          if (eventKey === 'crm') {
-                                              store.dispatch(setEditSiteAction(0));
-                                          }
-                                          if (eventKey === 'sites') {
-                                              store.dispatch(clearEditingSiteAction());
-                                          }
-                                      }}
-                                >
-                                    <Tab eventKey="customer"
-                                         title="Customer"
-                                    >
-                                        <CustomerEditMain customerId={customerId}/>
-                                    </Tab>
-                                    <Tab eventKey="projects"
-                                         title="Projects"
-                                    >
-                                        <CustomerProjectsComponent customerId={customerId}/>
-                                    </Tab>
-                                    <Tab eventKey="portalDocuments"
-                                         title="Portal Documents"
-                                    >
-                                        <PortalCustomerDocumentsComponent customerId={customerId}/>
-                                    </Tab>
-                                    <Tab eventKey="sites"
-                                         title="Sites"
-                                    >
-                                        <SitesList customerId={customerId}/>
-                                    </Tab>
-                                    <Tab eventKey="orders"
-                                         title="Orders"
-                                    >
-                                        <CustomerOrders customerId={customerId}/>
-                                    </Tab>
-                                    <Tab eventKey="contacts"
-                                         title="Contacts"
-                                    >
-                                        <ContactsComponent/>
-                                    </Tab>
-                                    <Tab eventKey="crm"
-                                         title="CRM"
-                                    >
-                                        <CustomerCRMComponent/>
-                                    </Tab>
-                                </Tabs>
-                            </nav>
-                            <div className="tab-content"
-                                 id="nav-tabContent"
-                            >
-                                <div className="tab-pane fade show active"
-                                     id="nav-home"
-                                     role="tabpanel"
-                                     aria-labelledby="nav-home-tab"
-                                >
-
-                                </div>
-                                <div className="tab-pane fade customerAddProjects"
-                                     id="nav-profile"
-                                     role="tabpanel"
-                                     aria-labelledby="nav-profile-tab"
-                                >
-
-                                </div>
-                                <div className="tab-pane fade"
-                                     id="nav-portal-documents-tab"
-                                     role="tabpanel"
-                                     aria-labelledby="nav-portal-documents-tab"
-                                >
-
-                                </div>
-                                <div className="tab-pane fade"
-                                     id="nav-sites"
-                                     role="tabpanel"
-                                     aria-labelledby="nav-sites-tab"
-                                >
-
-                                </div>
-                                <div className="tab-pane fade"
-                                     id="nav-orders"
-                                     role="tabpanel"
-                                     aria-labelledby="nav-orders-tab"
-                                >
-
-                                </div>
-                                <div className="tab-pane fade"
-                                     id="nav-crm"
-                                     role="tabpanel"
-                                     aria-labelledby="nav-crm-tab"
-                                >
-
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </Provider>
-        )*/
+               </div>      
     }
 }
 

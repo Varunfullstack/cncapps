@@ -891,10 +891,13 @@ class CTCustomer extends CTCNC
                         "%d/%m/%Y",
                         strtotime($dbeJOrdhead->getValue(DBEJOrdhead::date))
                     ),
-                    'custPORef' => $dbeJOrdhead->getValue(DBEJOrdhead::custPORef)
+                    'custPORef' => $dbeJOrdhead->getValue(DBEJOrdhead::custPORef), 
+                    'lastQuoteSent'=> $dbeJOrdhead->getValue(DBEJOrdhead::lastQuoteSent),
+                    'firstComment' => $dbeJOrdhead->getValue(DBEJOrdhead::firstComment)
                 ];
             }
         }
+ 
         echo json_encode(["status" => "ok", "data" => $orders]);
     }
 
@@ -3104,7 +3107,10 @@ ORDER BY NAME,
             $dbeCustomer->getRow($_REQUEST["customerID"]);
             $customerName = $dbeCustomer->getValue(DBECustomer::name);
         }
-        $this->setPageTitle('Customer ' . $customerName);
+        if($this->getAction() == CTCUSTOMER_ACT_ADDCUSTOMER )
+        $this->setPageTitle('Add New Customer');
+        else
+        $this->setPageTitle('Customer '.$customerName);
         $this->setTemplateFiles(
             'CustomerEdit',
             'CustomerEditSimple.inc'
@@ -3236,87 +3242,90 @@ ORDER BY NAME,
     function updateCustomer()
     {
         try {
-            $data = $this->getBody(true);
-
-            $updatedData = $this->only($data, [
-                "accountManagerUserID",
-                "accountName",
-                "accountNumber",
-                "activeDirectoryName",
-                "becameCustomerDate",
-                "customerID",
-                "customerTypeID",
-                "dateMeetingConfirmed",
-                "deliverSiteNo",
-                "droppedCustomerDate",
-                "eligiblePatchManagement",
-                "excludeFromWebrootChecks",
-                "gscTopUpAmount",
-                "inclusiveOOHCallOuts",
-                "inviteSent",
-                "invoiceSiteNo",
-                "lastContractSent",
-                "lastReviewMeetingDate",
-                "lastUpdatedDateTime",
-                "leadStatusId",
-                "mailshotFlag",
-                "meetingDateTime",
-                "modifyDate",
-                "name",
-                "noOfPCs",
-                "noOfServers",
-                "opportunityDeal",
-                "primaryMainContactID",
-                "rating",
-                'referredFlag',
-                "regNo",
-                'reportProcessed',
-                'reportSent',
-                'reviewAction',
-                'reviewDate',
-                'reviewMeetingBooked',
-                'reviewMeetingFrequencyMonths',
-                'reviewTime',
-                'sectorID',
-                'slaFixHoursP1',
-                'slaFixHoursP2',
-                'slaFixHoursP3',
-                'slaFixHoursP4',
-                'slaP1',
-                'slaP1PenaltiesAgreed',
-                'slaP2',
-                'slaP2PenaltiesAgreed',
-                'slaP3',
-                'slaP3PenaltiesAgreed',
-                'slaP4',
-                'slaP5',
-                'sortCode',
-                'specialAttentionEndDate',
-                'specialAttentionFlag',
-                'statementContactId',
-                'support24HourFlag',
-                'techNotes',
-                'websiteURL'
-            ]);
-
+            $data        = $this->getBody(true);            
+            $updatedData=$this->only($data,["accountManagerUserID",
+            "accountName",
+            "accountNumber",
+            "activeDirectoryName",
+            "becameCustomerDate",
+            "customerID",
+            "customerTypeID",
+            "dateMeetingConfirmed",
+            "deliverSiteNo",
+            "droppedCustomerDate",
+            "eligiblePatchManagement",
+            "excludeFromWebrootChecks",
+            "gscTopUpAmount",
+            "inclusiveOOHCallOuts",
+            "inviteSent",
+            "invoiceSiteNo",
+            "lastContractSent",
+            "lastReviewMeetingDate",
+            "lastUpdatedDateTime",
+            "leadStatusId",
+            "mailshotFlag",
+            "meetingDateTime",
+            "modifyDate",
+            "name",
+            "noOfPCs",
+            "noOfServers",
+            "opportunityDeal",
+            "primaryMainContactID",
+            "rating",
+            'referredFlag',
+            "regNo",
+            'reportProcessed',
+            'reportSent',
+            'reviewAction',
+            'reviewDate',
+            'reviewMeetingBooked',
+            'reviewMeetingFrequencyMonths',
+            'reviewTime',
+            'sectorID',
+            'slaFixHoursP1',
+            'slaFixHoursP2',
+            'slaFixHoursP3',
+            'slaFixHoursP4',
+            'slaP1',
+            'slaP1PenaltiesAgreed',
+            'slaP2',
+            'slaP2PenaltiesAgreed',
+            'slaP3',
+            'slaP3PenaltiesAgreed',
+            'slaP4',
+            'slaP5',
+            'sortCode',
+            'specialAttentionEndDate',
+            'specialAttentionFlag',
+            'statementContactId',
+            'support24HourFlag',
+            'techNotes',
+            'websiteURL']);
+            $customerID=@$data['customerID']??null;
             $dbeCustomer = new DBECustomer($this);
-            $dbeCustomer->getRow($data['customerID']);
-            if (empty($data['lastUpdatedDateTime']) || $data['lastUpdatedDateTime'] < $dbeCustomer->getValue(
-                    DBECustomer::lastUpdatedDateTime
-                )) {
-                return $this->fail(400, "Updated by another user");
-                // throw new JsonHttpException(
-                //     400, "Updated by another user", [
-                //            "errorCode"           => 1002,
-                //            "lastUpdatedDateTime" => $dbeCustomer->getValue(DBECustomer::lastUpdatedDateTime)
-                //        ]
-                // );
-            }
-            foreach ($updatedData as $key => $value) {
+            foreach (  $updatedData as $key => $value) {
                 $dbeCustomer->setValue($key, $value);
             }
-            $dbeCustomer->updateRow();
-            return $this->success(["lastUpdatedDateTime" => $dbeCustomer->getValue(DBECustomer::lastUpdatedDateTime)]);
+            
+            if($customerID)
+            {
+                $dbeCustomer->getRow($customerID);
+                if (empty($data['lastUpdatedDateTime']) || $data['lastUpdatedDateTime'] < $dbeCustomer->getValue(
+                    DBECustomer::lastUpdatedDateTime
+                )) {
+                    return $this->fail(400, "Updated by another user");                
+                }
+                $dbeCustomer->updateRow();//update
+            }
+            else { //new customer                 
+                //$dbeCustomer->debug=true;
+                $dbeCustomer->setValue(DBECustomer::modifyDate,date(DATE_MYSQL_DATETIME));   
+                $dbeCustomer->setValue(DBECustomer::lastUpdatedDateTime,date(DATE_MYSQL_DATETIME));                             
+                $dbeCustomer->setValue(DBECustomer::modifyUserID,$this->userID);
+                
+                $dbeCustomer->insertRow();
+            }         
+            return $this->success(["lastUpdatedDateTime" => $dbeCustomer->getValue(DBECustomer::lastUpdatedDateTime),"customerID"=>$dbeCustomer->getValue(DBECustomer::customerID)]);
         } catch (Exception $ex) {
             return $this->fail(["error"]);
         }

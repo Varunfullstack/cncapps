@@ -6,11 +6,11 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
-global
+global $cfg;
 
 use Intervention\Image\ImageManagerStatic;
 
-$cfg;
+
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BUExpense.inc.php');
 require_once($cfg['path_bu'] . '/BUExpenseType.inc.php');

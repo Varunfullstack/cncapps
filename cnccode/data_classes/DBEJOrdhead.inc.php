@@ -10,7 +10,9 @@ class DBEJOrdhead extends DBEOrdhead
     const customerName   = "customerName";
     const contract       = "contract";
     const customerItemID = "customerItemID";
-
+    const lastQuoteSent  = "lastQuoteSent";
+    const firstComment   = "firstComment";
+//
     /**
      * calls constructor()
      * @access public
@@ -39,6 +41,18 @@ class DBEJOrdhead extends DBEOrdhead
             DA_INTEGER,
             DA_ALLOW_NULL,
             'cui_cuino'
+        );
+        $this->addColumn(
+            self::lastQuoteSent,
+            DA_DATETIME,
+            DA_ALLOW_NULL,
+            "( SELECT MAX(sentDateTime) FROM quotation WHERE ordheadID=Ordhead.odh_ordno AND sentDateTime IS NOT NULL) "
+        );
+        $this->addColumn(
+            self::firstComment,
+            DA_DATETIME,
+            DA_ALLOW_NULL,
+            "(SELECT `odl_desc` FROM ordline WHERE  `odl_type`='C' AND `odl_ordno`=Ordhead.odh_ordno  LIMIT 1)"
         );
         $this->setAddColumnsOff();
     }

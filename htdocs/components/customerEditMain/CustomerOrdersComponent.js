@@ -31,6 +31,7 @@ export default class CustomerOrdersComponent extends MainComponent {
     getData = () => {
         const customerId = params.get("customerID");
         this.api.getCustomerOrders(customerId).then((res) => {
+            console.log("Orders",res.data)
             this.setState({orders: res.data, customerId});
         });
     };
@@ -38,13 +39,11 @@ export default class CustomerOrdersComponent extends MainComponent {
         const columns = [
             {
                 path: "id",
-                label: "ID",
-                hdToolTip: "ID",
-                sortable: true,
-                width: 200,
+                label: "Order No",
+                hdToolTip: "Order No",
+                sortable: true,               
                 content: (order) => (
-                    <a
-                        style={{color: "black"}}
+                    <a                        
                         href={`${order.url}`}
                         target="_blank"
                     >
@@ -57,44 +56,59 @@ export default class CustomerOrdersComponent extends MainComponent {
                 label: "Type",
                 hdToolTip: "Type",
                 sortable: true,
-                width: 200,
+                
             },
             {
                 path: "date",
-                label: "Date",
-                hdToolTip: "Date",
+                label: "Date Raised",
+                hdToolTip: "Date Raised",
                 sortable: true,
-                width: 200,
+               
+
+            },
+            {
+                path: "lastQuoteSent",
+                label: "Date Last Quoted",
+                hdToolTip: "Date Last Quoted",
+                sortable: true,
+                content:(order)=>this.getCorrectDate(order.lastQuoteSent)
             },
             {
                 path: "custPORef",
-                label: "POR Ref",
+                label: "Cust PO Ref",
                 hdToolTip: "POR Ref",
                 sortable: true,
-                width: 200,
+                 
             },
             {
-                path: "edit",
-                label: "",
-                hdToolTip: "Edit order",
-                //icon: "fal fa-2x fa-signal color-gray2 pointer",
-                sortable: false,
-                content: (order) =>
-                    this.getEditElement(order, () => this.handleEdit(order)),
+                path: "firstComment",
+                label: "First Comment",
+                hdToolTip: "First Comment",
+                sortable: true,
+                 
             },
-            {
-                path: "delete",
-                label: "",
-                hdToolTip: "Delete order",
-                //icon: "fal fa-2x fa-signal color-gray2 pointer",
-                sortable: false,
-                content: (order) =>
-                    this.getDeleteElement(
-                        order,
-                        () => this.handleDelete(order),
-                        order.isDeletable
-                    ),
-            },
+            // {
+            //     path: "edit",
+            //     label: "",
+            //     hdToolTip: "Edit order",
+            //     //icon: "fal fa-2x fa-signal color-gray2 pointer",
+            //     sortable: false,
+            //     content: (order) =>
+            //         this.getEditElement(order, () => this.handleEdit(order)),
+            // },
+            // {
+            //     path: "delete",
+            //     label: "",
+            //     hdToolTip: "Delete order",
+            //     //icon: "fal fa-2x fa-signal color-gray2 pointer",
+            //     sortable: false,
+            //     content: (order) =>
+            //         this.getDeleteElement(
+            //             order,
+            //             () => this.handleDelete(order),
+            //             order.isDeletable
+            //         ),
+            // },
         ];
         return (
             <Table
