@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.16.2] - 2021-08-12
+## Fixed
+- Fixed issues with contacts.
+
 ## [v5.16.1] - 2021-08-12
 ### Fixed
 - Fixed issue with Hide From Customer not working when in activity.
