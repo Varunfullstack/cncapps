@@ -6,21 +6,20 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
-global
 
 use CNCLTD\Exceptions\JsonHttpException;
 
-$cfg;
+global $cfg;
 require_once($cfg ['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg ['path_bu'] . '/BUEscalationReport.inc.php');
 require_once($cfg ['path_dbe'] . '/DSForm.inc.php');
 
 class CTTeamAndUserStatistics extends CTCNC
 {
-    const searchFormFromDate = 'fromDate';
-    const searchFormToDate = 'toDate';
+    const searchFormFromDate             = 'fromDate';
+    const searchFormToDate               = 'toDate';
     const GET_FIXED_SERVICE_REQUEST_DATA = "GET_FIXED_SERVICE_REQUEST_DATA";
-    const GET_TEAM_PERFORMANCE_DATA = "GET_TEAM_PERFORMANCE_DATA";
+    const GET_TEAM_PERFORMANCE_DATA      = "GET_TEAM_PERFORMANCE_DATA";
 
     private $dsSearchForm = '';
     private $buEscalationReport;
@@ -39,14 +38,12 @@ class CTTeamAndUserStatistics extends CTCNC
             $cookieVars,
             $cfg
         );
-
         if (!$this->isUserSDManager()) {
             Header("Location: /NotAllowed.php");
             exit;
         }
         $this->setMenuId(207);
         $this->buEscalationReport = new BUEscalationReport($this);
-
         $this->dsSearchForm = new DSForm ($this);
         $this->dsSearchForm->addColumn(
             self::searchFormFromDate,
@@ -69,11 +66,9 @@ class CTTeamAndUserStatistics extends CTCNC
         switch ($this->getAction()) {
             case self::GET_TEAM_PERFORMANCE_DATA:
                 $data = $this->getJSONData();
-
                 if (empty($data['startDate'])) {
                     throw new JsonHttpException(
-                        400,
-                        'Please provide a start date in YYYY-MM-DD format'
+                        400, 'Please provide a start date in YYYY-MM-DD format'
                     );
                 }
                 $startDate = $data['startDate'];
@@ -82,14 +77,13 @@ class CTTeamAndUserStatistics extends CTCNC
                         400, 'Please provide a end date in YYYY-MM-DD format'
                     );
                 }
-                $endDate = $data['endDate'];
+                $endDate             = $data['endDate'];
                 $startYearMonthArray = explode('-', $startDate);
-                $startYearMonth = "{$startYearMonthArray[0]}-{$startYearMonthArray[1]}";
-                $endYearMonthArray = explode('-', $endDate);
-                $endYearMonth = "{$endYearMonthArray[0]}-{$endYearMonthArray[1]}";
-
+                $startYearMonth      = "{$startYearMonthArray[0]}-{$startYearMonthArray[1]}";
+                $endYearMonthArray   = explode('-', $endDate);
+                $endYearMonth        = "{$endYearMonthArray[0]}-{$endYearMonthArray[1]}";
                 global $db;
-                $query = "
+                $query                 = "
                 SELECT
   AVG(hdTeamActualSlaPercentage) AS hdTeamAvgSLAPercentage,
   AVG(hdTeamActualFixHours) AS hdTeamAvgFixHours,
@@ -112,35 +106,27 @@ WHERE CONCAT(
     LPAD(team_performance.`month`, 2, 0)
   ) <= ?
                 ";
-                $teamPerformanceResult = $db->preparedQuery(
-                    $query,
-                    [
-                        [
-                            "type"  => "s",
-                            "value" => $startYearMonth
-                        ],
-                        [
-                            "type"  => "s",
-                            "value" => $endYearMonth
-                        ],
-                    ]
-                );
-                $teamPerformanceData = $teamPerformanceResult->fetch_array(MYSQLI_ASSOC);
-
-                echo json_encode(
-                    [
-                        "status" => "ok",
-                        "data"   => $teamPerformanceData
-                    ]
-                );
+                $teamPerformanceResult = $db->preparedQuery($query, [
+                                                                      [
+                                                                          "type"  => "s",
+                                                                          "value" => $startYearMonth
+                                                                      ],
+                                                                      [
+                                                                          "type"  => "s",
+                                                                          "value" => $endYearMonth
+                                                                      ],
+                                                                  ]);
+                $teamPerformanceData   = $teamPerformanceResult->fetch_array(MYSQLI_ASSOC);
+                echo json_encode([
+                                     "status" => "ok",
+                                     "data"   => $teamPerformanceData
+                                 ]);
                 break;
             case self::GET_FIXED_SERVICE_REQUEST_DATA:
                 $data = $this->getJSONData();
-
                 if (empty($data['startDate'])) {
                     throw new JsonHttpException(
-                        400,
-                        'Please provide a start date in YYYY-MM-DD format'
+                        400, 'Please provide a start date in YYYY-MM-DD format'
                     );
                 }
                 $startDate = $data['startDate'];
@@ -150,9 +136,8 @@ WHERE CONCAT(
                     );
                 }
                 $endDate = $data['endDate'];
-
                 global $db;
-                $query = "
+                $query               = "
                        SELECT
   consultant.`cns_name` AS userName,
   consultant.`cns_consno` AS userId,
@@ -194,28 +179,21 @@ GROUP BY a.userId
 ORDER BY teamId,
   userName             
                 ";
-                $result = $db->preparedQuery(
-                    $query,
-                    [
-                        [
-                            "type"  => "s",
-                            "value" => $startDate
-                        ],
-                        [
-                            "type"  => "s",
-                            "value" => $endDate
-                        ],
-                    ]
-                );
+                $result              = $db->preparedQuery($query, [
+                                                                    [
+                                                                        "type"  => "s",
+                                                                        "value" => $startDate
+                                                                    ],
+                                                                    [
+                                                                        "type"  => "s",
+                                                                        "value" => $endDate
+                                                                    ],
+                                                                ]);
                 $teamPerformanceData = $result->fetch_all(MYSQLI_ASSOC);
-
-                echo json_encode(
-                    [
-                        "status" => "ok",
-                        "data"   => $teamPerformanceData
-                    ]
-                );
-
+                echo json_encode([
+                                     "status" => "ok",
+                                     "data"   => $teamPerformanceData
+                                 ]);
                 break;
             default:
                 $this->search();
@@ -229,17 +207,16 @@ ORDER BY teamId,
     {
 
         $this->setMethodName('search');
-        $teamReport = null;
+        $teamReport       = null;
         $technicianReport = null;
         if (isset ($_REQUEST ['searchForm']) == 'POST') {
             if (!$this->dsSearchForm->populateFromArray($_REQUEST ['searchForm'])) {
                 $this->setFormErrorOn();
             } else {
-                $teamReport = $this->buEscalationReport->getTeamReport($this->dsSearchForm);
+                $teamReport       = $this->buEscalationReport->getTeamReport($this->dsSearchForm);
                 $technicianReport = $this->buEscalationReport->getTechnicianReport($this->dsSearchForm);
             }
         }
-
         if ($this->dsSearchForm->getValue(self::searchFormFromDate) == '') {
             $this->dsSearchForm->setUpdateModeUpdate();
             $this->dsSearchForm->setValue(
@@ -259,43 +236,29 @@ ORDER BY teamId,
             );
             $this->dsSearchForm->post();
         }
-
-
         $this->setMethodName('displaySearchForm');
-
-        $this->setTemplateFiles(
-            array(
-                'EscalationReport' => 'EscalationReport.inc'
-            )
-        );
+        $this->setTemplateFiles(array(
+                                    'EscalationReport' => 'EscalationReport.inc'
+                                ));
         $this->loadReactCSS('FixedServiceRequestCountComponent.css');
         $this->loadReactScript('FixedServiceRequestCountComponent.js');
-
-        $urlSubmit = Controller::buildLink(
-            $_SERVER ['PHP_SELF'],
-            array('action' => CTCNC_ACT_SEARCH)
-        );
-
+        $urlSubmit = Controller::buildLink($_SERVER ['PHP_SELF'], array('action' => CTCNC_ACT_SEARCH));
         $this->setPageTitle('Team & User Statistics', 'Engineer Service Request Statistics');
-
-        $this->template->set_var(
-            array(
-                'formError'        => $this->formError,
-                'fromDate'         => $this->dsSearchForm->getValue(self::searchFormFromDate),
-                'fromDateMessage'  => $this->dsSearchForm->getMessage(self::searchFormFromDate),
-                'toDate'           => $this->dsSearchForm->getValue(self::searchFormToDate),
-                'toDateMessage'    => $this->dsSearchForm->getMessage(self::searchFormToDate),
-                'urlSubmit'        => $urlSubmit,
-                'teamReport'       => $teamReport,
-                'technicianReport' => $technicianReport
-            )
-        );
+        $this->template->set_var(array(
+                                     'formError'        => $this->formError,
+                                     'fromDate'         => $this->dsSearchForm->getValue(self::searchFormFromDate),
+                                     'fromDateMessage'  => $this->dsSearchForm->getMessage(self::searchFormFromDate),
+                                     'toDate'           => $this->dsSearchForm->getValue(self::searchFormToDate),
+                                     'toDateMessage'    => $this->dsSearchForm->getMessage(self::searchFormToDate),
+                                     'urlSubmit'        => $urlSubmit,
+                                     'teamReport'       => $teamReport,
+                                     'technicianReport' => $technicianReport
+                                 ));
         $this->template->parse(
             'CONTENTS',
             'EscalationReport',
             true
         );
-
         $this->parsePage();
 
     } // end function displaySearchForm
