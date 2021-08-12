@@ -1,6 +1,11 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.16.1] - 2021-08-12
+### Fixed
+- Fixed issue with Hide From Customer not working when in activity.
+- Fixed issue with contracts not listed when fixing a service request.
+
 ## [v5.16.0] - 2021-08-11
 ### Added
 - Issue 1460 - Added Sales Order Id for the Sales Requests tab.
