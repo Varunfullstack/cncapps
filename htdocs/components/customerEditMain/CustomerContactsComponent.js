@@ -342,7 +342,7 @@ export default class CustomerContactsComponent extends MainComponent {
             pendingFurloughActionDate: "",
             pendingFurloughActionLevel: "",
             siteNo: "",
-            active: "",
+            active: 1,
         };
     }
 

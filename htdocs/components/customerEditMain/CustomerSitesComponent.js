@@ -11,7 +11,8 @@ import {AuditActionType} from "../services/APIAudit";
 
 export default class CustomerSitesComponent extends MainComponent {
     api = new APICustomers();
-    customerID=params.get("customerID");
+    customerID = params.get("customerID");
+
     constructor(props) {
         super(props);
         this.state = {
@@ -26,7 +27,7 @@ export default class CustomerSitesComponent extends MainComponent {
             filter: {
                 showInActive: false
             },
-            originData:null
+            originData: null
         };
     }
 
@@ -78,7 +79,8 @@ export default class CustomerSitesComponent extends MainComponent {
                 icon: "pointer",
                 sortable: true,
                 width: 150,
-                content:(site)=><a name="what3words" target="_blank" href={`https://what3words.com/${site.what3Words}`}>{site.what3Words}</a>
+                content: (site) => <a name="what3words" target="_blank"
+                                      href={`https://what3words.com/${site.what3Words}`}>{site.what3Words}</a>
             },
             {
                 path: "activeFlag",
@@ -87,7 +89,7 @@ export default class CustomerSitesComponent extends MainComponent {
                 icon: "pointer",
                 sortable: true,
                 width: 150,
-                content: (site) => <Toggle checked={site.activeFlag == 'Y'} onChange={() => null}></Toggle>
+                content: (site) => <Toggle checked={site.activeFlag == 'Y'} onChange={() => null}/>
             },
             {
                 path: "edit",
@@ -120,7 +122,7 @@ export default class CustomerSitesComponent extends MainComponent {
                 columns={columns}
                 data={this.state.sites || []}
                 search={true}
-            ></Table>
+            />
         );
     };
 
@@ -140,20 +142,20 @@ export default class CustomerSitesComponent extends MainComponent {
             sageRef: "",
             phone: "",
             maxTravelHours: "",
-            activeFlag: "",
+            activeFlag: 1,
             what3Words: "",
         };
     }
 
     handleEdit = (site) => {
-        this.setState({data: {...site},originData:{...site}, showModal: true, isNew: false});
+        this.setState({data: {...site}, originData: {...site}, showModal: true, isNew: false});
     };
 
     handleDelete = async (site) => {
         if (await this.confirm("Are you sure you want to delete this site?")) {
             this.APICustomers.deleteCustomerSite(site.id).then((res) => {
                 this.getData();
-                this.logData(site,null,this.customerID,null,Pages.Sites,AuditActionType.DELETE);
+                this.logData(site, null, this.customerID, null, Pages.Sites, AuditActionType.DELETE);
             });
         }
     };
@@ -190,7 +192,7 @@ export default class CustomerSitesComponent extends MainComponent {
     };
 
     handleSave = () => {
-        const {data, isNew,originData} = this.state;
+        const {data, isNew, originData} = this.state;
         if (!this.isFormValid("siteformdata")) {
             this.alert("Please enter required data");
             return;
@@ -201,7 +203,7 @@ export default class CustomerSitesComponent extends MainComponent {
                     this.setState({showModal: false, reset: true}, () =>
                         this.getData()
                     );
-                    this.logData(data,originData,this.customerID,null,Pages.Sites,AuditActionType.UPDATE,"id");
+                    this.logData(data, originData, this.customerID, null, Pages.Sites, AuditActionType.UPDATE, "id");
 
                 }
             });
@@ -212,7 +214,7 @@ export default class CustomerSitesComponent extends MainComponent {
                     this.setState({showModal: false, reset: true}, () =>
                         this.getData()
                     );
-                    this.logData(data,null,this.customerID,null,Pages.Sites,AuditActionType.NEW);
+                    this.logData(data, null, this.customerID, null, Pages.Sites, AuditActionType.NEW);
                 }
             });
         }
@@ -237,7 +239,7 @@ export default class CustomerSitesComponent extends MainComponent {
                     </div>
                 }
                 onClose={this.handleClose}
-            ></Modal>
+            />
         );
     };
 
@@ -261,7 +263,7 @@ export default class CustomerSitesComponent extends MainComponent {
                         </td>
                     </tr>
                     <tr>
-                        <td></td>
+                        <td/>
                         <td>
                             <input
                                 required
@@ -274,7 +276,7 @@ export default class CustomerSitesComponent extends MainComponent {
                         </td>
                     </tr>
                     <tr>
-                        <td className="text-right"></td>
+                        <td className="text-right"/>
                         <td>
                             <input
                                 value={data.add3 || ""}
@@ -373,7 +375,7 @@ export default class CustomerSitesComponent extends MainComponent {
                                         data.activeFlag === "Y" ? "N" : "Y"
                                     )
                                 }
-                            ></Toggle>
+                            />
                         </td>
                     </tr>
                     </tbody>
@@ -387,7 +389,7 @@ export default class CustomerSitesComponent extends MainComponent {
         return <div className="flex-row flex-center" style={{marginTop: -20}}>
             <label className="mr-3">Show Inactive Sites</label>
             <Toggle checked={filter.showInActive}
-                    onChange={() => this.handleFilterChange("showInActive", !filter.showInActive)}></Toggle>
+                    onChange={() => this.handleFilterChange("showInActive", !filter.showInActive)}/>
         </div>
     }
     handleFilterChange = (prop, value) => {
