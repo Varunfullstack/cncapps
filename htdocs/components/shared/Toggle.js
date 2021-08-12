@@ -1,26 +1,28 @@
 import React from 'react';
+
 /*
 checked, 
 onChange, 
 name, 
 disabled
 */
-class Toggle extends React.Component  {
+class Toggle extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {checked:this.props.checked}
+        this.state = {checked: this.props.checked}
     }
-    handleOnChange=(event)=>{
-        const {onChange}=this.props;
-        const {checked}=this.state;
-         if(onChange)
+
+    handleOnChange = (event) => {
+        const {onChange} = this.props;
+        const {checked} = this.state;
+        if (onChange)
             onChange(!checked);
-        this.setState({checked:!checked});
-        
+        this.setState({checked: !checked});
+
     }
 
     render() {
-        const {checked,  name, disabled} = this.props;
+        const {checked, name, disabled} = this.props;
         return (
             <label className="switch">
                 <input type="checkbox"

@@ -1445,7 +1445,7 @@ class ActivityEditComponent extends MainComponent {
                             onChange: ($event) => {
                                 this.setValue(
                                     "hideFromCustomerFlag",
-                                    $event.target.checked ? "Y" : "N"
+                                    $event ? "Y" : "N"
                                 )
                             }
                         }),

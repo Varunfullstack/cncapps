@@ -7,7 +7,7 @@
     </changeSet>
     <changeSet author="Mustafa" id="issue1468-1">
 
-        <preConditions>
+        <preConditions onFail="MARK_RAN">
             <not>                
                 <tableExists tableName="pages" />
             </not>
@@ -59,7 +59,7 @@
 
     <changeSet author="Mustafa" id="issue1468-2">
 
-        <preConditions>
+        <preConditions onFail="MARK_RAN">
             <not>                
                 <tableExists tableName="audit" />
             </not>
@@ -166,7 +166,7 @@
         </rollback>
     </changeSet>
     <changeSet author="Mustafa" id="issue1468-3">
-        <preConditions>               
+        <preConditions onFail="MARK_RAN">
                 <tableExists tableName="pages" />            
         </preConditions>
         <sql>
@@ -174,9 +174,10 @@
         INSERT INTO pages (name,parentPageId) VALUES('Sites', 1); 
         INSERT INTO pages (name,parentPageId) VALUES('Portal Documents', 1); 
         </sql>
+        <rollback/>
    </changeSet>
     <changeSet author="Mustafa" id="issue1468-4">
-        <preConditions>               
+        <preConditions onFail="MARK_RAN">
                 <tableExists tableName="audit" />            
         </preConditions>
          <addColumn tableName="audit"   >
