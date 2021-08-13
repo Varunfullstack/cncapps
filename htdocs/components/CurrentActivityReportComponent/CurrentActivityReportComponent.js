@@ -12,7 +12,7 @@ import MainComponent from '../shared/MainComponent';
 import ActivityFollowOn from '../Modals/ActivityFollowOn';
 import InboxOpenSRComponent from './subComponents/InboxOpenSRComponent';
 import {getServiceRequestWorkTitle, sort} from '../utils/utils';
-import React from 'react';
+import React, {Fragment, StrictMode} from 'react';
 import ReactDOM from 'react-dom';
 import APIStandardText from '../services/APIStandardText';
 import CallBackModal from '../shared/CallbackModal/CallBackModal';
@@ -396,7 +396,7 @@ class CurrentActivityReportComponent extends MainComponent {
             [
                 el("option", {value: "", key: "null"}),
                 options.map((e) => el("option", {value: e.id, key: e.id}, e.title)),
-                (<option key="priorityChange" >PRI</option>)
+                (<option key="priorityChange">PRI</option>)
             ]
         );
     };
@@ -678,151 +678,158 @@ class CurrentActivityReportComponent extends MainComponent {
             filter,
 
         } = this.state;
-        return el("div", {style: {backgroundColor: "white"}}, [
-            <CallBackComponent key='callback'
-                               team={filter.activeTab}
-                               customerID={this.state.openSrCustomerID}
-            />,
-            <AllocateMoreTimeComponent onClose={this.handleAllocateMoreTimeClose}
-                                       key="showAllocateMoreTime"
-                                       show={this.state.showAllocateMoreTime}
-                                       problem={this.state.currentProblem}
-            />,
-            this.getCallBackModal(),
-            this.getConfirm(),
-            this.getAlert(),
-            this.getPrompt(),
-            this.getFollowOnElement(),
-            this.getAssignTeamModal(),
-            el(Spinner, {key: "spinner", show: _showSpinner}),
-            getTabsElement(),
-            filter.activeTab !== 'TBL' && filter.activeTab !== "PR" ? getEngineersFilterElement() : null,
-            isActive("H")
+        return (
+            <Fragment>
+                {
+                    el("div", {style: {backgroundColor: "white"}}, [
+                <CallBackComponent key='callback'
+                                   team={filter.activeTab}
+                                   customerID={this.state.openSrCustomerID}
+                />,
+                <AllocateMoreTimeComponent onClose={this.handleAllocateMoreTimeClose}
+                                           key="showAllocateMoreTime"
+                                           show={this.state.showAllocateMoreTime}
+                                           problem={this.state.currentProblem}
+                />,
+                this.getCallBackModal(),
+                this.getConfirm(),
+                this.getAlert(),
+                this.getPrompt(),
+                this.getFollowOnElement(),
+                this.getAssignTeamModal(),
+                el(Spinner, {key: "spinner", show: _showSpinner}),
+                getTabsElement(),
+                filter.activeTab !== 'TBL' && filter.activeTab !== "PR" ? getEngineersFilterElement() : null,
+                isActive("H")
                 ? el(InboxHelpDeskComponent, {
-                    key: "help",
-                    data: helpDeskInboxFiltered,
-                    allocatedUsers,
-                    currentUser,
-                    loadQueue: loadQueue,
-                    getMoveElement,
-                    srDescription,
-                    startWork,
-                    allocateAdditionalTime,
-                    requestAdditionalTime,
-                    getAllocatedElement,
-                    getFollowOnElement,
-                    onCallBack
-                })
+                key: "help",
+                data: helpDeskInboxFiltered,
+                allocatedUsers,
+                currentUser,
+                loadQueue: loadQueue,
+                getMoveElement,
+                srDescription,
+                startWork,
+                allocateAdditionalTime,
+                requestAdditionalTime,
+                getAllocatedElement,
+                getFollowOnElement,
+                onCallBack
+            })
                 : null,
 
-            isActive("E")
+                isActive("E")
                 ? el(InboxEscalationsComponent, {
-                    key: "escalation",
-                    data: escalationInboxFiltered,
-                    allocatedUsers,
-                    currentUser,
-                    loadQueue: loadQueue,
-                    getMoveElement,
-                    srDescription,
-                    startWork,
-                    allocateAdditionalTime,
-                    requestAdditionalTime,
-                    getAllocatedElement,
-                    onCallBack
-                })
+                key: "escalation",
+                data: escalationInboxFiltered,
+                allocatedUsers,
+                currentUser,
+                loadQueue: loadQueue,
+                getMoveElement,
+                srDescription,
+                startWork,
+                allocateAdditionalTime,
+                requestAdditionalTime,
+                getAllocatedElement,
+                onCallBack
+            })
                 : null,
 
-            isActive("SP")
+                isActive("SP")
                 ? el(InboxSmallProjectsComponent, {
-                    key: "smallProjects",
-                    data: smallProjectsInboxFiltered,
-                    allocatedUsers,
-                    currentUser,
-                    loadQueue: loadQueue,
-                    getMoveElement,
-                    srDescription,
-                    startWork,
-                    allocateAdditionalTime,
-                    requestAdditionalTime,
-                    getAllocatedElement,
-                    onCallBack
-                })
+                key: "smallProjects",
+                data: smallProjectsInboxFiltered,
+                allocatedUsers,
+                currentUser,
+                loadQueue: loadQueue,
+                getMoveElement,
+                srDescription,
+                startWork,
+                allocateAdditionalTime,
+                requestAdditionalTime,
+                getAllocatedElement,
+                onCallBack
+            })
                 : null,
 
-            isActive("S")
+                isActive("S")
                 ? el(InboxSalesComponent, {
-                    key: "salesInbox",
-                    data: salesInboxFiltered,
-                    allocatedUsers,
-                    currentUser,
-                    loadQueue: loadQueue,
-                    getMoveElement,
-                    srDescription,
-                    startWork,
-                    allocateAdditionalTime,
-                    requestAdditionalTime,
-                    getAllocatedElement,
-                    onCallBack
-                })
+                key: "salesInbox",
+                data: salesInboxFiltered,
+                allocatedUsers,
+                currentUser,
+                loadQueue: loadQueue,
+                getMoveElement,
+                srDescription,
+                startWork,
+                allocateAdditionalTime,
+                requestAdditionalTime,
+                getAllocatedElement,
+                onCallBack
+            })
                 : null,
 
-            isActive("P")
+                isActive("P")
                 ? el(InboxProjectsComponent, {
-                    key: "projects",
-                    data: projectsInboxFiltered,
-                    allocatedUsers,
-                    currentUser,
-                    loadQueue: loadQueue,
-                    getMoveElement,
-                    srDescription,
-                    startWork,
-                    allocateAdditionalTime,
-                    requestAdditionalTime,
-                    getAllocatedElement,
-                    onCallBack
-                })
+                key: "projects",
+                data: projectsInboxFiltered,
+                allocatedUsers,
+                currentUser,
+                loadQueue: loadQueue,
+                getMoveElement,
+                srDescription,
+                startWork,
+                allocateAdditionalTime,
+                requestAdditionalTime,
+                getAllocatedElement,
+                onCallBack
+            })
                 : null,
 
-            isActive("TBL")
+                isActive("TBL")
                 ? el(InboxToBeLoggedComponent, {
-                    key: "toBeLogged",
-                    data: toBeLoggedInboxFiltered,
-                    deleteSR,
-                    createNewSR,
-                    srCustomerDescription,
-                    assignToRequest: (toBeLoggedRequest) => this.assignToRequest(toBeLoggedRequest)
-                })
+                key: "toBeLogged",
+                data: toBeLoggedInboxFiltered,
+                deleteSR,
+                createNewSR,
+                srCustomerDescription,
+                assignToRequest: (toBeLoggedRequest) => this.assignToRequest(toBeLoggedRequest)
+            })
                 : null,
 
-            isActive("PR")
+                isActive("PR")
                 ? el(InboxPendingReopenedComponent, {
-                    key: "pendingReopend",
-                    data: pendingReopenedInboxFiltered,
-                    deleteSR,
-                    createNewSR,
-                    srCustomerDescription,
-                    loadQueue
-                })
+                key: "pendingReopend",
+                data: pendingReopenedInboxFiltered,
+                deleteSR,
+                createNewSR,
+                srCustomerDescription,
+                loadQueue
+            })
                 : null,
-            isActive("OSR")
+                isActive("OSR")
                 ? el(InboxOpenSRComponent, {
-                    key: "openSR",
-                    data: openSRInboxFiltered,
-                    allocatedUsers,
-                    currentUser,
-                    loadQueue: loadQueue,
-                    getMoveElement,
-                    srDescription,
-                    startWork,
-                    allocateAdditionalTime,
-                    requestAdditionalTime,
-                    getAllocatedElement,
-                    getFollowOnElement,
-                    getCustomerOpenSR,
-                    onCallBack
-                })
+                key: "openSR",
+                data: openSRInboxFiltered,
+                allocatedUsers,
+                currentUser,
+                loadQueue: loadQueue,
+                getMoveElement,
+                srDescription,
+                startWork,
+                allocateAdditionalTime,
+                requestAdditionalTime,
+                getAllocatedElement,
+                getFollowOnElement,
+                getCustomerOpenSR,
+                onCallBack
+            })
                 : null,
-        ]);
+                ])}
+            </Fragment>
+        )
+
+
     }
 }
 

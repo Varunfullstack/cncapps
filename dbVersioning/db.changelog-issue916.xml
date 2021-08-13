@@ -396,7 +396,7 @@
     </changeSet>
 
     <changeSet author="pavwebdev" id="issue916-31">
-        <preConditions>
+        <preConditions onFail="MARK_RAN">
             <columnExists tableName="customer" columnName="cus_pcx"/>
         </preConditions>
         <dropColumn tableName="customer" columnName="cus_pcx"/>
@@ -404,7 +404,7 @@
     </changeSet>
 
     <changeSet author="pavwebdev" id="issue916-32">
-        <preConditions>
+        <preConditions onFail="MARK_RAN">
             <columnExists tableName="customer" columnName="cus_mailshot"/>
         </preConditions>
         <addColumn tableName="customer">
@@ -424,7 +424,7 @@
     </changeSet>
 
     <changeSet author="pavwebdev" id="issue916-33">
-        <preConditions>
+        <preConditions onFail="MARK_RAN">
             <columnExists tableName="customer" columnName="cus_referred"/>
         </preConditions>
         <addColumn tableName="customer">
@@ -444,7 +444,7 @@
     </changeSet>
 
     <changeSet author="pavwebdev" id="issue916-34">
-        <preConditions>
+        <preConditions onFail="MARK_RAN">
             <columnExists tableName="customer" columnName="noOfSites"/>
         </preConditions>
         <dropColumn tableName="customer" columnName="noOfSites"/>
