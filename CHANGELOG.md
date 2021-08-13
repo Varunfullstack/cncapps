@@ -1,6 +1,19 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.16.4] - 2021-08-13
+## Fixed
+- Fixed issue with deleting contacts.
+- Fixed issues with contacts encrypted fields.
+- Fixed issues with contacts having "none" as supportLevel.
+- Fixed issues with phone numbers links while editing activity not working as expected.
+## Removed
+- Removed no support contacts from ContractAndNumbersReport contact summary.
+
+## [v5.16.3] - 2021-08-12
+## Fixed
+- Fixed issues with one off scripts.
+
 ## [v5.16.2] - 2021-08-12
 ## Fixed
 - Fixed issues with contacts.
