@@ -55,7 +55,7 @@ export class ContactEditModalComponent extends MainComponent {
                 "supervisor",
                 "support",
                 "delegate",
-                "furlough",
+                "furlough"
             ],
         }
     }
@@ -238,14 +238,16 @@ export class ContactEditModalComponent extends MainComponent {
                                 <td className="text-right">Support Level</td>
                                 <td>
                                     <select
-                                        required
                                         name="supportLevel"
                                         value={data.supportLevel}
-                                        onChange={(event) =>
-                                            this.setValue("supportLevel", event.target.value)
+                                        onChange={(event) => {
+                                            let value = event.target.value;
+                                            return this.setValue("supportLevel", value);
+                                        }
                                         }
                                         className="form-control"
                                     >
+                                        <option key={'none'} value="">None</option>
                                         {this.state.supportLevelOptions.map((level) => {
                                             return (
                                                 <option key={level} value={level}>

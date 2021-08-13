@@ -168,7 +168,7 @@ export default class CustomerContactsComponent extends MainComponent {
                 icon: "pointer",
                 sortable: true,
 
-                content: (contact) => this.capitalizeFirstLetter(contact.supportLevel),
+                content: (contact) => this.capitalizeFirstLetterSupportLevel(contact.supportLevel),
             },
             {
                 path: "active",
@@ -299,11 +299,11 @@ export default class CustomerContactsComponent extends MainComponent {
         })
     }
 
-    capitalizeFirstLetter(string) {
-        if (string != null) {
-            return string.charAt(0).toUpperCase() + string.slice(1);
+    capitalizeFirstLetterSupportLevel(string) {
+        if (!string) {
+            return 'None';
         }
-        return "";
+        return string.charAt(0).toUpperCase() + string.slice(1);
     }
 
     newContact() {
@@ -451,6 +451,9 @@ export default class CustomerContactsComponent extends MainComponent {
     calcSummary = () => {
         const {contacts} = this.state;
         return contacts.reduce((summary, contact) => {
+            if (!contact.active) {
+                return summary;
+            }
             if (!contact.supportLevel) {
                 summary.noLevel++;
             } else {
@@ -471,7 +474,6 @@ export default class CustomerContactsComponent extends MainComponent {
     }
     getSummaryElement = () => {
         const summary = this.calcSummary();
-        console.log(summary);
         return <table className="table" style={{maxWidth: 500}}>
             <thead>
             <tr>
@@ -480,7 +482,7 @@ export default class CustomerContactsComponent extends MainComponent {
                 <th>Support</th>
                 <th>Delegate</th>
                 <th>Furlough</th>
-                <th>No Level</th>
+                <th>None</th>
                 <th>Total</th>
             </tr>
             </thead>

@@ -327,10 +327,7 @@ class CTCNC extends Controller
     {
         global $userName;
         $menu      = new SideMenu($this->favouriteMenu);
-        $urlLogout = Controller::buildLink(
-            $_SERVER ['PHP_SELF'],
-            array('action' => CTCNC_ACT_LOGOUT)
-        );
+        $urlLogout = Controller::buildLink($_SERVER ['PHP_SELF'], array('action' => CTCNC_ACT_LOGOUT));
         // if new session then username not set yet
         if (!$userName) {
             $dbeUser = new DBEUser ($this);
@@ -341,14 +338,12 @@ class CTCNC extends Controller
             $dbeUser->getRow();
             $userName = $dbeUser->getValue(DBEUser::name);
         }
-        $this->template->set_var(
-            array(
-                'userName'   => $userName,
-                'fromDate'   => null,
-                'urlLogout2' => $urlLogout,
-                'urlLogout'  => $urlLogout
-            )
-        );
+        $this->template->set_var(array(
+                                     'userName'   => $userName,
+                                     'fromDate'   => null,
+                                     'urlLogout2' => $urlLogout,
+                                     'urlLogout'  => $urlLogout
+                                 ));
         $technicalSection = [
             "key"  => "Technical",
             "icon" => 'fal fa-laptop',
@@ -388,7 +383,6 @@ class CTCNC extends Controller
             "SDManagerDashboard.php",
             $SDManagerSection['label']
         );
-
         $this->addConditionalMenu(
             $menu,
             $SDManagerSection['icon'],
@@ -462,30 +456,24 @@ class CTCNC extends Controller
         if ($this->hasPermissions(SENIOR_MANAGEMENT_PERMISSION)) {
             $menu->addSection("Management", 'fal fa-project-diagram', $this->getDefaultManagementMenu());
         }
-        $menu->addSection(
-            $this->getDbeUser()->getValue(DBEUser::name),
-            'fal fa-user',
-            [
-                [
-                    "id"    => 1001,
-                    "label" => "Expenses/Overtime",
-                    "href"  => "ExpenseDashboard.php",
-                ],
-                [
-                    "id"    => 1002,
-                    "label" => "My Account",
-                    "href"  => "MySettings.php",
-                ],
-            ]
-        );
+        $menu->addSection($this->getDbeUser()->getValue(DBEUser::name), 'fal fa-user', [
+                                                                          [
+                                                                              "id"    => 1001,
+                                                                              "label" => "Expenses/Overtime",
+                                                                              "href"  => "ExpenseDashboard.php",
+                                                                          ],
+                                                                          [
+                                                                              "id"    => 1002,
+                                                                              "label" => "My Account",
+                                                                              "href"  => "MySettings.php",
+                                                                          ],
+                                                                      ]);
         global $twig;
         $menu->sort();
         $sideMenu = $twig->render('@internal/sideMenu/sideMenuItems.html.twig', ["sideMenu" => $menu]);
         $this->template->setVar("sideMenu", $sideMenu);
-        $favouriteItemsHTML = $twig->render(
-            '@internal/sideMenu/favouritesMenuItems.html.twig',
-            ["favouriteItems" => $menu->getFavouriteItems()]
-        );
+        $favouriteItemsHTML = $twig->render('@internal/sideMenu/favouritesMenuItems.html.twig',
+                                            ["favouriteItems" => $menu->getFavouriteItems()]);
         $this->template->setVar('favouritesMenuItems', $favouriteItemsHTML);
         parent::parsePage();
     }
@@ -591,13 +579,13 @@ class CTCNC extends Controller
     }
 
     private function addConditionalMenu(SideMenu $menu,
-                                        $icon,
-                                        $menuKey,
-                                        $condition,
-                                        $id,
-                                        $label,
-                                        $href,
-                                        $menuName = null
+                                                 $icon,
+                                                 $menuKey,
+                                                 $condition,
+                                                 $id,
+                                                 $label,
+                                                 $href,
+                                                 $menuName = null
     )
     {
         if (!$condition) {
@@ -1277,17 +1265,15 @@ class CTCNC extends Controller
 
     public function fail($code, $message = "")
     {
-        var_dump($message);
-        exit;
         return new APIException($code, $message);
 
     }
 
-    public function only($data,$array)
+    public function only($data, $array)
     {
-        $result=[];
-        foreach ($array as   $item) {            
-            $result[$item]=((array)$data)[$item];
+        $result = [];
+        foreach ($array as $item) {
+            $result[$item] = ((array)$data)[$item];
         }
         return $result;
     }

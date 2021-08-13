@@ -775,22 +775,22 @@ export default class CustomerEditMain extends MainComponent {
             return;
         }
         this.api.updateCustomer(data).then(res => {
-            if (res.status) {
-                this.logData(data, originData, data.customerID, null, Pages.Customer);
-                if (this.props.customerId) {
-                    this.alert("Data saved successfully");
-                    this.getCustomerData();
-                } else {
-                    this.alert("Data saved successfully, Please add sites and contacts");
-                    setTimeout(() => {
-                        window.location = `Customer.php?action=dispEdit&customerID=${res.data.customerID}&activeTab=sites`;
-                    }, 1000)
-                }
-            } else
-                this.alert("Data not saved successfully");
-
+            if (!res.state) {
+                this.alert("Data not saved successfully: " + res.error);
+                return
+            }
+            this.logData(data, originData, data.customerID, null, Pages.Customer);
+            if (this.props.customerId) {
+                this.alert("Data saved successfully");
+                this.getCustomerData();
+            } else {
+                this.alert("Data saved successfully, Please add sites and contacts");
+                setTimeout(() => {
+                    window.location = `Customer.php?action=dispEdit&customerID=${res.data.customerID}&activeTab=sites`;
+                }, 1000)
+            }
         }, error => {
-            this.alert("Data not saved successfully");
+            this.alert("Data not saved successfully: " + error.error);
         })
     }
 
