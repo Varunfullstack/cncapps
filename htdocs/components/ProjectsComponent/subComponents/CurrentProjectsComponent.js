@@ -273,7 +273,7 @@ export default class CurrentProjectsComponent extends MainComponent {
                     <ToolTip title="New Project" width={30}>
                         <a href={`Projects.php?action=add`}>
                             <i
-                                className="fal fa-plus fa-2x pointer"
+                                className="fal fa-plus fa-2x color-gray2 pointer"
                             ></i>
                         </a>
                     </ToolTip>
