@@ -77,7 +77,7 @@ class CTContractAndNumbersReport extends CTCNC
                   COALESCE(virtualServers,0) AS virtualServers,
                   COALESCE(physicalServers,0) AS physicalServers,
                   COALESCE(serverCareContract,0) AS serverCareContract,
-                  concat('M ',coalesce(mainCount, 0),', SV ',coalesce(supervisorCount,0),', S ', coalesce(supportCount, 0),', D ', coalesce(delegateCount, 0),', N ', coalesce(noLevelCount, 0),', T ', coalesce(totalCount, 0) ) as supportedUsers,
+                  concat('M ',coalesce(mainCount, 0),', SV ',coalesce(supervisorCount,0),', S ', coalesce(supportCount, 0),', D ', coalesce(delegateCount, 0),', T ', coalesce(totalCount, 0) ) as supportedUsers,
                   -- actualSupportedUsersCount > serviceDeskUsers as moreUsersThanExpected ,
                   (coalesce(mainCount, 0)+coalesce(supervisorCount,0)+coalesce(supportCount, 0)+coalesce(delegateCount, 0)) > serviceDeskUsers as moreUsersThanExpected ,
                   (coalesce(mainCount, 0)+coalesce(supervisorCount,0)+coalesce(supportCount, 0)+coalesce(delegateCount, 0)) = serviceDeskUsers as supportAllUsers ,

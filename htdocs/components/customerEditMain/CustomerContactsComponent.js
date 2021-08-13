@@ -448,12 +448,30 @@ export default class CustomerContactsComponent extends MainComponent {
     handleFilterChange = (prop, value) => {
         this.setFilter(prop, value, () => this.applyFilter());
     };
-    calcSummary = (level) => {
+    calcSummary = () => {
         const {contacts} = this.state;
-        return contacts.filter(c => c.supportLevel == level).length;
+        return contacts.reduce((summary, contact) => {
+            if (!contact.supportLevel) {
+                summary.noLevel++;
+            } else {
+                summary[contact.supportLevel]++;
+            }
+            summary.total++;
+            return summary;
+
+        }, {
+            main: 0,
+            supervisor: 0,
+            support: 0,
+            delegate: 0,
+            furlough: 0,
+            noLevel: 0,
+            total: 0
+        })
     }
     getSummaryElement = () => {
-
+        const summary = this.calcSummary();
+        console.log(summary);
         return <table className="table" style={{maxWidth: 500}}>
             <thead>
             <tr>
@@ -468,13 +486,13 @@ export default class CustomerContactsComponent extends MainComponent {
             </thead>
             <tbody>
             <tr>
-                <td className="text-center">{this.calcSummary('main')}</td>
-                <td className="text-center">{this.calcSummary('supervisor')}</td>
-                <td className="text-center">{this.calcSummary('support')}</td>
-                <td className="text-center">{this.calcSummary('delegate')}</td>
-                <td className="text-center">{this.calcSummary('furlough')}</td>
-                <td className="text-center">{this.calcSummary(null)}</td>
-                <td className="text-center">{this.state.contacts.length}</td>
+                <td className="text-center">{summary.main}</td>
+                <td className="text-center">{summary.supervisor}</td>
+                <td className="text-center">{summary.support}</td>
+                <td className="text-center">{summary.delegate}</td>
+                <td className="text-center">{summary.furlough}</td>
+                <td className="text-center">{summary.noLevel}</td>
+                <td className="text-center">{summary.total}</td>
             </tr>
             </tbody>
         </table>

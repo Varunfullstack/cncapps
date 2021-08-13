@@ -1,30 +1,27 @@
-import React from 'react';
+import React, {Fragment} from 'react';
 import ReactInputMask from 'react-input-mask';
 
 class EncryptedTextInput extends React.PureComponent {
-    el = React.createElement;
-
     constructor(props) {
         super(props);
         this.state = {
-            encryptedValue: props.encryptedValue,
+            encryptedValue: "",
             unencryptedValue: '',
-            onChange: props.onChange,
-            isEncrypted: !!props.encryptedValue
+            isEncrypted: true,
+            hasBeenDecrypted: false
         }
 
         this.handleChange = this.handleChange.bind(this);
         this.decryptValue = this.decryptValue.bind(this);
     }
 
-    handleChange(e) {
-        this.setState({unencryptedValue: e.target.value.replace(/[^0-9]+/g, "")});
+    encryptAndSave = () => {
         if (this.props.onChange) {
-            if (!e.target.value) {
-                return this.props.onChange(e.target.value);
+            if (!this.state.unencryptedValue) {
+                return this.props.onChange(this.state.unencryptedValue);
             }
             const formData = new FormData();
-            formData.append('value', e.target.value);
+            formData.append('value', this.state.unencryptedValue);
             fetch('?action=encrypt', {method: 'POST', body: formData})
                 .then(response => {
                     if (response.ok) {
@@ -36,6 +33,20 @@ class EncryptedTextInput extends React.PureComponent {
                     this.props.onChange(response.data);
                 })
         }
+    };
+
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if (prevProps.encryptedValue !== this.props.encryptedValue) {
+            this.setState({isEncrypted: true, unencryptedValue: ''})
+        }
+    }
+
+    handleChange(e) {
+        let value = e.target.value;
+        if (this.props.replaceFunction) {
+            value = this.props.replaceFunction(value);
+        }
+        this.setState({unencryptedValue: value});
     }
 
     storePassPhrase(passPhrase) {
@@ -49,10 +60,9 @@ class EncryptedTextInput extends React.PureComponent {
         if (!this.state.isEncrypted) {
             return;
         }
-        if (!this.state.encryptedValue) {
+        if (!this.props.encryptedValue) {
             return this.setState({unencryptedValue: '', isEncrypted: false});
         }
-
         let passPhrase = document.storedPassPhrase;
         if (!passPhrase) {
             passPhrase = prompt('Please provide secure passphrase');
@@ -65,7 +75,7 @@ class EncryptedTextInput extends React.PureComponent {
         const formData = new FormData();
 
         formData.append('passphrase', passPhrase);
-        formData.append('encryptedData', this.state.encryptedValue);
+        formData.append('encryptedData', this.props.encryptedValue);
         fetch('?action=decrypt', {
             method: 'POST',
             body: formData
@@ -78,7 +88,7 @@ class EncryptedTextInput extends React.PureComponent {
             })
             .then(json => {
                 if (json) {
-                    return json.decryptedData;
+                    return json.decryptedData || "";
                 } else {
                     return null;
                 }
@@ -94,7 +104,7 @@ class EncryptedTextInput extends React.PureComponent {
 
     render() {
 
-        if (this.state.isEncrypted && this.state.encryptedValue) {
+        if (this.state.isEncrypted) {
             return (
                 <button type="button"
                         onClick={this.decryptValue}
@@ -104,13 +114,19 @@ class EncryptedTextInput extends React.PureComponent {
                 </button>
             );
         }
-        return <ReactInputMask
-            value={this.state.unencryptedValue}
-            onChange={this.handleChange}
-            mask={this.props.mask}
-            alwaysShowMask={true}
-            className='form-control'
-        />
+        return <Fragment>
+            <ReactInputMask
+                value={this.state.unencryptedValue}
+                onChange={this.handleChange}
+                mask={this.props.mask}
+                alwaysShowMask={true}
+                className='form-control '
+                style={{display: 'inline', width: "80%"}}
+            />
+            <button type="button" onClick={this.encryptAndSave}>
+                <i className="fal fa-lock"/>
+            </button>
+        </Fragment>
     }
 }
 

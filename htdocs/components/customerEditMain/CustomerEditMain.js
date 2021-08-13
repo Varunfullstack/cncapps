@@ -14,12 +14,14 @@ export default class CustomerEditMain extends MainComponent {
     api = new APICustomers();
     apiUsers = new APIUser()
     apiLeadStatusTypes = new APILeadStatusTypes();
+
     constructor(props) {
         super(props);
         this.state = {
             ...this.state,
             loaded: false,
-            data: {accountManagerUserID: null,
+            data: {
+                accountManagerUserID: null,
                 accountName: "",
                 accountNumber: "",
                 activeDirectoryName: "",
@@ -77,8 +79,8 @@ export default class CustomerEditMain extends MainComponent {
                 support24HourFlag: "N",
                 techNotes: "",
                 websiteURL: ""
-                },
-            originData:null,
+            },
+            originData: null,
             contacts: [],
             users: [],
             customerTypes: [],
@@ -88,17 +90,15 @@ export default class CustomerEditMain extends MainComponent {
     }
 
     componentDidMount() {
-         if(this.props.customerId)
-        {
+        if (this.props.customerId) {
             this.getCustomerData();
             this.api.getCustomerContacts(this.props.customerId).then(contacts => {
                 this.setState({contacts});
-                if(contacts.length==0)
-                {
-                this.alert("Please add contacts");
-                    setTimeout(()=>{
-                        window.location=`Customer.php?action=dispEdit&customerID=${this.props.customerId}&activeTab=contacts`;
-                    },1000)
+                if (contacts.length == 0) {
+                    this.alert("Please add contacts");
+                    setTimeout(() => {
+                        window.location = `Customer.php?action=dispEdit&customerID=${this.props.customerId}&activeTab=contacts`;
+                    }, 1000)
                 }
             });
         }
@@ -114,35 +114,25 @@ export default class CustomerEditMain extends MainComponent {
         this.apiLeadStatusTypes.getAllTypes().then(leadStatus => {
             this.setState({leadStatus})
         })
-       
+
     }
 
     getCustomerData = () => {
         this.api.getCustomerData(this.props.customerId).then(data => {
-            this.setState({data,originData:{...data}})
+            this.setState({data, originData: {...data}})
         }, error => {
             this.alert("Error in get customer data");
         });
     }
     updateCustomerField = (field, value) => {
-        const {customerValueUpdate} = this.props;
-        customerValueUpdate(field, value);
+        this.setValue(field, value);
     }
 
     handleFlagUpdate($event) {
-        //this.updateCustomerField($event.target.name, $event.target.checked ? "Y" : "N");
         this.setValue($event.target.name, $event.target.checked ? "Y" : "N");
-
-    }
-
-    handleCheckboxFieldUpdate($event) {
-        //this.updateCustomerField(event.target.name, event.target.checked);
-        this.setValue($event.target.name, $event.target.checked);
-
     }
 
     handleUpdateGenericField = ($event) => {
-        //this.updateCustomerField($event.target.name, $event.target.value);
         this.setValue($event.target.name, $event.target.value);
     }
 
@@ -182,7 +172,7 @@ export default class CustomerEditMain extends MainComponent {
                                     <select
                                         name="primaryMainContactID"
                                         className="form-control input-sm"
-                                        value={data.primaryMainContactID||""}
+                                        value={data.primaryMainContactID || ""}
                                         onChange={($value) =>
                                             this.setValue(
                                                 "primaryMainContactID",
@@ -206,7 +196,7 @@ export default class CustomerEditMain extends MainComponent {
                                     <select
                                         name="statementContactId"
                                         className="form-control input-sm"
-                                        value={data.statementContactId|""}
+                                        value={data.statementContactId | ""}
                                         onChange={($value) =>
                                             this.setValue(
                                                 "statementContactId",
@@ -214,7 +204,7 @@ export default class CustomerEditMain extends MainComponent {
                                             )
                                         }
                                     >
-                                        {this.state.contacts.filter(c=>c.active==1).map((contact) => (
+                                        {this.state.contacts.filter(c => c.active == 1).map((contact) => (
                                             <option key={contact.id} value={contact.id}>
                                                 {contact.firstName + " " + contact.lastName}
                                             </option>
@@ -434,7 +424,7 @@ export default class CustomerEditMain extends MainComponent {
                         <tr>
                             <td align="right">Lead Status</td>
                             <td>
-                                <select required className="form-control input-sm" value={data.leadStatusId||""}
+                                <select required className="form-control input-sm" value={data.leadStatusId || ""}
                                         onChange={($event) => this.setValue("leadStatusId", $event.target.value)}>
                                     <option value="">None</option>
                                     {
@@ -487,7 +477,7 @@ export default class CustomerEditMain extends MainComponent {
                             <td align="right">Sector</td>
                             <td>
                                 <select
-                                required
+                                    required
                                     className="form-control input-sm"
                                     value={data.sectorID || ""}
                                     onChange={($event) =>
@@ -537,8 +527,11 @@ export default class CustomerEditMain extends MainComponent {
                             <td align="right">Sort Code</td>
                             <td>
                                 <EncryptedTextInput
-                                    encryptedValue={data.sortCode||""}
-                                    onChange={this.handleUpdateGenericField}
+                                    encryptedValue={data.sortCode || ""}
+                                    onChange={(encryptedValue) => this.updateCustomerField('sortCode', encryptedValue)}
+                                    replaceFunction={(value) => {
+                                        return value.replace(/[^0-9]+/g, "");
+                                    }}
                                     mask="99-99-99"
                                     name="sortCode"
                                 />
@@ -547,11 +540,16 @@ export default class CustomerEditMain extends MainComponent {
                         <tr>
                             <td align="right">Account Name</td>
                             <td>
-                                <EncryptedTextInput
+                                <input
+                                    type="text"
+                                    value={data.accountName || ""}
+                                    onChange={($event) =>
+                                        this.handleUpdateGenericField($event)
+                                    }
+                                    size="18"
+                                    maxLength="18"
                                     className="form-control input-sm"
-                                    encryptedValue={data.accountName || ""}
                                     name="accountName"
-                                    onChange={this.handleUpdateGenericField}
                                 />
                             </td>
                         </tr>
@@ -559,8 +557,11 @@ export default class CustomerEditMain extends MainComponent {
                             <td align="right">Account Number</td>
                             <td>
                                 <EncryptedTextInput
-                                    encryptedValue={data.accountNumber||""}
-                                    onChange={this.handleUpdateGenericField}
+                                    encryptedValue={data.accountNumber || ""}
+                                    onChange={(encryptedValue) => this.updateCustomerField('accountNumber', encryptedValue)}
+                                    replaceFunction={(value) => {
+                                        return value.replace(/[^0-9]+/g, "");
+                                    }}
                                     mask="99999999"
                                     name="accountNumber"
                                 />
@@ -620,7 +621,7 @@ export default class CustomerEditMain extends MainComponent {
                         <tr>
                             <td align="right">Patch Management Eligible</td>
                             <td>
-                                {data.eligiblePatchManagement||""}
+                                {data.eligiblePatchManagement || ""}
                             </td>
                         </tr>
                         <tr>
@@ -641,7 +642,7 @@ export default class CustomerEditMain extends MainComponent {
         return (
             <div className="flex-row flex-center">
                 <span style={{width: 15, textAlign: "right"}}>{title}</span>
-                <input style={{width: 50}} className="form-control" value={data[field]||''}
+                <input style={{width: 50}} className="form-control" value={data[field] || ''}
                        onChange={($event) => this.setValue(field, $event.target.value)}></input>
             </div>
         );
@@ -768,27 +769,22 @@ export default class CustomerEditMain extends MainComponent {
         </div>
     }
     handleSave = () => {
-        const {data,originData} = this.state;      
-        if(!this.isFormValid("mainForm"))  
-        {
+        const {data, originData} = this.state;
+        if (!this.isFormValid("mainForm")) {
             this.alert("Please enter required inputs");
             return;
         }
         this.api.updateCustomer(data).then(res => {
             if (res.status) {
-               
-                 
-                this.logData(data,originData,data.customerID,null,Pages.Customer);                
-                if(this.props.customerId)
-                {
+                this.logData(data, originData, data.customerID, null, Pages.Customer);
+                if (this.props.customerId) {
                     this.alert("Data saved successfully");
                     this.getCustomerData();
-                }
-                else {
+                } else {
                     this.alert("Data saved successfully, Please add sites and contacts");
-                    setTimeout(()=>{
-                        window.location=`Customer.php?action=dispEdit&customerID=${res.data.customerID}&activeTab=sites`;
-                    },1000)
+                    setTimeout(() => {
+                        window.location = `Customer.php?action=dispEdit&customerID=${res.data.customerID}&activeTab=sites`;
+                    }, 1000)
                 }
             } else
                 this.alert("Data not saved successfully");
@@ -796,23 +792,21 @@ export default class CustomerEditMain extends MainComponent {
         }, error => {
             this.alert("Data not saved successfully");
         })
-        //console.log(data);
     }
 
-    
+
     isProspect() {
         return !(this.props.data.becameCustomerDate && !this.props.data.droppedCustomerDate);
     }
+
     render() {
-        const {data} = this.state;        
-        //if (!data) return null;
         return (
             <div>
                 {this.getAlert()}
                 {this.getCards()}
                 <button onClick={this.handleSave} className="ml-5">Save</button>
             </div>
-        );       
+        );
     }
-    
+
 }

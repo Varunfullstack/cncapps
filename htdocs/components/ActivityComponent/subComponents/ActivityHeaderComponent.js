@@ -49,12 +49,12 @@ export class ActivityHeaderComponent extends React.Component {
                     >
                         {data?.contactName + " "}
                     </a>
-                    <a href={`tel:${data?.sitePhone}`}> {data?.sitePhone} </a>
+                    <a target="_blank"  href={`tel:${data?.sitePhone}`}> {data?.sitePhone} </a>
                     {data?.contactPhone ? <label>DDI:</label> : null}
-                    {data?.contactPhone ? (<a href={`tel:${data?.contactPhone}`}>{data?.contactPhone}</a>) : null}
+                    {data?.contactPhone ? (<a target="_blank" href={`tel:${data?.contactPhone}`}>{data?.contactPhone}</a>) : null}
                     {data?.contactMobilePhone ? <label> Mobile:</label> : null}
                     {data?.contactMobilePhone ?
-                        <a href={`tel:${data?.contactMobilePhone}`}>{data?.contactMobilePhone}</a> : null
+                        <a  target="_blank" href={`tel:${data?.contactMobilePhone}`}>{data?.contactMobilePhone}</a> : null
                     }
                     <a href={`mailto:${data?.contactEmail}?cc=support@cnc-ltd.co.uk&subject=Service Request ${data?.problemID} - ${data.serviceRequestEmailSubject} - Update`}
                        target="_blank"

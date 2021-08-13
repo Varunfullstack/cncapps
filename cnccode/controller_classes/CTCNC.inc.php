@@ -1277,6 +1277,8 @@ class CTCNC extends Controller
 
     public function fail($code, $message = "")
     {
+        var_dump($message);
+        exit;
         return new APIException($code, $message);
 
     }
