@@ -80,7 +80,9 @@ class CustomerCRMComponent extends MainComponent {
             label: "",
             hdToolTip: "Phone",          
             icon: "fal fa-2x fa-phone color-gray2 pointer",
-            sortable: true,           
+            sortable: true,     
+            content:contact=><a href={`tel:${contact.contactPhone}`}>{contact.contactPhone}</a>
+      
         },
         {
             path: "contactName",

@@ -59,9 +59,9 @@ export default class CustomerSitesComponent extends MainComponent {
                 width: 150,
             },
             {
-                path: "county",
-                label: "Country",
-                hdToolTip: "Country",
+                path: "postcode",
+                label: "Postcode",
+                hdToolTip: "Postcode",
                 sortable: true,
                 width: 150,
             },
@@ -71,6 +71,8 @@ export default class CustomerSitesComponent extends MainComponent {
                 hdToolTip: "Phone",
                 sortable: true,
                 width: 150,
+                content:site=><a href={`tel:${site.phone}`}>{site.phone}</a>
+
             },
             {
                 path: "what3Words",

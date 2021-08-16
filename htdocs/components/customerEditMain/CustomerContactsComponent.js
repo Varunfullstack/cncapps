@@ -153,6 +153,7 @@ export default class CustomerContactsComponent extends MainComponent {
                 hdToolTip: "Phone",
                 icon: "pointer",
                 sortable: true,
+                content:contact=><a href={`tel:${contact.phone}`}>{contact.phone}</a>
             },
             {
                 path: "mobilePhone",
@@ -170,17 +171,7 @@ export default class CustomerContactsComponent extends MainComponent {
 
                 content: (contact) => this.capitalizeFirstLetterSupportLevel(contact.supportLevel),
             },
-            {
-                path: "active",
-                label: "Active",
-                hdToolTip: "",
-                icon: "pointer",
-                sortable: true,
-
-                content: (contact) => (
-                    <Toggle checked={contact.active} onChange={() => null}/>
-                ),
-            },
+            
             {
                 path: "linkedInURL",
                 label: "",

@@ -2285,6 +2285,7 @@ ORDER BY NAME,
             foreach ($updatedData as $key => $value) {
                 $dbeCustomer->setValue($key, $value);
             }
+            
             $dbeCustomer->setValue(DBECustomer::modifyDate, date(DATE_MYSQL_DATETIME));
             $dbeCustomer->setValue(DBECustomer::lastUpdatedDateTime, date(DATE_MYSQL_DATETIME));
             $dbeCustomer->setValue(DBECustomer::modifyUserID, $this->userID);

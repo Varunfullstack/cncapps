@@ -254,7 +254,7 @@ export default class AssetListSelectorComponent extends React.PureComponent {
                               return (
                                   <div ref={InputProps.ref}>
                                       <label {...InputLabelProps} >
-                                          <input {...inputProps} style={{width: "100%"}}/>
+                                          <input {...inputProps} style={{width: "100%"}} className="form-control"/>
                                       </label>
                                   </div>
                               )

@@ -236,24 +236,23 @@ class InboxOpenSRComponent extends React.Component {
     getOtherSearchElement = () => {
         const {el} = this;
         const {customers} = this.state;
-        return el('div', {className: "flex-row"}, "Customer",
-            el(AutoComplete, {
-                errorMessage: "No Customer found",
-                items: customers,
-                displayLength: "40",
-                displayColumn: "name",
-                pk: "id",
-                width: 300,
-                onSelect: (customer) => this.setFilter('customer', customer),
-            }),
+        return <div className="flex-row" style={{alignItems:"center"}}>
+            <label>Customer</label>
+            <AutoComplete
+            errorMessage= "No Customer found"
+            items={customers}
+            displayLength={40}
+            displayColumn= "name"
+            pk= "id"
+            width= {300}
+            onSelect={ (customer) => this.setFilter('customer', customer)}
+            ></AutoComplete>
             <label style={{marginLeft: 30, whiteSpace: "nowrap"}}>SR Number</label>
-            ,
-            el('input', {
-                style: {height: 14},
-                className: "form-control",
-                onChange: (event) => this.setFilter('srNumber', event.target.value)
-            })
-        )
+            <input
+             className="form-control"
+             onChange={(event) => this.setFilter('srNumber', event.target.value)}
+            ></input>
+        </div>        
     }
     setFilter = (field, value) => {
         const {filter} = this.state;
