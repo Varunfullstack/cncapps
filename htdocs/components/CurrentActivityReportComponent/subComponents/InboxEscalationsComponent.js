@@ -213,6 +213,7 @@ class InboxEscalationsComponent extends React.Component {
             columns: columns,
             pk: "problemID",
             search: true,
+            autoAlign:false
         });
     }
 

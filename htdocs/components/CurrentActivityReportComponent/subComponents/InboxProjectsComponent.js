@@ -212,6 +212,7 @@ class InboxProjectsComponent extends React.Component {
             columns: columns,
             pk: "problemID",
             search: true,
+            autoAlign:false
         });
     };
 

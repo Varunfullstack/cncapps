@@ -206,6 +206,7 @@ class InboxHelpDeskComponent extends React.Component {
             columns: columns,
             pk: "problemID",
             search: true,
+            autoAlign:false
         });
     };
 

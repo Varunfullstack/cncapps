@@ -203,12 +203,13 @@ class InboxSmallProjectsComponent extends React.Component {
             .filter((c) => c.hide == false)
             .sort((a, b) => (a.order > b.order ? 1 : -1));
         const {data} = this.props;
-
+            
         return <Table id="helpDesk"
                       data={data || []}
                       columns={columns}
                       pk="problemID"
                       search={true}
+                      autoAlign={false}
         />
     };
 
