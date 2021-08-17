@@ -1,6 +1,12 @@
 # Changelog
 This project changes will be shown here.
 
+## Unreleased - 2021-08-17
+## Added
+- Add CustomerGenralInfoComponent for issue 1484.
+- Changes in APICustomers.
+- Changes in CTCustomer.inc
+
 ## [v5.16.4] - 2021-08-13
 ## Fixed
 - Fixed issue with deleting contacts.

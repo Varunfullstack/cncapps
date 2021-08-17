@@ -33,6 +33,12 @@ class APICustomers extends APIMain {
             .then(res => res.json());
     }
 
+    getCustomerGenNotes(customerId) {
+
+        return fetch(`${ApiUrls.Customer}genNote&customerID=${customerId}`)
+            .then(res => res.json() );
+    }
+
     getCustomerProjects(customerId) {
         return fetch(`${ApiUrls.Customer}projects&customerID=${customerId}`)
             .then(res => res.json())
@@ -63,6 +69,12 @@ class APICustomers extends APIMain {
 
     updateCustomer(data) {
         return this.post(`${ApiUrls.Customer}updateCustomer`, data, true);
+    }
+
+    saveGenNote(data){
+
+        return this.post(`${ApiUrls.Customer}updateGenNotes`, data, true);
+
     }
 
     getPortalCustomerDocuments(customerId) {

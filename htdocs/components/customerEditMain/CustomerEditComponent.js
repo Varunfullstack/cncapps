@@ -7,6 +7,7 @@ import PortalCustomerDocumentsComponent from "./PortalCustomerDocumentsComponent
 import CustomerSitesComponent from "./CustomerSitesComponent";
 import CustomerContactsComponent from "./CustomerContactsComponent";
 import CustomerOrdersComponent from "./CustomerOrdersComponent";
+import CustomerGenralInfoComponent from "./CustomerGenralInfoComponent";
 import CustomerCRMComponent from "./CustomerCRMComponent";
 import CustomerNotesComponent from "./CustomerNotesComponent";
 import {params} from "../utils/utils";
@@ -19,6 +20,7 @@ class CustomerEditComponent extends MainComponent {
     tabs = [];
     TAB_CUSTOMER = 'customer';
     TAB_PROJECTS = 'projects';
+    TAB_GENERAL = 'General';
     TAB_PORTAL_DOCUMENT = 'portal_document';
     TAB_SITES = 'sites';
     TAB_ORDERS = 'orders';
@@ -49,6 +51,7 @@ class CustomerEditComponent extends MainComponent {
         if (customerId && action != 'addCustomer') {
             this.tabs = [
                 {id: this.TAB_CUSTOMER, title: "Customer", icon: null},
+                {id: this.TAB_GENERAL, title: "General Info", icon: null},
                 {id: this.TAB_CONTACTS, title: "Contacts", icon: null},
                 {id: this.TAB_SITES, title: "Sites", icon: null},
                 {id: this.TAB_PROJECTS, title: "Projects", icon: null},
@@ -106,6 +109,8 @@ class CustomerEditComponent extends MainComponent {
         switch (filter.activeTab) {
             case this.TAB_CUSTOMER:
                 return <CustomerEditMain customerId={customerId}/>;
+            case this.TAB_GENERAL:
+                return <CustomerGenralInfoComponent customerId={customerId}/>
             case this.TAB_CONTACTS:
                 return <CustomerContactsComponent customerId={customerId}/>;
             case this.TAB_CRM:
