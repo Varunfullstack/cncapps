@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.16.5] - 2021-08-17
+### Changed
+- Changed logic for webroot deactivation.
+
 ## [v5.16.4] - 2021-08-13
 ## Fixed
 - Fixed issue with deleting contacts.

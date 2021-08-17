@@ -1,4 +1,5 @@
 <?php
+
 global $cfg;
 const DATA_CSV_FILENAME = 'data.csv';
 use CNCLTD\Business\BUActivity;
@@ -20,9 +21,9 @@ if (!is_cli()) {
     exit;
 }
 // Script example.php
-$shortopts     = "dte";
-$longopts      = [];
-$options       = getopt($shortopts, $longopts);
+$shortopts = "dte";
+$longopts = [];
+$options = getopt($shortopts, $longopts);
 $sendEmailMode = false;
 if (isset($options['e'])) {
     $sendEmailMode = true;
@@ -35,24 +36,24 @@ $testMode = false;
 if (isset($options['t'])) {
     $testMode = true;
 }
-$logName  = 'CheckWebrootDeactivation';
-$logger   = new LoggerCLI($logName, $loggerLevel);
-$thing    = null;
+$logName = 'CheckWebrootDeactivation';
+$logger = new LoggerCLI($logName, $loggerLevel);
+$thing = null;
 $buHeader = new BUHeader($thing);
 $dsHeader = new DataSet($thing);
 $buHeader->getHeader($dsHeader);
-$user          = "cncappsapi@" . CONFIG_PUBLIC_DOMAIN;
-$password      = '3uGhNEBW6dsAHd6q';
-$client_Id     = 'client_e2maZ8d5@' . CONFIG_PUBLIC_DOMAIN;
+$user = "cncappsapi@" . CONFIG_PUBLIC_DOMAIN;
+$password = '3uGhNEBW6dsAHd6q';
+$client_Id = 'client_e2maZ8d5@' . CONFIG_PUBLIC_DOMAIN;
 $client_secret = '{1!XM^QJcqvM8qj';
-$gsmKey        = "2FB2-LTSW-E06B-3F49-43DC";
+$gsmKey = "2FB2-LTSW-E06B-3F49-43DC";
 // we are going to ask for a new access token
 $webrootAPI = new WebrootAPI($user, $password, $client_Id, $client_secret, $gsmKey, $logger);
-$matches    = [];
-$errors     = [];
+$matches = [];
+$errors = [];
 // here we have all the webroot computers...
-$dsn       = 'mysql:host=' . LABTECH_DB_HOST . ';dbname=' . LABTECH_DB_NAME;
-$options   = [
+$dsn = 'mysql:host=' . LABTECH_DB_HOST . ';dbname=' . LABTECH_DB_NAME;
+$options = [
     PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8'
 ];
 $labtechDB = new PDO(
@@ -87,7 +88,6 @@ WHERE clients.`Name` = ?
 }
 
 while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-
     if (!$row['customerName'] || !$row['computerName']) {
         $errorTxt = "Labtech device without customer name or computer name ? ComputerID {$row['computerID']} ";
         $logger->error($errorTxt);
@@ -95,7 +95,7 @@ while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
         continue;
     }
     $customerName = strtolower($row['customerName']);
-    $customer     = getCustomerByNameOrNull($customerName);
+    $customer = getCustomerByNameOrNull($customerName);
     $computerName = strtolower($row['computerName']);
     $logger->debug("Processing Automate $computerName for $customerName");
     if ($customer && ($customer->getValue(DBECustomer::excludeFromWebrootChecks) || in_array(
@@ -111,10 +111,10 @@ while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
     }
     if (empty($matches[$customerName][$computerName])) {
         $matches[$customerName][$computerName] = [
-            "webroot"     => null,
-            "control"     => null,
-            "labtech"     => null,
-            "isWebroot"   => null,
+            "webroot" => null,
+            "control" => null,
+            "labtech" => null,
+            "isWebroot" => null,
             "webrootMIDs" => []
         ];
     }
@@ -144,9 +144,9 @@ function getCustomerByNameOrNull($customerName): ?DBECustomer
 
 function raiseDuplicatedMIDRequest($computerName, $customerName, $vendorName = "Webroot Portal")
 {
-    $customer   = getCustomerByNameOrNull($customerName);
+    $customer = getCustomerByNameOrNull($customerName);
     $customerId = 282;
-    $reason     = "$computerName is duplicated in $vendorName, please check and retire as appropriate";
+    $reason = "$computerName is duplicated in $vendorName, please check and retire as appropriate";
     if (!$customer) {
         $reason .= " for customer $customerName";
     } else {
@@ -158,8 +158,8 @@ function raiseDuplicatedMIDRequest($computerName, $customerName, $vendorName = "
 
 function raiseSeenInLabtechButNotWebrootRequest($computerName, $customerName, $thresholdDays)
 {
-    $reason     = "$computerName has not been seen in Webroot for over $thresholdDays days but has been reporting online within CW Automate so Webroot might be broken. Please review and correct";
-    $customer   = getCustomerByNameOrNull($customerName);
+    $reason = "$computerName has not been seen in Webroot for over $thresholdDays days but has been reporting online within CW Automate so Webroot might be broken. Please review and correct";
+    $customer = getCustomerByNameOrNull($customerName);
     $customerId = 282;
     if (!$customer) {
         $reason .= " for customer $customerName";
@@ -172,8 +172,8 @@ function raiseSeenInLabtechButNotWebrootRequest($computerName, $customerName, $t
 
 function raiseSeenInWebrootButNotLabtechRequest($computerName, $customerName, $thresholdDays)
 {
-    $reason     = "$computerName has been seen in Webroot for within $thresholdDays days but has not been reporting online within CW Automate so the agent might be broken. Please review and correct";
-    $customer   = getCustomerByNameOrNull($customerName);
+    $reason = "$computerName has been seen in Webroot for within $thresholdDays days but has not been reporting online within CW Automate so the agent might be broken. Please review and correct";
+    $customer = getCustomerByNameOrNull($customerName);
     $customerId = 282;
     if (!$customer) {
         $reason .= " for customer $customerName";
@@ -186,8 +186,8 @@ function raiseSeenInWebrootButNotLabtechRequest($computerName, $customerName, $t
 
 function raiseDeactivateWebrootRequest($computerName, $customerName, $thresholdDays)
 {
-    $reason     = "$computerName has not been seen in Webroot for within $thresholdDays days and is flagged as retired within CW Automate. Please review and deactivate in Webroot accordingly";
-    $customer   = getCustomerByNameOrNull($customerName);
+    $reason = "$computerName has not been seen in Webroot for within $thresholdDays days and is flagged as retired within CW Automate. Please review and deactivate in Webroot accordingly";
+    $customer = getCustomerByNameOrNull($customerName);
     $customerId = 282;
     if (!$customer) {
         $reason .= " for customer $customerName";
@@ -200,9 +200,8 @@ function raiseDeactivateWebrootRequest($computerName, $customerName, $thresholdD
 
 function raiseRequest($customerId, $reason, $computerName, $emailSubjectSummary)
 {
-
-    $buActivity     = new BUActivity($thing);
-    $buCustomer     = new BUCustomer($thing);
+    $buActivity = new BUActivity($thing);
+    $buCustomer = new BUCustomer($thing);
     $primaryContact = $buCustomer->getPrimaryContact($customerId);
     if (!$primaryContact) {
         throw new Exception("Customer doesn't have a primary contact set");
@@ -210,13 +209,13 @@ function raiseRequest($customerId, $reason, $computerName, $emailSubjectSummary)
     $buHeader = new BUHeader($thing);
     $dsHeader = new DataSet($thing);
     $buHeader->getHeader($dsHeader);
-    $priority         = 3;
+    $priority = 3;
     $slaResponseHours = $buActivity->getSlaResponseHours(
         $priority,
         $customerId,
         $primaryContact->getValue(DBEContact::contactID)
     );
-    $dbeProblem       = new DBEProblem($thing);
+    $dbeProblem = new DBEProblem($thing);
     $dbeProblem->setValue(DBEProblem::problemID, null);
     $siteNo = $primaryContact->getValue(DBEContact::siteNo);
     $dbeProblem->setValue(
@@ -337,7 +336,7 @@ function raiseRequest($customerId, $reason, $computerName, $emailSubjectSummary)
 }
 
 $thresholdDays = $dsHeader->getValue(DBEHeader::computerLastSeenThresholdDays);
-$toCheckDate   = (new DateTime())->sub(
+$toCheckDate = (new DateTime())->sub(
     new DateInterval("P{$thresholdDays}D")
 );
 foreach ($sitesResponse->sites as $site) {
@@ -348,7 +347,7 @@ foreach ($sitesResponse->sites as $site) {
         continue;
     }
     $customerName = strtolower($site->siteName);
-    $customer     = getCustomerByNameOrNull($customerName);
+    $customer = getCustomerByNameOrNull($customerName);
     $logger->debug("Processing Webroot site $customerName");
     if ($customer && ($customer->getValue(DBECustomer::excludeFromWebrootChecks) || in_array(
                 $customer->getValue(DBECustomer::customerID),
@@ -358,7 +357,6 @@ foreach ($sitesResponse->sites as $site) {
         continue;
     }
     foreach ($webrootAPI->getEndpoints($site->siteId) as $device) {
-
         if ($device->deactivated) {
             continue;
         }
@@ -377,9 +375,9 @@ foreach ($sitesResponse->sites as $site) {
         }
         if (empty($matches[$customerName][$computerName])) {
             $matches[$customerName][$computerName] = [
-                "webroot"     => null,
-                "control"     => null,
-                "labtech"     => null,
+                "webroot" => null,
+                "control" => null,
+                "labtech" => null,
                 "webrootMIDs" => []
             ];
         }
@@ -388,9 +386,7 @@ foreach ($sitesResponse->sites as $site) {
         if (empty($matches[$customerName][$computerName]["webrootMIDs"][$mid])) {
             $matches[$customerName][$computerName]["webrootMIDs"][$mid] = true;
             $logger->debug("Registering MID: $mid for $customerName endpoint $computerName");
-
         } else {
-
             $logger->debug(
                 "Duplicated MID : $mid from $customerName endpoint $computerName found, raising duplicated MDI request"
             );
@@ -404,7 +400,7 @@ foreach ($sitesResponse->sites as $site) {
         $logger->debug(
             "$customerName endpoint $computerName: checking webroot lastSeen: {$lastSeenDateTime->format(DATE_MYSQL_DATETIME)} against threshold date {$toCheckDate->format(DATE_MYSQL_DATETIME)}"
         );
-        if ($lastSeenDateTime <= $toCheckDate && isLabtechRetired($computerName, $customerName, $labtechDB)) {
+        if ($lastSeenDateTime <= $toCheckDate) {
             $testText = ' (Not actually deactivated testOnly)';
             if (!$testMode) {
                 $logger->info(
@@ -431,19 +427,7 @@ foreach ($sitesResponse->sites as $site) {
             $logger->debug(
                 "$customerName endpoint $computerName: Labtech data present, checking dates webrootLastSeen {$lastSeenDateTime->format(DATE_MYSQL_DATETIME)}, thresholdDate {$toCheckDate->format(DATE_MYSQL_DATETIME)}, labtechLastSeen {$labtechLastSeenDateTime->format(DATE_MYSQL_DATETIME)}"
             );
-            if ($lastSeenDateTime <= $toCheckDate && $labtechLastSeenDateTime > $toCheckDate) {
-                try {
-                    raiseSeenInLabtechButNotWebrootRequest(
-                        $computerName,
-                        $customerName,
-                        $thresholdDays
-                    );
-                } catch (Exception $exception) {
-                    $logger->error($exception->getMessage());
-                }
-                $logger->warning("$computerName raising seen in Automate but not in Webroot request");
-            }
-            if ($lastSeenDateTime > $toCheckDate && $labtechLastSeenDateTime <= $toCheckDate) {
+            if ($labtechLastSeenDateTime <= $toCheckDate) {
                 try {
                     raiseSeenInWebrootButNotLabtechRequest(
                         $computerName,
@@ -456,11 +440,9 @@ foreach ($sitesResponse->sites as $site) {
                 $logger->warning("$computerName raising seen in Webroot but not in Automate request");
             }
         } else {
-
             $logger->debug(
                 "$customerName endpoint $computerName: No Labtech data, skipping availability checks"
             );
-
         }
         // ignore same computer name and only care if same instance MID
         if (!empty($matches[$customerName][$computerName]['webroot'])) {
@@ -473,18 +455,16 @@ foreach ($sitesResponse->sites as $site) {
         $matches[$customerName][$computerName]['webroot'] = new ToCheckDevice(
             $customerName, $computerName, $lastSeenDateTime
         );
-
     }
 }
-$sqlite         = new SQLite3('E:\Sites\cwcontrol\session.db');
-$result         = $sqlite->query(
+$sqlite = new SQLite3('E:\Sites\cwcontrol\session.db');
+$result = $sqlite->query(
     'select CustomProperty1 as customerName, GuestMachineName as computerName, GuestInfoUpdateTime as lastSeen, rowid from Session'
 );
 $controlDevices = [];
 while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
-
     $customerName = strtolower($row['customerName']);
-    $customer     = getCustomerByNameOrNull($customerName);
+    $customer = getCustomerByNameOrNull($customerName);
     if ($customer && ($customer->getValue(DBECustomer::excludeFromWebrootChecks) || in_array(
                 $customer->getValue(DBECustomer::customerID),
                 [1746, 2214, 6121]
@@ -505,8 +485,8 @@ while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
     }
     if (empty($matches[$customerName][$computerName])) {
         $matches[$customerName][$computerName] = [
-            "control"   => null,
-            "labtech"   => null,
+            "control" => null,
+            "labtech" => null,
             "isWebroot" => null,
         ];
     }
@@ -526,7 +506,6 @@ $csv = fopen(DATA_CSV_FILENAME, 'w');
 fputcsv($csv, ["Customer", "Machine", "Automate", "Control", "Webroot"]);
 foreach (array_keys($matches) as $customerName) {
     foreach (array_keys($matches[$customerName]) as $computerName) {
-
         if ($computerName === 'isWebroot') {
             continue;
         }
@@ -574,13 +553,13 @@ foreach (array_keys($matches) as $customerName) {
 }
 fclose($csv);
 if ($sendEmailMode) {
-    $buMail  = new BUMail($thing);
+    $buMail = new BUMail($thing);
     $toEmail = 'unseencomputers@' . CONFIG_PUBLIC_DOMAIN;
-    $hdrs    = array(
-        'From'         => 'support@' . CONFIG_PUBLIC_DOMAIN,
-        'To'           => $toEmail,
-        'Subject'      => "Computers not seen recently",
-        'Date'         => date("r"),
+    $hdrs = array(
+        'From' => 'support@' . CONFIG_PUBLIC_DOMAIN,
+        'To' => $toEmail,
+        'Subject' => "Computers not seen recently",
+        'Date' => date("r"),
         'Content-Type' => 'text/html; charset=UTF-8'
     );
     global $twig;
@@ -589,12 +568,12 @@ if ($sendEmailMode) {
     $buMail->mime->addAttachment(DATA_CSV_FILENAME, 'text/csv');
     $mime_params = array(
         'text_encoding' => '7bit',
-        'text_charset'  => 'UTF-8',
-        'html_charset'  => 'UTF-8',
-        'head_charset'  => 'UTF-8'
+        'text_charset' => 'UTF-8',
+        'html_charset' => 'UTF-8',
+        'head_charset' => 'UTF-8'
     );
-    $body        = $buMail->mime->get($mime_params);
-    $hdrs        = $buMail->mime->headers($hdrs);
+    $body = $buMail->mime->get($mime_params);
+    $hdrs = $buMail->mime->headers($hdrs);
     $buMail->send($toEmail, $hdrs, $body);
 }
 echo file_get_contents(DATA_CSV_FILENAME);
