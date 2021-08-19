@@ -70,7 +70,7 @@ export default class CustomerGenralInfoComponent extends MainComponent {
     render() {
         return (
             <div>
-                <div class="card-header"><h3>Genral Notes</h3></div>
+                <div class="card-header"><h3>General Notes</h3></div>
                 <div>
                     <textarea rows={15}  name="genNotes" value={this.state.genNotes}  className="text_textarea"
                               onChange={($event) => this.setNotesData($event)}>{this.state.genNotes} </textarea>
