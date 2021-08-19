@@ -126,10 +126,12 @@ class ReviewListComponent extends MainComponent {
 
     getDataTable = () => {
         const columns = [
+           
             {
                 path: "customerName",
-                label: "Customer",
-                hdToolTip: "Name",
+                label: "",
+                hdToolTip: "Customer",
+                icon: "fal fa-2x fa-building color-gray2 pointer",
                 hdClassName: "text-center",
                 sortable: true,
                 content: (review) => <a
@@ -138,60 +140,68 @@ class ReviewListComponent extends MainComponent {
             },
             {
                 path: "contactName",
-                label: "Contact",
-                hdToolTip: "Name",
+                label: "",
+                hdToolTip: "Contact",
+                icon: "fal fa-2x fa-id-card-alt color-gray2 pointer",
                 hdClassName: "text-center",
                 sortable: true,
             },
             {
                 path: "contactEmail",
-                label: "Email",
+                label: "",
                 hdToolTip: "Email",
+                icon: "fal fa-2x fa-envelope color-gray2 pointer",
                 hdClassName: "text-center",
                 sortable: true,
                 content: (review) => <a href={`mailto:${review.contactEmail}`}>{review.contactEmail}</a>
             },
             {
                 path: "contactPhone",
-                label: "Phone",
-                hdToolTip: "Phone",
+                label: "",
+                hdToolTip: "Contact Phone",
+                icon: "fal fa-2x fa-phone gray2 pointer",
                 hdClassName: "text-center",
                 sortable: true,
                 content: (review) => <a href={`tel:${review.contactPhone}`}>{review.contactPhone}</a>
             },
             {
                 path: "leadStatus",
-                label: "Status",
-                hdToolTip: "status",
+                label: "",
+                hdToolTip: "Status",
+                icon: "fal fa-2x fa-thermometer-full pointer",
                 hdClassName: "text-center",
                 sortable: true,
             },
             {
                 path: "reviewDate",
-                label: "IT Review Date",
+                label: "",
                 hdToolTip: "IT Review Date",
+                icon: "fal fa-2x fa-calendar pointer",
                 hdClassName: "text-center",
                 sortable: true,
                 content: (review) => this.getCorrectDate(review.reviewDate)
             },
             {
                 path: "reviewTime",
-                label: "Time",
+                label: "",
                 hdToolTip: "Time",
+                icon: "fal fa-2x fa-clock pointer",
                 hdClassName: "text-center",
                 sortable: true,
             },
             {
                 path: "latestUpdate",
-                label: "Last Update",
+                label: "",
                 hdToolTip: "Last Update",
+                icon: "fal fa-2x fa-file-alt pointer",
                 hdClassName: "text-center",
                 sortable: true,
             },
             {
                 path: "reviewUserName",
-                label: "User",
+                label: "",
                 hdToolTip: "User",
+                icon: "fal fa-2x fa-user-hard-hat color-gray2 ",
                 hdClassName: "text-center",
                 sortable: true,
             }

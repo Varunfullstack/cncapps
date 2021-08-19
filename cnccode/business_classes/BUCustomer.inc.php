@@ -338,9 +338,9 @@ class BUCustomer extends Business
      * @param null $leadStatusID
      * @return DBEContact
      */
-    function getContactsByLeadStatus($leadStatusID = null)
+    function getContactsByLeadStatus($leadStatusID = null,$customerID=null)
     {
-        return $this->dbeContact->getContactsByLeadStatus($leadStatusID);
+        return $this->dbeContact->getContactsByLeadStatus($leadStatusID,$customerID);
     }
 
     /**

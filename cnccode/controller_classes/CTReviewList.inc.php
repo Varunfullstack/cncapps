@@ -36,12 +36,15 @@ class CTReviewList extends CTCNC
      */
     function defaultAction()
     {
-        $i = $this->action;
-        if ($i == "getData") {
-            $this->getData();
-        } else {
+        switch ($this->action) {
+            case 'getData':
+                $this->getData();
+                break;            
+          
+            default:
             $this->displayForm();
-        }
+                break;
+        }         
     }
 
     /**
@@ -130,7 +133,7 @@ class CTReviewList extends CTCNC
         ORDER BY $orderBy $orderDir
         LIMIT $limit OFFSET $offset";
         $data = DBConnect::fetchAll($query, ['q' => $q,"from"=>@$_REQUEST["from"]??null,"to"=>@$_REQUEST["to"]??null]);
-        echo json_encode($this->success($data), JSON_NUMERIC_CHECK);
+        echo json_encode($this->success($data));
         // $offset = $_REQUEST['start'];
         // $limit = $_REQUEST['length']; /** @var dbSweetcode $db */ // global $db;
         // $countResult = $db->query($baseQuery);
@@ -179,4 +182,5 @@ class CTReviewList extends CTCNC
         $this->template->parse('CONTENTS', 'CustomerReviewList', true);
         $this->parsePage();
     }
+  
 }

@@ -152,7 +152,7 @@ class InboxSalesComponent extends React.Component {
                 icon: "fal fa-2x fa-hashtag color-gray2 ",
                 sortable: false,
                 hdClassName: "text-center",
-                className: "text-center",
+                className: "text-right",
                 content: (problem) =>
                     el(
                         "a",

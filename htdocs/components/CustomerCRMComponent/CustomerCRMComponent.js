@@ -47,23 +47,24 @@ class CustomerCRMComponent extends MainComponent {
 
   handleCustomerSelect=(customer)=>{
     //console.log(customer);
-    this.setFilter({customerID:customer.id})
+    this.setFilter("customerID",customer.id)
     window.open(`Customer.php?action=dispEdit&customerID=${customer.id}&activeTab=crm`,"_blank");
+    this.getData();
   }
 
   handleLeadSelect=(value)=>{
       const {filter}=this.state;
       filter.page=1;
-    this.setFilter("leadStatusId", value);
-    this.setState({showSpinner:true,filter})
-
-    this.apiCustomer.getCustomersByLeadStatus(value).then(customers=>{
-        //console.log(customers);
-        this.setState({customers,showSpinner:false,customersFiltered:[...customers] })
-    });
-    
+      this.setFilter("leadStatusId", value,this.getData);   
   }
-
+  getData=()=>{
+    const {filter}=this.state;
+    this.setState({showSpinner:true})
+    this.apiCustomer.getCustomersByLeadStatus(filter.leadStatusId,filter.customerID).then(customers=>{
+      //console.log(customers);
+      this.setState({customers,showSpinner:false,customersFiltered:[...customers] })
+  });
+  }
   getCustomerTable=()=>{
     const {customersFiltered} =this.state;
     const columns=[
