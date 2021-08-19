@@ -8,6 +8,7 @@ import APIUser from '../services/APIUser';
 import APILeadStatusTypes from '../LeadStatusTypes/services/APILeadStatusTypes';
 import {Pages} from '../utils/utils';
 import moment from 'moment';
+import ToolTip from '../shared/ToolTip';
 
 export default class CustomerEditMain extends MainComponent {
 
@@ -161,7 +162,7 @@ export default class CustomerEditMain extends MainComponent {
                                         size="50"
                                         maxLength="50"
                                         name="name"
-                                        className="form-control input-sm"
+                                        className="form-control "
                                         required
                                     />
                                 </td>
@@ -171,7 +172,7 @@ export default class CustomerEditMain extends MainComponent {
                                 <td>
                                     <select
                                         name="primaryMainContactID"
-                                        className="form-control input-sm"
+                                        className="form-control "
                                         value={data.primaryMainContactID || ""}
                                         onChange={($value) =>
                                             this.setValue(
@@ -195,7 +196,7 @@ export default class CustomerEditMain extends MainComponent {
                                 <td>
                                     <select
                                         name="statementContactId"
-                                        className="form-control input-sm"
+                                        className="form-control "
                                         value={data.statementContactId | ""}
                                         onChange={($value) =>
                                             this.setValue(
@@ -210,6 +211,25 @@ export default class CustomerEditMain extends MainComponent {
                                             </option>
                                         ))}
                                     </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td className="text-align-right">Website</td>
+                                <td>
+                                    <div className="flex-row pointer" style={{alignItems:"center"}}>
+                                    <input className="form-control" value={data.websiteURL}
+                                    onChange={($value) =>
+                                        this.setValue(
+                                            "websiteURL",
+                                            $value.target.value
+                                        )
+                                    }
+                                    ></input>
+                                    {data.websiteURL?
+                                    <ToolTip title="Open website">                                        
+                                        <i className="fal fa-external-link pointer" onClick={()=>window.open(data.websiteURL,"_blank")}></i>                                        
+                                    </ToolTip>:null}
+                                    </div>
                                 </td>
                             </tr>
                             <tr>
@@ -266,7 +286,7 @@ export default class CustomerEditMain extends MainComponent {
                                             value={data.specialAttentionEndDate || ""}
                                             size="10"
                                             maxLength="10"
-                                            className="form-control input-sm"
+                                            className="form-control "
                                             onChange={($event) =>
                                                 this.handleUpdateGenericField($event)
                                             }
@@ -305,7 +325,7 @@ export default class CustomerEditMain extends MainComponent {
                                     value={data.lastReviewMeetingDate || ""}
                                     size="10"
                                     maxLength="10"
-                                    className="form-control input-sm"
+                                    className="form-control "
                                     name="lastReviewMeetingDate"
                                 />
                             </td>
@@ -313,7 +333,7 @@ export default class CustomerEditMain extends MainComponent {
                             <td align="right">Frequency</td>
                             <td>
                                 <select
-                                    className="form-control input-sm"
+                                    className="form-control "
                                     name="reviewMeetingFrequencyMonths"
                                     value={data.reviewMeetingFrequencyMonths || ""}
                                     onChange={($event) =>
@@ -360,7 +380,7 @@ export default class CustomerEditMain extends MainComponent {
                             <td align="right">Account Manager</td>
                             <td>
                                 <select
-                                    className="form-control input-sm"
+                                    className="form-control "
                                     name="accountManagerUserID"
                                     value={data.accountManagerUserID || ""}
                                     onChange={($event) =>
@@ -386,7 +406,7 @@ export default class CustomerEditMain extends MainComponent {
                                     }
                                     size="10"
                                     maxLength="10"
-                                    className="form-control input-sm"
+                                    className="form-control "
                                     name="becameCustomerDate"
                                 />
                             </td>
@@ -402,7 +422,7 @@ export default class CustomerEditMain extends MainComponent {
                                     }
                                     size="10"
                                     maxLength="10"
-                                    className="form-control input-sm"
+                                    className="form-control "
                                     name="droppedCustomerDate"
                                 />
                             </td>
@@ -424,7 +444,7 @@ export default class CustomerEditMain extends MainComponent {
                         <tr>
                             <td align="right">Lead Status</td>
                             <td>
-                                <select required className="form-control input-sm" value={data.leadStatusId || ""}
+                                <select required className="form-control " value={data.leadStatusId || ""}
                                         onChange={($event) => this.setValue("leadStatusId", $event.target.value)}>
                                     <option value="">None</option>
                                     {
@@ -457,7 +477,7 @@ export default class CustomerEditMain extends MainComponent {
                             <td>
                                 <select
                                     required
-                                    className="form-control input-sm"
+                                    className="form-control "
                                     value={data.customerTypeID || ""}
                                     onChange={($event) =>
                                         this.handleUpdateGenericField($event)
@@ -478,7 +498,7 @@ export default class CustomerEditMain extends MainComponent {
                             <td>
                                 <select
                                     required
-                                    className="form-control input-sm"
+                                    className="form-control "
                                     value={data.sectorID || ""}
                                     onChange={($event) =>
                                         this.handleUpdateGenericField($event)
@@ -503,7 +523,7 @@ export default class CustomerEditMain extends MainComponent {
                                     onChange={($event) =>
                                         this.handleUpdateGenericField($event)
                                     }
-                                    className="form-control input-sm"
+                                    className="form-control "
                                     name="noOfPCs"
                                 />
                             </td>
@@ -518,7 +538,7 @@ export default class CustomerEditMain extends MainComponent {
                                     onChange={($event) =>
                                         this.handleUpdateGenericField($event)
                                     }
-                                    className="form-control input-sm"
+                                    className="form-control "
                                     name="noOfServers"
                                 />
                             </td>
@@ -548,7 +568,7 @@ export default class CustomerEditMain extends MainComponent {
                                     }
                                     size="18"
                                     maxLength="18"
-                                    className="form-control input-sm"
+                                    className="form-control "
                                     name="accountName"
                                 />
                             </td>
@@ -578,7 +598,7 @@ export default class CustomerEditMain extends MainComponent {
                                     }
                                     size="10"
                                     maxLength="10"
-                                    className="form-control input-sm"
+                                    className="form-control "
                                     name="regNo"
                                 />
                             </td>
@@ -594,7 +614,7 @@ export default class CustomerEditMain extends MainComponent {
                                     }
                                     size="10"
                                     maxLength="10"
-                                    className="form-control input-sm"
+                                    className="form-control "
                                     name="gscTopUpAmount"
                                 />
                             </td>
@@ -610,7 +630,7 @@ export default class CustomerEditMain extends MainComponent {
                                     }
                                     size="10"
                                     maxLength="10"
-                                    className="form-control input-sm"
+                                    className="form-control "
                                     name="inclusiveOOHCallOuts"
                                 />
 
@@ -722,7 +742,7 @@ export default class CustomerEditMain extends MainComponent {
                 <h3>Technical Notes</h3>
             </div>
             <div className="card-body">
-                <table>
+                <table className="table">
                     <tbody>
                     <tr>
                         <td align="right">Active Directory Name</td>
@@ -732,16 +752,16 @@ export default class CustomerEditMain extends MainComponent {
                                    onChange={($event) => this.handleUpdateGenericField($event)}
                                    size="54"
                                    maxLength="255"
-                                   className="form-control input-sm"
+                                   className="form-control "
                                    name="activeDirectoryName"
                             />
                         </td>
                     </tr>
                     <tr>
                         <td align="right">Technical Notes</td>
-                        <td>  <textarea className="form-control input-sm"
-                                        cols="30"
-                                        rows="2"
+                        <td>  <textarea className="form-control "
+                                        
+                                        rows="6"
                                         value={data.techNotes || ''}
                                         onChange={($event) => this.handleUpdateGenericField($event)}
                                         name="techNotes"

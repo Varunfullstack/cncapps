@@ -1,3 +1,11 @@
+.form-control{
+font-family: 'Arial Narrow' !important;
+}
+.fa, .fal,.fas{
+    font-family: 'Font Awesome 5 Pro' !important;
+
+}
+
 .label-bold {
     font-size: 12px;
     font-weight: bold !important;
@@ -204,12 +212,12 @@ dd {
 }
 
 .form-control {
-    font-family: Arial, Tahoma, Helvetica, sans-serif;
-    font-size: 12px;
+    
+    font-size: 14px;
     display: block;
     width: 100%;
     /* padding: .375rem .75rem; */
-    /* line-height: 1.5; */
+    line-height: 1.3; 
     color: #495057;
     background-color: #fff;
     background-clip: padding-box;
@@ -219,6 +227,7 @@ dd {
     box-sizing: border-box; 
     padding: 2px;
     margin: 2px ;
+    
 }
 
 .float-right {
@@ -836,6 +845,14 @@ input:disabled + .slider{
 input[type="checkbox"][disabled]:checked + .slider {
     background-color: #00b9f1;
 }
+input[type="checkbox"][disabled]:checked + .slider {
+    background-color: #00b9f1;
+}
+input[type="date"],input[type="time"]{
+    padding-top: 0px;
+    padding-bottom: 0px;
+}
+ 
 /* Rounded sliders */
 
 .slider.round {
@@ -1043,7 +1060,7 @@ input[type="checkbox"][disabled]:checked + .slider {
 
 input:focus:required:invalid {border: 1px solid red;}
 input:required:invalid {border: 1px solid red;}
-input:required:valid { border: 1px solid black; }
+
 .disable{
     background-color: #bdbec1 !important;
 }
@@ -1054,7 +1071,7 @@ input:required:valid { border: 1px solid black; }
 
 select:focus:required:invalid {border: 1px solid red;}
 select:required:invalid {border: 1px solid red;}
-select:required:valid { border: 1px solid black; }
+ 
 .modal-input{
     color:white;
     background-color: transparent;

@@ -703,7 +703,9 @@ class ActivityEditComponent extends MainComponent {
             }
 
 
-            return (<input type="time"
+            return (<input className="form-control"
+                           style={{width:75}}
+                           type="time"
                            key="alarmTime"
                            value={data?.alarmTime || ""}
                            onChange={($event) => this.setValue("alarmTime", $event.target.value)}
@@ -733,7 +735,8 @@ class ActivityEditComponent extends MainComponent {
             <label className="m-2">
                 Future Action
             </label>
-            <input type="date"
+            <input 
+            type="date" className="form-control" style={{width:150}}
                    value={data?.alarmDate || ""}
                    onChange={(event) => this.setValue("alarmDate", event.target.value)}
             />
@@ -996,7 +999,7 @@ class ActivityEditComponent extends MainComponent {
                 "td",
                 {
                     key,
-                    style: {marginTop: 3, backgroundcolor: bgcolor, textAlign: "right"},
+                    style: { backgroundcolor: bgcolor, textAlign: "right"},
                 },
                 label
                     ? el(
@@ -1010,7 +1013,7 @@ class ActivityEditComponent extends MainComponent {
                 "td",
                 {
                     key: key + 2,
-                    style: {marginTop: 3, backgroundcolor: bgcolor, textAlign: "left"},
+                    style: { backgroundcolor: bgcolor, textAlign: "left"},
                 },
                 el(
                     "label",
@@ -1027,7 +1030,7 @@ class ActivityEditComponent extends MainComponent {
                 "td",
                 {
                     key,
-                    style: {marginTop: 3, backgroundcolor: bgcolor, textAlign: "right"},
+                    style: { backgroundcolor: bgcolor, textAlign: "right"},
                 },
                 label
                     ? el(
@@ -1041,7 +1044,7 @@ class ActivityEditComponent extends MainComponent {
                 "td",
                 {
                     key: key + 2,
-                    style: {marginTop: 3, backgroundcolor: bgcolor, textAlign: "left", paddingRight: 15},
+                    style: { backgroundcolor: bgcolor, textAlign: "left", paddingRight: 15},
                 },
                 content
             ),
@@ -1086,11 +1089,12 @@ class ActivityEditComponent extends MainComponent {
                 el(
                     "select",
                     {
+                        className:"form-control",
                         disabled: !isEnabled,
                         required: true,
                         value: data?.callActTypeID || "",
                         onChange: (event) => this.handleTypeChange(event.target.value),
-                        style: {width: "100%"},
+                        
                     },
                     el("option", {key: "empty", value: ""}, "Please select"),
                     activityTypesToShow.map((t) =>
@@ -1165,10 +1169,10 @@ class ActivityEditComponent extends MainComponent {
         return el('div', {style: {display: "flex", flexDirection: "row", border: 0, marginRight: -6, padding: 0}}, el(
             "select",
             {
+                className:"form-control" ,
                 key: "contacts",
                 value: data.contactID,
-                onChange: (event) => this.handleContactChange(event.target.value),
-                style: {width: "100%"},
+                onChange: (event) => this.handleContactChange(event.target.value),                
             },
             el("option", {key: "empty", value: ""}, "Please Select "),
             contactsGroup.map((group, index) => {
@@ -1215,7 +1219,7 @@ class ActivityEditComponent extends MainComponent {
                 required: true,
                 value: data?.siteNo,
                 onChange: (event) => this.setValue("siteNo", event.target.value),
-                style: {width: "100%"},
+                className:"form-control",
             },
             el("option", {key: "empty", value: "-1"}, "Please select"),
             sites?.map((t) => el("option", {key: t.id, value: t.id}, t.title))
@@ -1227,7 +1231,7 @@ class ActivityEditComponent extends MainComponent {
             if (!data.callActivityID) {
                 return '';
             }
-            return <input type="time"
+            return <input className="form-control" style={{width:90}} type="time"
                           key="startTime"
                           disabled={data?.isInitalDisabled}
                           value={data?.startTime || ""}
@@ -1238,7 +1242,7 @@ class ActivityEditComponent extends MainComponent {
             if (!data.callActivityID) {
                 return '';
             }
-            return <input type="time"
+            return <input type="time" className="form-control" style={{width:90}}
                           key="endTime"
                           disabled={data?.isInitalDisabled}
                           value={data?.endTime || ""}
@@ -1249,7 +1253,7 @@ class ActivityEditComponent extends MainComponent {
         return <div style={{
             display: "flex",
             flexDirection: "row",
-            justifyContent: "flex-start",
+            justifyContent: "space-between",
             alignItems: "center",
         }}
         >
@@ -1274,7 +1278,7 @@ class ActivityEditComponent extends MainComponent {
                     required={true}
                     value={data?.priority}
                     onChange={(event) => this.setValue("priority", event.target.value)}
-                    style={{width: "100%"}}
+                    className="form-control"
             >
                 <option key="empty"
                         value={null}
@@ -1298,7 +1302,7 @@ class ActivityEditComponent extends MainComponent {
                 required={true}
                 value={data?.userID}
                 onChange={(event) => this.setValue("userID", event.target.value)}
-                style={{width: "100%"}}
+                className="form-control"
             >
 
                 <option
@@ -1328,7 +1332,7 @@ class ActivityEditComponent extends MainComponent {
                 disabled={!data?.changeSRContractsFlag}
                 value={data?.contractCustomerItemID || ""}
                 onChange={(event) => this.setValue("contractCustomerItemID", event.target.value)}
-                style={{width: "100%"}}
+                className="form-control"
             >
                 <option
                     key={"empty"}
@@ -1371,9 +1375,10 @@ class ActivityEditComponent extends MainComponent {
 
         return (
             <select
+                className="form-control"
                 key={"rootCauses"}
                 disabled={!data.canChangePriorityFlag}
-                style={{maxWidth: 200, width: "100%"}}
+                style={{  }}
                 value={data?.rootCauseID || ""}
                 onChange={(event) => this.setValue("rootCauseID", event.target.value)}
             >
@@ -1434,7 +1439,7 @@ class ActivityEditComponent extends MainComponent {
                     data?.problemHideFromCustomerFlag == "Y" ? el(
                         "td",
                         {style: {textAlign: "right"}, colSpan: 2},
-                        el("h3", {style: {color: "red", fontSize: 14}}, "Entire SR hidden from customer"),
+                        <label style= {{color: "red", fontSize: 14,fontWeight:"bold"}}>Entire SR hidden from customer</label>                        
                     ) : null,
                     data?.problemHideFromCustomerFlag == "N" ? el(
                         "td",
@@ -1454,11 +1459,12 @@ class ActivityEditComponent extends MainComponent {
                         "Date",
                         "Date",
                         el("input", {
+                            className:"form-control",
                             type: "date",
                             disabled: data?.isInitalDisabled,
                             value: data?.date,
                             onChange: (event) => this.setValue("date", event.target.value),
-                            style: {width: "95%"}
+                             
                         })
                     ),
                 ),
@@ -1492,7 +1498,7 @@ class ActivityEditComponent extends MainComponent {
                             title: "Date when this request should be set to completed",
                             type: "date",
                             value: data?.completeDate || "",
-                            style: {width: "100%"},
+                            className:"form-control" ,                            
                             onChange: (event) => this.setValue("completeDate", event.target.value),
 
                         })
@@ -1511,7 +1517,7 @@ class ActivityEditComponent extends MainComponent {
                             min: 0,
                             type: "number",
                             value: data?.curValue,
-                            style: {width: "100%"},
+                            className:"form-control",
                             onChange: (event) =>
                                 this.setValue("curValue", event.target.value),
                         })

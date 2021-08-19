@@ -109,8 +109,8 @@ class APIMain {
         })
 
     }
-    getCustomersByLeadStatus(leadStatusId) {
-        return fetch(`Customer.php?action=searchByLeadStatus&leadStatusID=${leadStatusId}`)
+    getCustomersByLeadStatus(leadStatusId,customerID) {
+        return fetch(`Customer.php?action=searchByLeadStatus&leadStatusID=${leadStatusId}&customerID=${customerID?customerID:""}`)
             .then((res) => res.json());
     }
 }

@@ -626,7 +626,7 @@ WHERE {$this->getDBColumnName(self::supportLevel)} is not null
      * @param null $leadStatusID
      * @return DBEContact $this
      */
-    function getContactsByLeadStatus($leadStatusID = null)
+    function getContactsByLeadStatus($leadStatusID = null,$customerID=null)
     {
         $sqlQuery = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName(
             ) . " left join customer on con_custno = cus_custno WHERE active and ";
@@ -635,6 +635,9 @@ WHERE {$this->getDBColumnName(self::supportLevel)} is not null
         } else {
             $sqlQuery .= " leadStatusId is not null and leadStatusId <> 0";
         }
+        if ($customerID) {
+            $sqlQuery .= " and cus_custno = $customerID";
+        }  
         $this->setQueryString($sqlQuery);
         $this->getRows();
         return $this;

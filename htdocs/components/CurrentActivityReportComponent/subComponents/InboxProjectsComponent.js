@@ -1,4 +1,4 @@
-import Table from "./../../shared/table/table";
+import Table, { CellType } from "./../../shared/table/table";
 import CurrentActivityService from "../services/CurrentActivityService";
 
 import React, {Fragment} from 'react';
@@ -70,7 +70,7 @@ class InboxProjectsComponent extends React.Component {
                 sortable: false,
                 width: "55",
                 hdClassName: "text-center",
-                className: "text-center",
+                cellType:CellType.Number,
                 content: (problem) => [
                     el(
                         "label",
@@ -89,6 +89,7 @@ class InboxProjectsComponent extends React.Component {
                 icon: "fal fa-2x fa-id-card-alt color-gray2 ",
                 sortable: false,
                 hdClassName: "text-center",
+                cellType:CellType.Text,
             },
             {
                 hide: false,
@@ -112,7 +113,7 @@ class InboxProjectsComponent extends React.Component {
                 icon: "fal fa-2x fa-hashtag color-gray2 ",
                 sortable: false,
                 hdClassName: "text-center",
-                className: "text-center",
+                cellType:CellType.Number,
                 content: (problem) =>
                     el(
                         "a",
@@ -134,6 +135,7 @@ class InboxProjectsComponent extends React.Component {
                 sortable: false,
                 width: "220",
                 hdClassName: "text-center",
+                cellType:CellType.Text,
                 content: (problem) =>
                     el(
                         "a",
@@ -155,6 +157,7 @@ class InboxProjectsComponent extends React.Component {
                 icon: "fal fa-2x fa-file-alt color-gray2 ",
                 sortable: false,
                 hdClassName: "text-center",
+                cellType:CellType.Text,
                 content: (problem) =>
                     el(
                         "a",
@@ -212,6 +215,7 @@ class InboxProjectsComponent extends React.Component {
             columns: columns,
             pk: "problemID",
             search: true,
+            autoAlign:false
         });
     };
 

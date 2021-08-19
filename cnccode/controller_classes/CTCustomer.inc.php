@@ -2285,6 +2285,7 @@ ORDER BY NAME,
             foreach ($updatedData as $key => $value) {
                 $dbeCustomer->setValue($key, $value);
             }
+            
             $dbeCustomer->setValue(DBECustomer::modifyDate, date(DATE_MYSQL_DATETIME));
             $dbeCustomer->setValue(DBECustomer::lastUpdatedDateTime, date(DATE_MYSQL_DATETIME));
             $dbeCustomer->setValue(DBECustomer::modifyUserID, $this->userID);
@@ -2742,9 +2743,10 @@ ORDER BY NAME,
     function customersByLeadStatus()
     {
         $customerLeadID = @$_REQUEST['leadStatusID'];
+        $customerID = @$_REQUEST['customerID'];
         // in the post we should find the id of the status we are searching for
         /** @var DBEContact $results */
-        $results                = $this->buCustomer->getContactsByLeadStatus($customerLeadID);
+        $results                = $this->buCustomer->getContactsByLeadStatus($customerLeadID,$customerID);
         $data                   = [];
         $customers              = [];
         $dsCustomerLeadStatuses = new DataSet($this);

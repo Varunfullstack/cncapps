@@ -24,7 +24,7 @@
                 header.innerText = key;
                 arrayOfLeads.forEach(item => {
                     const anchor = document.createElement('a');
-                    anchor.href = "/CustomerCRM.php?action=displayEditForm&customerID=" + item.customerId;
+                    anchor.href = "/Customer.php?action=dispEdit&customerID=" + item.customerId;
                     anchor.text = item.customerName;
                     anchor.target = '_blank';
                     const tr = document.createElement('tr');

@@ -211,14 +211,18 @@ class Table extends React.Component {
             search,
             searchLabelStyle,
             hasFooter,
-            style
+            style,
+            autoAlign
         } = props;
         let {columns} = props;
         const {sortColumn} = this.state;
         const {handleSearch} = this;
         const el = React.createElement;
         const filterData = search ? this.filterData(data, columns) : data;
-        columns = this.correctCellType(columns, filterData);
+        if(autoAlign!==false)
+        {
+            columns = this.correctCellType(columns, filterData);
+        }
         let striped = "table-striped";
         if (this.props.striped === false)
             striped = "";

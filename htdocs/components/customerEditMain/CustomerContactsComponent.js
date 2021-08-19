@@ -153,6 +153,7 @@ export default class CustomerContactsComponent extends MainComponent {
                 hdToolTip: "Phone",
                 icon: "pointer",
                 sortable: true,
+                content:contact=><a href={`tel:${contact.phone}`}>{contact.phone}</a>
             },
             {
                 path: "mobilePhone",
@@ -170,17 +171,7 @@ export default class CustomerContactsComponent extends MainComponent {
 
                 content: (contact) => this.capitalizeFirstLetterSupportLevel(contact.supportLevel),
             },
-            {
-                path: "active",
-                label: "Active",
-                hdToolTip: "",
-                icon: "pointer",
-                sortable: true,
-
-                content: (contact) => (
-                    <Toggle checked={contact.active} onChange={() => null}/>
-                ),
-            },
+            
             {
                 path: "linkedInURL",
                 label: "",
@@ -514,13 +505,13 @@ export default class CustomerContactsComponent extends MainComponent {
             <div>
                 {this.getFilter()}
                 <div className="flex-row m-5">
-                    <button onClick={this.handleClearSupportLevel}>Clear Support Level</button>
                     <ToolTip title="New Item" width={30}>
                         <i
                             className="fal fa-2x fa-plus color-gray1 pointer"
                             onClick={this.handleNewItem}
                         />
                     </ToolTip>
+					<button onClick={this.handleClearSupportLevel}>Clear Support Level</button>
                 </div>
                 {this.getConfirm()}
                 {this.getAlert()}

@@ -151,6 +151,7 @@ class InboxToBeLoggedComponent extends React.Component {
                 key: "srId",
                 label: "",
                 sortable: false,
+                className:"text-right",
                 icon: "fal fa-hashtag fa-2x  color-gray2",
                 hdToolTip: "Service Request number",
                 hdClassName: "text-center",

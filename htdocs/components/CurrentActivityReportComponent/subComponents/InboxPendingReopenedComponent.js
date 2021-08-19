@@ -149,7 +149,7 @@ class InboxPendingReopenedComponent extends MainComponent {
                 label: "",
                 key: "pendingReopenSR",
                 sortable: false,
-                className: "text-center",
+                className: "text-right",
                 hdClassName: "text-center",
                 icon: "fal fa-2x fa-hashtag color-gray2 ",
                 hdToolTip: "Service Request number",

@@ -137,8 +137,10 @@ class CurrentActivityReportComponent extends MainComponent {
     }
 
     componentDidMount() {
-        this.loadData();
+        this.loadData(); 
     }
+    componentWillUnmount() {
+     }
 
     showSpinner = () => {
         this.setState({_showSpinner: true});
@@ -202,9 +204,8 @@ class CurrentActivityReportComponent extends MainComponent {
     }
 
     setActiveTab = (code) => {
-
         const {filter} = this.state;
-        filter.activeTab = code;
+        filter.activeTab = code;        
         this.loadQueue(code);
         this.checkAutoReload(code);
         this.saveFilterToLocalStorage(filter);
@@ -233,8 +234,7 @@ class CurrentActivityReportComponent extends MainComponent {
         if (filter)
             filter = JSON.parse(filter);
         else
-            filter = {activeTab: "H", userFilter: ""};
-
+            filter = {activeTab: "H", userFilter: ""};        
         return filter;
     }
     saveFilterToLocalStorage = (filter) => {
@@ -243,6 +243,16 @@ class CurrentActivityReportComponent extends MainComponent {
     loadQueue = (code) => {
         const {handleUserFilterOnSelect} = this;
         const {filter} = this.state;
+        this.setState({
+            helpDeskInbox:[],
+            smallProjectsInbox:[],
+            projectsInbox:[],
+            salesInbox:[],
+            escalationInbox:[],
+            toBeLoggedInbox:[],
+            pendingReopenedInbox:[],
+            openSRInbox:[],
+        });
         if (code) {
             if (code !== "OSR")
                 this.showSpinner();
@@ -275,8 +285,8 @@ class CurrentActivityReportComponent extends MainComponent {
                     });
                     break;
                 case "SP":
-                    this.apiCurrentActivityService.getSmallProjectsInbox().then((res) => {
-                        const smallProjectsInbox = this.prepareResult(res);
+                    this.apiCurrentActivityService.getSmallProjectsInbox().then((res) => {                        
+                        const smallProjectsInbox = this.prepareResult(res);                        
                         this.setState({
                             _showSpinner: false,
                             smallProjectsInbox,
@@ -490,7 +500,7 @@ class CurrentActivityReportComponent extends MainComponent {
             return problem;
         });
     };
-    handleUserFilterOnSelect = (userId) => {
+    handleUserFilterOnSelect = (userId) => {                             
         const userFilter = userId;
         let {
             helpDeskInbox,
@@ -503,6 +513,7 @@ class CurrentActivityReportComponent extends MainComponent {
             openSRInbox,
             filter,
         } = this.state;
+        
         filter.userFilter = userFilter;
         const helpDeskInboxFiltered = this.filterData(userFilter, helpDeskInbox);
         const smallProjectsInboxFiltered = this.filterData(
@@ -519,18 +530,18 @@ class CurrentActivityReportComponent extends MainComponent {
         const openSRInboxFiltered = this.filterData(userFilter, openSRInbox);
         const toBeLoggedInboxFiltered = toBeLoggedInbox;
         const pendingReopenedInboxFiltered = pendingReopenedInbox;
-        this.saveFilterToLocalStorage(filter);
+        this.saveFilterToLocalStorage(filter);        
         this.setState({
             filter,
-            helpDeskInboxFiltered,
-            smallProjectsInboxFiltered,
+            helpDeskInboxFiltered:helpDeskInboxFiltered,
+            smallProjectsInboxFiltered:smallProjectsInboxFiltered,
             projectsInboxFiltered,
             salesInboxFiltered,
-            escalationInboxFiltered,
+            escalationInboxFiltered:escalationInboxFiltered,
             toBeLoggedInboxFiltered,
             pendingReopenedInboxFiltered,
             openSRInboxFiltered
-        });
+        });         
     };
     filterData = (engineerId, data) => {
         return data.filter(
@@ -640,7 +651,8 @@ class CurrentActivityReportComponent extends MainComponent {
         const {filter} = this.state;
         this.loadQueue(filter.activeTab);
     }
-
+     
+   
     render() {
         const {
             el,
