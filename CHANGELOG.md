@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.16.6] - 2021-08-19
+### Fixed
+- Fixed issue with react slowness.
+
 ## [v5.16.5] - 2021-08-17
 ### Changed
 - Changed logic for webroot deactivation.
