@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Fixed
+- Issue 1476 - Fixed formatting issues in System Header Account Management.
+
 ## [v5.16.5] - 2021-08-17
 ### Changed
 - Changed logic for webroot deactivation.
