@@ -40,22 +40,26 @@ export default class CustomerGenralInfoComponent extends MainComponent {
         this.setState({genNotes: $event.target.value});
     };
 
-    handleEdit = (notes) => {
-
+    handleEdit = () => {
+        var notes = {};
         const customerID = params.get("customerID");
 
 
         const {genNotes, customerId} = this.state;
         notes.genNotes = this.state.genNotes;
+        var genNotesOld = this.state.originData.data.genNotes;
         notes.customerID = customerID;
+        if(notes.genNotes == null){
+            alert("Please enter required inputs");
+            return false;
+        }
+
         this.api.saveGenNote({genNotes:notes.genNotes,customerID:notes.customerID}).then((res) => {
             if (res.status == 200) {
-
-                this.logData({genNotes, customerId} ,this.state.originData.data,notes.customerID, null, Pages.Customer);
+                this.logData({genNotes} ,{genNotesOld},notes.customerID, null, Pages.Customer);
                 this.getData()
-
-
             }
+            return true;
         });
 
 
@@ -71,12 +75,12 @@ export default class CustomerGenralInfoComponent extends MainComponent {
                     <textarea rows={15}  name="genNotes" value={this.state.genNotes}  className="text_textarea"
                               onChange={($event) => this.setNotesData($event)}>{this.state.genNotes} </textarea>
                 </div>
-                <ToolTip title="Save Notes">
-                    <i
-                        onClick={this.handleEdit}
-                        className="fal fa-save fa-2x icon pointer "
-                    ></i>
-                </ToolTip>
+                <button onClick={(e) => {
+                    e.currentTarget.blur();
+                    this.handleEdit();
+                }
+                } className="ml-5">Save</button>
+
             </div>
         );
     }

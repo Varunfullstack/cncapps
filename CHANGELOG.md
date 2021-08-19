@@ -1,9 +1,11 @@
 # Changelog
 This project changes will be shown here.
 
-## Unreleased - 2021-08-18
-## Added
+
+## Unreleased - 2021-08-19
+## Changes
 - Change in CustomerGenralInfoComponent.
+
 
 ## [v5.16.4] - 2021-08-13
 ## Fixed
