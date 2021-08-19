@@ -1,5 +1,8 @@
 # Changelog
 This project changes will be shown here.
+## [unreleased] 
+### Add
+- Add automateMachineID to problem
 
 ## [v5.16.5] - 2021-08-17
 ### Changed
