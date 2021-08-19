@@ -72,7 +72,7 @@ class DBEProblem extends DBEntity
     const taskListUpdatedBy                = "taskListUpdatedBy";
     const taskListUpdatedAt                = "taskListUpdatedAt";
     const prePayChargeApproved             = "prepayChargeApproved";
-
+    const automateMachineID                = "automateMachineID";
     /**
      * calls constructor()
      * @access public
@@ -455,6 +455,12 @@ class DBEProblem extends DBEntity
             null,
             0
         );
+        $this->addColumn(
+            self::automateMachineID,
+            DA_INTEGER,
+            DA_ALLOW_NULL,            
+        );
+        
         $this->setAddColumnsOff();
         $this->setPK(0);
         if ($pkID) {

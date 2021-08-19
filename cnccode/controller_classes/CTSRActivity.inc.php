@@ -495,7 +495,8 @@ class CTSRActivity extends CTCNC
             "emailsubjectsummary"             => $dbeProblem->getValue(DBEProblem::emailSubjectSummary),
             'pendingCallbacks'                => $pendingCallbacks,
             "what3Words"                      => $what3Words,
-            "Inbound"                         => $this->checkIsInbound($callActivityID)
+            "Inbound"                         => $this->checkIsInbound($callActivityID),
+            "automateMachineID"               => $dbeProblem->getValue(DBEProblem::automateMachineID),
         ];
     }
 

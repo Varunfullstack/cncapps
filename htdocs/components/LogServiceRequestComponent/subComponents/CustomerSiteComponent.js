@@ -120,6 +120,7 @@ class CustomerSiteComponent extends MainComponent {
             if (value.isAsset) {
                 data.assetName = value.name;
                 data.assetTitle = value.name + " " + value.LastUsername + " " + value.BiosVer;
+                data.automateMachineID=value.ComputerID
             } else {
                 data.emptyAssetReason = value.template;
             }

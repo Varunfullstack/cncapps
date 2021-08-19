@@ -263,7 +263,8 @@ class ActivityEditComponent extends MainComponent {
             "submitAsOvertime",
             "emptyAssetReason",
             "completeDate",
-            "Inbound"
+            "Inbound",
+            "automateMachineID"
         ]);
         this.api
             .updateActivity(finalData)
@@ -1767,11 +1768,12 @@ class ActivityEditComponent extends MainComponent {
         const {data} = this.state;
         data.assetName = "";
         data.assetTitle = "";
-        data.emptyAssetReason = "";
+        data.emptyAssetReason = "";        
         if (value) {
             if (value.isAsset) {
                 data.assetName = value.name;
                 data.assetTitle = value.name + " " + value.LastUsername + " " + value.BiosVer;
+                data.automateMachineID=value.ComputerID;
             } else {
                 data.emptyAssetReason = value.template;
             }

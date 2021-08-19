@@ -1398,6 +1398,10 @@ class BUActivity extends Business
                 DBEJProblem::assetTitle,
                 $dsCallActivity->getValue(DBEJCallActivity::assetTitle)
             );
+            
+            if($dsCallActivity->getValue(DBEProblem::automateMachineID))
+                $problem->setValue(DBEProblem::automateMachineID, $dsCallActivity->getValue(DBEProblem::automateMachineID));
+
             $problem->setValue(DBEProblem::emptyAssetReason, null);
         } else {
             $problem->setValue(
@@ -5248,6 +5252,14 @@ class BUActivity extends Business
             DBEProblem::repeatProblem,
             $body->repeatProblem ? 1 : 0
         );
+        if(isset($body->automateMachineID)){
+            $dbeProblem->setValue(
+                DBEProblem::automateMachineID,
+                $body->automateMachineID
+            );
+            
+        }
+        
         if (isset($body->notFirstTimeFixReason)) {
             $dbeProblem->setValue(
                 DBEProblem::notFirstTimeFixReason,
