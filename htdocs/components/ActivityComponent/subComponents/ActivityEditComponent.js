@@ -1754,7 +1754,8 @@ class ActivityEditComponent extends MainComponent {
         if (!data || !data.customerId) {
             return '';
         }
-        return <AssetListSelectorComponent
+        return <div className="flex-row">
+            <AssetListSelectorComponent
             emptyAssetReason={data.emptyAssetReason}
             assetName={data.assetName}
             assetTitle={data.assetTitle}
@@ -1763,6 +1764,11 @@ class ActivityEditComponent extends MainComponent {
             onChange={value => this.handleAssetSelect(value)}
             showUnsupportedWhileSelected={true}
         />
+            {data.automateMachineID?<i className="fal fa-cog ml-5 pointer fa-2x" 
+                            onClick={()=>window.open(`https://serverguard.cnc-ltd.co.uk/automate/computer/${data.automateMachineID}/normal-tiles`,"_target")}
+                            
+                            ></i>:null}
+            </div>
     }
     handleAssetSelect = (value) => {
         const {data} = this.state;
