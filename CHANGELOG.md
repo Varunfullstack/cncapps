@@ -2,6 +2,8 @@
 This project changes will be shown here.
 
 ## [unreleased]
+### Changed
+- Issue 1484 - Change in CustomerGeneralInfoComponent.
 ### Fixed
 - Issue 1476 - Fixed formatting issues in System Header Account Management.
 

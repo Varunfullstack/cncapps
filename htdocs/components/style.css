@@ -965,6 +965,10 @@ input[type="checkbox"][disabled]:checked + .slider {
     height: 100%;
 }
 
+.text_textarea{
+    width: 80%!important;
+}
+
 .contianer-round {
 
     margin-top: 5px;

@@ -80,7 +80,7 @@ class DBECustomer extends DBCNCEntity
     const inclusiveOOHCallOuts         = "inclusiveOOHCallOuts";
     const eligiblePatchManagement      = "eligiblePatchManagement";
     const excludeFromWebrootChecks     = "excludeFromWebrootChecks";
-
+    const genNotes                     = "genNotes";
     const statementContactId = "statementContactId";
 
     /**
@@ -231,6 +231,12 @@ class DBECustomer extends DBCNCEntity
             DA_STRING,
             DA_ALLOW_NULL,
             'cus_tech_notes'
+        );
+        $this->addColumn(
+            self::genNotes,
+            DA_TEXT,
+            DA_ALLOW_NULL,
+            "cus_notes"
         );
         $this->addColumn(
             self::specialAttentionFlag,
@@ -638,7 +644,11 @@ class DBECustomer extends DBCNCEntity
         $ret = (parent::getRows());
         return $ret;
     }
+    function getGEnNotes($customer){
+        $queryString = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName() . " where 
+        cus_custno = ".$customer;
 
+    }
     /**
      * Returns list of customers with 24 hour support
      *
