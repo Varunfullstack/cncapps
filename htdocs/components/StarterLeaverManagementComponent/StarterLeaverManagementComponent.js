@@ -53,8 +53,11 @@ class StarterLeaverManagementComponent extends MainComponent {
            
             <div className="flex-row">
             {this.getCustomersElement()} 
-               
+
             </div>
+            <br/>
+            <span >Change the order of the questions here to change the order in the portal because they are copied from the order below. </span>
+
             <QuestionsComponent  customer={activCustomer}></QuestionsComponent>
             <QuestionDetailsComponent
               customer={activCustomer}

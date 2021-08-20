@@ -445,13 +445,39 @@ class HeaderComponent extends MainComponent {
         );
     }
     getAccountManagmentTab = () => {
-        return (
-            <table className="table " style={{width: 700}}>
-                <tbody>
-                {this.getInput("Customer Review Meeting Text", "customerReviewMeetingText", this.inputType.Editor, true, "Entries here will show in the Meeting Agenda editor", "", "", 70, 70)}
-                </tbody>
-            </table>
-        );
+        const {data}=this.state;
+        return <div style={{maxWidth:700}}>
+            <ToolTip title="Entries here will show in the Meeting Agenda editor"><label className="mb-5">Customer Review Meeting Text</label></ToolTip> 
+            <div className="mt-5">
+                        <div id="internalNoteTop"
+                             key="bottomElement"
+                        />
+                        <CNCCKEditor
+                            key={"customerReviewMeetingText"}
+                            name={"customerReviewMeetingText"}
+                            value={data["customerReviewMeetingText"]}
+                            onChange={(data) => this.setValue("customerReviewMeetingText", data)}
+                            className="CNCCKEditor"
+                            type="inline"
+                            height={500}
+                            width={800}
+                            sharedSpaces={true}
+                            top="internalNoteTop"
+                            bottom="internalNoteBottom"
+                            hasFormat={true}
+                        ></CNCCKEditor>
+                        <div id="internalNoteBottom"
+                             key="bottomElement"
+                        />
+                    </div>
+        </div>
+        // (
+        //     <table className="table " style={{width: 700}}>
+        //         <tbody>
+        //         {this.getInput("Customer Review Meeting Text", "customerReviewMeetingText", this.inputType.Editor, true, "Entries here will show in the Meeting Agenda editor", "", "", 70, 70)}
+        //         </tbody>
+        //     </table>
+        // );
     }
     getCustomerContactTab = () => {
         return <div>
@@ -561,6 +587,8 @@ class HeaderComponent extends MainComponent {
         data.mailshot8FlagDef = data.mailshot8FlagDef ? "Y" : "N";        
         data.mailshot3FlagDef = data.mailshot3FlagDef ? "Y" : "N";
         data.mailshot2FlagDef = data.mailshot2FlagDef ? "Y" : "N";
+        //data.customerReviewMeetingText=data.customerReviewMeetingText.replace('<u>','');
+        //data.customerReviewMeetingText=data.customerReviewMeetingText.replace('</u>','');
         this.api.updateHeaderData(data).then(res => {
         }, err => {
             this.alert("Please enter all required fields")

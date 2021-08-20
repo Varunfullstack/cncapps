@@ -1,6 +1,14 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 1484 - Change in CustomerGeneralInfoComponent.
+- Issue 1498 - Starter leaver sort order on portal.
+- Issue 1500 - New Project Icon colour change.
+### Fixed
+- Issue 1476 - Fixed formatting issues in System Header Account Management.
+
 ## [v5.16.6] - 2021-08-19
 ### Fixed
 - Fixed issue with react slowness.

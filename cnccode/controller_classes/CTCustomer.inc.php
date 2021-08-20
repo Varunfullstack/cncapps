@@ -666,7 +666,7 @@ class CTCustomer extends CTCNC
             }
             case 'getMainContacts':
             {
-                $this->_getMainContacts(@$_REQUEST['customerID']);
+                $this->_getMainContacts($_REQUEST['customerID']);
                 break;
             }
             case 'getLeadStatuses':
@@ -792,6 +792,12 @@ class CTCustomer extends CTCNC
             case "searchCustomers":
                 echo json_encode($this->searchCustomers(), JSON_NUMERIC_CHECK);
                 exit;
+            case "genNote":
+                echo $this->getGenNotes();
+                exit;
+            case  "updateGenNotes":
+                echo json_encode($this->updateGenNotes(), JSON_NUMERIC_CHECK);
+                break;
             case "getCustomerSR":
                 echo json_encode($this->getCustomerSR());
                 exit;
@@ -1780,6 +1786,8 @@ class CTCustomer extends CTCNC
         return $customerSR;
     }
 
+
+
     private function isSpecialAttention($dbejProblem)
     {
         return $dbejProblem->getValue(DBEJProblem::specialAttentionContactFlag) == 'Y' || $dbejProblem->getValue(
@@ -2103,6 +2111,7 @@ ORDER BY NAME,
                                  "droppedCustomerDate"          => $dbeCustomer->getValue(
                                      DBECustomer::droppedCustomerDate
                                  ),
+                                 "genNotes"                     => $dbeCustomer->getValue(DBECustomer::genNotes),
                                  "gscTopUpAmount"               => $dbeCustomer->getValue(DBECustomer::gscTopUpAmount),
                                  "lastReviewMeetingDate"        => $dbeCustomer->getValue(
                                      DBECustomer::lastReviewMeetingDate
@@ -2191,6 +2200,30 @@ ORDER BY NAME,
                          ]);
     }
 
+    function getGenNotes(){
+        $customerID = @$_REQUEST['customerID'];
+        if (!$customerID) {
+            http_response_code(400);
+            echo json_encode(["status" => "error", "description" => "Customer ID Not provided"]);
+            exit;
+        }
+        $dbeCustomer = new DBECustomer($this);
+
+        if (!$dbeCustomer->getRow($customerID)) {
+            http_response_code(404);
+            echo json_encode(["status" => "error", "description" => "Customer not found"]);
+            exit;
+        }
+
+        echo json_encode([
+            "status" => "ok",
+            "data"   => [
+                "customerID"                   => $dbeCustomer->getValue(DBECustomer::customerID),
+                "genNotes"                     => $dbeCustomer->getValue(DBECustomer::genNotes),
+            ]
+        ]);
+    }
+
     function _getMainContacts($customerID)
     {
         if (!$customerID) {
@@ -2210,6 +2243,7 @@ ORDER BY NAME,
 
     function updateCustomer()
     {
+
         try {
             $data        = $this->getBody(true);
             $updatedData = $this->only($data, [
@@ -2306,6 +2340,34 @@ ORDER BY NAME,
                                       "lastUpdatedDateTime" => $dbeCustomer->getValue(DBECustomer::lastUpdatedDateTime),
                                       "customerID"          => $dbeCustomer->getValue(DBECustomer::customerID)
                                   ]);
+        } catch (Exception $ex) {
+            $this->fail(400, $ex->getMessage());
+        }
+    }
+
+    function updateGenNotes(){
+
+        try {
+            $data        = $this->getBody(true);
+            $updatedData = $this->only($data, [
+                'genNotes',
+
+            ]);
+
+            $customerID  = $data['customerID']  ;
+            $dbeCustomer = new DBECustomer($this);
+            $dbeCustomer->getRow($customerID);
+            $dbeCustomer->setValue(DBECustomer::genNotes,$data['genNotes']);
+            $dbeCustomer->setValue(DBECustomer::modifyDate, date(DATE_MYSQL_DATETIME));
+            $dbeCustomer->setValue(DBECustomer::lastUpdatedDateTime, date(DATE_MYSQL_DATETIME));
+            $dbeCustomer->setValue(DBECustomer::modifyUserID, $this->userID);
+            if ($customerID) {
+                $dbeCustomer->updateRow();
+            }
+            return $this->success([
+                "lastUpdatedDateTime" => $dbeCustomer->getValue(DBECustomer::lastUpdatedDateTime),
+                "customerID"          => $dbeCustomer->getValue(DBECustomer::customerID)
+            ]);
         } catch (Exception $ex) {
             $this->fail(400, $ex->getMessage());
         }

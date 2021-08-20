@@ -173,7 +173,8 @@ class CNCCKEditor extends React.Component {
                     "Bold",
                     "Italic",
                     "Underline",
-                    "TextColor",
+                    "TextColor",                    
+                    
                 ],
                 ["NumberedList", "BulletedList"],
                 ["Table"],
@@ -205,6 +206,10 @@ class CNCCKEditor extends React.Component {
                 top: this.props.top || "top",
                 bottom: this.props.bottom || "bottom"
             };
+        }
+        if(this.props.hasFormat)
+        {
+            defaultConfig.toolbar_CNCToolbar[0].push("Format");
         }
         return defaultConfig;
     }
