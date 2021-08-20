@@ -36,13 +36,16 @@ class APICustomers extends APIMain {
     getCustomerGenNotes(customerId) {
 
         return fetch(`${ApiUrls.Customer}genNote&customerID=${customerId}`)
-            .then(res => res.json() );
+            .then(res => res.json());
     }
 
-    getCustomerProjects(customerId) {
-        return fetch(`${ApiUrls.Customer}projects&customerID=${customerId}`)
-            .then(res => res.json())
-            ;
+    getCustomerProjects(customerId, activeOnly = false) {
+        let urlString = `${ApiUrls.Customer}projects&customerID=${customerId}`;
+        if (activeOnly) {
+            urlString += "&activeOnly=true"
+        }
+        return fetch(urlString)
+            .then(res => res.json());
     }
 
     getCustomerContracts(customerId, contractCustomerItemID, linkedToSalesOrder) {
@@ -71,7 +74,7 @@ class APICustomers extends APIMain {
         return this.post(`${ApiUrls.Customer}updateCustomer`, data, true);
     }
 
-    saveGenNote(data){
+    saveGenNote(data) {
 
         return this.post(`${ApiUrls.Customer}updateGenNotes`, data, true);
 
@@ -166,7 +169,7 @@ class APICustomers extends APIMain {
 
     }
 
-     deleteCustomerContact(id) {
+    deleteCustomerContact(id) {
         return this.postJson(`${ApiUrls.Customer}archiveContact`, {contactID: id});
     }
 }

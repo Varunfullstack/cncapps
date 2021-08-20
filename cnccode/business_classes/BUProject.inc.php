@@ -1,4 +1,5 @@
-<?php /**
+<?php
+/**
  * Call further action business class
  *
  * @access public
@@ -14,7 +15,7 @@ require_once($cfg["path_dbe"] . "/DBEProblem.inc.php");
 
 class BUProject extends Business
 {
-    var $dbeProject      = "";
+    var $dbeProject = "";
     var $dbeCallActivity = "";
 
     /**
@@ -34,7 +35,7 @@ class BUProject extends Business
             $dsData,
             $this->dbeProject
         );
-        return TRUE;
+        return true;
     }
 
     /**
@@ -44,7 +45,7 @@ class BUProject extends Business
      */
     public static function getCurrentProjectLink($customerID)
     {
-        $thing     = null;
+        $thing = null;
         $buProject = new BUProject($thing);
         $dsProject = new DataSet($thing);
         $buProject->getProjectsByCustomerID(
@@ -54,27 +55,24 @@ class BUProject extends Business
         );
         $link = '';
         while ($dsProject->fetchNext()) {
-
             if (!$link) {
                 $link = "<table><tr class='makeItColor'><td style='color: black'>SEE CURRENT PROJECTS</td>";
             }
-            $url  = Controller::buildLink(
+            $url = Controller::buildLink(
                 'Projects.php',
                 array(
-                    'action'    => 'edit',
+                    'action' => 'edit',
                     'projectID' => $dsProject->getValue(DBEProject::projectID),
                 )
             );
             $link .= '<td><A HREF="' . $url . ' " target="_blank" >' . $dsProject->getValue(
                     DBEProject::description
                 ) . '</A></td>';
-
         }
         if ($link) {
             $link .= "</tr></table>";
         }
         return $link;
-
     }
 
     /**
@@ -84,8 +82,10 @@ class BUProject extends Business
      */
     public static function getCustomerProjects($customerID)
     {
-        if (!isset($customerID)) return [];
-        $date  = date(DATE_MYSQL_DATE);
+        if (!isset($customerID)) {
+            return [];
+        }
+        $date = date(DATE_MYSQL_DATE);
         $query = "SELECT  
                     `projectID`,
                     `description`, 
@@ -94,41 +94,14 @@ class BUProject extends Business
                     LEFT JOIN  `projectstages` ps ON ps.id=project.`projectStageID`
                 WHERE 
                     (project.`projectStageID` IS  NULL OR ps.displayInSr=1)
-                    AND `customerID`=:customerId";
-        $query .= " AND (expiryDate >= '$date' or expiryDate is null)";
+                    AND `customerID`=:customerId AND (expiryDate >= '$date' or expiryDate is null)";
         return DBConnect::fetchAll($query, ["customerId" => $customerID]);
-        /*
-        $thing = null;
-        $buProject = new BUProject($thing);
-        $dsProject = new DataSet($thing);
-        $buProject->getProjectsByCustomerID(
-            $customerID,
-            $dsProject,
-            date(DATE_MYSQL_DATE)
-        );        
-        $projects=array();
-        while ($dsProject->fetchNext()) {
-            $url = Controller::buildLink(
-                'Projects.php',
-                array(
-                    'action'    => 'edit',
-                    'projectID' => $dsProject->getValue(DBEProject::projectID),
-                )
-            );
-            array_push($projects,
-            [
-                "projectID"=> $dsProject->getValue(DBEProject::projectID),
-                "description"=>$dsProject->getValue(DBEProject::description),
-                "editUrl"=> $url 
-            ]);
-        }
-        return $projects;*/
     }
 
-    function getProjectByID($ID,
-                            &$dsResults
-    )
-    {
+    function getProjectByID(
+        $ID,
+        &$dsResults
+    ) {
         $this->dbeProject->setPKValue($ID);
         $this->dbeProject->getRow();
         return ($this->getData(
@@ -137,15 +110,19 @@ class BUProject extends Business
         ));
     }
 
-    function getProjectsByCustomerID($customerID,
-                                     &$dsResults,
-                                     $activityDate = false
-    )
-    {
-        if (!isset($customerID)) return [];
+    function getProjectsByCustomerID(
+        $customerID,
+        &$dsResults,
+        $activityDate = false,
+        $activeOnly = false
+    ) {
+        if (!isset($customerID)) {
+            return [];
+        }
         $this->dbeProject->getRowsByCustomerID(
             $customerID,
-            $activityDate
+            $activityDate,
+            $activeOnly
         );
         return ($this->getData(
             $this->dbeProject,
@@ -164,7 +141,7 @@ class BUProject extends Business
         if ($this->canDelete($ID)) {
             return $this->dbeProject->deleteRow($ID);
         } else {
-            return FALSE;
+            return false;
         }
     }
 
@@ -183,9 +160,9 @@ class BUProject extends Business
             $ID
         );
         if ($dbeProblem->countRowsByColumn(DBEProblem::projectID) < 1) {
-            return TRUE;
+            return true;
         } else {
-            return FALSE;
+            return false;
         }
     }
 
@@ -194,11 +171,11 @@ class BUProject extends Business
      * @param $linkedOrderID
      * @throws Exception
      */
-    public function updateLinkedSalesOrder($projectID,
-                                           $linkedOrderID,
-                                           $orignalOrder = false
-    )
-    {
+    public function updateLinkedSalesOrder(
+        $projectID,
+        $linkedOrderID,
+        $orignalOrder = false
+    ) {
         $dbeSalesOrder = new DBEOrdhead($this);
         if (!$dbeSalesOrder->getRow($linkedOrderID)) {
             throw new Exception('Sales order does not exist');

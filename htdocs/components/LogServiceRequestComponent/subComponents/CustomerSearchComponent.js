@@ -71,7 +71,7 @@ class CustomerSearchComponent extends React.Component {
         if (this.props.updateSRData) {
             this.props.updateSRData({customer, customerID: customer.cus_custno, nextStep: 2});
         }
-        this.apiCustomer.getCustomerProjects(customer.cus_custno).then(projects => {
+        this.apiCustomer.getCustomerProjects(customer.cus_custno, true).then(projects => {
 
             if (this.props.updateSRData)
                 this.props.updateSRData({projects});
