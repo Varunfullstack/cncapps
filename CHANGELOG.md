@@ -1,7 +1,12 @@
 # Changelog
 This project changes will be shown here.
 
-## [unreleased]
+## [v5.17.1] - 2021-08-20
+### Fixed
+- Fixed changelog.md version
+- 
+
+## [v5.17.0] - 2021-08-20
 ### Changed
 - Issue 1484 - Change in CustomerGeneralInfoComponent.
 - Issue 1498 - Starter leaver sort order on portal.
