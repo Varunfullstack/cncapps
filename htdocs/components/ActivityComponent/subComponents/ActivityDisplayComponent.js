@@ -21,7 +21,7 @@ import CallbackModal from "../../shared/CallbackModal/CallbackModal";
 import {format} from "../../../../stencil/cncapps-components/src/utils/utils";
 import * as PropTypes from "prop-types";
 import {TEMPlATE_TYPES, TemplateModal} from "./Modals/TemplateModal";
-import { ActivityHeaderComponent } from './ActivityHeaderComponent';
+import {ActivityHeaderComponent} from './ActivityHeaderComponent';
 
 // noinspection EqualityComparisonWithCoercionJS
 const emptyAssetReasonCharactersToShow = 30;
@@ -123,7 +123,7 @@ class ActivityDisplayComponent extends MainComponent {
             </div>
         );
     }
- 
+
     handleExtraTime = async (data) => {
 
         const reason = await this.prompt(
@@ -688,7 +688,7 @@ class ActivityDisplayComponent extends MainComponent {
                 this.getCurrentActivityIndxElement(data, currentActivity)
             ),
             el('div', {style: {display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "center"}},
-                currentUser.isSDManager ? this.getToggle("QA", 'holdForQA') : null,
+                (currentUser.isSDManager || currentUser.serviceRequestQueueManager) ? this.getToggle("QA", 'holdForQA') : null,
                 this.getToggle("Critical SR", 'criticalSR'),
                 this.getToggle("Monitor SR", 'monitorSR'),
                 this.getToggle("Travel", "showTravel"),
@@ -1159,7 +1159,7 @@ class ActivityDisplayComponent extends MainComponent {
                 {this.getPrompt()}
                 {this.getFollowOnElement()}
                 {this.getProjectsElement()}
-                
+
                 <ActivityHeaderComponent serviceRequestData={data}/>
 
                 {this.getCallbackModal()}
