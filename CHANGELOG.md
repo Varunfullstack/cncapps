@@ -2,9 +2,10 @@
 This project changes will be shown here.
 
 ## [v5.17.1] - 2021-08-20
+### Changed
+- Changed alignment of priority columns at CurrentActivityReport.
 ### Fixed
 - Fixed changelog.md version
-- 
 
 ## [v5.17.0] - 2021-08-20
 ### Changed

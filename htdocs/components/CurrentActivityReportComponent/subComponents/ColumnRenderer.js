@@ -207,7 +207,7 @@ export class ColumnRenderer {
     }
 
     static getPriorityColumn() {
-        return {
+        return { 
             hide: false,
             order: 11,
             path: "priority",
@@ -218,7 +218,7 @@ export class ColumnRenderer {
             hdClassName: "text-center",
             className: "text-center",
             classNameColumn: 'priorityClass',
-            cellType:CellType.Number,
+            cellType:CellType.Default,
             content: (problem) => {
                 if (problem.priority !== 1) {
                     return problem.priority;
