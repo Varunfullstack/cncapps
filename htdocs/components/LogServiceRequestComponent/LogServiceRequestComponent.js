@@ -45,23 +45,23 @@ export default class LogServiceRequestComponent extends MainComponent {
         // check pending Reopen
         this.checkPendingReopen();
     }
-    checkPendingReopen=()=>{
-        const pendingReopenedID=params.get("pendingReopenedID");
-        const emailSubjectSummary=params.get("emailSubjectSummary");
-        if(pendingReopenedID)
-        {
+
+    checkPendingReopen = () => {
+        const pendingReopenedID = params.get("pendingReopenedID");
+        const emailSubjectSummary = params.get("emailSubjectSummary");
+        if (pendingReopenedID) {
             //loading reopen data
-            this.api.getPendingReopen(pendingReopenedID).then(res=>{
+            this.api.getPendingReopen(pendingReopenedID).then(res => {
                 // init data;
                 //customer, customerID: customer.cus_custno, nextStep: 2
-                const {data}=this.state;
-                data.customerID=res.customerID;
-                data.customer={cus_custno:res.customerID,cus_name:res.cus_name,con_contno:res.contactID};
-                data.emailSubjectSummary=emailSubjectSummary;
-                data.reason=res.reason;
-                data.pendingReopenedID=pendingReopenedID;
-                data.contactID=res.contactID;
-                data.deletePending='true';
+                const {data} = this.state;
+                data.customerID = res.customerID;
+                data.customer = {cus_custno: res.customerID, cus_name: res.cus_name, con_contno: res.contactID};
+                data.emailSubjectSummary = emailSubjectSummary;
+                data.reason = res.reason;
+                data.pendingReopenedID = pendingReopenedID;
+                data.contactID = res.contactID;
+                data.deletePending = 'true';
                 this.setState({data});
                 this.setActiveStep(2);
                 this.setActiveStep(3);
@@ -97,7 +97,6 @@ export default class LogServiceRequestComponent extends MainComponent {
         );
     };
 
-   
 
     loadCustomerProblem = () => {
         const Id = params.get("customerproblemno");
@@ -165,18 +164,26 @@ export default class LogServiceRequestComponent extends MainComponent {
     }
     getProjectsElement = () => {
         const {data} = this.state;
-        const {el} = this;
-        if (data && data.projects && data.projects.length > 0) {
-            return el('div', {style: {display: "flex", flexDirection: "row", alignItems: "center", marginTop: -20}},
-                el('h3', {className: "mr-5"}, "Projects "),
-                data.projects.map(p => el("a", {
-                    key: p.projectID,
-                    href: p.editUrl,
-                    className: "link-round",
-                    target: '_blank'
-                }, p.description))
-            )
-        } else return null;
+        if (!(data && data.projects && data.projects.length > 0)) {
+            return null;
+        }
+
+        return <div style={{display: "flex", flexDirection: "row", alignItems: "center", marginTop: -20}}>
+            <h3 className="mr-5">
+                Projects
+            </h3>
+            {
+                data.projects.map(
+                    p => <a key={p.projectID}
+                            href={`Projects.php?action=edit&&projectID=${p.id}`}
+                            className="link-round"
+                            target='_blank'
+                    >
+                        {p.name}
+                    </a>
+                )
+            }
+        </div>
     }
 
     render() {
