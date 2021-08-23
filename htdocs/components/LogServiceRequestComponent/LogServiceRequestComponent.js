@@ -109,6 +109,7 @@ export default class LogServiceRequestComponent extends MainComponent {
                 data.priority = result.cpr_priority;
                 data.siteNo = result.con_siteno;
                 data.customer = {cus_custno: result.con_custno, con_contno: result.cpr_contno};
+                data.automateMachineID=result.automateMachineID;
                 this.setState({data});
             })
         }

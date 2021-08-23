@@ -22,4 +22,20 @@
         </rollback>
     </changeSet>
 
+    <changeSet id="issue1472-2" author="Mustafa">
+        <preConditions>
+            <not>
+                <columnExists tableName="customerproblem" columnName="automateMachineID"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="customerproblem">
+            <column name="automateMachineID" type="bigint">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+        <rollback>
+
+        </rollback>
+    </changeSet>
+
 </databaseChangeLog>
