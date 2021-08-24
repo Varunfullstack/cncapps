@@ -2,6 +2,7 @@
 global $cfg;
 
 use CNCLTD\Data\DBConnect;
+use CNCLTD\Exceptions\APIException;
 
 require_once($cfg ['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg ['path_bu'] . '/BUMISReport.inc.php');
@@ -18,7 +19,7 @@ class CTKPIReport extends CTCNC
     const GET_DAILY_SOURCE                        = 'dailySource';
     const GET_ENGINEER_MONTHLY_BILLING            = "engineerMonthlyBilling";
     const GET_DAILY_CONTACT                       = "dailyContact";
-
+    const GET_GROSS_PROFIT                        = "grossProfit";
     /**
      * CTKPIReport constructor.
      */
@@ -59,6 +60,9 @@ class CTKPIReport extends CTCNC
                 exit;
             case self::GET_DAILY_CONTACT:
                 echo json_encode($this->getDailyContact(), JSON_NUMERIC_CHECK);
+                exit;
+            case self::GET_GROSS_PROFIT:
+                echo json_encode($this->getGrossProfit(), JSON_NUMERIC_CHECK);
                 exit;
             default:
                 $this->setTemplate();
@@ -409,5 +413,42 @@ WHERE problem.`pro_date_raised` >= '2020-01-01'
       GROUP BY DATE_FORMAT(create_at,'%Y-%m-%d')";
         //echo $query; exit;
         return DBConnect::fetchAll($query, $params);
+    }
+    function getGrossProfit(){
+        $from=@$_REQUEST["from"];
+        $to=@$_REQUEST["to"];
+        $customerID=@$_REQUEST["customerID"];
+        $stockCat=@$_REQUEST["stockCat"];
+        if(!isset($from)||!isset($to))
+            return $this->fail(APIException::badRequest,"Missing paramaters");
+        $query="SELECT 
+        customer.`cus_name` AS customer,
+        DATE_FORMAT(inh_date_printed, '%Y-%m-01') AS date,
+        ROUND(SUM(
+            invline.`inl_cost_price` * invline.`inl_qty`
+        ),2) AS totalCost,
+        ROUND(SUM(
+            invline.`inl_unit_price` * invline.`inl_qty`
+        ),2) AS totalSale,
+        invline.`inl_stockcat` AS stockCat
+        FROM
+        invline
+        JOIN invhead
+            ON invline.`inl_invno` = invhead.`inh_invno`
+        JOIN customer
+            ON invhead.`inh_custno` = customer.`cus_custno`
+        WHERE 
+        (:customerID is null or customer.cus_custno=:customerID)
+        and inh_date_printed >= :from
+        AND inh_date_printed <= :to
+        AND inl_line_type <> 'C'
+        AND (:stockCat is null or inl_stockcat=:stockCat)
+        GROUP BY invline.`inl_stockcat`, invhead.`inh_custno`, inh_date_printed_yearmonth 
+        ORDER BY customer, date, stockCat ";
+        
+        $result=DBConnect::fetchAll($query,
+        ["from"=>$from,"to"=>$to,"customerID"=>$customerID??null,"stockCat"=>$stockCat??null]);
+
+        return $this->success($result);
     }
 }

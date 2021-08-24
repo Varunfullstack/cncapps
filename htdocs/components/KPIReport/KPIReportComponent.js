@@ -21,6 +21,7 @@ import {groupBy} from '../utils/utils';
 import BillingConsultancyComponent from './subComponents/BillingConsultancyComponent';
 import APIUser from '../services/APIUser';
 import Toggle from '../shared/Toggle';
+import GrossProfitComponent from './subComponents/GrossProfitComponent';
 
 export const ReportType = {Daily: "day", Weekly: "week", Monthly: "month"}
 
@@ -39,7 +40,8 @@ export default class KPIReportComponent extends MainComponent {
     REP_SERVICE_REQUEST_SOURCE = 'serviceRequestSource';
     apiSDManagerDashboard = new APISDManagerDashboard();
     REP_CONFIRMED_BILLED_PER_ENGINEER = 'confirmedBilledPerEngineer';
-    REP_DAILY_CONTACT='DailyContact'
+    REP_DAILY_CONTACT ='DailyContact';
+    REP_GROSS_PROFIT_STOCK_CATEGORY ='GrossProfitPerStockCategory';
     /**
      * SRS_BY_CONTRAC
      * @param props
@@ -174,10 +176,20 @@ export default class KPIReportComponent extends MainComponent {
                     this.reportparameters.resultType,                 
                 ]
             },
+            {
+                id: this.REP_GROSS_PROFIT_STOCK_CATEGORY,
+                title: "Gross Profit Per Stock Category",
+                parameters: [
+                    this.reportparameters.dateFrom,
+                    this.reportparameters.dateTo,             
+                    this.reportparameters.customer,
+                      
+                ]
+            },
         ];
         reports.sort((a, b) => a.title.localeCompare(b.title));
         if (!activeReport)
-            activeReport = reports[5];
+            activeReport = reports[2];
         this.setState({reports, activeReport}, () => this.handleReportView());
     }
 
@@ -455,6 +467,13 @@ export default class KPIReportComponent extends MainComponent {
                     this.processData(data, false);              
                 });
                 break;
+                case this.REP_GROSS_PROFIT_STOCK_CATEGORY:
+                this.api.getGrossProfit(filter).then((result) => {
+                    filter.resultType = this.ResultType.Monthly;
+                    this.setState({data:result.data, _showSpinner: false,filter});      
+                    console.log(result.data)    ;
+                });
+                break;
         }
 
 
@@ -512,8 +531,10 @@ export default class KPIReportComponent extends MainComponent {
             case this.REP_DAILY_CONTACT:
             return <DailyContactComponent data={data}
             filter={filter}>
-
             </DailyContactComponent>
+            case this.REP_GROSS_PROFIT_STOCK_CATEGORY:
+                return <GrossProfitComponent data={data} filter={filter}>
+                </GrossProfitComponent>
             default:
                 return null;
         }
