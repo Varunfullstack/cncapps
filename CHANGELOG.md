@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 1515 - Changed the description that shows in the PDF quote to be the line description instead of the item's.
+
 ## [v5.17.1] - 2021-08-20
 ### Changed
 - Changed alignment of priority columns at CurrentActivityReport.
