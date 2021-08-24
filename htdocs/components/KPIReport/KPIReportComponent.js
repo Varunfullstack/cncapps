@@ -16,7 +16,7 @@ import APISDManagerDashboard from '../SDManagerDashboardComponent/services/APISD
 import ServiceRequestComponent from './subComponents/ServiceRequestComponent';
 import DailySourceComponent from './subComponents/DailySourceComponent';
 import DailyContactComponent from './subComponents/DailyContactComponent';
-import {groupBy} from '../utils/utils';
+import {groupBy, sort} from '../utils/utils';
 
 import BillingConsultancyComponent from './subComponents/BillingConsultancyComponent';
 import APIUser from '../services/APIUser';
@@ -470,8 +470,19 @@ export default class KPIReportComponent extends MainComponent {
                 case this.REP_GROSS_PROFIT_STOCK_CATEGORY:
                 this.api.getGrossProfit(filter).then((result) => {
                     filter.resultType = this.ResultType.Monthly;
-                    this.setState({data:result.data, _showSpinner: false,filter});      
-                    console.log(result.data)    ;
+                    // we need to add 0 for each customer don't have the category in each month
+                    const data=result.data;
+                    const g=groupBy(data,'date');
+                    const cust=groupBy(data,'customer');
+                    const cat=groupBy(data,'stockCat');
+                    for(let i=0;i<cust.length;i++){
+                        for(let j=0; j<g.length;j++)
+                        for(let k=0;k<cat.length;k++)
+                        if(data.filter(d=>d.customer==cust[i].groupName&&d.date==g[j].groupName&&d.stockCat==cat[k].groupName).length==0)
+                        data.push({customer:cust[i].groupName,date:g[j].groupName,totalCost:0,totalSale:0,stockCat:cat[k].groupName})
+                    }
+                    this.setState({data:sort(data,'date'), _showSpinner: false,filter});
+                    //console.log("2021-03-01",data.filter(d=>d.date=='2021-03-01'&&d.stockCat=='B').map(m=>m.totalSale - m.totalCost).reduce((a,b)=>a+b,0));
                 });
                 break;
         }
