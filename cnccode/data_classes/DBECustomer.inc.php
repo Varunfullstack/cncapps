@@ -16,7 +16,6 @@ class DBECustomer extends DBCNCEntity
     const regNo                        = "regNo";
     const invoiceSiteNo                = "invoiceSiteNo";
     const deliverSiteNo                = "deliverSiteNo";
-    const mailshotFlag                 = "mailshotFlag";
     const createDate                   = "createDate";
     const referredFlag                 = "referredFlag";
     const customerTypeID               = "customerTypeID";
@@ -50,15 +49,10 @@ class DBECustomer extends DBCNCEntity
     const accountManagerUserID         = "accountManagerUserID";
     const reviewMeetingEmailSentFlag   = "reviewMeetingEmailSentFlag";
     const dateMeetingConfirmed         = 'dateMeetingConfirmed';
-    const meetingDateTime              = 'meetingDateTime';
-    const inviteSent                   = 'inviteSent';
-    const reportProcessed              = 'reportProcessed';
-    const reportSent                   = 'reportSent';
     const crmComments                  = 'crmComments';
     const companyBackground            = 'companyBackground';
     const decisionMakerBackground      = 'decisionMakerBackground';
     const opportunityDeal              = 'opportunityDeal';
-    const rating                       = 'rating';
     const lastContractSent             = 'lastContractSent';
     const primaryMainContactID         = 'primaryMainContactID';
     const sortCode                     = 'sortCode';
@@ -124,12 +118,7 @@ class DBECustomer extends DBCNCEntity
             DA_ALLOW_NULL,
             "cus_del_siteno"
         ); // have to be strings so zero sites don't go empty
-        $this->addColumn(
-            self::mailshotFlag,
-            DA_BOOLEAN,
-            DA_NOT_NULL,
-            "mailshotAllowed"
-        );
+         
         $this->addColumn(
             self::createDate,
             DA_DATE,
@@ -331,31 +320,7 @@ class DBECustomer extends DBCNCEntity
             DA_DATE,
             DA_ALLOW_NULL,
             'date_meeting_confirmed'
-        );
-        $this->addColumn(
-            self::meetingDateTime,
-            DA_DATETIME,
-            DA_ALLOW_NULL,
-            'meeting_datetime'
-        );
-        $this->addColumn(
-            self::inviteSent,
-            DA_BOOLEAN,
-            DA_NOT_NULL,
-            "invite_sent"
-        );
-        $this->addColumn(
-            self::reportProcessed,
-            DA_BOOLEAN,
-            DA_NOT_NULL,
-            "report_processed"
-        );
-        $this->addColumn(
-            self::reportSent,
-            DA_BOOLEAN,
-            DA_NOT_NULL,
-            "report_sent"
-        );
+        );        
         $this->addColumn(
             self::crmComments,
             DA_STRING,
@@ -380,12 +345,7 @@ class DBECustomer extends DBCNCEntity
             DA_ALLOW_NULL,
             "opportunity_deal"
         );
-        $this->addColumn(
-            self::rating,
-            DA_INTEGER,
-            DA_ALLOW_NULL,
-            "rating"
-        );
+        
         $this->addColumn(
             self::lastContractSent,
             DA_TEXT,

@@ -1,0 +1,34 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="Mustafa" id="issue1510-0">
+        <tagDatabase tag="issue1510"/>
+    </changeSet>
+
+    <changeSet id="issue1510-1" author="Mustafa">
+        
+        <dropColumn tableName="customer" columnName="mailshotAllowed" >
+        </dropColumn>
+
+        <dropColumn tableName="customer" columnName="meeting_datetime" >
+        </dropColumn>
+
+        <dropColumn tableName="customer" columnName="invite_sent" >
+        </dropColumn>
+
+        <dropColumn tableName="customer" columnName="report_processed" >
+        </dropColumn>
+
+        <dropColumn tableName="customer" columnName="report_sent" >
+        </dropColumn>
+
+        <dropColumn tableName="customer" columnName="rating" >
+        </dropColumn>
+
+        <rollback>
+
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

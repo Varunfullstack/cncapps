@@ -119,22 +119,7 @@ export default class CustomerCRMComponent extends MainComponent {
                             </select>
                         </td>
                     </tr>
-                    <tr>
-                        <td>
-                            <div>Email Opt Out</div>
-                        </td>
-                        <td>
-                            <Toggle
-                                checked={data.mailshotFlag === 1}
-                                onChange={() =>
-                                    this.setValue(
-                                        "mailshotFlag",
-                                        data.mailshotFlag === 1 ? 0 : 1
-                                    )
-                                }
-                            ></Toggle>
-                        </td>
-                    </tr>
+                     
                     <tr>
                         <td>
                             Meeting Confirmed
@@ -153,88 +138,7 @@ export default class CustomerCRMComponent extends MainComponent {
                                 style={{maxWidth: 170}}
                             />
                         </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            Meeting Date
-                        </td>
-                        <td>
-                            <input
-                                type="datetime-local"
-                                value={data.meetingDateTime || ""}
-                                onChange={($event) =>
-                                    this.handleUpdateGenericField($event)
-                                }
-                                size="10"
-                                maxLength="10"
-                                className="form-control input-sm"
-                                name="meetingDateTime"
-                                style={{maxWidth: 170}}
-                            />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div>Invite Sent</div>
-                        </td>
-                        <td>
-                            <Toggle
-                                checked={data.inviteSent === 1}
-                                onChange={() =>
-                                    this.setValue(
-                                        "inviteSent",
-                                        data.inviteSent === 1 ? 0 : 1
-                                    )
-                                }
-                            ></Toggle>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div>Report Processed</div>
-                        </td>
-                        <td>
-                            <Toggle
-                                checked={data.reportProcessed === 1}
-                                onChange={() =>
-                                    this.setValue(
-                                        "reportProcessed",
-                                        data.reportProcessed === 1 ? 0 : 1
-                                    )
-                                }
-                            ></Toggle>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div>Report Sent</div>
-                        </td>
-                        <td>
-                            <Toggle
-                                checked={data.reportSent === 1}
-                                onChange={() =>
-                                    this.setValue(
-                                        "reportSent",
-                                        data.reportSent === 1 ? 0 : 1
-                                    )
-                                }
-                            ></Toggle>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div>Rating</div>
-                        </td>
-                        <td>
-                            <input
-                                value={data.rating || ""}
-                                onChange={(event) =>
-                                    this.setValue("rating", event.target.value)
-                                }
-                                className="form-control"
-                            />
-                        </td>
-                    </tr>
+                    </tr>                      
                     </tbody>
                 </table>
             </div>

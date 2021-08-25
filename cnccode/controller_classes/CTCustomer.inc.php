@@ -2111,7 +2111,6 @@ ORDER BY NAME,
                                      DBECustomer::lastReviewMeetingDate
                                  ),
                                  "leadStatusId" => $dbeCustomer->getValue(DBECustomer::leadStatusId),
-                                 "mailshotFlag" => $dbeCustomer->getValue(DBECustomer::mailshotFlag),
                                  "modifyDate" => $dbeCustomer->getValue(DBECustomer::modifyDate),
                                  "name" => $dbeCustomer->getValue(DBECustomer::name),
                                  "noOfPCs" => $dbeCustomer->getValue(DBECustomer::noOfPCs),
@@ -2184,12 +2183,8 @@ ORDER BY NAME,
                                  ),
                                  "excludeFromWebrootChecks" => $dbeCustomer->getValue(
                                      DBECustomer::excludeFromWebrootChecks
-                                 ),
-                                 "inviteSent" => $dbeCustomer->getValue(DBECustomer::inviteSent),
-                                 "reportProcessed" => $dbeCustomer->getValue(DBECustomer::reportProcessed),
-                                 "reportSent" => $dbeCustomer->getValue(DBECustomer::reportSent),
-                                 "rating" => $dbeCustomer->getValue(DBECustomer::rating),
-                                 "meetingDateTime" => $dbeCustomer->getValue(DBECustomer::meetingDateTime),
+                                 ),                                 
+                                 
                              ]
                          ]);
     }
@@ -2771,13 +2766,7 @@ ORDER BY NAME,
             return $this->fail(APIException::notFound, "Customer Not Found");
         }
         $dbeCustomer->setValue(DBECustomer::leadStatusId, $body->leadStatusId);
-        $dbeCustomer->setValue(DBECustomer::mailshotFlag, $body->mailshotFlag);
         $dbeCustomer->setValue(DBECustomer::dateMeetingConfirmed, $body->dateMeetingConfirmed);
-        $dbeCustomer->setValue(DBECustomer::meetingDateTime, $body->meetingDateTime);
-        $dbeCustomer->setValue(DBECustomer::inviteSent, $body->inviteSent);
-        $dbeCustomer->setValue(DBECustomer::reportProcessed, $body->reportProcessed);
-        $dbeCustomer->setValue(DBECustomer::reportSent, $body->reportSent);
-        $dbeCustomer->setValue(DBECustomer::rating, $body->rating);
         $dbeCustomer->setValue(DBECustomer::opportunityDeal, $body->opportunityDeal);
         $dbeCustomer->updateRow();
         return $this->success();
