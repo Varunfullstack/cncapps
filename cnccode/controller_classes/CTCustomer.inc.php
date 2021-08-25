@@ -1846,7 +1846,11 @@ class CTCustomer extends CTCNC
     function getCustomerAssets(): array
     {
         $customerId = $_GET["customerId"];
-        $labtechDB = $this->getLabtechDB();
+        try {
+            $labtechDB = $this->getLabtechDB();
+        } catch (PDOException $exception) {
+            return [];
+        }
         $query = "SELECT
   computers.name AS `name`,
   computers.assetTag AS `assetTag`,

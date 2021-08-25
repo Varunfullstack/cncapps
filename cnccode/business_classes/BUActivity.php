@@ -7453,6 +7453,8 @@ class BUActivity extends Business
         );
         if ($record->getMonitorAgentName()) {
             // try to find the computer name from Labtech
+            try {
+
             $labtechRepo  = new LabtechPDORepo();
             $computerName = $labtechRepo->getComputerNameForComputerId($record->getMonitorAgentName());
             if (!$computerName) {
@@ -7460,6 +7462,9 @@ class BUActivity extends Business
             }
             $dbeProblem->setValue(DBEProblem::assetName, $computerName);
             $dbeProblem->setValue(DBEProblem::assetTitle, $computerName);
+            } catch (\PDOException $exception){
+
+            }
         }
         $dbeProblem->setValue(DBEProblem::emailSubjectSummary, substr($record->getSubjectLine(), 0, 100));
         $dbeProblem->setValue(
