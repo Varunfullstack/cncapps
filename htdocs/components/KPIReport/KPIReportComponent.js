@@ -189,7 +189,7 @@ export default class KPIReportComponent extends MainComponent {
         ];
         reports.sort((a, b) => a.title.localeCompare(b.title));
         if (!activeReport)
-            activeReport = reports[2];
+            activeReport = reports[0];
         this.setState({reports, activeReport}, () => this.handleReportView());
     }
 
