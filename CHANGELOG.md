@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.17.2] - 2021-08-25
+### Fixed
+- Fixed issue when Automate server is down and can't select assets.
+
 ## [v5.17.1] - 2021-08-20
 ### Changed
 - Changed alignment of priority columns at CurrentActivityReport.
