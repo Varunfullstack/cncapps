@@ -307,8 +307,8 @@ export default class GrossProfitComponent extends React.Component {
             hdToolTip: "Average Profit per month",
             hdClassName: "text-center",
             sortable: true,
-            cellType:CellType.value,
-            content:(g)=>'£'+g.value
+            cellType:CellType.Number,
+            content:(g)=>g.value
          }
     ];
     return (
