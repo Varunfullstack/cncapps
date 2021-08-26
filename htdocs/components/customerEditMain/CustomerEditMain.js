@@ -28,21 +28,19 @@ export default class CustomerEditMain extends MainComponent {
                 activeDirectoryName: "",
                 becameCustomerDate: "",
                 customerID: null,
-                customerTypeID: "",
-                dateMeetingConfirmed: null,
+                customerTypeID: "",                
                 deliverSiteNo: null,
                 droppedCustomerDate: null,
                 eligiblePatchManagement: null,
                 excludeFromWebrootChecks: 0,
                 gscTopUpAmount: null,
                 inclusiveOOHCallOuts: 0,
-                inviteSent: null,
+                
                 invoiceSiteNo: 0,
                 lastContractSent: null,
                 lastReviewMeetingDate: "",
                 lastUpdatedDateTime: "",
                 leadStatusId: null,
-                mailshotFlag: 0,
                 meetingDateTime: null,
                 modifyDate: moment().format("YYYY-MM-DD"),
                 name: "",
@@ -50,16 +48,13 @@ export default class CustomerEditMain extends MainComponent {
                 noOfServers: null,
                 opportunityDeal: null,
                 primaryMainContactID: null,
-                rating: null,
                 referredFlag: 0,
-                regNo: "",
-                reportProcessed: null,
-                reportSent: null,
+                regNo: "",                                
                 reviewAction: "",
                 reviewDate: "",
                 reviewMeetingBooked: 0,
                 reviewMeetingFrequencyMonths: null,
-                reviewTime: "",
+              
                 sectorID: null,
                 slaFixHoursP1: null,
                 slaFixHoursP2: null,
@@ -427,20 +422,7 @@ export default class CustomerEditMain extends MainComponent {
                                 />
                             </td>
                         </tr>
-                        <tr>
-                            <td align="right">Mailshot</td>
-                            <td>
-                                <Toggle
-                                    checked={data.mailshotFlag}
-                                    onChange={() =>
-                                        this.setValue(
-                                            "mailshotFlag",
-                                            (!data.mailshotFlag * 1)
-                                        )
-                                    }
-                                ></Toggle>
-                            </td>
-                        </tr>
+                        
                         <tr>
                             <td align="right">Lead Status</td>
                             <td>
@@ -724,10 +706,7 @@ export default class CustomerEditMain extends MainComponent {
                                 </div>
                             </td>
                         </tr>
-                        <tr>
-                            <td align="right">Last Modified:</td>
-                            <td>{data.lastUpdatedDateTime}</td>
-                        </tr>
+                      
                         </tbody>
                     </table>
                 </div>

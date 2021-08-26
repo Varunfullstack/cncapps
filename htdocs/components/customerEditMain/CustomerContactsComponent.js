@@ -55,7 +55,12 @@ export default class CustomerContactsComponent extends MainComponent {
         });
         this.api.getLetters().then(res => {
             this.setState({letters: res.data});
-        })
+        });
+        this.api.getCustomerData(this.props.customerId).then(data => {
+            this.setState({customer:data});
+        }, error => {
+            this.alert("Error in get customer data");
+        });
     }
 
     getData = () => {
@@ -381,8 +386,8 @@ export default class CustomerContactsComponent extends MainComponent {
     };
 
     handleSave = (contactData) => {
-        const {isNew} = this.state;
-        if (!this.isFormValid("contactformdata")) {
+        const {isNew,customer} = this.state;
+        if (!customer.referredFlag&& !this.isFormValid("contactformdata")) {
             this.alert("Please enter required data");
             return;
         }
@@ -500,7 +505,7 @@ export default class CustomerContactsComponent extends MainComponent {
 
     render() {
         if (this.state.showSpinner)
-            return <Spinner show={this.state.showSpinner}/>;
+            return <Spinner show={this.state.showSpinner&&!this.props.custom}/>;
         return (
             <div>
                 {this.getFilter()}
@@ -511,7 +516,8 @@ export default class CustomerContactsComponent extends MainComponent {
                             onClick={this.handleNewItem}
                         />
                     </ToolTip>
-					<button onClick={this.handleClearSupportLevel}>Clear Support Level</button>
+                    <button onClick={this.handleClearSupportLevel}>Clear Support Level</button>
+					
                 </div>
                 {this.getConfirm()}
                 {this.getAlert()}

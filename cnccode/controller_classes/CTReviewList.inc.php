@@ -91,8 +91,7 @@ class CTReviewList extends CTCNC
         $query = "SELECT 
         cus_name                              as customerName,
         reviewAction                                  as reviewAction,
-        reviewDate,
-        reviewTime,
+        reviewDate,       
         reviewUserID,
         consultant.cns_name                           as reviewUserName,
         cus_custno                                    as customerId,

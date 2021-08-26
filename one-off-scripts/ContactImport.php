@@ -55,7 +55,6 @@ while ($line = fgetcsv($csvFile)) {
         $customerInsert->setValue(DBECustomer::websiteURL, $line[14]);
         $customerInsert->setValue(DBECustomer::sectorID, $line[16]);
         $customerInsert->setValue(DBECustomer::noOfPCs, $line[18]);
-        $customerInsert->setValue(DBECustomer::mailshotFlag, 'Y');
         $customerInsert->setValue(DBECustomer::customerTypeID, 47);
         $customerInsert->setValue(DBECustomer::deliverSiteNo, 0);
         $customerInsert->insertRow();

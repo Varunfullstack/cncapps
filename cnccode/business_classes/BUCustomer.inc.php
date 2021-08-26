@@ -710,10 +710,7 @@ class BUCustomer extends Business
             DBECustomer::name,
             'New Customer'
         );
-        $dsCustomer->setValue(
-            DBECustomer::mailshotFlag,
-            'Y'
-        );
+        
         $dsCustomer->setValue(
             DBECustomer::referredFlag,
             true
@@ -1476,7 +1473,7 @@ class BUCustomer extends Business
 			WHERE
 				{$dbeSite->getDBColumnName(DBESite::invoiceContactID)} = 0
 				AND {$dbeCustomer->getDBColumnName(DBECustomer::becameCustomerDate)} is not null and {$dbeCustomer->getDBColumnName(DBECustomer::droppedCustomerDate)} is null
-				AND {$dbeCustomer->getDBColumnName(DBECustomer::mailshotFlag)} = 'Y'
+				
 				AND {$dbeCustomer->getDBColumnName(DBECustomer::customerID)} = " . $customerID;
         $db->query($sql);
         $db->next_record();

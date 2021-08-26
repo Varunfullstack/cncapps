@@ -1119,8 +1119,7 @@ ORDER BY caa_date ASC,
                     array(
                         'customerName' => $dsCustomer->getValue(DBECustomer::name),
                         'reviewDate'   => $dsCustomer->getValue(DBECustomer::reviewDate),
-                        'reviewTime'   => $dsCustomer->getValue(DBECustomer::reviewTime),
-                        'reviewAction' => $dsCustomer->getValue(DBECustomer::reviewAction),
+                         'reviewAction' => $dsCustomer->getValue(DBECustomer::reviewAction),
                         'reviewUser'   => $user,
                         'linkURL'      => $linkURL
                     )

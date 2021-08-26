@@ -36,14 +36,7 @@ class CustomerNotesComponent extends MainComponent {
     }
 
     componentDidMount() {
-        this.api.getCustomerReviewData(this.state.customerId).then(
-            (res) => {
-                this.setState({reviewData: res.data});
-            },
-            (error) => {
-                this.alert("Error in loading data");
-            }
-        );
+        
         this.apiUsers.getActiveUsers().then((enginners) => {
             this.setState({enginners});
         });
@@ -138,69 +131,9 @@ class CustomerNotesComponent extends MainComponent {
             });
     };
 
-
-    setReviewData = ($event) => {
-        const {reviewData} = this.state;
-        reviewData[$event.target.name] = $event.target.value;
-        this.setState({reviewData});
-    };
-    handleSaveREviewData = () => {
-        const {reviewData, customerId} = this.state;
-        reviewData.customerId = customerId;
-        this.api.updateCustomerReviewData(reviewData).then(
-            (res) => {
-                this.alert("saved");
-            },
-            (error) => {
-                this.alert("Error in save data");
-            }
-        );
-    };
-    getReviewElement = () => {
-        const {reviewData} = this.state;
-        return (
-            <div className="flex-row" style={{alignItems: "center"}}>
-                <span>To be reviewed on</span>
-                <input
-                    style={{width: 140}}
-                    className="form-control"
-                    type="date"
-                    value={reviewData.toBeReviewedOnDate}
-                    name="toBeReviewedOnDate"
-                    onChange={($event) => this.setReviewData($event)}
-                ></input>
-                <span>Time</span>
-                <input
-                    style={{width: 80}}
-                    className="form-control"
-                    type="time"
-                    value={reviewData.toBeReviewedOnTime}
-                    name="toBeReviewedOnTime"
-                    onChange={($event) => this.setReviewData($event)}
-                ></input>
-                <span>By</span>
-                <select
-                    style={{width: 150}}
-                    className="form-control"
-                    value={reviewData.toBeReviewedOnByEngineerId}
-                    name="toBeReviewedOnByEngineerId"
-                    onChange={($event) => this.setReviewData($event)}
-                >
-                    {this.state.enginners.map((e) => (
-                        <option key={e.id} value={e.id}>
-                            {e.name}
-                        </option>
-                    ))}
-                </select>
-                <ToolTip title="Save reviewed data">
-                    <i
-                        onClick={this.handleSaveREviewData}
-                        className="fal fa-save fa-2x icon pointer "
-                    ></i>
-                </ToolTip>
-            </div>
-        );
-    };
+ 
+    
+    
     setNote = (value) => {
         const {currentNote} = this.state;
         currentNote.note = value;
@@ -277,7 +210,7 @@ class CustomerNotesComponent extends MainComponent {
                 {this.getConfirm()}
                 {this.getAlert()}
                 {this.getModal()}
-                {this.getReviewElement()}
+               
                 {this.getAddNewNoteElement()}
                 {this.getHistoryElement()}
 
