@@ -54,7 +54,7 @@ class ReviewListComponent extends MainComponent {
             leadStatus: '',
             contactPhone: '',
             reviewDate: '',
-            reviewTime: '',
+           
             latestUpdate: '',
             reviewUserName: '',
             customerId: '',

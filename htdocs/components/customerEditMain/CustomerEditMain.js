@@ -58,7 +58,7 @@ export default class CustomerEditMain extends MainComponent {
                 reviewDate: "",
                 reviewMeetingBooked: 0,
                 reviewMeetingFrequencyMonths: null,
-                reviewTime: "",
+              
                 sectorID: null,
                 slaFixHoursP1: null,
                 slaFixHoursP2: null,
