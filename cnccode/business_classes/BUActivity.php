@@ -1398,6 +1398,10 @@ class BUActivity extends Business
                 DBEJProblem::assetTitle,
                 $dsCallActivity->getValue(DBEJCallActivity::assetTitle)
             );
+
+            if($dsCallActivity->getValue(DBEProblem::automateMachineID))
+                $problem->setValue(DBEProblem::automateMachineID, $dsCallActivity->getValue(DBEProblem::automateMachineID));
+
             $problem->setValue(DBEProblem::emptyAssetReason, null);
         } else {
             $problem->setValue(
@@ -5248,6 +5252,14 @@ class BUActivity extends Business
             DBEProblem::repeatProblem,
             $body->repeatProblem ? 1 : 0
         );
+        if(isset($body->automateMachineID)){
+            $dbeProblem->setValue(
+                DBEProblem::automateMachineID,
+                $body->automateMachineID
+            );
+
+        }
+
         if (isset($body->notFirstTimeFixReason)) {
             $dbeProblem->setValue(
                 DBEProblem::notFirstTimeFixReason,
@@ -6794,7 +6806,8 @@ class BUActivity extends Business
         add_postcode,
         con_notes,
         cus_tech_notes,
-        emailSubject
+        emailSubject,
+        automateMachineID
       FROM
         customerproblem
         LEFT JOIN contact ON con_contno = cpr_contno
@@ -7003,6 +7016,10 @@ class BUActivity extends Business
             DBEJProblem::raiseTypeId,
             $raiseTypeId
         );
+        $dbeProblem->setValue(
+            DBEJProblem::automateMachineID,
+            $automatedRequest->getMonitorAgentName()
+        );
         $dbeProblem->insertRow();
         $dbeCallActivity = new DBECallActivity($this);
         $dbeCallActivity->setValue(
@@ -7056,6 +7073,7 @@ class BUActivity extends Business
             DBEJCallActivity::userID,
             USER_SYSTEM
         );
+
         $dbeCallActivity->insertRow();
         $dsCustomer = new DBECustomer($this);
         $dsCustomer->getRow($customerID);
@@ -7245,7 +7263,8 @@ class BUActivity extends Business
         cpr_send_email = ?,
         cpr_priority = ?,
         cpr_reason = ?,
-        emailSubject = ?
+        emailSubject = ?,
+        automateMachineID = ?
         ";
         $parameters  = [
             [
@@ -7291,6 +7310,10 @@ class BUActivity extends Business
             [
                 "type"  => "s",
                 "value" => substr($record->getSubjectLine(), 0, 49)
+            ],
+            [
+                'type'  => 'i',
+                'value' => $record->getMonitorAgentName()
             ]
         ];
         $db->preparedQuery(
@@ -7462,6 +7485,8 @@ class BUActivity extends Business
             }
             $dbeProblem->setValue(DBEProblem::assetName, $computerName);
             $dbeProblem->setValue(DBEProblem::assetTitle, $computerName);
+            $dbeProblem->setValue(DBEProblem::automateMachineID, $record->getMonitorAgentName());
+
             } catch (\PDOException $exception){
 
             }

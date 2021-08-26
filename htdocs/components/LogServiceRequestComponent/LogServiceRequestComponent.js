@@ -108,6 +108,7 @@ export default class LogServiceRequestComponent extends MainComponent {
                 data.priority = result.cpr_priority;
                 data.siteNo = result.con_siteno;
                 data.customer = {cus_custno: result.con_custno, con_contno: result.cpr_contno};
+                data.automateMachineID=result.automateMachineID;
                 this.setState({data});
             })
         }
@@ -128,9 +129,8 @@ export default class LogServiceRequestComponent extends MainComponent {
         if (save) {
             const customData = {...newData};
             this.setState({_showSpinner: true});
-            newData.callActTypeID = null;
+            newData.callActTypeID = null;           
             const result = await this.api.createProblem(customData);
-
             if (result.status) {
                 if (newData.uploadFiles.length > 0) {
                     await this.api.uploadFiles(

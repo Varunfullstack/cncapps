@@ -884,6 +884,10 @@ class ActivityDisplayComponent extends MainComponent {
                             className="nowrap"
                         >
                             {this.getAssetName(data)}
+                            {data.automateMachineID?<i className="fal fa-cog ml-5 pointer" 
+                            onClick={()=>window.open(`https://serverguard.cnc-ltd.co.uk/automate/computer/${data.automateMachineID}/normal-tiles`,"_target")}
+                            
+                            ></i>:null}
                         </td>
                     </tr>
                     {

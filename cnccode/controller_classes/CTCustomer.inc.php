@@ -1856,7 +1856,8 @@ class CTCustomer extends CTCNC
   computers.assetTag AS `assetTag`,
   computers.LastUsername AS `lastUsername`,
   computers.BiosVer AS `biosVer`,
-  computers.BiosName AS `biosName`
+  computers.BiosName AS `biosName`,
+  computers.ComputerID
 FROM
   computers
   JOIN clients
@@ -1869,7 +1870,8 @@ SELECT
   NULL AS `assetTag`,
   NULL AS `lastUsername`,
   NULL AS `biosVer`,
-  NULL AS `biosName`
+  NULL AS `biosName`,
+  null AS ComputerID
 FROM
   plugin_vm_esxhosts
   JOIN `networkdevices`
