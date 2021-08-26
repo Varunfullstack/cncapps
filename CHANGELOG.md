@@ -4,6 +4,7 @@ This project changes will be shown here.
 ## [unreleased] 
 ### Added
 - Issue 1472 - Add automateMachineID to problem.
+- Issue 1489 - Added Invoicing graph. 
 
 ## [v5.17.2] - 2021-08-25
 ### Fixed
