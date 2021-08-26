@@ -20,7 +20,7 @@ class ReviewListComponent extends MainComponent {
             filter: {
                 limit: 100,
                 page: 1,
-                orderBy: 'customerName',
+                orderBy: 'reviewDate',
                 orderDir: 'asc',
                 q: '',
                 discontinued: false,
@@ -135,7 +135,7 @@ class ReviewListComponent extends MainComponent {
                 hdClassName: "text-center",
                 sortable: true,
                 content: (review) => <a
-                    href={`/Customer.php?action=dispEdit&customerID=${review.customerId}`}>{review.customerName}</a>
+                    href={`/Customer.php?action=dispEdit&customerID=${review.customerId}&activeTab=crm`}>{review.customerName}</a>
 
             },
             {
@@ -184,7 +184,7 @@ class ReviewListComponent extends MainComponent {
             {
                 path: "reviewDate",
                 label: "",
-                hdToolTip: "IT Review Date",
+                hdToolTip: "Next CRM Review",
                 icon: "fal fa-2x fa-calendar pointer",
                 hdClassName: "text-center",
                 sortable: true,
