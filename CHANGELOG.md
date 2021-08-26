@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.18.1] - 2021-08-26
+### Fixed
+- Fixed issue when trying to save activity due to automateMachineID not allowed to be null.
+
 ## [v5.18.0] - 2021-08-26 
 ### Added
 - Issue 1472 - Add automateMachineID to problem.
