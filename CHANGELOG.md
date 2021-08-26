@@ -7,6 +7,7 @@ This project changes will be shown here.
 - Issue 1489 - Added Invoicing graph. 
 ### Changed
 - Issue 1515 - Changed the description that shows in the PDF quote to be the line description instead of the item's.
+- Issue 1514 - Tweaked Contract Report End Date.
 
 ## [v5.17.2] - 2021-08-25
 ### Fixed
