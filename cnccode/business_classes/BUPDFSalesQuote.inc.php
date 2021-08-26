@@ -1,4 +1,5 @@
 <?php
+
 global $cfg;
 
 use CNCLTD\Data\DBEItem;
@@ -13,7 +14,7 @@ require_once($cfg["path_bu"] . "/BUSalesOrder.inc.php");
 class BUPDFSalesQuote extends Business
 {
     /** @var BUSalesOrder */
-    public  $buSalesOrder;
+    public $buSalesOrder;
     private $footerImage;
     /**
      * @var float|int
@@ -55,16 +56,16 @@ class BUPDFSalesQuote extends Business
      * @return bool
      * @throws Exception
      */
-    function generate($ordheadID,
-                      $salutation = false,
-                      $introduction = false,
-                      $emailSubject = false,
-                      $dsSelectedOrderLine = false
-    )
-    {
-        $dsOrdline         = new DataSet($this);
+    function generate(
+        $ordheadID,
+        $salutation = false,
+        $introduction = false,
+        $emailSubject = false,
+        $dsSelectedOrderLine = false
+    ) {
+        $dsOrdline = new DataSet($this);
         $dsDeliveryContact = new DataSet($this);
-        $dsOrdhead         = new DataSet($this);
+        $dsOrdhead = new DataSet($this);
         if (!$this->buSalesOrder->getOrderWithCustomerName(
             $ordheadID,
             $dsOrdhead,
@@ -84,21 +85,21 @@ class BUPDFSalesQuote extends Business
         }
         $versionNo = $this->buSalesOrder->getNextQuoteVersion($ordheadID);
         $quoteFile = QUOTES_DIR . $ordheadID . '_' . $versionNo . '.pdf';
-        $userID    = $GLOBALS ['auth']->is_authenticated();
-        $dsUser    = new DataSet($this);
+        $userID = $GLOBALS ['auth']->is_authenticated();
+        $dsUser = new DataSet($this);
         $this->buSalesOrder->getUserByID(
             $userID,
             $dsUser
         );
-        $buPDF             = new BUPDF(
+        $buPDF = new BUPDF(
             $this, $quoteFile, $dsUser->getValue(DBEUser::name), $ordheadID . '/' . $versionNo, 'CNC Ltd', 'Quotation'
         );
         $this->footerImage = $GLOBALS['cfg']['cncaddress_path'];
         list($originalWidth, $originalHeight) = getimagesize($this->footerImage);
         $this->footerImageRatio = $originalHeight / $originalWidth;
         $this->footerImageWidth = $buPDF->pdf->GetPageWidth() - 10 - 10;
-        $this->footerHeight     = ($this->footerImageWidth * $this->footerImageRatio) + 10;
-        $this->footerPosition   = $buPDF->pdf->GetPageHeight() - $this->footerHeight;
+        $this->footerHeight = ($this->footerImageWidth * $this->footerImageRatio) + 10;
+        $this->footerPosition = $buPDF->pdf->GetPageHeight() - $this->footerHeight;
         $this->shouldShowFooter = true;
         $buPDF->footerCallback(
             function (FPDF_Protection $pdf) {
@@ -199,8 +200,8 @@ class BUPDFSalesQuote extends Business
         $dbeQuotation->setValue(DBEQuotation::confirmCode, $confirmationCode);
         $dbeQuotation->insertRow();
         $quotationNextId = $dbeQuotation->getValue(DBEQuotation::quotationID);
-        $oneOffLines     = [];
-        $recurringLines  = [];
+        $oneOffLines = [];
+        $recurringLines = [];
         while ($dsOrdline->fetchNext()) {
             if (!$dsSelectedOrderLine || !$dsSelectedOrderLine->search(
                     DBEOrdline::id,
@@ -209,24 +210,24 @@ class BUPDFSalesQuote extends Business
                 continue;
             }
             $row = [
-                DBEJOrdline::lineType              => $dsOrdline->getValue(DBEJOrdline::lineType),
-                DBEJOrdline::ordheadID             => $dsOrdline->getValue(DBEJOrdline::ordheadID),
-                DBEJOrdline::customerID            => $dsOrdline->getValue(DBEJOrdline::customerID),
-                DBEJOrdline::itemID                => $dsOrdline->getValue(DBEJOrdline::itemID),
-                DBEJOrdline::stockcat              => $dsOrdline->getValue(DBEJOrdline::stockcat),
-                DBEJOrdline::description           => $dsOrdline->getValue(DBEJOrdline::description),
-                DBEJOrdline::qtyOrdered            => $dsOrdline->getValue(DBEJOrdline::qtyOrdered),
-                DBEJOrdline::qtyDespatched         => $dsOrdline->getValue(DBEJOrdline::qtyDespatched),
-                DBEJOrdline::qtyLastDespatched     => $dsOrdline->getValue(DBEJOrdline::qtyLastDespatched),
-                DBEJOrdline::supplierID            => $dsOrdline->getValue(DBEJOrdline::supplierID),
-                DBEJOrdline::curUnitCost           => $dsOrdline->getValue(DBEJOrdline::curUnitCost),
-                DBEJOrdline::curTotalCost          => $dsOrdline->getValue(DBEJOrdline::curTotalCost),
-                DBEJOrdline::curUnitSale           => $dsOrdline->getValue(DBEJOrdline::curUnitSale),
-                DBEJOrdline::curTotalSale          => $dsOrdline->getValue(DBEJOrdline::curTotalSale),
+                DBEJOrdline::lineType => $dsOrdline->getValue(DBEJOrdline::lineType),
+                DBEJOrdline::ordheadID => $dsOrdline->getValue(DBEJOrdline::ordheadID),
+                DBEJOrdline::customerID => $dsOrdline->getValue(DBEJOrdline::customerID),
+                DBEJOrdline::itemID => $dsOrdline->getValue(DBEJOrdline::itemID),
+                DBEJOrdline::stockcat => $dsOrdline->getValue(DBEJOrdline::stockcat),
+                DBEJOrdline::description => $dsOrdline->getValue(DBEJOrdline::description),
+                DBEJOrdline::qtyOrdered => $dsOrdline->getValue(DBEJOrdline::qtyOrdered),
+                DBEJOrdline::qtyDespatched => $dsOrdline->getValue(DBEJOrdline::qtyDespatched),
+                DBEJOrdline::qtyLastDespatched => $dsOrdline->getValue(DBEJOrdline::qtyLastDespatched),
+                DBEJOrdline::supplierID => $dsOrdline->getValue(DBEJOrdline::supplierID),
+                DBEJOrdline::curUnitCost => $dsOrdline->getValue(DBEJOrdline::curUnitCost),
+                DBEJOrdline::curTotalCost => $dsOrdline->getValue(DBEJOrdline::curTotalCost),
+                DBEJOrdline::curUnitSale => $dsOrdline->getValue(DBEJOrdline::curUnitSale),
+                DBEJOrdline::curTotalSale => $dsOrdline->getValue(DBEJOrdline::curTotalSale),
                 DBEJOrdline::renewalCustomerItemID => $dsOrdline->getValue(DBEJOrdline::renewalCustomerItemID),
-                DBEOrdline::isRecurring            => $dsOrdline->getValue(DBEOrdline::isRecurring),
-                DBEJOrdline::itemDescription       => $dsOrdline->getValue(DBEJOrdline::itemDescription),
-                DBEOrdline::sequenceNo             => $dsOrdline->getValue(DBEOrdline::sequenceNo)
+                DBEOrdline::isRecurring => $dsOrdline->getValue(DBEOrdline::isRecurring),
+                DBEJOrdline::itemDescription => $dsOrdline->getValue(DBEJOrdline::itemDescription),
+                DBEOrdline::sequenceNo => $dsOrdline->getValue(DBEOrdline::sequenceNo)
             ];
             if ($dsOrdline->getValue(DBEOrdline::isRecurring)) {
                 $recurringLines[] = $row;
@@ -278,7 +279,7 @@ class BUPDFSalesQuote extends Business
         $buPDF->CR();
         if ($dsUser->getValue(DBEUser::signatureFilename)) {
             $signatureHeight = 20;
-            $filePath        = IMAGES_DIR . '/' . $dsUser->getValue(DBEUser::signatureFilename);
+            $filePath = IMAGES_DIR . '/' . $dsUser->getValue(DBEUser::signatureFilename);
             if (!file_exists($filePath)) {
                 throw new Exception('Could not find the signature file for the user in: ' . $filePath);
             }
@@ -342,12 +343,12 @@ class BUPDFSalesQuote extends Business
         return true;
     } // end function
 
-    private function renderAndSaveQuotationLines(BUPDF $buPDF,
-                                                 string $title,
-                                                 array $lines,
-                                                 int $quotationNextId
-    )
-    {
+    private function renderAndSaveQuotationLines(
+        BUPDF $buPDF,
+        string $title,
+        array $lines,
+        int $quotationNextId
+    ) {
         if (empty($lines)) {
             return;
         }
@@ -379,7 +380,6 @@ class BUPDFSalesQuote extends Business
         $buPDF->CR();
         $grandTotal = 0;
         foreach ($lines as $line) {
-
             // we have to copy the line to the quotation table
             $dbeQuotationLine = new DBEQuotationLine($this);
             $dbeQuotationLine->setValue(DBEQuotationLine::id, null);
@@ -439,17 +439,14 @@ class BUPDFSalesQuote extends Business
             $dbeQuotationLine->setValue(DBEQuotationLine::isRecurring, $line[DBEOrdline::isRecurring]);
             $dbeQuotationLine->insertRow();
             if ($line[DBEJOrdline::lineType] == "I") {
-                if ($line[DBEJOrdline::itemDescription] != '') {
-                    $buPDF->printStringAt(
-                        40,
-                        $line[DBEJOrdline::itemDescription]
-                    );
-                } else {
-                    $buPDF->printStringAt(
-                        40,
-                        $line[DBEJOrdline::description]
-                    );
+                $description = $line[DBEJOrdline::itemDescription];
+                if ($line[DBEJOrdline::description] != '') {
+                    $description = $line[DBEJOrdline::description];
                 }
+                $buPDF->printStringAt(
+                    40,
+                    $description
+                );
                 if ($line[DBEJOrdline::qtyOrdered]) {
                     $buPDF->printStringRJAt(
                         30,
@@ -534,19 +531,18 @@ class BUPDFSalesQuote extends Business
      * @return mixed
      * @throws Exception
      */
-    function sendReminderPDFEmailQuote($quotationID,
-                                       $emailSubject
-    )
-    {
-        $buMail       = new BUMail($this);
+    function sendReminderPDFEmailQuote(
+        $quotationID,
+        $emailSubject
+    ) {
+        $buMail = new BUMail($this);
         $dbeQuotation = new DBEQuotation($this);
         if (!$dbeQuotation->getRow($quotationID)) {
             throw new Exception('Quotation Not Found');
-
         }
-        $dsOrdhead         = new DataSet($this);
+        $dsOrdhead = new DataSet($this);
         $dsDeliveryContact = new DataSet($this);
-        $dsOrdline         = new DataSet($this);
+        $dsOrdline = new DataSet($this);
         if (!$this->buSalesOrder->getOrderWithCustomerName(
             $dbeQuotation->getValue(DBEQuotation::ordheadID),
             $dsOrdhead,
@@ -561,7 +557,7 @@ class BUPDFSalesQuote extends Business
             $dsUser
         );
         $quoteFileName = "{$dbeQuotation->getValue(DBEOrdhead::ordheadID)}_{$dbeQuotation->getValue(DBEQuotation::versionNo)}.pdf";
-        $quoteFile     = QUOTES_DIR . $quoteFileName;
+        $quoteFile = QUOTES_DIR . $quoteFileName;
         global $twig;
         $DBEJRenQuotation = new DBEJRenQuotation($this);
         $DBEJRenQuotation->getRowsBySalesOrderID($dsOrdhead->getValue(DBEOrdhead::ordheadID));
@@ -570,19 +566,19 @@ class BUPDFSalesQuote extends Business
         }
         $DBEJRenQuotation->fetchNext();
         $contactFirstName = $dsDeliveryContact->getValue(DBEContact::firstName);
-        $renewalType      = $DBEJRenQuotation->getValue(DBEJRenQuotation::type);
-        $body             = $twig->render(
+        $renewalType = $DBEJRenQuotation->getValue(DBEJRenQuotation::type);
+        $body = $twig->render(
             '@customerFacing/QuoteReminder/QuoteReminder.html.twig',
             [
                 "contactFirstName" => $contactFirstName,
-                "renewalType"      => $renewalType
+                "renewalType" => $renewalType
             ]
         );
-        $recipientsArray  = [
+        $recipientsArray = [
             $dsOrdhead->getValue(DBEOrdhead::delContactEmail),
             CONFIG_SALES_EMAIL
         ];
-        $attachments      = new AttachmentCollection();
+        $attachments = new AttachmentCollection();
         $attachments->add(
             $quoteFile,
             'application/pdf',
@@ -607,14 +603,13 @@ class BUPDFSalesQuote extends Business
      */
     function sendPDFEmailQuote($quotationID)
     {
-        $buMail       = new BUMail($this);
+        $buMail = new BUMail($this);
         $dbeQuotation = new DBEQuotation($this);
         if (!$dbeQuotation->getRow($quotationID)) {
             throw new Exception('Quotation Not Found');
-
         }
-        $dsOrdhead         = new DataSet($this);
-        $dsOrdline         = new DataSet($this);
+        $dsOrdhead = new DataSet($this);
+        $dsOrdline = new DataSet($this);
         $dsDeliveryContact = new DataSet($this);
         if (!$this->buSalesOrder->getOrderWithCustomerName(
             $dbeQuotation->getValue(DBEQuotation::ordheadID),
@@ -630,37 +625,37 @@ class BUPDFSalesQuote extends Business
             $userID,
             $dsUser
         );
-        $quoteFile   = QUOTES_DIR . $dbeQuotation->getValue(DBEQuotation::ordheadID) . '_' . $dbeQuotation->getValue(
+        $quoteFile = QUOTES_DIR . $dbeQuotation->getValue(DBEQuotation::ordheadID) . '_' . $dbeQuotation->getValue(
                 DBEQuotation::versionNo
             ) . '.pdf';
-        $body        = $dbeQuotation->getValue(DBEQuotation::documentType) . ' ' . $dsOrdhead->getValue(
+        $body = $dbeQuotation->getValue(DBEQuotation::documentType) . ' ' . $dsOrdhead->getValue(
                 DBEJOrdhead::ordheadID
             ) . '/' . $dbeQuotation->getValue(DBEQuotation::versionNo) . ' for ' . $dbeQuotation->getValue(
                 DBEQuotation::emailSubject
             );
-        $subject     = ucwords($body);
+        $subject = ucwords($body);
         $senderEmail = $dsUser->getValue(DBEUser::username) . '@' . CONFIG_PUBLIC_DOMAIN;
-        $senderName  = $dsUser->getValue(DBEUser::firstName) . ' ' . $dsUser->getValue(DBEUser::lastName);
+        $senderName = $dsUser->getValue(DBEUser::firstName) . ' ' . $dsUser->getValue(DBEUser::lastName);
         global $twig;
-        $apiURL  = API_URL . "/acceptQuotation?code={$dbeQuotation->getValue(DBEQuotation::confirmCode)}";
+        $apiURL = API_URL . "/acceptQuotation?code={$dbeQuotation->getValue(DBEQuotation::confirmCode)}";
         $toEmail = $dsOrdhead->getValue(DBEJOrdhead::delContactEmail);
-        $hdrs    = array(
-            'From'         => $senderName . '<' . $senderEmail . '>',
-            'To'           => $toEmail,
-            'Subject'      => $subject,
-            'Date'         => date("r"),
+        $hdrs = array(
+            'From' => $senderName . '<' . $senderEmail . '>',
+            'To' => $toEmail,
+            'Subject' => $subject,
+            'Date' => date("r"),
             'Content-Type' => 'text/html; charset=UTF-8'
         );
         $buMail->mime->setHTMLBody(
             $twig->render(
                 '@customerFacing/Quote/Quote.html.twig',
                 [
-                    "isOrderForm"     => $dbeQuotation->getValue(DBEQuotation::documentType) == 'order form',
-                    "apiURL"          => $apiURL,
-                    "salutation"      => $dbeQuotation->getValue(DBEQuotation::salutation),
+                    "isOrderForm" => $dbeQuotation->getValue(DBEQuotation::documentType) == 'order form',
+                    "apiURL" => $apiURL,
+                    "salutation" => $dbeQuotation->getValue(DBEQuotation::salutation),
                     "senderFirstName" => $dsUser->getValue(DBEUser::firstName),
-                    "senderLastName"  => $dsUser->getValue(DBEUser::lastName),
-                    "introduction"    => $dbeQuotation->getValue(DBEQuotation::salutation)
+                    "senderLastName" => $dsUser->getValue(DBEUser::lastName),
+                    "introduction" => $dbeQuotation->getValue(DBEQuotation::salutation)
                 ]
             )
         );
@@ -670,20 +665,19 @@ class BUPDFSalesQuote extends Business
         );
         $mime_params = array(
             'text_encoding' => '7bit',
-            'text_charset'  => 'UTF-8',
-            'html_charset'  => 'UTF-8',
-            'head_charset'  => 'UTF-8'
+            'text_charset' => 'UTF-8',
+            'html_charset' => 'UTF-8',
+            'head_charset' => 'UTF-8'
         );
-        $body        = $buMail->mime->get($mime_params);
-        $hdrs        = $buMail->mime->headers($hdrs);
-        $toEmail     .= ',' . CONFIG_SALES_EMAIL;
+        $body = $buMail->mime->get($mime_params);
+        $hdrs = $buMail->mime->headers($hdrs);
+        $toEmail .= ',' . CONFIG_SALES_EMAIL;
         return $buMail->putInQueue(
             $senderEmail,
             $toEmail,
             $hdrs,
             $body
         );
-
     }
 
 }
