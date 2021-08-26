@@ -38,4 +38,16 @@ export default class APIKPIReport extends APIMain {
     getDailyContact(from,to){
         return this.get(`${ApiUrls.KPIReport}dailyContact&from=${from}&to=${to}`);
     }
+    getGrossProfit(filter){
+        //from,to,customerID,stockCat
+        let url=`${ApiUrls.KPIReport}grossProfit&from=${filter.from}&to=${filter.to}`;
+
+        if(filter.customerID)
+            url += "&customerID="+filter.customerID;
+
+        if(filter.stockCat)
+            url += "&stockCat="+filter.stockCat;
+
+        return this.get(url);
+    }
 }
