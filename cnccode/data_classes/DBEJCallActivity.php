@@ -391,7 +391,7 @@ class DBEJCallActivity extends DBECallActivity
         $this->addColumn(
             self::automateMachineID,
             DA_INTEGER,
-            DA_NULL,
+            DA_ALLOW_NULL,
             "problem.automateMachineID"
         );
         
