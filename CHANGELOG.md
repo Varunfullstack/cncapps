@@ -8,6 +8,7 @@ This project changes will be shown here.
 ### Changed
 - Issue 1515 - Changed the description that shows in the PDF quote to be the line description instead of the item's.
 - Issue 1514 - Tweaked Contract Report End Date.
+- Issue 1510 - Changed CRM Tab.
 
 ## [v5.17.2] - 2021-08-25
 ### Fixed
