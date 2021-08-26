@@ -500,7 +500,7 @@ export default class CustomerContactsComponent extends MainComponent {
 
     render() {
         if (this.state.showSpinner)
-            return <Spinner show={this.state.showSpinner}/>;
+            return <Spinner show={this.state.showSpinner&&!this.props.custom}/>;
         return (
             <div>
                 {this.getFilter()}
@@ -511,7 +511,8 @@ export default class CustomerContactsComponent extends MainComponent {
                             onClick={this.handleNewItem}
                         />
                     </ToolTip>
-					<button onClick={this.handleClearSupportLevel}>Clear Support Level</button>
+                    <button onClick={this.handleClearSupportLevel}>Clear Support Level</button>
+					
                 </div>
                 {this.getConfirm()}
                 {this.getAlert()}

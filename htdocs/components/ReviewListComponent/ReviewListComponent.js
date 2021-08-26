@@ -171,23 +171,7 @@ class ReviewListComponent extends MainComponent {
                 icon: "fal fa-2x fa-thermometer-full pointer",
                 hdClassName: "text-center",
                 sortable: true,
-            },
-            {
-                path: "reviewDate",
-                label: "",
-                hdToolTip: "IT Review Date",
-                icon: "fal fa-2x fa-calendar pointer",
-                hdClassName: "text-center",
-                sortable: true,
-                content: (review) => this.getCorrectDate(review.reviewDate)
-            },
-            {
-                path: "reviewTime",
-                label: "",
-                hdToolTip: "Time",
-                icon: "fal fa-2x fa-clock pointer",
-                hdClassName: "text-center",
-                sortable: true,
+                width:100
             },
             {
                 path: "latestUpdate",
@@ -198,12 +182,24 @@ class ReviewListComponent extends MainComponent {
                 sortable: true,
             },
             {
+                path: "reviewDate",
+                label: "",
+                hdToolTip: "IT Review Date",
+                icon: "fal fa-2x fa-calendar pointer",
+                hdClassName: "text-center",
+                sortable: true,
+                content: (review) => this.getCorrectDate(review.reviewDate)
+            },
+            
+            
+            {
                 path: "reviewUserName",
                 label: "",
                 hdToolTip: "User",
                 icon: "fal fa-2x fa-user-hard-hat color-gray2 ",
                 hdClassName: "text-center",
                 sortable: true,
+                width:100
             }
         ];
 

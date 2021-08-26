@@ -28,8 +28,7 @@ export default class CustomerEditMain extends MainComponent {
                 activeDirectoryName: "",
                 becameCustomerDate: "",
                 customerID: null,
-                customerTypeID: "",
-                dateMeetingConfirmed: null,
+                customerTypeID: "",                
                 deliverSiteNo: null,
                 droppedCustomerDate: null,
                 eligiblePatchManagement: null,
@@ -724,10 +723,7 @@ export default class CustomerEditMain extends MainComponent {
                                 </div>
                             </td>
                         </tr>
-                        <tr>
-                            <td align="right">Last Modified:</td>
-                            <td>{data.lastUpdatedDateTime}</td>
-                        </tr>
+                      
                         </tbody>
                     </table>
                 </div>

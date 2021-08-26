@@ -931,52 +931,9 @@ class CTCustomer extends CTCNC
         $dbeUser->getRows();
         echo json_encode(["status" => "ok", "data" => $dbeUser->fetchArray()]);
     }
+ 
 
-    function getCustomerReviewDataController()
-    {
-        if (!isset($_REQUEST['customerID'])) {
-            http_response_code(400);
-            echo json_encode(["status" => "error", "message" => "Customer ID is mandatory"]);
-            exit;
-        }
-        $dbeCustomer = new DBECustomer($this);
-        if (!$dbeCustomer->getRow($_REQUEST['customerID'])) {
-            http_response_code(404);
-            echo json_encode(["status" => "error", "message" => "Customer does not exist"]);
-            exit;
-        }
-        echo json_encode([
-                             "status" => "ok",
-                             "data" => [
-                                 "toBeReviewedOnDate" => $dbeCustomer->getValue(DBECustomer::reviewDate),
-                                 "toBeReviewedOnTime" => $dbeCustomer->getValue(DBECustomer::reviewTime),
-                                 "toBeReviewedOnByEngineerId" => $dbeCustomer->getValue(DBECustomer::reviewUserID),
-                                 "toBeReviewedOnAction" => $dbeCustomer->getValue(DBECustomer::reviewAction)
-                             ]
-                         ]);
-    }
-
-    function updateCustomerReviewController()
-    {
-        $data = json_decode(file_get_contents('php://input'), true);
-        if (!isset($data['customerId'])) {
-            http_response_code(400);
-            echo json_encode(["status" => "error", "message" => "Customer ID is mandatory"]);
-            exit;
-        }
-        $dbeCustomer = new DBECustomer($this);
-        if (!$dbeCustomer->getRow($data['customerId'])) {
-            http_response_code(404);
-            echo json_encode(["status" => "error", "message" => "Customer does not exist"]);
-            exit;
-        }
-        $dbeCustomer->setValue(DBECustomer::reviewDate, $data["toBeReviewedOnDate"]);
-        $dbeCustomer->setValue(DBECustomer::reviewTime, $data["toBeReviewedOnTime"]);
-        $dbeCustomer->setValue(DBECustomer::reviewUserID, $data["toBeReviewedOnByEngineerId"]);
-        $dbeCustomer->setValue(DBECustomer::reviewAction, $data["toBeReviewedOnAction"]);
-        $dbeCustomer->updateRow();
-        echo json_encode(["status" => "ok",]);
-    }
+     
 
     function getPortalCustomerDocumentsController($customerID)
     {
@@ -1116,8 +1073,7 @@ class CTCustomer extends CTCNC
                 }
                 $this->template->set_var(array(
                                              'customerName' => $dsCustomer->getValue(DBECustomer::name),
-                                             'reviewDate' => $dsCustomer->getValue(DBECustomer::reviewDate),
-                                             'reviewTime' => $dsCustomer->getValue(DBECustomer::reviewTime),
+                                             'reviewDate' => $dsCustomer->getValue(DBECustomer::reviewDate),                                             
                                              'reviewAction' => $dsCustomer->getValue(DBECustomer::reviewAction),
                                              'reviewUser' => $user,
                                              'linkURL' => $linkURL
@@ -2156,11 +2112,9 @@ ORDER BY NAME,
                                      DBECustomer::support24HourFlag
                                  ),
                                  "techNotes" => $dbeCustomer->getValue(DBECustomer::techNotes),
-                                 "websiteURL" => $dbeCustomer->getValue(DBECustomer::websiteURL),
-                                 "reviewDate" => $dbeCustomer->getValue(DBECustomer::reviewDate),
-                                 "reviewTime" => $dbeCustomer->getValue(DBECustomer::reviewTime),
-                                 "dateMeetingConfirmed" => $dbeCustomer->getValue(
-                                     DBECustomer::dateMeetingConfirmed
+                                 "websiteURL" => $dbeCustomer->getValue(DBECustomer::websiteURL),                                 
+                                 "meetingDateTime" => $dbeCustomer->getValue(
+                                     DBECustomer::meetingDateTime
                                  ),
                                  "invoiceSiteNo" => $dbeCustomer->getValue(DBECustomer::invoiceSiteNo),
                                  "deliverSiteNo" => $dbeCustomer->getValue(DBECustomer::deliverSiteNo),
@@ -2184,8 +2138,9 @@ ORDER BY NAME,
                                  "excludeFromWebrootChecks" => $dbeCustomer->getValue(
                                      DBECustomer::excludeFromWebrootChecks
                                  ),                                 
-                                 
-                             ]
+                                 "reviewDate" => $dbeCustomer->getValue(DBECustomer::reviewDate),
+                                 "reviewUserID" => $dbeCustomer->getValue(DBECustomer::reviewUserID),
+                              ]
                          ]);
     }
 
@@ -2242,8 +2197,7 @@ ORDER BY NAME,
                 "activeDirectoryName",
                 "becameCustomerDate",
                 "customerID",
-                "customerTypeID",
-                "dateMeetingConfirmed",
+                "customerTypeID",                
                 "deliverSiteNo",
                 "droppedCustomerDate",
                 "eligiblePatchManagement",
@@ -2765,9 +2719,21 @@ ORDER BY NAME,
         if (!$dbeCustomer->rowCount()) {
             return $this->fail(APIException::notFound, "Customer Not Found");
         }
+        
         $dbeCustomer->setValue(DBECustomer::leadStatusId, $body->leadStatusId);
-        $dbeCustomer->setValue(DBECustomer::dateMeetingConfirmed, $body->dateMeetingConfirmed);
+        $dbeCustomer->setValue(DBECustomer::meetingDateTime,  
+            $body->meetingDateTime 
+        );
+
         $dbeCustomer->setValue(DBECustomer::opportunityDeal, $body->opportunityDeal);
+        if(isset($body->reviewDate))
+        $dbeCustomer->setValue(DBECustomer::reviewDate, $body->reviewDate);
+        if(isset($body->reviewUserID))
+        $dbeCustomer->setValue(DBECustomer::reviewUserID, $body->reviewUserID);
+
+        if(isset($body->websiteURL))
+            $dbeCustomer->setValue(DBECustomer::websiteURL, $body->websiteURL);
+        
         $dbeCustomer->updateRow();
         return $this->success();
     }

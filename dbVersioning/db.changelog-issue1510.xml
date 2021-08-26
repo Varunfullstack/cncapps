@@ -11,7 +11,7 @@
         <dropColumn tableName="customer" columnName="mailshotAllowed" >
         </dropColumn>
 
-        <dropColumn tableName="customer" columnName="meeting_datetime" >
+        <dropColumn tableName="customer" columnName="date_meeting_confirmed" >
         </dropColumn>
 
         <dropColumn tableName="customer" columnName="invite_sent" >
@@ -26,6 +26,23 @@
         <dropColumn tableName="customer" columnName="rating" >
         </dropColumn>
 
+        <rollback>
+
+        </rollback>
+    </changeSet>
+      <changeSet id="issue1510-2" author="Mustafa">
+        <dropColumn tableName="customer" columnName="reviewTime" >
+        </dropColumn>
+        <rollback>
+
+        </rollback>
+    </changeSet>
+    <changeSet id="issue1510-3" author="Mustafa">
+      <modifyDataType   
+            columnName="meeting_datetime"
+            newDataType="date"
+            tableName="customer"/>  
+            
         <rollback>
 
         </rollback>
