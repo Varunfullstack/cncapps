@@ -238,12 +238,12 @@ export default class CustomerCRMComponent extends MainComponent {
   };
   getContacts=()=>{
     const { data } = this.state;
-    if(data.referredFlag)
+    
     return <div className="ml-5">
       <h3>Contacts</h3>
       <CustomerContactsComponent customerId={data.customerID} custom={true}></CustomerContactsComponent>
       </div>
-    return null;
+    
   }
   getNotes=()=>{
     const { data } = this.state; 
