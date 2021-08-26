@@ -35,13 +35,12 @@ export default class CustomerEditMain extends MainComponent {
                 excludeFromWebrootChecks: 0,
                 gscTopUpAmount: null,
                 inclusiveOOHCallOuts: 0,
-                inviteSent: null,
+                
                 invoiceSiteNo: 0,
                 lastContractSent: null,
                 lastReviewMeetingDate: "",
                 lastUpdatedDateTime: "",
                 leadStatusId: null,
-                mailshotFlag: 0,
                 meetingDateTime: null,
                 modifyDate: moment().format("YYYY-MM-DD"),
                 name: "",
@@ -49,11 +48,8 @@ export default class CustomerEditMain extends MainComponent {
                 noOfServers: null,
                 opportunityDeal: null,
                 primaryMainContactID: null,
-                rating: null,
                 referredFlag: 0,
-                regNo: "",
-                reportProcessed: null,
-                reportSent: null,
+                regNo: "",                                
                 reviewAction: "",
                 reviewDate: "",
                 reviewMeetingBooked: 0,
@@ -426,20 +422,7 @@ export default class CustomerEditMain extends MainComponent {
                                 />
                             </td>
                         </tr>
-                        <tr>
-                            <td align="right">Mailshot</td>
-                            <td>
-                                <Toggle
-                                    checked={data.mailshotFlag}
-                                    onChange={() =>
-                                        this.setValue(
-                                            "mailshotFlag",
-                                            (!data.mailshotFlag * 1)
-                                        )
-                                    }
-                                ></Toggle>
-                            </td>
-                        </tr>
+                        
                         <tr>
                             <td align="right">Lead Status</td>
                             <td>

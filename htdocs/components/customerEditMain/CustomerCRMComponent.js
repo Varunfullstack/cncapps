@@ -61,12 +61,7 @@ export default class CustomerCRMComponent extends MainComponent {
       id: "",
       customerID: params.get("customerID"),
       leadStatusId: "",
-      mailshotFlag: "",      
-      meetingDateTime: "",
-      inviteSent: "",
-      reportProcessed: "",
-      reportSent: "",
-      rating: "",
+      meetingDateTime: "",            
       opportunityDeal: "",
     };
   }

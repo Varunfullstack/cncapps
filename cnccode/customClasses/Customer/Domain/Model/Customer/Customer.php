@@ -77,15 +77,11 @@ class Customer implements AggregateRoot
     protected $reviewMeetingFrequencyMonths;
     protected $accountManagerUserID;
     protected $reviewMeetingEmailSentFlag;    
-    protected $meetingDateTime;
-    protected $inviteSent;
-    protected $reportProcessed;
-    protected $reportSent;
+    protected $meetingDateTime;        
     protected $crmComments;
     protected $companyBackground;
     protected $decisionMakerBackground;
     protected $opportunityDeal;
-    protected $rating;
     protected $lastContractSent;
     protected $primaryMainContactID;
     protected $sortCode;
