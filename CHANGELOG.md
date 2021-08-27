@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.18.2] - 2021-08-27
+### Fixed
+- Fixed issue when creating a new contact from the customer page not getting the right site id.
+
 ## [v5.18.1] - 2021-08-26
 ### Fixed
 - Fixed issue when trying to save activity due to automateMachineID not allowed to be null.
