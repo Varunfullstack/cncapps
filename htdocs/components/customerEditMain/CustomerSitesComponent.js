@@ -27,7 +27,8 @@ export default class CustomerSitesComponent extends MainComponent {
             filter: {
                 showInActive: false
             },
-            originData: null
+            originData: null,
+            contacts: []
         };
     }
 
@@ -38,9 +39,16 @@ export default class CustomerSitesComponent extends MainComponent {
     getData = () => {
         this.setState({showSpinner: true});
         const customerId = this.customerID;
-        this.api.getCustomerSites(customerId, this.state.filter.showInActive).then((sites) => {
-            this.setState({sites, customerId, showSpinner: false});
-        });
+        Promise.all([
+                this.api.getCustomerSites(customerId, this.state.filter.showInActive),
+                this.api.getCustomerContacts(customerId)
+            ]
+        )
+            .then(
+                ([sites, contacts]) => {
+                    this.setState({sites, customerId, contacts, showSpinner: false});
+                }
+            )
     };
     getTable = () => {
         const columns = [
@@ -71,7 +79,7 @@ export default class CustomerSitesComponent extends MainComponent {
                 hdToolTip: "Phone",
                 sortable: true,
                 width: 150,
-                content:site=><a href={`tel:${site.phone}`}>{site.phone}</a>
+                content: site => <a href={`tel:${site.phone}`}>{site.phone}</a>
 
             },
             {
@@ -246,7 +254,7 @@ export default class CustomerSitesComponent extends MainComponent {
     };
 
     getModalContent = () => {
-        const {data} = this.state;
+        const {data, contacts} = this.state;
         return (
             <div key="content" id="siteformdata">
                 <table className="table">
@@ -364,6 +372,38 @@ export default class CustomerSitesComponent extends MainComponent {
                                 }
                                 className="form-control"
                             />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td className="text-right">Invoice Contact</td>
+                        <td>
+                            <select onChange={(event) => {
+                                this.setValue('invoiceContactID', event.target.value)
+                            }} value={data.invoiceContactID}
+                                    className="form-control"
+                            >
+                                <option key="emptyOption" value="">-- Select Contact --</option>
+                                {
+                                    contacts.map(contact => <option key={contact.id}
+                                                                    value={contact.id}>{contact.firstName + " " + contact.lastName}</option>)
+                                }
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td className="text-right">Delivery Contact</td>
+                        <td>
+                            <select onChange={(event) => {
+                                this.setValue('deliverContactID', event.target.value)
+                            }} value={data.deliverContactID}
+                                    className="form-control"
+                            >
+                                <option key="emptyOption" value="">-- Select Contact --</option>
+                                {
+                                    contacts.map(contact => <option key={contact.id}
+                                                                    value={contact.id}>{contact.firstName + " " + contact.lastName}</option>)
+                                }
+                            </select>
                         </td>
                     </tr>
                     <tr>

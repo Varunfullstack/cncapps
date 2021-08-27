@@ -50,6 +50,14 @@ class SiteValidation
             $errors->addError("What3Words value is missing");
         }
 
+        if (!$this->site->getValue(DBESite::deliverContactID)) {
+            $errors->addError('Deliver contact is missing');
+        }
+
+        if (!$this->site->getValue(DBESite::invoiceContactID)) {
+            $errors->addError('Invoice contact is missing');
+        }
+
         return $errors;
     }
 
@@ -63,7 +71,6 @@ class SiteValidation
      */
     public function getValidationErrors()
     {
-
         return $this->validationErrors->getErrors();
     }
 

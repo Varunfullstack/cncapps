@@ -28,15 +28,15 @@ export default class CustomerEditMain extends MainComponent {
                 activeDirectoryName: "",
                 becameCustomerDate: "",
                 customerID: null,
-                customerTypeID: "",                
+                customerTypeID: "",
                 deliverSiteNo: null,
                 droppedCustomerDate: null,
                 eligiblePatchManagement: null,
                 excludeFromWebrootChecks: 0,
                 gscTopUpAmount: null,
                 inclusiveOOHCallOuts: 0,
-                
-                invoiceSiteNo: 0,
+
+                invoiceSiteNo: "",
                 lastContractSent: null,
                 lastReviewMeetingDate: "",
                 lastUpdatedDateTime: "",
@@ -49,12 +49,12 @@ export default class CustomerEditMain extends MainComponent {
                 opportunityDeal: null,
                 primaryMainContactID: null,
                 referredFlag: 0,
-                regNo: "",                                
+                regNo: "",
                 reviewAction: "",
                 reviewDate: "",
                 reviewMeetingBooked: 0,
                 reviewMeetingFrequencyMonths: null,
-              
+
                 sectorID: null,
                 slaFixHoursP1: null,
                 slaFixHoursP2: null,
@@ -81,7 +81,8 @@ export default class CustomerEditMain extends MainComponent {
             users: [],
             customerTypes: [],
             sectors: [],
-            leadStatus: []
+            leadStatus: [],
+            sites: [],
         };
     }
 
@@ -97,6 +98,7 @@ export default class CustomerEditMain extends MainComponent {
                     }, 1000)
                 }
             });
+
         }
         this.apiUsers.getActiveUsers().then(users => {
             this.setState({users})
@@ -114,8 +116,12 @@ export default class CustomerEditMain extends MainComponent {
     }
 
     getCustomerData = () => {
-        this.api.getCustomerData(this.props.customerId).then(data => {
-            this.setState({data, originData: {...data}})
+        Promise.all([
+                this.api.getCustomerSites(this.props.customerId, false),
+                this.api.getCustomerData(this.props.customerId)
+            ]
+        ).then(([sites, data]) => {
+            this.setState({data, originData: {...data}, sites})
         }, error => {
             this.alert("Error in get customer data");
         });
@@ -133,7 +139,7 @@ export default class CustomerEditMain extends MainComponent {
     }
 
     getKeyDetailsCard = () => {
-        const {data} = this.state;
+        const {data, sites} = this.state;
         return (
             <div className="card m-5">
                 <div className="card-header">
@@ -209,21 +215,54 @@ export default class CustomerEditMain extends MainComponent {
                                 </td>
                             </tr>
                             <tr>
+                                <td className="text-align-right">Default Invoice Site</td>
+                                <td>
+                                    <div className="flex-row pointer" style={{alignItems: "center"}}>
+                                        <select value={data.invoiceSiteNo?.toString() || ""}
+                                                name="invoiceSiteNo"
+                                                onChange={event => this.handleUpdateGenericField(event)}>
+                                            <option value="" key="emptyOption">-- Select Site --</option>
+                                            {
+                                                sites.map(site => <option key={site.id}
+                                                                          value={site.id}>{site.title}</option>)
+                                            }
+                                        </select>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td className="text-align-right">Default Delivery Site</td>
+                                <td>
+                                    <div className="flex-row pointer" style={{alignItems: "center"}}>
+                                        <select value={data.deliverSiteNo?.toString() || ""}
+                                                onChange={event => this.handleUpdateGenericField(event)}
+                                                name="deliverSiteNo">
+                                            <option value="" key="emptyOption">-- Select Site --</option>
+                                            {
+                                                sites.map(site => <option key={site.id}
+                                                                          value={site.id}>{site.title}</option>)
+                                            }
+                                        </select>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
                                 <td className="text-align-right">Website</td>
                                 <td>
-                                    <div className="flex-row pointer" style={{alignItems:"center"}}>
-                                    <input className="form-control" value={data.websiteURL}
-                                    onChange={($value) =>
-                                        this.setValue(
-                                            "websiteURL",
-                                            $value.target.value
-                                        )
-                                    }
-                                    ></input>
-                                    {data.websiteURL?
-                                    <ToolTip title="Open website">                                        
-                                        <i className="fal fa-external-link pointer" onClick={()=>window.open(data.websiteURL,"_blank")}></i>                                        
-                                    </ToolTip>:null}
+                                    <div className="flex-row pointer" style={{alignItems: "center"}}>
+                                        <input className="form-control" value={data.websiteURL}
+                                               onChange={($value) =>
+                                                   this.setValue(
+                                                       "websiteURL",
+                                                       $value.target.value
+                                                   )
+                                               }
+                                        ></input>
+                                        {data.websiteURL ?
+                                            <ToolTip title="Open website">
+                                                <i className="fal fa-external-link pointer"
+                                                   onClick={() => window.open(data.websiteURL, "_blank")}></i>
+                                            </ToolTip> : null}
                                     </div>
                                 </td>
                             </tr>
@@ -422,7 +461,7 @@ export default class CustomerEditMain extends MainComponent {
                                 />
                             </td>
                         </tr>
-                        
+
                         <tr>
                             <td align="right">Lead Status</td>
                             <td>
@@ -706,7 +745,7 @@ export default class CustomerEditMain extends MainComponent {
                                 </div>
                             </td>
                         </tr>
-                      
+
                         </tbody>
                     </table>
                 </div>
@@ -739,7 +778,7 @@ export default class CustomerEditMain extends MainComponent {
                     <tr>
                         <td align="right">Technical Notes</td>
                         <td>  <textarea className="form-control "
-                                        
+
                                         rows="6"
                                         value={data.techNotes || ''}
                                         onChange={($event) => this.handleUpdateGenericField($event)}

@@ -121,6 +121,7 @@ export class ContactEditModalComponent extends MainComponent {
                                         }
                                         className="form-control"
                                     >
+                                        <option key="nullOption" value="">-- Select Site --</option>
                                         {this.state.sites.map((site, index) => {
                                             return (
                                                 <option key={site.id} value={site.id}>
