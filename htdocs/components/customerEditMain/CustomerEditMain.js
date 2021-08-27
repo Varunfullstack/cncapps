@@ -220,6 +220,7 @@ export default class CustomerEditMain extends MainComponent {
                                     <div className="flex-row pointer" style={{alignItems: "center"}}>
                                         <select value={data.invoiceSiteNo?.toString() || ""}
                                                 name="invoiceSiteNo"
+                                                className="form-control "
                                                 onChange={event => this.handleUpdateGenericField(event)}>
                                             <option value="" key="emptyOption">-- Select Site --</option>
                                             {
@@ -235,6 +236,7 @@ export default class CustomerEditMain extends MainComponent {
                                 <td>
                                     <div className="flex-row pointer" style={{alignItems: "center"}}>
                                         <select value={data.deliverSiteNo?.toString() || ""}
+                                                className="form-control "
                                                 onChange={event => this.handleUpdateGenericField(event)}
                                                 name="deliverSiteNo">
                                             <option value="" key="emptyOption">-- Select Site --</option>
