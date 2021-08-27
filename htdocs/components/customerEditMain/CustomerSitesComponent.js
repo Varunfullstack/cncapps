@@ -379,7 +379,7 @@ export default class CustomerSitesComponent extends MainComponent {
                         <td>
                             <select onChange={(event) => {
                                 this.setValue('invoiceContactID', event.target.value)
-                            }} value={data.invoiceContactID}
+                            }} value={data.invoiceContactID || ""}
                                     className="form-control"
                             >
                                 <option key="emptyOption" value="">-- Select Contact --</option>
@@ -395,7 +395,7 @@ export default class CustomerSitesComponent extends MainComponent {
                         <td>
                             <select onChange={(event) => {
                                 this.setValue('deliverContactID', event.target.value)
-                            }} value={data.deliverContactID}
+                            }} value={data.deliverContactID || ""}
                                     className="form-control"
                             >
                                 <option key="emptyOption" value="">-- Select Contact --</option>

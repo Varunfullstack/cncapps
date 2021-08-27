@@ -2344,6 +2344,8 @@ ORDER BY NAME,
         $dbeSite->setValue(DBESite::what3Words, $data['what3Words']);
         $dbeSite->setValue(DBESite::maxTravelHours, $data['maxTravelHours']);
         $dbeSite->setValue(DBESite::activeFlag, $data['activeFlag']);
+        $dbeSite->setValue(DBESite::invoiceContactID, $data['invoiceContactID']);
+        $dbeSite->setValue(DBESite::deliverContactID, $data['deliverContactID']);
         $dbeSite->updateRow();
         echo json_encode([
                              "status" => "ok",
