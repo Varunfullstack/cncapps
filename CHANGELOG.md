@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.18.3] - 2021-08-31
+### Changed
+- Include Total in the average table of KPI Report for Gross Profit per Stock.
+
 ## [v5.18.2] - 2021-08-27
 ### Fixed
 - Fixed issue when creating a new contact from the customer page not getting the right site id.
