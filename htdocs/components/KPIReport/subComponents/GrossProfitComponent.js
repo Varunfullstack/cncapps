@@ -290,7 +290,7 @@ export default class GrossProfitComponent extends React.Component {
         return {'name':g.groupName,value:(sumBy(g.items,'profit')/months).toFixed(2)};
     }).filter(g=>['B','F','G','H','J','M','R','S'].indexOf(g.name)>=0);
     sort(avgData,'name');
-
+    const total=avgData.map(a=>parseFloat(a.value)).reduce((a,b)=>a+b,0).toFixed(2);
     const columns=[
         {
            path: "name",
@@ -299,7 +299,8 @@ export default class GrossProfitComponent extends React.Component {
            hdClassName: "text-center",
            sortable: true,
            cellType:CellType.Text,
-           content:(g)=>this.getCatName(g.name)
+           content:(g)=>this.getCatName(g.name),
+           footerContent:()=>"Total"
          },
         {
             path: "value",
@@ -308,7 +309,8 @@ export default class GrossProfitComponent extends React.Component {
             hdClassName: "text-center",
             sortable: true,
             cellType:CellType.Number,
-            content:(g)=>g.value
+            content:(g)=>g.value,
+            footerContent:()=><div className="text-right">{total}</div>
          }
     ];
     return (
@@ -319,6 +321,7 @@ export default class GrossProfitComponent extends React.Component {
           columns={columns}
           data={avgData || []}
           search={false}
+          hasFooter={true}
          ></Table>
       );
   }
