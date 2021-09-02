@@ -1,62 +1,64 @@
-<?php /*
+<?php
+/*
 * Contact table
 * @authors Karim Ahmed
 * @access public
 */
+
 global $cfg;
 require_once($cfg["path_dbe"] . "/DBCNCEntity.inc.php");
 
 class DBEContact extends DBCNCEntity
 {
-    const FURLOUGH_ACTION_TO_FURLOUGH   = 1;
+    const FURLOUGH_ACTION_TO_FURLOUGH = 1;
     const FURLOUGH_ACTION_TO_UNFURLOUGH = 2;
 
 
-    const contactID        = "contactID";
-    const siteNo           = "siteNo";
-    const customerID       = "customerID";
-    const title            = "title";
-    const position         = "position";
-    const lastName         = "lastName";
-    const firstName        = "firstName";
-    const email            = "email";
-    const phone            = "phone";
-    const mobilePhone      = "mobilePhone";
-    const fax              = "fax";
-    const portalPassword   = "portalPassword";
-    const mailshot         = "mailshot";
-    const mailshot2Flag    = "mailshot2Flag";
-    const mailshot3Flag    = "mailshot3Flag";
-    const mailshot8Flag    = "mailshot8Flag";
-    const mailshot9Flag    = "mailshot9Flag";
-    const mailshot11Flag   = "mailshot11Flag";
-    const notes            = "notes";
+    const contactID = "contactID";
+    const siteNo = "siteNo";
+    const customerID = "customerID";
+    const title = "title";
+    const position = "position";
+    const lastName = "lastName";
+    const firstName = "firstName";
+    const email = "email";
+    const phone = "phone";
+    const mobilePhone = "mobilePhone";
+    const fax = "fax";
+    const portalPassword = "portalPassword";
+    const mailshot = "mailshot";
+    const mailshot2Flag = "mailshot2Flag";
+    const mailshot3Flag = "mailshot3Flag";
+    const mailshot8Flag = "mailshot8Flag";
+    const mailshot9Flag = "mailshot9Flag";
+    const mailshot11Flag = "mailshot11Flag";
+    const notes = "notes";
     const failedLoginCount = "failedLoginCount";
-    const reviewUser       = "reviewUser";
-    const hrUser           = "hrUser";
+    const reviewUser = "reviewUser";
+    const hrUser = "hrUser";
 
     const supportLevel = "supportLevel";
 
-    const supportLevelMain       = 'main';
+    const supportLevelMain = 'main';
     const supportLevelSupervisor = 'supervisor';
-    const supportLevelSupport    = 'support';
-    const supportLevelDelegate   = 'delegate';
-    const supportLevelFurlough   = 'furlough';
+    const supportLevelSupport = 'support';
+    const supportLevelDelegate = 'delegate';
+    const supportLevelFurlough = 'furlough';
 
     const initialLoggingEmail = 'initialLoggingEmail';
 
     const othersInitialLoggingEmailFlag = 'othersInitialLoggingEmailFlag';
-    const othersWorkUpdatesEmailFlag    = 'othersWorkUpdatesEmailFlag';
-    const othersFixedEmailFlag          = 'othersFixedEmailFlag';
+    const othersWorkUpdatesEmailFlag = 'othersWorkUpdatesEmailFlag';
+    const othersFixedEmailFlag = 'othersFixedEmailFlag';
 
-    const pendingLeaverFlag           = 'pendingLeaverFlag';
-    const pendingLeaverDate           = 'pendingLeaverDate';
+    const pendingLeaverFlag = 'pendingLeaverFlag';
+    const pendingLeaverDate = 'pendingLeaverDate';
     const specialAttentionContactFlag = "specialAttentionContactFlag";
-    const linkedInURL                 = "linkedInURL";
-    const active                      = "active";
-    const pendingFurloughAction       = 'pendingFurloughAction';
-    const pendingFurloughActionDate   = 'pendingFurloughActionDate';
-    const pendingFurloughActionLevel  = 'pendingFurloughActionLevel';
+    const linkedInURL = "linkedInURL";
+    const active = "active";
+    const pendingFurloughAction = 'pendingFurloughAction';
+    const pendingFurloughActionDate = 'pendingFurloughActionDate';
+    const pendingFurloughActionLevel = 'pendingFurloughActionLevel';
 
     /**
      * calls constructor()
@@ -285,11 +287,11 @@ class DBEContact extends DBCNCEntity
      * @param bool $supportOnly
      * @return bool Success
      */
-    function getRowsByCustomerID($customerID,
-                                 $includeInactive = false,
-                                 $supportOnly = false
-    )
-    {
+    function getRowsByCustomerID(
+        $customerID,
+        $includeInactive = false,
+        $supportOnly = false
+    ) {
         $this->setValue(
             self::customerID,
             $customerID
@@ -314,7 +316,6 @@ class DBEContact extends DBCNCEntity
         $query .= " ORDER BY con_siteno, orderSupport, con_first_name, con_last_name";
         $this->setQueryString($query);
         return (parent::getRows());
-
     }
 
     function unfurlough()
@@ -335,7 +336,7 @@ class DBEContact extends DBCNCEntity
         //log the rows that are going to be deleted
         global $db;
         $currentLoggedInUserID = ( string )$GLOBALS['auth']->is_authenticated();
-        $query                 = "insert into contactauditlog select
+        $query = "insert into contactauditlog select
                               'delete'                  as action,
                               current_timestamp         as createdAt,
                               $currentLoggedInUserID    as userId,
@@ -367,7 +368,7 @@ class DBEContact extends DBCNCEntity
     {
         global $db;
         $currentLoggedInUserID = ( string )$GLOBALS['auth']->is_authenticated();
-        $query                 = "insert into contactauditlog select
+        $query = "insert into contactauditlog select
                               'delete'                  as action,
                               current_timestamp         as createdAt,
                               $currentLoggedInUserID    as userId,
@@ -400,11 +401,11 @@ class DBEContact extends DBCNCEntity
      * @param bool $supportOnly
      * @return bool Success
      */
-    function getRowsByCustomerIDSiteNo($customerID,
-                                       $siteNo,
-                                       $supportOnly = false
-    )
-    {
+    function getRowsByCustomerIDSiteNo(
+        $customerID,
+        $siteNo,
+        $supportOnly = false
+    ) {
         $this->setMethodName("getRowsByCustomerIDSiteNo");
         $this->setValue(
             self::customerID,
@@ -439,7 +440,7 @@ class DBEContact extends DBCNCEntity
             $this->db->link_id(),
             $match
         );
-        $queryString  = "SELECT {$this->getDBColumnNamesAsString()} FROM {$this->getTableName()} WHERE (
+        $queryString = "SELECT {$this->getDBColumnNamesAsString()} FROM {$this->getTableName()} WHERE (
         {$this->getDBColumnName(self::lastName)} LIKE '%{$escapedMatch}%' OR {$this->getDBColumnName(self::firstName)} LIKE '%{$escapedMatch}%'
     )  AND {$this->getDBColumnName(self::customerID)} = {$this->getFormattedValue(self::customerID)} 
                           AND {$this->getDBColumnName(self::supportLevel)} in('support' or 'main') 
@@ -458,10 +459,10 @@ class DBEContact extends DBCNCEntity
      * @param $match
      * @return bool Success
      */
-    function getCustomerRowsByNameMatch($customerId,
-                                        $match
-    )
-    {
+    function getCustomerRowsByNameMatch(
+        $customerId,
+        $match
+    ) {
         $this->setMethodName("getCustomerRowsByNameMatch");
         $this->setValue(
             self::customerID,
@@ -471,7 +472,7 @@ class DBEContact extends DBCNCEntity
             $this->db->link_id(),
             $match
         );
-        $queryString  = "SELECT {$this->getDBColumnNamesAsString()} FROM {$this->getTableName()} WHERE 
+        $queryString = "SELECT {$this->getDBColumnNamesAsString()} FROM {$this->getTableName()} WHERE 
                (
                   {$this->getDBColumnName(self::lastName)} LIKE '%{$escapedMatch}%' OR
                   {$this->getDBColumnName(self::firstName)} LIKE '%{$escapedMatch}%'
@@ -497,17 +498,19 @@ class DBEContact extends DBCNCEntity
      * @param $match
      * @return bool Success
      */
-    function getCustomerRowsByContactFullNameMatch($customerId,
-                                                   $match
-    )
-    {
+    function getCustomerRowsByContactFullNameMatch(
+        $customerId,
+        $match
+    ) {
         $this->setMethodName("getCustomerRowsByNameMatch");
         $this->setValue(
             self::customerID,
             $customerId
         );
         $queryString = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName(
-            ) . " WHERE concat(".$this->getDBColumnName(self::firstName).",' ', ".$this->getDBColumnName(self::lastName).") like '%" . mysqli_real_escape_string(
+            ) . " WHERE concat(" . $this->getDBColumnName(self::firstName) . ",' ', " . $this->getDBColumnName(
+                self::lastName
+            ) . ") like '%" . mysqli_real_escape_string(
                 $this->db->link_id(),
                 $match
             ) . "%' AND " . $this->getDBColumnName(
@@ -544,10 +547,10 @@ class DBEContact extends DBCNCEntity
         return (parent::getRows());
     }
 
-    function getMainSupportRowsByCustomerID($customerID,
-                                            $includeSupervisors = false
-    )
-    {
+    function getMainSupportRowsByCustomerID(
+        $customerID,
+        $includeSupervisors = false
+    ) {
         if ($customerID == '') {
             $this->raiseError('customerID not set');
         }
@@ -578,7 +581,7 @@ class DBEContact extends DBCNCEntity
     function getSupportRows($customerID = false)
     {
         $dbeCustomer = new DBECustomer($this);
-        $sql         = "SELECT {$this->getDBColumnNamesAsString()}
+        $sql = "SELECT {$this->getDBColumnNamesAsString()}
 FROM {$this->getTableName()}
          left join {$dbeCustomer->getTableName()} on {$this->getDBColumnName(DBEContact::customerID)} = {$dbeCustomer->getDBColumnName(DBECustomer::customerID)}
 WHERE {$this->getDBColumnName(self::supportLevel)} is not null
@@ -626,7 +629,7 @@ WHERE {$this->getDBColumnName(self::supportLevel)} is not null
      * @param null $leadStatusID
      * @return DBEContact $this
      */
-    function getContactsByLeadStatus($leadStatusID = null,$customerID=null)
+    function getContactsByLeadStatus($leadStatusID = null, $customerID = null)
     {
         $sqlQuery = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName(
             ) . " left join customer on con_custno = cus_custno WHERE active and ";
@@ -637,7 +640,7 @@ WHERE {$this->getDBColumnName(self::supportLevel)} is not null
         }
         if ($customerID) {
             $sqlQuery .= " and cus_custno = $customerID";
-        }  
+        }
         $this->setQueryString($sqlQuery);
         $this->getRows();
         return $this;
@@ -646,7 +649,7 @@ WHERE {$this->getDBColumnName(self::supportLevel)} is not null
 
     function insertRow()
     {
-        $inserted              = parent::insertRow();
+        $inserted = parent::insertRow();
         $currentLoggedInUserID = USER_SYSTEM;
         if (isset($GLOBALS['auth'])) {
             $currentLoggedInUserID = $GLOBALS['auth']->is_authenticated();
@@ -672,19 +675,19 @@ WHERE {$this->getDBColumnName(self::supportLevel)} is not null
     {
         global $db;
         // pull the data before it's updated
-        $readQuery     = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName(
+        $readQuery = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName(
             ) . " where con_contno = " . $this->getFormattedValue(
                 self::contactID
             );
-        $result        = $db->query($readQuery);
-        $readRow       = $result->fetch_assoc();
+        $result = $db->query($readQuery);
+        $readRow = $result->fetch_assoc();
         $stringColumns = $this->getDBColumnNamesAsString();
-        $columns       = explode(
+        $columns = explode(
             ',',
             $stringColumns
         );
-        $counter       = 0;
-        $hasChanged    = false;
+        $counter = 0;
+        $hasChanged = false;
         while (!$hasChanged && count($columns) > $counter) {
             if ($this->getValue($counter) != $readRow[$columns[$counter]]) {
                 $hasChanged = true;
@@ -804,36 +807,34 @@ WHERE {$this->getDBColumnName(self::supportLevel)} is not null
         $this->setQueryString($queryString);
         $ret = (parent::getRows());
         return $ret;
-
     }
 
     public function validateUniqueEmail($email, $contactID)
     {
-        $query      = "select count(con_contno) as count from contact where con_email = ? and con_contno <> ? and active";
+        $query = "select count(con_contno) as count from contact where con_email = ? and con_contno <> ? and active";
         $parameters = [
             [
-                'type'  => 's',
+                'type' => 's',
                 'value' => $email
             ],
             [
-                'type'  => 'd',
+                'type' => 'd',
                 'value' => $contactID
             ],
         ];
-        $result     = $this->db->preparedQuery($query, $parameters);
-        $data       = $result->fetch_assoc();
+        $result = $this->db->preparedQuery($query, $parameters);
+        $data = $result->fetch_assoc();
         if ($data['count'] > 0) {
             return false;
         }
         return true;
     }
 
-    public function getOthersWorkUpdateRowsByCustomerID($customerID)
+    public function getSiteVisitContactRowsByCustomerID($customerID)
     {
         $this->setMethodName("getSpecialAttentionContacts");
-        $queryString = "SELECT {$this->getDBColumnNamesAsString()} FROM {$this->getTableName()} where {$this->getDBColumnName(self::othersWorkUpdatesEmailFlag)} = 'Y' and active and {$this->getDBColumnName(DBEContact::customerID)}  = $customerID ORDER BY con_custno, con_contno";
+        $queryString = "SELECT {$this->getDBColumnNamesAsString()} FROM {$this->getTableName()} where {$this->getDBColumnName(self::othersWorkUpdatesEmailFlag)} = 'Y' and active and {$this->getDBColumnName(DBEContact::customerID)}  = $customerID and supportLevel = 'main' ORDER BY con_custno, con_contno";
         $this->setQueryString($queryString);
-        $ret = (parent::getRows());
-        return $ret;
+        return (parent::getRows());
     }
 }

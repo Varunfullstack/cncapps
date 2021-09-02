@@ -9053,7 +9053,7 @@ class BUActivity extends Business
             "VisitConfirmation@" . CONFIG_PUBLIC_DOMAIN
         ];
         $buCustomer = new BUCustomer($this);
-        $cc         = $buCustomer->getOthersWorkEmailAddresses(
+        $cc         = $buCustomer->getSiteVisitContactsEmailsAddresses(
             $dsCallActivity->getValue(DBEJCallActivity::customerID),
             $contactEmail
         );

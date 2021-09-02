@@ -984,13 +984,13 @@ class BUCustomer extends Business
         return $emailList;
     }
 
-    function getOthersWorkEmailAddresses($customerID, $excludeEmail)
+    function getSiteVisitContactsEmailsAddresses($customerID, $excludeEmail)
     {
 
         if (!$customerID) {
             $this->raiseError('customerID not passed');
         }
-        $this->dbeContact->getOthersWorkUpdateRowsByCustomerID($customerID);
+        $this->dbeContact->getSiteVisitContactRowsByCustomerID($customerID);
         $emailList = [];
         while ($this->dbeContact->fetchNext()) {
             $currentContactEmail = strtolower($this->dbeContact->getValue(DBEContact::email));
