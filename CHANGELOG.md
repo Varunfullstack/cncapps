@@ -4,6 +4,7 @@ This project changes will be shown here.
 ## [v5.18.4] - 2021-09-02
 ### Changed
 - Only send Site Visit emails to main contacts that are active and with othersWorkUpdateFlag enabled.
+- Add othersWorkUpdatesEmailFlag to the contact edit modal, so we can edit this field.
 
 ## [v5.18.3] - 2021-08-31
 ### Changed

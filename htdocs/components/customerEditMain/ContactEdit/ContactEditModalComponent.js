@@ -285,15 +285,22 @@ export class ContactEditModalComponent extends MainComponent {
                                 {this.getYNFlag(
                                     "Send Others Initial Logging Email",
                                     "othersInitialLoggingEmailFlag",
-                                    data.supportLevel == "support" || data.supportLevel == "delegate"
+                                    !(data.supportLevel == "main" || data.supportLevel == "supervisor")
                                 )}
                                 {this.getYNFlag("Mailshot", "sendMailshotFlag")}
                             </tr>
                             <tr>
                                 {this.getYNFlag(
+                                    "Send Others Update Email",
+                                    "othersWorkUpdatesEmailFlag",
+                                    !(data.supportLevel == "main" || data.supportLevel == "supervisor")
+                                )}
+                            </tr>
+                            <tr>
+                                {this.getYNFlag(
                                     "Send Others Fixed Email",
                                     "othersFixedEmailFlag",
-                                    data.supportLevel == "support" || data.supportLevel == "delegate"
+                                    !(data.supportLevel == "main" || data.supportLevel == "supervisor")
                                 )}
                             </tr>
                             <tr>
