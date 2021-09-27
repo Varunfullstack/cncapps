@@ -889,6 +889,7 @@ GROUP BY t.month;
                         "action"           => "displayActivity"
                     )
                 );
+
                 $template->setVar(
                     array(
                         'customer'         => $row[0],
@@ -899,7 +900,8 @@ GROUP BY t.month;
                             0,
                             50
                         ),
-                        'durationHours'    => $row[4],
+                        'durationHours'    => $row[5],
+                        'problemStatus'    => $row[4],
                         'urlRequest'       => $urlRequest,
                         'title'            => $title
                     )
@@ -918,7 +920,8 @@ GROUP BY t.month;
                                 50
                             )
                         ),
-                        'durationHours'    => $row[4],
+                        'durationHours'    => $row[5],
+                        'problemStatus'    => $row[4],
                     )
                 );
                 $template->parse(
@@ -963,7 +966,13 @@ GROUP BY t.month;
                 cus_name AS customer,
                 pro_problemno AS requestID,
                 cns_name AS assignedTo,
-                reason,
+                reason,CASE pro_status 
+WHEN 'P' THEN   'In Progress'
+WHEN 'I' THEN  'Not started'
+WHEN 'F' THEN  'Fixed'
+WHEN 'C' THEN  'Completed'
+ELSE 'NO'
+END AS problemStatus ,
                 DATEDIFF(NOW(), pro_date_raised) AS openDays
                 FROM
                 problem
@@ -979,6 +988,7 @@ GROUP BY t.month;
                 AND pro_custno != 282
                 AND pro_queue_no !=4
                 AND pro_queue_no !=7";
+
         return $this->db->query($sql);
     }
 

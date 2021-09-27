@@ -28,6 +28,7 @@
         <th style="text-align: left;">Details</th>
         <th style="text-align: left;">Assigned To</th>
         <th style="text-align: right;">Open For(days)</th>
+        <th style="text-align: right;">SR Status</th>
     </tr>
     <!-- BEGIN requestBlock -->
     <tr>
@@ -35,7 +36,8 @@
         <td  style="text-align: right;"><a href="{urlRequest}">{serviceRequestID}</a></td>
         <td  style="text-align: left;">{description}</td>
         <td  style="text-align: left;">{assignedTo}</td>
-        <td  style="text-align: right;">{durationHours}</td>
+        <td  style="text-align: center;">{durationHours}</td>
+        <td style="text-align: center;">{problemStatus}</td>
     </tr>
     <!-- END requestBlock -->
 </table>

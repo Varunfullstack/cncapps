@@ -1,6 +1,11 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased] 
+### Changed
+-  Issue-1570  Add new column to the right of "Open For (days)" called "SR Status". 
+ 
+
 ## [v5.18.4] - 2021-09-02
 ### Changed
 - Only send Site Visit emails to main contacts that are active and with othersWorkUpdateFlag enabled.
